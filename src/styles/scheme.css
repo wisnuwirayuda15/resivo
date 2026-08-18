@@ -1,0 +1,40 @@
+/**
+ * Semantic color ramp. Mantine sets `data-mantine-color-scheme="light" | "dark"`
+ * on <html> (it resolves "auto" to one of those at runtime), so we flip a small
+ * set of app-level semantic tokens off that attribute.
+ *
+ * The `@theme inline` block then exposes each semantic token as a Tailwind color
+ * (`bg-app-surface`, `text-app-text`, `border-app-border`, ...). Because it
+ * references the `var(--app-*)` at use-time, those utilities are theme-aware and
+ * flip automatically between light and dark.
+ */
+
+/* Light (also the default before the scheme attribute is applied) */
+:root,
+[data-mantine-color-scheme='light'] {
+  --app-bg: var(--mantine-color-white);
+  --app-surface: var(--mantine-color-gray-0);
+  --app-surface-hover: var(--mantine-color-gray-1);
+  --app-border: var(--mantine-color-gray-3);
+  --app-text: var(--mantine-color-gray-9);
+  --app-muted: var(--mantine-color-gray-6);
+}
+
+/* Dark */
+[data-mantine-color-scheme='dark'] {
+  --app-bg: var(--mantine-color-dark-7);
+  --app-surface: var(--mantine-color-dark-6);
+  --app-surface-hover: var(--mantine-color-dark-5);
+  --app-border: var(--mantine-color-dark-4);
+  --app-text: var(--mantine-color-dark-0);
+  --app-muted: var(--mantine-color-dark-2);
+}
+
+@theme inline {
+  --color-app-bg: var(--app-bg);
+  --color-app-surface: var(--app-surface);
+  --color-app-surface-hover: var(--app-surface-hover);
+  --color-app-border: var(--app-border);
+  --color-app-text: var(--app-text);
+  --color-app-muted: var(--app-muted);
+}

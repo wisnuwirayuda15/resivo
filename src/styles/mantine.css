@@ -1,0 +1,6 @@
+/**
+ * Styles for the extra Mantine packages used in the app. `@mantine/core`
+ * styles are already included by the generated theme.css.
+ */
+@import '@mantine/dates/styles.css';
+@import '@mantine/notifications/styles.css';

@@ -1,0 +1,20 @@
+/**
+ * Global element resets / base styles. Mantine's own reset ships in the
+ * `mantine` layer via the generated theme.css; this file only adds a few
+ * app-wide defaults on top.
+ */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--app-bg);
+  color: var(--app-text);
+}

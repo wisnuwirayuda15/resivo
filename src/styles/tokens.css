@@ -1,0 +1,26 @@
+/**
+ * App design tokens that are not part of the Mantine theme object: motion
+ * durations, easing curves, and blur radii.
+ *
+ * Declared in a Tailwind `@theme` block so the namespaced ones become
+ * utilities (`ease-standard`, `blur-md`, ...) while all of them are also
+ * available as plain `var(--*)` custom properties at runtime.
+ */
+@theme {
+  /* motion durations */
+  --duration-instant: 80ms;
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+
+  /* easing curves */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+
+  /* blur radii */
+  --blur-xs: 2px;
+  --blur-sm: 4px;
+  --blur-md: 12px;
+  --blur-lg: 24px;
+}

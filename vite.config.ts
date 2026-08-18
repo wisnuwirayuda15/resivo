@@ -7,6 +7,8 @@ import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
 import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 import { nitro } from 'nitro/vite'
+import svgr from 'vite-plugin-svgr'
+import mantineTheme from 'tailwind-preset-mantine/vite'
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
@@ -14,9 +16,12 @@ const config = defineConfig({
     devtools(),
     nitro({ rollupConfig: { external: [/^@sentry\//] } }),
     tailwindcss(),
+    svgr(),
     tanstackStart(),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
+    // Regenerates src/styles/theme.css from the Mantine theme (never hand-edit it).
+    mantineTheme({ input: './src/styles/theme.ts' }),
   ],
 })
 

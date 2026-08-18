@@ -1,3 +1,8 @@
 package-lock.json
 pnpm-lock.yaml
 yarn.lock
+bun.lock
+
+# generated files
+src/styles/theme.css
+src/routeTree.gen.ts
