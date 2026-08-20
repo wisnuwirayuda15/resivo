@@ -4,6 +4,7 @@ import {
   ArrowSquareOut,
   ArrowUUpLeft,
   ArrowUUpRight,
+  ArrowsHorizontal,
   Briefcase,
   CaretDown,
   CaretLeft,
@@ -48,6 +49,7 @@ import {
   MagnifyingGlass,
   MapPin,
   MarkdownLogo,
+  Minus,
   Moon,
   Phone,
   Plugs,
@@ -110,6 +112,8 @@ export const ICON_REGISTRY: Record<string, PhosphorIcon> = {
 
   // Actions
   plus: Plus,
+  minus: Minus,
+  'arrows-horizontal': ArrowsHorizontal,
   x: X,
   check: Check,
   'check-circle': CheckCircle,

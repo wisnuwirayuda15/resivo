@@ -28,6 +28,13 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    /**
+     * Vitest stubs CSS imports to an empty module by default, and that stubbing
+     * catches `?raw` too. The preview engine injects its stylesheets into the
+     * iframe as text, so an empty stub would let a broken import pass every test
+     * while leaving the rendered paper unstyled.
+     */
+    css: true,
     coverage: {
       provider: 'v8',
       include: ['src/features/**', 'src/database/**', 'src/lib/**'],

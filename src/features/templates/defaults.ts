@@ -88,6 +88,12 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
     case 'editorial':
       // Serif throughout, larger name, red accent, no dividers — the hierarchy
       // is carried by type size instead of rules.
+      //
+      // The whole type ramp is derived from `baseSize` and `scale` (the name is
+      // four steps up — see `preview/css.ts`), so the larger name is expressed
+      // as a wider scale rather than as a one-off size. 1.255 puts the 10.5pt
+      // body at the 26pt name the design system specifies for this template.
+      design.typography.scale = 1.255
       design.colors.accent = '#94271d'
       design.rules.showDividers = false
       design.spacing.section = 1.1
