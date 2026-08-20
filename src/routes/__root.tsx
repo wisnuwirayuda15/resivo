@@ -1,19 +1,66 @@
 import {
   HeadContent,
+  Link,
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { ColorSchemeScript, mantineHtmlProps } from '@mantine/core'
+import { Button, ColorSchemeScript, mantineHtmlProps } from '@mantine/core'
 
+import { EmptyState } from '@/components/EmptyState'
 import { Providers } from '@/components/providers'
 
 import appCss from '@/styles/global.css?url'
 
+import type { ErrorComponentProps } from '@tanstack/react-router'
 import type { QueryClient } from '@tanstack/react-query'
 
 interface MyRouterContext {
   queryClient: QueryClient
 }
+
+/**
+ * Last-resort error screen.
+ *
+ * Without one, an error that escapes a route renders TanStack's bare fallback,
+ * which tells the user nothing and — worse for debugging — makes a render error
+ * indistinguishable from a blank page. Names what failed and offers the way back,
+ * per the design system's rule for errors: no error code in the primary line, no
+ * apology.
+ */
+const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => (
+  <div className="bg-app min-h-dvh">
+    <EmptyState
+      icon="warning-circle"
+      title="Something went wrong"
+      body="Your resumes are stored on this device and are unaffected. Reload to try again."
+      action={
+        <div className="flex flex-col items-center gap-3">
+          <Button onClick={() => window.location.reload()}>Reload</Button>
+          {/* The message is for the user's bug report, so it is shown rather
+              than swallowed — but kept out of the primary line. */}
+          <code className="text-subtle max-w-[60ch] text-[11px] break-words">
+            {error instanceof Error ? error.message : String(error)}
+          </code>
+        </div>
+      }
+    />
+  </div>
+)
+
+const RootNotFound: React.FC = () => (
+  <div className="bg-app min-h-dvh">
+    <EmptyState
+      icon="file-text"
+      title="Page not found"
+      body="That address does not exist in Resivo."
+      action={
+        <Button component={Link} to="/resumes">
+          Go to resumes
+        </Button>
+      }
+    />
+  </div>
+)
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
@@ -36,6 +83,8 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  errorComponent: RootErrorComponent,
+  notFoundComponent: RootNotFound,
   shellComponent: RootDocument,
 })
 
@@ -43,6 +92,13 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   const { queryClient } = Route.useRouteContext()
 
   return (
+    /**
+     * `mantineHtmlProps` carries `suppressHydrationWarning`, which this document
+     * genuinely needs: the server renders a fixed colour scheme, then
+     * `ColorSchemeScript` rewrites the attribute from the stored preference or
+     * `prefers-color-scheme` before React hydrates. Without it, every visit in
+     * dark mode would warn.
+     */
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
