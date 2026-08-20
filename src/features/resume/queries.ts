@@ -62,6 +62,14 @@ export const useResume = (id: string | undefined) =>
      */
     staleTime: Infinity,
     refetchOnWindowFocus: false,
+    /**
+     * A local read either works or fails for a structural reason — a document
+     * from a newer build, or one that no longer validates. There is no flaky
+     * network to ride out, so retrying just delays the error: during the backoff
+     * the query is neither loading nor failed, and the UI shows "not found"
+     * about a resume that is sitting right there.
+     */
+    retry: false,
   })
 
 export const useGroups = () =>

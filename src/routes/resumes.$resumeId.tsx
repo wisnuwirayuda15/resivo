@@ -46,11 +46,35 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   // teardown, so this cannot drop a pending write.
   useEffect(() => () => useEditorStore.getState().close(), [])
 
-  if (resume.isLoading) {
+  // `isPending` rather than `isLoading`: the latter is false while a query sits
+  // between attempts, which would flash a wrong screen instead of the loader.
+  if (resume.isPending) {
     return (
       <div className="flex justify-center py-20">
         <Loader size="sm" />
       </div>
+    )
+  }
+
+  /**
+   * A resume that fails to load is not the same as one that is not there, and
+   * saying "not found" about a document sitting in the database is the kind of
+   * wrong answer that sends someone looking in the wrong place. `migrateDocument`
+   * refuses anything it cannot honestly repair — a document from a newer build,
+   * or one that no longer validates — and its message says which, so it is shown
+   * rather than flattened into a missing-file screen.
+   */
+  if (resume.isError) {
+    return (
+      <EmptyState
+        icon="warning-circle"
+        title="This resume could not be opened"
+        body={
+          resume.error instanceof Error
+            ? resume.error.message
+            : 'The stored document could not be read.'
+        }
+      />
     )
   }
 
