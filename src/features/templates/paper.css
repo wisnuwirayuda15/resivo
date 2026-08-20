@@ -1,0 +1,81 @@
+/**
+ * Paper tokens — the resume's own styling, deliberately separate from the app.
+ *
+ * The resume preview NEVER follows the app theme. Anything inside
+ * `.resivo-paper` resets to template-owned light paper tokens and pins
+ * `color-scheme: light`, so in dark mode the page is the brightest thing on
+ * screen — intentionally, because it is what will be printed.
+ *
+ * Used in two places, which is why the rules are NOT wrapped in a cascade layer
+ * here:
+ *
+ *  1. The application stylesheet imports this file, so paper miniatures (the
+ *     template tiles, the library cards) can render with real paper tokens.
+ *  2. The preview engine reads the same rules as text and injects them into the
+ *     iframe inside `@layer template`, the lowest of its three layers:
+ *
+ *       @layer template  -> these rules + the active template's baseCss
+ *       @layer tokens    -> the user's DesignConfig, as --paper-* overrides
+ *       @layer custom    -> the user's custom CSS  (wins)
+ *
+ * Wrapping them in a layer here would leave them un-layerable there, since a
+ * layer cannot be reassigned after the fact.
+ *
+ * Never put `data-theme` or `data-mantine-color-scheme` on anything inside
+ * `.resivo-paper`.
+ */
+.resivo-paper {
+  --paper-bg: #ffffff;
+  --paper-ink: #1a1a18;
+  --paper-ink-muted: #55554e;
+  --paper-rule: #d8d8d3;
+  --paper-accent: #0e7c76;
+  --paper-font-body: var(--font-serif);
+  --paper-font-head: var(--font-serif);
+  --paper-fs-body: 10.5pt;
+  --paper-fs-name: 22pt;
+  --paper-lh: 1.42;
+  --paper-margin: 0.6in;
+  --paper-w: 8.5in;
+  --paper-h: 11in;
+
+  background: var(--paper-bg);
+  color: var(--paper-ink);
+  font-family: var(--paper-font-body);
+  font-size: var(--paper-fs-body);
+  line-height: var(--paper-lh);
+  color-scheme: light;
+}
+
+/* A4 swaps only the page box; every other token is template-owned. */
+.resivo-paper[data-size='A4'] {
+  --paper-w: 210mm;
+  --paper-h: 297mm;
+}
+
+/* ---- Template scopes ---- */
+
+/* classic — traditional single-column serif. Uses the baseline above. */
+
+/* modern — clean contemporary sans, ink accent rather than colour. */
+.resivo-paper[data-template='modern'] {
+  --paper-font-body: var(--font-sans);
+  --paper-font-head: var(--font-sans);
+  --paper-accent: #1d1d1a;
+}
+
+/* technical — sans body with monospace headings, tighter body size. */
+.resivo-paper[data-template='technical'] {
+  --paper-font-body: var(--font-sans);
+  --paper-font-head: var(--font-mono);
+  --paper-accent: #2563a8;
+  --paper-fs-body: 10pt;
+}
+
+/* editorial — serif throughout with a larger name and a red accent. */
+.resivo-paper[data-template='editorial'] {
+  --paper-font-body: var(--font-serif);
+  --paper-font-head: var(--font-serif);
+  --paper-accent: #94271d;
+  --paper-fs-name: 26pt;
+}

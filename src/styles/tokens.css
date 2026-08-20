@@ -1,26 +1,207 @@
 /**
- * App design tokens that are not part of the Mantine theme object: motion
- * durations, easing curves, and blur radii.
+ * Raw design-system scales — the primitive layer.
  *
- * Declared in a Tailwind `@theme` block so the namespaced ones become
- * utilities (`ease-standard`, `blur-md`, ...) while all of them are also
- * available as plain `var(--*)` custom properties at runtime.
+ * These are the literal values from the Resivo Design System. Nothing here is
+ * theme-aware: `scheme.css` is what maps these primitives onto semantic,
+ * light/dark-flipping aliases, and `theme.ts` is what feeds the subset Mantine
+ * needs into its own token pipeline.
+ *
+ * Ordinary `:root` rules (not `@theme`) because these are referenced by name
+ * from CSS, not meant to become Tailwind utilities. The handful that should be
+ * utilities live in the `@theme` block at the bottom.
+ */
+:root {
+  /* ---- Neutrals — warm graphite, a hint of yellow rather than blue, so
+     paper white and screen white sit together without clashing ---- */
+  --n-0: #ffffff;
+  --n-25: #fbfbfa;
+  --n-50: #f6f6f4;
+  --n-100: #eeeeeb;
+  --n-150: #e5e5e1;
+  --n-200: #d8d8d3;
+  --n-300: #c0c0b9;
+  --n-400: #9b9b93;
+  --n-500: #79796f;
+  --n-600: #5c5c55;
+  --n-700: #454540;
+  --n-800: #2e2e2a;
+  --n-900: #1d1d1a;
+  --n-950: #121210;
+
+  /* ---- Primary — deep archival teal. The only saturated colour in the
+     chrome. ---- */
+  --p-50: #e8f3f2;
+  --p-100: #c9e5e2;
+  --p-200: #9dcfcb;
+  --p-300: #66b2ad;
+  --p-400: #32948e;
+  --p-500: #0e7c76;
+  --p-600: #066560;
+  --p-700: #04514d;
+  --p-800: #06403d;
+  --p-900: #062e2c;
+
+  /* ---- Semantic hues — muted, and only ever used as a `*-quiet` background
+     with a `*-text` foreground, never as a saturated fill ---- */
+  --green-500: #0f8a4d;
+  --green-100: #dcf1e4;
+  --green-700: #0a5f37;
+  --amber-500: #b5720b;
+  --amber-100: #f7ecd6;
+  --amber-700: #8a5606;
+  --red-500: #c13b2f;
+  --red-100: #f8e3e0;
+  --red-700: #94271d;
+  --blue-500: #2563a8;
+  --blue-100: #e0eaf6;
+  --blue-700: #1a487c;
+
+  /* ---- Type scale — compact, because dense UI needs 1px decisions.
+     13px is the body default, not 16px. ---- */
+  --fs-10: 10px;
+  --fs-11: 11px;
+  --fs-12: 12px;
+  --fs-13: 13px;
+  --fs-14: 14px;
+  --fs-16: 16px;
+  --fs-18: 18px;
+  --fs-20: 20px;
+  --fs-24: 24px;
+  --fs-30: 30px;
+  --fs-38: 38px;
+
+  --lh-tight: 1.15;
+  --lh-snug: 1.3;
+  --lh-normal: 1.45;
+  --lh-relaxed: 1.6;
+  --lh-code: 1.7;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+
+  --ls-tight: -0.015em;
+  --ls-normal: 0;
+  --ls-wide: 0.01em;
+  --ls-caps: 0.06em;
+
+  /* Font-shorthand roles. `--font-sans` / `--font-mono` come from the
+     generated theme.css (they alias the Mantine families). */
+  --type-display: var(--fw-semibold) var(--fs-38) / var(--lh-tight)
+    var(--font-sans);
+  --type-h1: var(--fw-semibold) var(--fs-24) / var(--lh-snug) var(--font-sans);
+  --type-h2: var(--fw-semibold) var(--fs-18) / var(--lh-snug) var(--font-sans);
+  --type-h3: var(--fw-semibold) var(--fs-14) / var(--lh-snug) var(--font-sans);
+  --type-body: var(--fw-regular) var(--fs-13) / var(--lh-normal)
+    var(--font-sans);
+  --type-body-lg: var(--fw-regular) var(--fs-14) / var(--lh-normal)
+    var(--font-sans);
+  --type-label: var(--fw-medium) var(--fs-12) / var(--lh-snug) var(--font-sans);
+  --type-caption: var(--fw-regular) var(--fs-11) / var(--lh-snug)
+    var(--font-sans);
+  --type-code: var(--fw-regular) var(--fs-12) / 1.65 var(--font-mono);
+  --type-code-editor: var(--fw-regular) var(--fs-13) / var(--lh-code)
+    var(--font-mono);
+
+  /* ---- Spacing — the 6/8/10/12 band does most of the work ---- */
+  --sp-0: 0px;
+  --sp-1: 2px;
+  --sp-2: 4px;
+  --sp-3: 6px;
+  --sp-4: 8px;
+  --sp-5: 10px;
+  --sp-6: 12px;
+  --sp-7: 16px;
+  --sp-8: 20px;
+  --sp-9: 24px;
+  --sp-10: 32px;
+  --sp-11: 40px;
+  --sp-12: 48px;
+  --sp-13: 64px;
+
+  /* Control geometry — 30px is the default height */
+  --ctl-h-xs: 22px;
+  --ctl-h-sm: 26px;
+  --ctl-h-md: 30px;
+  --ctl-h-lg: 36px;
+  --ctl-px-sm: 8px;
+  --ctl-px-md: 11px;
+  --ctl-px-lg: 14px;
+  --ctl-gap: 6px;
+
+  /* ---- Radii — paper is 2px, nearly square, because paper is not a card ---- */
+  --r-xs: 3px;
+  --r-sm: 5px;
+  --r-md: 7px;
+  --r-lg: 10px;
+  --r-xl: 14px;
+  --r-2xl: 20px;
+  --r-full: 999px;
+  --r-control: var(--r-sm);
+  --r-panel: var(--r-md);
+  --r-card: var(--r-lg);
+  --r-dialog: var(--r-xl);
+  --r-paper: 2px;
+
+  /* ---- Shadows — near-neutral and shallow. Every surface has a border;
+     most have no shadow. `--sh-paper` is the only one with real spread. ---- */
+  --sh-none: none;
+  --sh-hairline: 0 0 0 1px var(--border-default);
+  --sh-xs: 0 1px 1px rgba(18, 18, 16, 0.04);
+  --sh-sm: 0 1px 2px rgba(18, 18, 16, 0.06), 0 1px 1px rgba(18, 18, 16, 0.04);
+  --sh-md: 0 2px 4px rgba(18, 18, 16, 0.06), 0 4px 12px rgba(18, 18, 16, 0.05);
+  --sh-lg: 0 8px 24px rgba(18, 18, 16, 0.09), 0 2px 6px rgba(18, 18, 16, 0.05);
+  --sh-dialog:
+    0 18px 48px rgba(18, 18, 16, 0.18), 0 2px 8px rgba(18, 18, 16, 0.08);
+  --sh-inset: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  --sh-paper:
+    0 1px 2px rgba(18, 18, 16, 0.08), 0 12px 32px rgba(18, 18, 16, 0.1);
+}
+
+/* Dark theme deepens shadows instead of letting them disappear. */
+[data-mantine-color-scheme='dark'] {
+  --sh-xs: 0 1px 1px rgba(0, 0, 0, 0.3);
+  --sh-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --sh-md: 0 2px 6px rgba(0, 0, 0, 0.4), 0 6px 16px rgba(0, 0, 0, 0.3);
+  --sh-lg: 0 10px 28px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --sh-dialog: 0 22px 56px rgba(0, 0, 0, 0.6), 0 2px 10px rgba(0, 0, 0, 0.4);
+  --sh-inset: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  --sh-paper: 0 2px 4px rgba(0, 0, 0, 0.4), 0 16px 40px rgba(0, 0, 0, 0.45);
+}
+
+/**
+ * Tokens that should also become Tailwind utilities.
+ *
+ * Chrome dimensions are fixed by the design system, so they are expressed as
+ * spacing keys (`h-toolbar`, `w-sidebar`, ...) rather than magic numbers at the
+ * call site. Motion follows the DS vocabulary: 80–320ms, one curve for state
+ * changes and one for entrances.
  */
 @theme {
+  /* fixed chrome dimensions */
+  --spacing-toolbar: 44px;
+  --spacing-titlebar: 38px;
+  --spacing-statusbar: 26px;
+  --spacing-sidebar: 232px;
+  --spacing-sidebar-rail: 60px;
+  --spacing-inspector: 288px;
+  --spacing-gutter: 1px;
+
+  /* editor pane minimums (never collapse to zero) */
+  --spacing-pane-code: 280px;
+  --spacing-pane-paper: 340px;
+  --spacing-pane-style: 268px;
+
   /* motion durations */
   --duration-instant: 80ms;
   --duration-fast: 120ms;
   --duration-base: 200ms;
   --duration-slow: 320ms;
 
-  /* easing curves */
-  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
-  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
-  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  /* easing curves — state changes vs entrances */
+  --ease-standard: cubic-bezier(0.2, 0.7, 0.3, 1);
+  --ease-entrance: cubic-bezier(0.16, 1, 0.3, 1);
 
-  /* blur radii */
-  --blur-xs: 2px;
-  --blur-sm: 4px;
-  --blur-md: 12px;
-  --blur-lg: 24px;
+  /* blur radii — used only by the dialog scrim */
+  --blur-scrim: 2px;
 }

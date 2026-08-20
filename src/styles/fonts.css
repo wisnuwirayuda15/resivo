@@ -1,0 +1,26 @@
+/**
+ * Typefaces, vendored locally.
+ *
+ * Resivo is local-first: nothing may be fetched from a CDN at runtime, so the
+ * three families ship as npm packages (variable WOFF2) instead of Google Fonts
+ * links. `@fontsource-variable/*` emits the `@font-face` rules; we only declare
+ * the family tokens on top.
+ *
+ *   Instrument Sans  -> all application chrome
+ *   JetBrains Mono   -> code panes, file names, every numeric readout
+ *   Source Serif 4   -> resume paper (never used by the app chrome)
+ *
+ * `--font-sans` / `--font-mono` are already emitted by tailwind-preset-mantine
+ * (they alias the Mantine font families, which `theme.ts` sets to these two).
+ * `--font-serif` has no Mantine equivalent because the app chrome never uses a
+ * serif — it exists purely for `.resivo-paper`.
+ */
+@import '@fontsource-variable/instrument-sans';
+@import '@fontsource-variable/jetbrains-mono';
+@import '@fontsource-variable/source-serif-4';
+
+:root {
+  --font-serif:
+    'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia,
+    'Times New Roman', serif;
+}

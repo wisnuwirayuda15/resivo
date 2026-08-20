@@ -1,6 +1,6 @@
 /**
  * Global element resets / base styles. Mantine's own reset ships in the
- * `mantine` layer via the generated theme.css; this file only adds a few
+ * `mantine` layer via the generated theme.css; this file only adds the
  * app-wide defaults on top.
  */
 * {
@@ -15,6 +15,70 @@ body,
 
 body {
   margin: 0;
-  background-color: var(--app-bg);
-  color: var(--app-text);
+  background-color: var(--bg-app);
+  color: var(--text-body);
+  font: var(--type-body);
+  /* The chrome is a dense tool, not a document: no automatic text inflation. */
+  -webkit-text-size-adjust: 100%;
+}
+
+a {
+  color: var(--text-link);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--text-link-hover);
+  text-decoration: underline;
+}
+
+/* Every numeric readout, file name and path is monospace. */
+code,
+kbd,
+samp,
+pre {
+  font-family: var(--font-mono);
+}
+
+/* Focus is always visible — keyboard is a first-class input. */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* Thin and track-less. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--border-strong);
+  border: 3px solid transparent;
+  border-radius: var(--r-full);
+  background-clip: content-box;
+}
+
+/**
+ * Nothing bounces, spins decoratively, or springs — and when the user asks for
+ * less motion, every duration goes to zero rather than being merely shortened.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
