@@ -35,7 +35,11 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     // Guarded on the id rather than on `document === null`, so navigating from
     // one resume to another swaps the working copy while re-rendering this route
     // with the same document never discards unsaved edits.
-    if (resume.data !== undefined && openResumeId !== resume.data.id) {
+    if (
+      resume.data !== undefined &&
+      resume.data !== null &&
+      openResumeId !== resume.data.id
+    ) {
       load(resume.data.id, resume.data.document)
     }
   }, [resume.data, openResumeId, load])
@@ -76,7 +80,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     )
   }
 
-  if (resume.data === undefined) {
+  if (resume.data === null) {
     return (
       <EmptyState
         icon="warning-circle"

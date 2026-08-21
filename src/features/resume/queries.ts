@@ -53,7 +53,16 @@ export const useArchivedResumes = () =>
 export const useResume = (id: string | undefined) =>
   useQuery({
     queryKey: resumeKeys.detail(id ?? ''),
-    queryFn: () => resumeRepo.getResume(id as string),
+    /**
+     * `null`, never `undefined`, for a resume that is not there.
+     *
+     * TanStack Query rejects an `undefined` result as a programming error and
+     * turns it into a failed query — which would report a deleted resume as a
+     * document that could not be read, and put its own internal message on
+     * screen. `null` is a value, so "not found" stays distinguishable from
+     * "broken".
+     */
+    queryFn: async () => (await resumeRepo.getResume(id as string)) ?? null,
     enabled: id !== undefined,
     /**
      * The editor store holds the working copy, so refetching a resume that is
