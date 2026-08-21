@@ -1,4 +1,16 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import {
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react'
+
+import {
+  loadedIconCatalog,
+  onIconCatalogLoaded,
+} from '@/features/icons/catalog'
 
 import { resolveTemplate } from '@/features/templates/registry'
 
@@ -52,6 +64,8 @@ interface PaginationKey {
   design: DesignConfig
   templateId: TemplateId
   fontEpoch: number
+  /** Bumped when the icon catalog arrives — see below. */
+  glyphEpoch: number
   /** The iframe's width — see the observer below. */
   width: number
 }
@@ -127,6 +141,18 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   zoom,
   onPageCountChange,
 }) => {
+  /**
+   * The icon catalog loads asynchronously, and a glyph that appears after
+   * pagination changes nothing about layout only because the reserved box is
+   * exactly its size. Re-paginating anyway is the cheap insurance: if that
+   * assumption is ever wrong, the breaks are corrected rather than left wrong.
+   */
+  const glyphEpoch = useSyncExternalStore(
+    onIconCatalogLoaded,
+    () => (loadedIconCatalog() === null ? 0 : 1),
+    () => 0,
+  )
+
   const template = useMemo(
     () => resolveTemplate(document.templateId),
     [document.templateId],
@@ -174,6 +200,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     paged.design !== document.design ||
     paged.templateId !== document.templateId ||
     paged.fontEpoch !== fontEpoch ||
+    paged.glyphEpoch !== glyphEpoch ||
     paged.width !== width
 
   /**
@@ -219,10 +246,19 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       design: document.design,
       templateId: document.templateId,
       fontEpoch,
+      glyphEpoch,
       width,
       pages: paginate(measured.metrics, measured.contentHeight),
     })
-  }, [stale, items, document.design, document.templateId, fontEpoch, width])
+  }, [
+    stale,
+    items,
+    document.design,
+    document.templateId,
+    fontEpoch,
+    glyphEpoch,
+    width,
+  ])
 
   const pageCount = paged?.pages.length
 

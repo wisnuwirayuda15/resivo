@@ -24,6 +24,8 @@ export default [
       '.tanstack/**',
       'dist/**',
       'src/routeTree.gen.ts',
+      'src/features/icons/catalog.gen.ts',
+      'scripts/**',
     ],
   },
 ]

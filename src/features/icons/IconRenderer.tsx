@@ -1,3 +1,5 @@
+import { useCatalogGlyph } from './useCatalogGlyph'
+
 import { resolveIcon } from './registry'
 
 import type { IconRef } from '@/features/resume/model/document'
@@ -36,20 +38,53 @@ export const Icon: React.FC<IconProps> = ({
   className,
 }) => {
   const Component = resolveIcon(name)
+  const catalogGlyph = useCatalogGlyph(
+    Component === undefined ? name : undefined,
+  )
 
   if (Component === undefined) {
     /**
-     * An unknown name means a document references an icon this build does not
-     * carry. Reserving the space keeps the surrounding layout — and therefore
-     * pagination — identical to what it would be with the glyph present, so a
-     * missing icon never silently reflows a printed page.
+     * Not one of the curated icons, so it comes from the catalog — 1512 glyphs
+     * behind a lazy import, because bundling them all as components would cost
+     * megabytes at the entry point.
+     *
+     * Until that lands, and for a name no build carries at all, the space is
+     * reserved rather than collapsed. That keeps the surrounding layout — and
+     * therefore pagination — identical to what it will be once the glyph
+     * appears, so an icon arriving late cannot reflow a printed page.
      */
+    if (catalogGlyph === undefined) {
+      return (
+        <span
+          aria-hidden
+          className={className}
+          style={{ display: 'inline-block', width: size, height: size }}
+          data-unknown-icon={name}
+        />
+      )
+    }
+
     return (
-      <span
-        aria-hidden
+      <svg
         className={className}
-        style={{ display: 'inline-block', width: size, height: size }}
-        data-unknown-icon={name}
+        // Phosphor's own viewBox. Every glyph in the catalog is drawn in it, so
+        // a catalog icon and a curated one are the same size at the same
+        // `size`.
+        viewBox="0 0 256 256"
+        width={size}
+        height={size}
+        fill={color}
+        opacity={opacity}
+        {...(title === undefined
+          ? { 'aria-hidden': true }
+          : { role: 'img', 'aria-label': title })}
+        /**
+         * The markup is generated from the icon package's own assets by
+         * `scripts/generate-icon-catalog.mjs`, which takes only the drawable
+         * shapes — so this is build-time data from a dependency, never anything
+         * a user typed.
+         */
+        dangerouslySetInnerHTML={{ __html: catalogGlyph }}
       />
     )
   }

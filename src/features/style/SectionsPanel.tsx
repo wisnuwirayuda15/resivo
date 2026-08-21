@@ -8,7 +8,8 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 
-import { Icon } from '@/features/icons/IconRenderer'
+import { DocumentIcon, Icon } from '@/features/icons/IconRenderer'
+import { IconPicker } from '@/features/icons/IconPicker'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
 import { cn } from '@/lib/utils'
 import { SECTION_KINDS } from '@/features/resume/model/document'
@@ -18,6 +19,7 @@ import {
   moveSection,
   removeSection,
   setSectionHidden,
+  setSectionIcon,
   setSectionTitle,
 } from '@/features/editor/mutations'
 
@@ -82,6 +84,7 @@ const SectionRow: React.FC<{
   const label = plainText(section.title)
   const editable = isPlainTitle(section.title)
   const blocks = section.blocks.length
+  const [picking, setPicking] = useState(false)
 
   return (
     <li className="border-line-soft hover:bg-hover flex items-center gap-1 border-b px-2 py-1.5 last:border-b-0">
@@ -139,6 +142,43 @@ const SectionRow: React.FC<{
           {blocks} {blocks === 1 ? 'block' : 'blocks'}
         </Text>
       </Box>
+
+      {/* The icon is chosen here rather than in the Style tab because it belongs
+          to one section, not to the document's style. Empty is the common case,
+          so the button shows a dashed placeholder rather than a default glyph
+          that would look chosen. */}
+      <Tooltip label={section.icon === undefined ? 'Add icon' : 'Change icon'}>
+        <UnstyledButton
+          aria-label={
+            section.icon === undefined
+              ? `Add an icon to ${label}`
+              : `Change the icon on ${label}`
+          }
+          className={cn(
+            'rounded-control flex size-[22px] flex-none items-center justify-center',
+            section.icon === undefined
+              ? 'border-line text-subtle hover:text-body hover:bg-active border border-dashed'
+              : 'text-accent hover:bg-active',
+          )}
+          onClick={() => setPicking(true)}
+        >
+          {section.icon === undefined ? (
+            <Icon name="plus" size={10} />
+          ) : (
+            <DocumentIcon icon={section.icon} size={13} />
+          )}
+        </UnstyledButton>
+      </Tooltip>
+
+      <IconPicker
+        onChange={(name) =>
+          apply(setSectionIcon(section.id, { library: 'phosphor', name }))
+        }
+        onClear={() => apply(setSectionIcon(section.id, undefined))}
+        onClose={() => setPicking(false)}
+        opened={picking}
+        value={section.icon?.name}
+      />
 
       <Tooltip label={section.hidden === true ? 'Show' : 'Hide'}>
         <UnstyledButton

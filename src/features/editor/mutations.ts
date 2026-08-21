@@ -6,6 +6,7 @@ import type { Draft } from 'immer'
 import type {
   Block,
   DesignConfig,
+  IconRef,
   InlineText,
   ResumeDocument,
   Section,
@@ -161,6 +162,29 @@ export const setSectionHidden =
       section.hidden = true
     } else {
       delete section.hidden
+    }
+  }
+
+/**
+ * Sets or clears a section's icon.
+ *
+ * Stored as an `IconRef` rather than a component or a glyph, so a resume saved
+ * today keeps rendering if the icon set is replaced — and so the Markdown codec
+ * has a name to write.
+ */
+export const setSectionIcon =
+  (sectionId: string, icon: IconRef | undefined): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+
+    if (section === undefined) {
+      return
+    }
+
+    if (icon === undefined) {
+      delete section.icon
+    } else {
+      section.icon = icon
     }
   }
 

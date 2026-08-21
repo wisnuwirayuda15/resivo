@@ -15,7 +15,8 @@
     "check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "generate-icons": "node scripts/generate-icon-catalog.mjs"
   },
   "dependencies": {
     "@fontsource-variable/instrument-sans": "^5.3.0",
@@ -58,6 +59,7 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@phosphor-icons/core": "^2.1.1",
     "@rolldown/plugin-babel": "^0.2.3",
     "@tanstack/devtools-vite": "latest",
     "@tanstack/eslint-config": "latest",
