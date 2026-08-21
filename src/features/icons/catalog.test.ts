@@ -1,15 +1,24 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseCatalog, scoreIcon, searchIcons } from './catalog'
+import {
+  isIconWeight,
+  parseCatalog,
+  parseGlyphs,
+  scoreIcon,
+  searchIcons,
+} from './catalog'
+
+import type { IconWeight } from '@/features/resume/model/document'
 
 /**
- * The generated catalog is not imported here: these tests are about the reader
- * and the ranking, and pulling in 730KB of glyphs to assert that "star" beats
- * "star-four" would make the suite slower for no extra confidence. One test does
- * load it, to check the file it is generated into still parses.
+ * The generated files are not imported by most of these: the tests are about the
+ * reader and the ranking, and pulling in megabytes of glyphs to assert that
+ * "star" beats "star-four" would make the suite slower for no extra confidence.
+ * The last block does load them, to check every weight is present, complete and
+ * distinct.
  */
 
-const entry = (name: string, terms = '') => ({ name, terms, body: '<path/>' })
+const entry = (name: string, terms = '') => ({ name, terms })
 
 const ENTRIES = [
   entry('star', 'rate ratings favorites'),
@@ -22,26 +31,44 @@ const ENTRIES = [
 ]
 
 describe('parseCatalog', () => {
-  it('reads name, terms and body from each line', () => {
+  it('reads name and terms from each line', () => {
     const { entries, byName } = parseCatalog(
-      'star\trate favorites\t<path d="a"/>\ntrash\tdelete\t<path d="b"/>',
+      'star\trate favorites\ntrash\tdelete',
     )
 
     expect(entries).toHaveLength(2)
-    expect(entries[0]).toEqual({
-      name: 'star',
-      terms: 'rate favorites',
-      body: '<path d="a"/>',
-    })
-    expect(byName.get('trash')?.body).toBe('<path d="b"/>')
+    expect(entries[0]).toEqual({ name: 'star', terms: 'rate favorites' })
+    expect(byName.get('trash')?.terms).toBe('delete')
   })
 
   it('ignores blank lines', () => {
-    expect(parseCatalog('a\t\t<path/>\n\n').entries).toHaveLength(1)
+    expect(parseCatalog('a\t\n\n').entries).toHaveLength(1)
   })
 
   it('yields nothing for an empty source', () => {
     expect(parseCatalog('').entries).toEqual([])
+  })
+})
+
+describe('parseGlyphs', () => {
+  it('maps each name to its markup', () => {
+    const glyphs = parseGlyphs('star\t<path d="a"/>\ntrash\t<path d="b"/>')
+
+    expect(glyphs.get('star')).toBe('<path d="a"/>')
+    expect(glyphs.size).toBe(2)
+  })
+
+  it('yields nothing for an empty source', () => {
+    expect(parseGlyphs('').size).toBe(0)
+  })
+})
+
+describe('isIconWeight', () => {
+  it('accepts the six weights and nothing else', () => {
+    expect(isIconWeight('duotone')).toBe(true)
+    expect(isIconWeight('regular')).toBe(true)
+    expect(isIconWeight('Bold')).toBe(false)
+    expect(isIconWeight('')).toBe(false)
   })
 })
 
@@ -161,26 +188,82 @@ describe('searchIcons', () => {
   })
 })
 
-describe('the generated catalog', () => {
-  it('parses, and holds the icons the app already referenced by hand', async () => {
-    const { ICON_CATALOG_SOURCE } = await import('./catalog.gen')
-    const { entries, byName } = parseCatalog(ICON_CATALOG_SOURCE)
+/**
+ * The one place the generated files are actually loaded. Each weight is checked
+ * for the same 1512 names and for markup on every one of them, because a missing
+ * or empty record would show up in the app as a silently reserved blank box
+ * rather than as an error.
+ */
+describe('the generated files', () => {
+  it('index parses, and holds the icons the app already referenced by hand', async () => {
+    const { ICON_INDEX_SOURCE } = await import('./catalog.gen')
+    const { entries, byName } = parseCatalog(ICON_INDEX_SOURCE)
 
     expect(entries.length).toBeGreaterThan(1400)
 
     for (const name of ['star', 'trash', 'envelope-simple', 'map-pin']) {
-      expect(byName.get(name)?.body).toContain('<path')
+      expect(byName.get(name)?.terms).toBeTypeOf('string')
     }
   })
 
-  it('has a glyph and a name for every record', async () => {
-    const { ICON_CATALOG_SOURCE } = await import('./catalog.gen')
-    const { entries } = parseCatalog(ICON_CATALOG_SOURCE)
+  it('index names every icon exactly once', async () => {
+    const { ICON_INDEX_SOURCE } = await import('./catalog.gen')
+    const { entries, byName } = parseCatalog(ICON_INDEX_SOURCE)
 
-    const broken = entries.filter(
-      (icon) => icon.name === '' || !icon.body.startsWith('<'),
-    )
+    expect(byName.size).toBe(entries.length)
+    expect(entries.filter((icon) => icon.name === '')).toEqual([])
+  })
 
-    expect(broken).toEqual([])
+  const WEIGHT_SOURCES: Array<
+    [IconWeight, () => Promise<{ GLYPH_SOURCE: string }>]
+  > = [
+    ['thin', () => import('./glyphs.thin.gen')],
+    ['light', () => import('./glyphs.light.gen')],
+    ['regular', () => import('./glyphs.regular.gen')],
+    ['bold', () => import('./glyphs.bold.gen')],
+    ['fill', () => import('./glyphs.fill.gen')],
+    ['duotone', () => import('./glyphs.duotone.gen')],
+  ]
+
+  it.each(WEIGHT_SOURCES)(
+    'has a glyph for every icon in the %s weight',
+    async (_weight, load) => {
+      const { ICON_INDEX_SOURCE } = await import('./catalog.gen')
+      const { entries } = parseCatalog(ICON_INDEX_SOURCE)
+      const glyphs = parseGlyphs((await load()).GLYPH_SOURCE)
+
+      expect(glyphs.size).toBe(entries.length)
+
+      const missing = entries.filter(
+        (icon) => !(glyphs.get(icon.name) ?? '').startsWith('<'),
+      )
+
+      expect(missing).toEqual([])
+    },
+  )
+
+  it('draws the same icon differently in every weight', async () => {
+    const drawings = new Set<string>()
+
+    for (const [, load] of WEIGHT_SOURCES) {
+      const glyph = parseGlyphs((await load()).GLYPH_SOURCE).get('star')
+
+      expect(glyph).toBeDefined()
+      drawings.add(glyph as string)
+    }
+
+    // Six distinct drawings: if a generator bug pointed two weights at the same
+    // asset directory, the files would still parse and every other test here
+    // would still pass.
+    expect(drawings.size).toBe(WEIGHT_SOURCES.length)
+  })
+
+  it('keeps duotone its backing shape', async () => {
+    const { GLYPH_SOURCE } = await import('./glyphs.duotone.gen')
+
+    // Duotone is two shapes, the lower one drawn at reduced opacity. That
+    // attribute is what makes it duotone rather than fill, and it survives only
+    // because the generator lifts shapes verbatim.
+    expect(parseGlyphs(GLYPH_SOURCE).get('star')).toContain('opacity')
   })
 })

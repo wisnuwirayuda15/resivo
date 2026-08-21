@@ -3,27 +3,37 @@ import {
   Box,
   Loader,
   Modal,
+  SegmentedControl,
   Text,
   TextInput,
   UnstyledButton,
 } from '@mantine/core'
 import { useVirtualizer } from '@tanstack/react-virtual'
 
+import { ICON_WEIGHTS } from '@/features/resume/model/document'
+
 import { cn } from '@/lib/utils'
 
 import { Icon } from './IconRenderer'
-import { loadIconCatalog, searchIcons } from './catalog'
+import {
+  isIconWeight,
+  loadGlyphs,
+  loadIconCatalog,
+  searchIcons,
+} from './catalog'
 
 import type { IconCatalog, IconEntry } from './catalog'
+import type { IconWeight } from '@/features/resume/model/document'
 
 /**
- * The icon picker: all 1512 Phosphor icons, searchable.
+ * The icon picker: all 1512 Phosphor icons, in all six weights, searchable.
  *
- * Two things keep it fast. The catalog is one lazy import rather than 1512
- * component modules, and the grid is row-virtualized — at any moment about
- * sixty glyphs exist in the DOM, whatever the query matched. Mounting the whole
- * set would be thousands of SVG nodes, which is not a frame-rate problem so much
- * as a several-second-freeze problem.
+ * Two things keep it fast. The glyphs are one lazy import per weight rather than
+ * 1512 component modules — and the search index is a seventh file, so typing is
+ * never waiting on markup — and the grid is row-virtualized, so at any moment
+ * about sixty glyphs exist in the DOM, whatever the query matched. Mounting the
+ * whole set would be thousands of SVG nodes, which is not a frame-rate problem
+ * so much as a several-second-freeze problem.
  *
  * The columns are computed from the measured width rather than fixed, because
  * this opens in a 288px inspector today and could open in a dialog tomorrow; a
@@ -37,11 +47,25 @@ const CELL = 40
  * keystroke while still feeling immediate. */
 const SEARCH_DELAY_MS = 80
 
+/** Single letters, because six full weight names do not fit a 480px dialog and
+ * the glyphs in the grid are the real label — the control only has to say which
+ * one is showing. */
+const WEIGHT_LABELS: Record<IconWeight, string> = {
+  thin: 'Thin',
+  light: 'Light',
+  regular: 'Regular',
+  bold: 'Bold',
+  fill: 'Fill',
+  duotone: 'Duo',
+}
+
 interface IconPickerProps {
   opened: boolean
   /** The name currently chosen, if any. Shown selected and scrolled to. */
   value?: string
-  onChange: (name: string) => void
+  /** The weight currently chosen. The grid opens showing it. */
+  weight?: IconWeight
+  onChange: (name: string, weight: IconWeight) => void
   onClear?: () => void
   onClose: () => void
 }
@@ -50,8 +74,9 @@ const IconGrid: React.FC<{
   catalog: IconCatalog
   query: string
   value: string | undefined
+  weight: IconWeight
   onChange: (name: string) => void
-}> = ({ catalog, query, value, onChange }) => {
+}> = ({ catalog, query, value, weight, onChange }) => {
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const [columns, setColumns] = useState(6)
 
@@ -190,6 +215,7 @@ const IconGrid: React.FC<{
                         onChange(entry.name)
                       }}
                       selected={entry.name === value}
+                      weight={weight}
                     />
                   )
                 })}
@@ -214,8 +240,9 @@ const Cell: React.FC<{
   entry: IconEntry
   selected: boolean
   active: boolean
+  weight: IconWeight
   onSelect: () => void
-}> = ({ entry, selected, active, onSelect }) => (
+}> = ({ entry, selected, active, weight, onSelect }) => (
   <UnstyledButton
     aria-label={entry.name}
     aria-selected={selected}
@@ -235,13 +262,14 @@ const Cell: React.FC<{
     // arrow keys.
     tabIndex={-1}
   >
-    <Icon name={entry.name} size={18} />
+    <Icon name={entry.name} size={18} weight={weight} />
   </UnstyledButton>
 )
 
 export const IconPicker: React.FC<IconPickerProps> = ({
   opened,
   value,
+  weight: chosenWeight,
   onChange,
   onClear,
   onClose,
@@ -249,6 +277,10 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   const [catalog, setCatalog] = useState<IconCatalog | null>(null)
   const [typed, setTyped] = useState('')
   const [query, setQuery] = useState('')
+  const [weight, setWeight] = useState<IconWeight>(chosenWeight ?? 'regular')
+  /** The weight the loaded glyphs belong to. Until it matches the chosen one,
+   * the grid would draw reserved boxes for everything not curated. */
+  const [drawn, setDrawn] = useState<IconWeight | null>(null)
 
   useEffect(() => {
     if (!opened) {
@@ -257,16 +289,24 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
     let cancelled = false
 
-    void loadIconCatalog().then((loaded) => {
-      if (!cancelled) {
-        setCatalog(loaded)
-      }
-    })
+    /**
+     * Both pieces, and the grid waits for both: the index alone would draw the
+     * seventy-odd curated icons and reserve blank space for the rest, which
+     * reads as a broken picker rather than as a loading one.
+     */
+    void Promise.all([loadIconCatalog(), loadGlyphs(weight)]).then(
+      ([loaded]) => {
+        if (!cancelled) {
+          setCatalog(loaded)
+          setDrawn(weight)
+        }
+      },
+    )
 
     return () => {
       cancelled = true
     }
-  }, [opened])
+  }, [opened, weight])
 
   useEffect(() => {
     const timer = setTimeout(() => setQuery(typed), SEARCH_DELAY_MS)
@@ -276,15 +316,15 @@ export const IconPicker: React.FC<IconPickerProps> = ({
 
   const handleChange = useCallback(
     (name: string) => {
-      onChange(name)
+      onChange(name, weight)
       onClose()
     },
-    [onChange, onClose],
+    [onChange, onClose, weight],
   )
 
   return (
     <Modal onClose={onClose} opened={opened} size={480} title="Choose an icon">
-      <Box className="flex h-[420px] flex-col">
+      <Box className="flex h-[460px] flex-col">
         <TextInput
           aria-label="Search icons"
           data-autofocus
@@ -294,8 +334,28 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           value={typed}
         />
 
+        {/* Above the grid rather than beside it: switching weight redraws every
+            cell, and a control that sits over what it changes makes that
+            obvious. */}
+        <SegmentedControl
+          aria-label="Icon weight"
+          className="mt-2 flex-none"
+          data={ICON_WEIGHTS.map((option) => ({
+            value: option,
+            label: WEIGHT_LABELS[option],
+          }))}
+          fullWidth
+          onChange={(next) => {
+            if (isIconWeight(next)) {
+              setWeight(next)
+            }
+          }}
+          size="xs"
+          value={weight}
+        />
+
         <Box className="mt-2 flex min-h-0 flex-1 flex-col">
-          {catalog === null ? (
+          {catalog === null || drawn !== weight ? (
             <Box className="flex flex-1 items-center justify-center">
               <Loader size="sm" />
             </Box>
@@ -305,6 +365,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
               onChange={handleChange}
               query={query}
               value={value}
+              weight={weight}
             />
           )}
         </Box>

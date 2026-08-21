@@ -6,4 +6,4 @@ bun.lock
 # generated files
 src/styles/theme.css
 src/routeTree.gen.ts
-src/features/icons/catalog.gen.ts
+src/features/icons/*.gen.ts

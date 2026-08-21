@@ -40,13 +40,18 @@ export const Icon: React.FC<IconProps> = ({
   const Component = resolveIcon(name)
   const catalogGlyph = useCatalogGlyph(
     Component === undefined ? name : undefined,
+    weight,
   )
 
   if (Component === undefined) {
     /**
      * Not one of the curated icons, so it comes from the catalog — 1512 glyphs
-     * behind a lazy import, because bundling them all as components would cost
-     * megabytes at the entry point.
+     * per weight behind a lazy import, because bundling them all as components
+     * would cost megabytes at the entry point.
+     *
+     * The weight selects which file is fetched, so a catalog icon is drawn in
+     * the weight the document asked for rather than approximated by the
+     * default.
      *
      * Until that lands, and for a name no build carries at all, the space is
      * reserved rather than collapsed. That keeps the surrounding layout — and

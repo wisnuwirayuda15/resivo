@@ -7,10 +7,7 @@ import {
   useSyncExternalStore,
 } from 'react'
 
-import {
-  loadedIconCatalog,
-  onIconCatalogLoaded,
-} from '@/features/icons/catalog'
+import { loadedGlyphCount, onIconCatalogLoaded } from '@/features/icons/catalog'
 
 import { resolveTemplate } from '@/features/templates/registry'
 
@@ -142,14 +139,18 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   onPageCountChange,
 }) => {
   /**
-   * The icon catalog loads asynchronously, and a glyph that appears after
+   * Glyphs load asynchronously, one file per weight, and one that appears after
    * pagination changes nothing about layout only because the reserved box is
    * exactly its size. Re-paginating anyway is the cheap insurance: if that
    * assumption is ever wrong, the breaks are corrected rather than left wrong.
+   *
+   * The count of loaded weights, not a boolean: a document mixing `regular` and
+   * `duotone` gets its glyphs in two arrivals, and the second matters as much as
+   * the first.
    */
   const glyphEpoch = useSyncExternalStore(
     onIconCatalogLoaded,
-    () => (loadedIconCatalog() === null ? 0 : 1),
+    loadedGlyphCount,
     () => 0,
   )
 

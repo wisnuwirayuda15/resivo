@@ -171,13 +171,23 @@ const SectionRow: React.FC<{
       </Tooltip>
 
       <IconPicker
-        onChange={(name) =>
-          apply(setSectionIcon(section.id, { library: 'phosphor', name }))
+        onChange={(name, weight) =>
+          apply(
+            setSectionIcon(section.id, {
+              library: 'phosphor',
+              name,
+              // Only when it is not the default: the document stays free of a
+              // field that says nothing, and the Markdown round trip does not
+              // grow a `weight` attribute on every icon.
+              ...(weight === 'regular' ? {} : { weight }),
+            }),
+          )
         }
         onClear={() => apply(setSectionIcon(section.id, undefined))}
         onClose={() => setPicking(false)}
         opened={picking}
         value={section.icon?.name}
+        weight={section.icon?.weight}
       />
 
       <Tooltip label={section.hidden === true ? 'Show' : 'Hide'}>

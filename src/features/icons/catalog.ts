@@ -1,24 +1,33 @@
 /**
- * The icon catalog: 1512 names, their search terms, and their glyphs.
+ * The icon catalog: 1512 names, their search terms, and their glyphs in every
+ * one of Phosphor's six weights.
  *
- * Loaded lazily. The data is ~730KB of markup and words, which is the right
- * price for a picker someone opens occasionally and the wrong one for an app
- * entry point — so `loadIconCatalog` fetches it on first use and everything
- * afterwards is synchronous.
+ * Loaded lazily, and in two independent pieces, because the two have different
+ * shapes:
  *
- * Nothing here reflects over the icon package at runtime. The catalog is
- * generated and committed (see `scripts/generate-icon-catalog.mjs`), so the set
- * of icons a build ships is fixed at build time and a document that names one
- * cannot depend on what happens to be installed.
+ *   the index — names and search terms, ~110KB, weight-independent. The picker's
+ *   search runs against this and nothing else, so typing is never waiting on
+ *   markup.
+ *
+ *   the glyphs — one file per weight, ~600-800KB each. Fetched only for a weight
+ *   something actually renders in. A document that stays on the default pays for
+ *   one of the six; the other five are not deferred, they are never fetched.
+ *
+ * Nothing here reflects over the icon package at runtime. Both are generated and
+ * committed (see `scripts/generate-icon-catalog.mjs`), so the set of icons a
+ * build ships is fixed at build time and a document that names one cannot depend
+ * on what happens to be installed.
  */
+
+import { ICON_WEIGHTS } from '@/features/resume/model/document'
+
+import type { IconWeight } from '@/features/resume/model/document'
 
 export interface IconEntry {
   /** Kebab-case, as the document model stores it. */
   name: string
   /** Tags and categories, lowercased and space-joined. */
   terms: string
-  /** The SVG children — paths and shapes — of the regular weight. */
-  body: string
 }
 
 export interface IconCatalog {
@@ -26,29 +35,76 @@ export interface IconCatalog {
   byName: Map<string, IconEntry>
 }
 
+/** Name to SVG children, for one weight. */
+export type GlyphSet = Map<string, string>
+
 export const parseCatalog = (source: string): IconCatalog => {
   const entries = source
     .split('\n')
     .filter((line) => line !== '')
     .map((line) => {
-      const [name = '', terms = '', body = ''] = line.split('\t')
+      const [name = '', terms = ''] = line.split('\t')
 
-      return { name, terms, body }
+      return { name, terms }
     })
 
   return { entries, byName: new Map(entries.map((e) => [e.name, e])) }
 }
 
+export const parseGlyphs = (source: string): GlyphSet =>
+  new Map(
+    source
+      .split('\n')
+      .filter((line) => line !== '')
+      .map((line) => {
+        const [name = '', body = ''] = line.split('\t')
+
+        return [name, body] as const
+      }),
+  )
+
 // ---------------------------------------------------------------------------
 // Loading
 // ---------------------------------------------------------------------------
 
-let catalog: IconCatalog | null = null
-let pending: Promise<IconCatalog> | null = null
+/**
+ * The import per weight, written out rather than built from a template string,
+ * because the bundler has to see each one to split it into its own chunk. A
+ * computed `import(\`./glyphs.${weight}.gen\`)` would either fail to resolve or
+ * pull all six into the graph, which is the exact cost this file exists to
+ * avoid.
+ */
+const GLYPH_IMPORTS: Record<
+  IconWeight,
+  () => Promise<{ GLYPH_SOURCE: string }>
+> = {
+  thin: () => import('./glyphs.thin.gen'),
+  light: () => import('./glyphs.light.gen'),
+  regular: () => import('./glyphs.regular.gen'),
+  bold: () => import('./glyphs.bold.gen'),
+  fill: () => import('./glyphs.fill.gen'),
+  duotone: () => import('./glyphs.duotone.gen'),
+}
 
-/** Notified when the catalog arrives, so anything already rendered — the paper,
- * above all — can draw the glyphs it had to leave as reserved space. */
+/** Notified when the index or any weight arrives, so anything already rendered —
+ * the paper, above all — can draw the glyphs it had to leave as reserved
+ * space. */
 const listeners = new Set<() => void>()
+
+const announce = () => {
+  for (const listener of listeners) {
+    listener()
+  }
+}
+
+export const onIconCatalogLoaded = (listener: () => void): (() => void) => {
+  listeners.add(listener)
+
+  return () => listeners.delete(listener)
+}
+
+let catalog: IconCatalog | null = null
+let catalogPending: Promise<IconCatalog> | null = null
 
 export const loadIconCatalog = (): Promise<IconCatalog> => {
   if (catalog !== null) {
@@ -57,29 +113,63 @@ export const loadIconCatalog = (): Promise<IconCatalog> => {
 
   // One request no matter how many components ask at once: the picker and the
   // preview both want it, and they mount together.
-  pending ??= import('./catalog.gen').then((module) => {
-    catalog = parseCatalog(module.ICON_CATALOG_SOURCE)
-    pending = null
-
-    for (const listener of listeners) {
-      listener()
-    }
+  catalogPending ??= import('./catalog.gen').then((module) => {
+    catalog = parseCatalog(module.ICON_INDEX_SOURCE)
+    catalogPending = null
+    announce()
 
     return catalog
   })
 
-  return pending
+  return catalogPending
 }
 
-/** The catalog if it is already here, `null` otherwise. Synchronous, for a
- * render that cannot wait. */
-export const loadedIconCatalog = (): IconCatalog | null => catalog
+const glyphs = new Map<IconWeight, GlyphSet>()
+const glyphsPending = new Map<IconWeight, Promise<GlyphSet>>()
 
-export const onIconCatalogLoaded = (listener: () => void): (() => void) => {
-  listeners.add(listener)
+export const loadGlyphs = (weight: IconWeight): Promise<GlyphSet> => {
+  const loaded = glyphs.get(weight)
 
-  return () => listeners.delete(listener)
+  if (loaded !== undefined) {
+    return Promise.resolve(loaded)
+  }
+
+  const inFlight = glyphsPending.get(weight)
+
+  if (inFlight !== undefined) {
+    return inFlight
+  }
+
+  const request = GLYPH_IMPORTS[weight]().then((module) => {
+    const parsed = parseGlyphs(module.GLYPH_SOURCE)
+
+    glyphs.set(weight, parsed)
+    glyphsPending.delete(weight)
+    announce()
+
+    return parsed
+  })
+
+  glyphsPending.set(weight, request)
+
+  return request
 }
+
+/** One weight's glyphs if they are already here, `null` otherwise. */
+export const loadedGlyphs = (weight: IconWeight): GlyphSet | null =>
+  glyphs.get(weight) ?? null
+
+/**
+ * How many weights have arrived. The paper watches this rather than a boolean,
+ * because a second weight landing changes what is drawn just as much as the
+ * first did.
+ */
+export const loadedGlyphCount = (): number => glyphs.size
+
+/** Whether a string is one of the weights this build carries. Used where a
+ * weight comes from a saved document rather than from the app. */
+export const isIconWeight = (value: string): value is IconWeight =>
+  (ICON_WEIGHTS as ReadonlyArray<string>).includes(value)
 
 // ---------------------------------------------------------------------------
 // Search

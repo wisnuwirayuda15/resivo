@@ -1,39 +1,36 @@
 import { useEffect, useSyncExternalStore } from 'react'
 
-import {
-  loadIconCatalog,
-  loadedIconCatalog,
-  onIconCatalogLoaded,
-} from './catalog'
+import { loadGlyphs, loadedGlyphs, onIconCatalogLoaded } from './catalog'
+
+import type { IconWeight } from '@/features/resume/model/document'
 
 /**
- * The glyph for an icon that is not one of the curated components.
+ * The glyph for an icon that is not one of the curated components, in the weight
+ * asked for.
  *
- * `useSyncExternalStore` rather than state and an effect, because the catalog is
+ * `useSyncExternalStore` rather than state and an effect, because the glyphs are
  * genuinely external and shared: dozens of icons across the paper and the picker
- * ask for it at once, it loads once, and every one of them has to re-render when
- * it arrives. Wiring that by hand would mean one subscription per icon and a
- * render pass per subscription.
+ * ask for them at once, each weight loads once, and every one of them has to
+ * re-render when it arrives. Wiring that by hand would mean one subscription per
+ * icon and a render pass per subscription.
  *
- * Returns `undefined` while the catalog is in flight, and for a name no build
+ * Returns `undefined` while the weight is in flight, and for a name no build
  * carries. The caller reserves the space in both cases — see `IconRenderer`.
  */
 export const useCatalogGlyph = (
   name: string | undefined,
+  weight: IconWeight,
 ): string | undefined => {
   useEffect(() => {
     if (name !== undefined) {
-      void loadIconCatalog()
+      void loadGlyphs(weight)
     }
-  }, [name])
+  }, [name, weight])
 
   return useSyncExternalStore(
     onIconCatalogLoaded,
-    () =>
-      name === undefined
-        ? undefined
-        : loadedIconCatalog()?.byName.get(name)?.body,
-    // On the server the catalog is never loaded, so the markup rendered there is
+    () => (name === undefined ? undefined : loadedGlyphs(weight)?.get(name)),
+    // On the server no glyphs are ever loaded, so the markup rendered there is
     // the reserved box — which is what hydration then matches.
     () => undefined,
   )
