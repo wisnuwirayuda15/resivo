@@ -23,6 +23,13 @@ import type {
  * boxes using the breaks the paginator chose. Both passes render the *same React
  * elements* — they are built once and placed twice — which is what guarantees
  * that what was measured is what appears.
+ *
+ * Plain `div`s and one inline style, unlike the rest of the app. Everything here
+ * is portalled into the iframe, which loads no Mantine stylesheet and no
+ * Tailwind, so `Box` would render a class with nothing behind it; the only rules
+ * that reach this document are the ones `previewStylesheet` injects. The zoom is
+ * inline because it is a live value and because `zoom` — unlike `transform` —
+ * participates in layout, which is the whole reason it is used here.
  */
 
 interface PreviewPaperProps {

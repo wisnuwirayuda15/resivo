@@ -27,6 +27,12 @@ import type {
  * fills the rest from here. Almost all visual difference between templates is
  * carried by CSS tokens rather than by markup, which is what keeps four
  * templates from becoming four renderers to keep in sync.
+ *
+ * Plain elements and `rp-` class names throughout, never `Box`/`Text` or a
+ * Tailwind utility: this markup is serialised into the iframe and, later, into
+ * the HTML export, neither of which carries the app's stylesheets. The one
+ * inline style is an image's width, which is a per-block value from the
+ * document.
  */
 
 const DefaultHeader: React.FC<HeaderProps> = ({ header }) => (

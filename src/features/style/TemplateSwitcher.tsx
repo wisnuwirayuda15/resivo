@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  Box,
   Button,
   Group,
   Modal,
@@ -14,6 +15,7 @@ import {
 } from '@/features/templates/defaults'
 import { TEMPLATE_CATALOG, templateList } from '@/features/templates/catalog'
 import { setTemplate } from '@/features/editor/mutations'
+import { cn } from '@/lib/utils'
 
 import type { Recipe } from '@/features/editor/mutations'
 import type { DesignConfig, TemplateId } from '@/features/resume/model/document'
@@ -42,30 +44,30 @@ interface TemplateSwitcherProps {
  * paper tokens. Small enough to sit in a 288px panel, and honest, because it
  * reads the same `data-template` scope the page does.
  *
- * Plain elements rather than `Text`, unlike the rest of this panel: everything
- * inside `.resivo-paper` shows paper tokens, and Mantine's `Text` would put the
- * chrome's own font size and leading on the specimen it is meant to preview.
+ * `Box`, not `Text`: everything inside `.resivo-paper` is showing paper tokens,
+ * and `Text` would paint the chrome's own font size and leading over the
+ * specimen this exists to preview. The heading weight is the one value that
+ * cannot be a utility class — it comes from the template's tokens at runtime, and
+ * Tailwind can only emit classes it can see in the source — so it goes through
+ * Mantine's `fw` style prop, which resolves a dynamic value at render.
  */
 const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
   const design = templateDefaults(id)
 
   return (
-    <span
+    <Box
       className="resivo-paper border-line-soft flex size-[26px] flex-none items-center justify-center rounded-[2px] border"
+      component="span"
       data-template={id}
     >
-      <span
-        style={{
-          fontFamily: 'var(--paper-font-head)',
-          fontSize: 13,
-          fontWeight: design.typography.weights.heading,
-          color: 'var(--paper-accent)',
-          lineHeight: 1,
-        }}
+      <Box
+        className="font-[family-name:var(--paper-font-head)] text-[13px] leading-none text-[var(--paper-accent)]"
+        component="span"
+        fw={design.typography.weights.heading}
       >
         Aa
-      </span>
-    </span>
+      </Box>
+    </Box>
   )
 }
 
@@ -99,35 +101,35 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
 
   return (
     <>
-      <div className="flex flex-col gap-1">
+      <Box className="flex flex-col gap-1">
         {templateList.map((template) => {
           const selected = template.id === templateId
 
           return (
             <UnstyledButton
               aria-pressed={selected}
-              className={[
+              className={cn(
                 'rounded-control duration-fast ease-standard flex items-center gap-2 border px-2 py-1.5 text-left transition-colors',
                 selected
                   ? 'border-line-accent bg-selected'
                   : 'border-transparent hover:bg-hover',
-              ].join(' ')}
+              )}
               key={template.id}
               onClick={() => select(template.id)}
             >
               <TemplateSwatch id={template.id} />
-              <span className="min-w-0 flex-1">
+              <Box className="min-w-0 flex-1" component="span">
                 <Text span className="text-title block text-[12px] font-medium">
                   {template.name}
                 </Text>
                 <Text span className="text-subtle block truncate text-[11px]">
                   {template.description}
                 </Text>
-              </span>
+              </Box>
             </UnstyledButton>
           )
         })}
-      </div>
+      </Box>
 
       <Modal
         onClose={() => setPending(null)}

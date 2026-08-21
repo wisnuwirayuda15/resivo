@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { Loader } from '@mantine/core'
+import { Box, Loader } from '@mantine/core'
 
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
@@ -48,9 +48,9 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   // between attempts, which would flash a wrong screen instead of the loader.
   if (resume.isPending) {
     return (
-      <div className="flex justify-center py-20">
+      <Box className="flex justify-center py-20">
         <Loader size="sm" />
-      </div>
+      </Box>
     )
   }
 
@@ -89,9 +89,9 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   // One render between the record arriving and the store accepting it.
   if (document === null) {
     return (
-      <div className="flex justify-center py-20">
+      <Box className="flex justify-center py-20">
         <Loader size="sm" />
-      </div>
+      </Box>
     )
   }
 
@@ -106,17 +106,17 @@ const ResumeScreen: React.FC = () => {
     <Shell title={resume.data?.title ?? 'Resume'}>
       {/* The editor fills the viewport rather than scrolling the page: the pane
           inside it owns its own scrolling, so the chrome never moves. */}
-      <div className="h-[calc(100dvh-44px)]">
+      <Box className="h-[calc(100dvh-44px)]">
         <ClientOnly
           fallback={
-            <div className="flex justify-center py-20">
+            <Box className="flex justify-center py-20">
               <Loader size="sm" />
-            </div>
+            </Box>
           }
         >
           <ResumeView resumeId={resumeId} />
         </ClientOnly>
-      </div>
+      </Box>
     </Shell>
   )
 }

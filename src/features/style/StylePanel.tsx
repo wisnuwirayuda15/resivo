@@ -1,3 +1,5 @@
+import { Box } from '@mantine/core'
+
 import { BUILTIN_FONTS } from '@/features/templates/defaults'
 import { patchDesign } from '@/features/editor/mutations'
 
@@ -101,7 +103,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
   const { paper, typography, colors, spacing, rules, image, icons } = design
 
   return (
-    <div>
+    <Box>
       <ControlGroup title="Paper">
         <SelectField
           data={PAPER_SIZES}
@@ -340,6 +342,6 @@ export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
           value={image.avatarSize}
         />
       </ControlGroup>
-    </div>
+    </Box>
   )
 }

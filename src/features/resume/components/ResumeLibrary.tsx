@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Skeleton, Text } from '@mantine/core'
+import { Box, Skeleton, Text } from '@mantine/core'
 
 import { EmptyState } from '@/components/EmptyState'
 
@@ -80,11 +80,11 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-4 p-6">
+      <Box className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-4 p-6">
         {Array.from({ length: 6 }, (_unused, index) => (
           <Skeleton key={index} height={252} radius="card" />
         ))}
-      </div>
+      </Box>
     )
   }
 
@@ -104,7 +104,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
 
   return (
     <>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-4 p-6">
+      <Box className="grid grid-cols-[repeat(auto-fill,minmax(196px,1fr))] gap-4 p-6">
         {visible.map((resume) => (
           <ResumeCard
             key={resume.id}
@@ -116,7 +116,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
             onDelete={() => setDeleting(resume)}
           />
         ))}
-      </div>
+      </Box>
 
       <RenameResumeDialog
         resume={renaming}

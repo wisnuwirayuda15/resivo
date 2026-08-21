@@ -1,7 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SegmentedControl, Text, Tooltip, UnstyledButton } from '@mantine/core'
+import {
+  Box,
+  SegmentedControl,
+  Text,
+  Tooltip,
+  UnstyledButton,
+} from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
+
+import { cn } from '@/lib/utils'
 
 import { PreviewFrame } from './PreviewFrame'
 import { PAGE_DIMENSIONS } from './css'
@@ -113,14 +121,14 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   const dimensions = PAGE_DIMENSIONS[size]
 
   return (
-    <section className={`flex min-h-0 flex-col ${className ?? ''}`}>
+    <section className={cn('flex min-h-0 flex-col', className)}>
       <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
         <Text span className="text-subtle font-mono text-[11px]">
           {pageCount} {pageCount === 1 ? 'page' : 'pages'} · {dimensions.width}{' '}
           × {dimensions.height}
         </Text>
 
-        <div className="ml-auto flex items-center gap-1">
+        <Box className="ml-auto flex items-center gap-1">
           {onPaperSizeChange === undefined ? null : (
             <SegmentedControl
               aria-label="Paper size"
@@ -166,28 +174,28 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
             <UnstyledButton
               aria-label="Fit width"
               aria-pressed={pinnedZoom === null}
-              className={[
+              className={cn(
                 'rounded-control flex size-[22px] items-center justify-center',
                 pinnedZoom === null
                   ? 'text-accent bg-selected'
                   : 'text-muted hover:text-body hover:bg-hover',
-              ].join(' ')}
+              )}
               onClick={() => setPinnedZoom(null)}
             >
               <Icon name="arrows-horizontal" size={14} />
             </UnstyledButton>
           </Tooltip>
-        </div>
+        </Box>
       </header>
 
-      <div className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
+      <Box className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
         <PreviewFrame
           className="block size-full border-0 bg-transparent"
           document={resume}
           onPageCountChange={handlePageCount}
           zoom={zoom}
         />
-      </div>
+      </Box>
     </section>
   )
 }

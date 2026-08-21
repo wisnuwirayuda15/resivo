@@ -4,7 +4,13 @@ import {
   Scripts,
   createRootRouteWithContext,
 } from '@tanstack/react-router'
-import { Button, ColorSchemeScript, mantineHtmlProps } from '@mantine/core'
+import {
+  Box,
+  Button,
+  ColorSchemeScript,
+  Text,
+  mantineHtmlProps,
+} from '@mantine/core'
 
 import { EmptyState } from '@/components/EmptyState'
 import { Providers } from '@/components/providers'
@@ -28,27 +34,30 @@ interface MyRouterContext {
  * apology.
  */
 const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => (
-  <div className="bg-app min-h-dvh">
+  <Box className="bg-app min-h-dvh">
     <EmptyState
       icon="warning-circle"
       title="Something went wrong"
       body="Your resumes are stored on this device and are unaffected. Reload to try again."
       action={
-        <div className="flex flex-col items-center gap-3">
+        <Box className="flex flex-col items-center gap-3">
           <Button onClick={() => window.location.reload()}>Reload</Button>
           {/* The message is for the user's bug report, so it is shown rather
               than swallowed — but kept out of the primary line. */}
-          <code className="text-subtle max-w-[60ch] text-[11px] break-words">
+          <Text
+            className="text-subtle max-w-[60ch] text-[11px] break-words"
+            component="code"
+          >
             {error instanceof Error ? error.message : String(error)}
-          </code>
-        </div>
+          </Text>
+        </Box>
       }
     />
-  </div>
+  </Box>
 )
 
 const RootNotFound: React.FC = () => (
-  <div className="bg-app min-h-dvh">
+  <Box className="bg-app min-h-dvh">
     <EmptyState
       icon="file-text"
       title="Page not found"
@@ -59,7 +68,7 @@ const RootNotFound: React.FC = () => (
         </Button>
       }
     />
-  </div>
+  </Box>
 )
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({

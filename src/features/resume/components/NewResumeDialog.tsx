@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import {
+  Box,
   Button,
   Group,
   Modal,
@@ -70,14 +71,14 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   return (
     <Modal opened={opened} onClose={close} title="New resume" size={620}>
       <Stack gap="lg">
-        <div>
+        <Box>
           <Text
             className="text-muted mb-2 text-[12px] font-medium"
             component="div"
           >
             Template
           </Text>
-          <div className="grid grid-cols-4 gap-2">
+          <Box className="grid grid-cols-4 gap-2">
             {templateList.map((template) => (
               <TemplateTile
                 key={template.id}
@@ -86,8 +87,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
                 onSelect={() => setTemplateId(template.id)}
               />
             ))}
-          </div>
-        </div>
+          </Box>
+        </Box>
 
         <Group grow align="flex-start">
           <TextInput

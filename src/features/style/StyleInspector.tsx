@@ -1,6 +1,7 @@
 import { ScrollArea, Tabs } from '@mantine/core'
 
 import { EmptyState } from '@/components/EmptyState'
+import { cn } from '@/lib/utils'
 import { Icon } from '@/features/icons/IconRenderer'
 
 import { StylePanel } from './StylePanel'
@@ -34,7 +35,7 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
   apply,
   className,
 }) => (
-  <aside className={`bg-surface flex min-h-0 flex-col ${className ?? ''}`}>
+  <aside className={cn('bg-surface flex min-h-0 flex-col', className)}>
     {/* `keepMounted={false}` so an inactive tab costs nothing: the style tab
         alone is thirty controlled inputs, and none of them holds state worth
         preserving across a tab switch — every value they show lives in the

@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
-import { Text } from '@mantine/core'
+import { Box, Text } from '@mantine/core'
 
+import { cn } from '@/lib/utils'
 import { Icon } from '@/features/icons/IconRenderer'
 
 import type { ComponentProps, ReactNode } from 'react'
@@ -18,13 +19,13 @@ import type { ComponentProps, ReactNode } from 'react'
  * Selection is an accent-tinted fill, never a coloured left border bar.
  */
 export const navItemClassName = (active = false): string =>
-  [
+  cn(
     'flex w-full items-center gap-2.5 rounded-control px-2.5 text-[13px]',
     'h-[26px] transition-colors duration-fast ease-standard',
     active
       ? 'bg-selected text-accent font-medium'
       : 'text-muted hover:bg-hover hover:text-body',
-  ].join(' ')
+  )
 
 interface NavItemContentProps {
   icon: string
@@ -96,7 +97,7 @@ interface NavGroupProps {
 }
 
 export const NavGroup: React.FC<NavGroupProps> = ({ label, children }) => (
-  <div className="px-2.5 pb-1.5">
+  <Box className="px-2.5 pb-1.5">
     {label === undefined ? null : (
       <Text
         className="text-subtle px-2.5 pt-3 pb-1.5 text-[10px] font-medium tracking-[0.06em] uppercase"
@@ -105,6 +106,6 @@ export const NavGroup: React.FC<NavGroupProps> = ({ label, children }) => (
         {label}
       </Text>
     )}
-    <div className="flex flex-col gap-px">{children}</div>
-  </div>
+    <Box className="flex flex-col gap-px">{children}</Box>
+  </Box>
 )

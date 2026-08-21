@@ -1,4 +1,5 @@
 import {
+  Box,
   Menu,
   Text,
   Tooltip,
@@ -59,18 +60,18 @@ export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
   const isDark = scheme === 'dark'
 
   return (
-    <div className="flex h-full items-center gap-2 px-4">
+    <Box className="flex h-full items-center gap-2 px-4">
       {burger}
 
       <Text span className="text-title text-[14px] leading-none font-semibold">
         {title}
       </Text>
 
-      <div className="flex-1" />
+      <Box className="flex-1" />
 
       {actions}
 
-      <div className="bg-line mx-1 h-4 w-px" />
+      <Box className="bg-line mx-1 h-4 w-px" />
 
       <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
         <BarButton
@@ -93,6 +94,6 @@ export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
-    </div>
+    </Box>
   )
 }

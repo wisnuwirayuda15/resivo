@@ -24,6 +24,7 @@
         "@tanstack/react-router-ssr-query": "latest",
         "@tanstack/react-start": "latest",
         "@tanstack/react-virtual": "^3.14.9",
+        "clsx": "^2.1.1",
         "dayjs": "^1.11.23",
         "dexie": "^4.4.5",
         "dexie-react-hooks": "^4.4.0",
@@ -31,6 +32,7 @@
         "nitro": "3.0.260610-beta",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
+        "tailwind-merge": "^3.6.0",
         "tailwindcss": "^4.1.18",
         "zod": "^4.3.6",
         "zustand": "5.0.15",
@@ -985,6 +987,8 @@
     "tabbable": ["tabbable@6.5.0", "", {}, "sha512-wieBHXygIm7OyQOu5hQlkk62/WyCFYGlWg7L6/ZCUZwx0o398Zkn4pVmMyfYhfMG8kGrj/Krt8eIk6UKC6VzwA=="],
 
     "tagged-tag": ["tagged-tag@1.0.0", "", {}, "sha512-yEFYrVhod+hdNyx7g5Bnkkb0G6si8HJurOoOEgC8B/O0uXLHlaey/65KRv6cuWBNhBgHKAROVpc7QyYqE5gFng=="],
+
+    "tailwind-merge": ["tailwind-merge@3.6.0", "", {}, "sha512-uxL7qAVQriqRQPAyK3pj66VqskWqoZ37PW94jwOTwNfq/z9oyu1V+eqrZqtR2+fCiXdYOZe/Modt8GtvqNzu+w=="],
 
     "tailwind-preset-mantine": ["tailwind-preset-mantine@4.1.0", "", { "dependencies": { "es-module-lexer": "^2.1.0", "get-tsconfig": "^4.14.0", "postcss": "^8.5.15", "tsx": "^4.22.4" }, "peerDependencies": { "@mantine/core": "^7 || ^8 || ^9", "tailwindcss": "^4" }, "bin": { "tailwind-preset-mantine": "src/cli/index.js" } }, "sha512-ikMEtNdRyjjArH96YAWz4Hdl9hJKAxLI5gIJRhGb0JFNhAKN69SynrQw1CRt2nhxCekyhR/tlbiMnfbeYJKpRg=="],
 

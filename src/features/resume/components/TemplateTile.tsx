@@ -1,4 +1,7 @@
-import { Text, UnstyledButton } from '@mantine/core'
+import { Box, Text, UnstyledButton } from '@mantine/core'
+
+import { PaperMiniature } from '@/features/templates/PaperMiniature'
+import { cn } from '@/lib/utils'
 
 import type { TemplateMeta } from '@/features/templates/catalog'
 
@@ -9,12 +12,7 @@ interface TemplateTileProps {
 }
 
 /**
- * A selectable template, shown as a ruled paper miniature above its name.
- *
- * The miniature is built from a handful of 1–2px divs rather than a screenshot:
- * it stays crisp at any zoom, needs no asset pipeline, and — because it sits
- * inside `.resivo-paper` — it picks up the template's real paper tokens, so the
- * accent colour and heading face shown here are the ones the resume will use.
+ * A selectable template, shown as a paper miniature above its name.
  */
 export const TemplateTile: React.FC<TemplateTileProps> = ({
   template,
@@ -22,74 +20,20 @@ export const TemplateTile: React.FC<TemplateTileProps> = ({
   onSelect,
 }) => (
   <UnstyledButton
-    onClick={onSelect}
     aria-pressed={selected}
-    className={[
-      'rounded-card border p-2 text-left transition-colors duration-fast ease-standard',
+    className={cn(
+      'rounded-card duration-fast ease-standard border p-2 text-left transition-colors',
       selected
         ? 'border-line-accent bg-selected'
         : 'border-line-soft bg-surface hover:border-line',
-    ].join(' ')}
+    )}
+    onClick={onSelect}
   >
-    <div className="bg-sunken rounded-xs flex justify-center p-2.5">
-      <div
-        className="resivo-paper rounded-[2px] px-2 py-2.5 shadow-xs"
-        data-template={template.id}
-        style={{ width: 72, height: 94 }}
-      >
-        {/* Name */}
-        <div
-          style={{
-            height: 5,
-            width: '62%',
-            background: 'var(--paper-ink)',
-            fontFamily: 'var(--paper-font-head)',
-          }}
-        />
-        {/* Contact line */}
-        <div
-          style={{
-            height: 2,
-            width: '44%',
-            marginTop: 3,
-            background: 'var(--paper-ink-muted)',
-          }}
-        />
-        {[0, 1].map((section) => (
-          <div key={section} style={{ marginTop: 8 }}>
-            {/* Section heading, in the template's accent */}
-            <div
-              style={{
-                height: 3,
-                width: '34%',
-                background: 'var(--paper-accent)',
-              }}
-            />
-            <div
-              style={{
-                height: 1,
-                marginTop: 2,
-                background: 'var(--paper-rule)',
-              }}
-            />
-            {[0, 1, 2].map((line) => (
-              <div
-                key={line}
-                style={{
-                  height: 2,
-                  marginTop: 2.5,
-                  width: line === 2 ? '68%' : '100%',
-                  background: 'var(--paper-ink-muted)',
-                  opacity: 0.55,
-                }}
-              />
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
+    <Box className="bg-sunken rounded-xs flex justify-center p-2.5">
+      <PaperMiniature size="tile" templateId={template.id} />
+    </Box>
 
-    <div className="px-1 pt-2 pb-0.5">
+    <Box className="px-1 pt-2 pb-0.5">
       <Text className="text-title text-[13px] font-medium" component="div">
         {template.name}
       </Text>
@@ -99,6 +43,6 @@ export const TemplateTile: React.FC<TemplateTileProps> = ({
       >
         {template.description}
       </Text>
-    </div>
+    </Box>
   </UnstyledButton>
 )

@@ -1,4 +1,5 @@
 import {
+  Box,
   ColorInput,
   NumberInput,
   Select,
@@ -33,7 +34,7 @@ export const ControlGroup: React.FC<{
     >
       {title}
     </Text>
-    <div className="flex flex-col gap-1.5">{children}</div>
+    <Box className="flex flex-col gap-1.5">{children}</Box>
   </section>
 )
 
@@ -50,7 +51,7 @@ export const Field: React.FC<{
   htmlFor?: string
   children: ReactNode
 }> = ({ label, hint, htmlFor, children }) => (
-  <div className="flex items-center gap-2">
+  <Box className="flex items-center gap-2">
     <Tooltip disabled={hint === undefined} label={hint} multiline w={220}>
       <Text
         className="text-muted w-[86px] flex-none text-[12px] leading-snug"
@@ -60,8 +61,8 @@ export const Field: React.FC<{
         {label}
       </Text>
     </Tooltip>
-    <div className="min-w-0 flex-1">{children}</div>
-  </div>
+    <Box className="min-w-0 flex-1">{children}</Box>
+  </Box>
 )
 
 /**
@@ -227,7 +228,7 @@ export const SliderField: React.FC<{
   format = (next) => next.toFixed(2),
 }) => (
   <Field hint={hint} label={label}>
-    <div className="flex items-center gap-2">
+    <Box className="flex items-center gap-2">
       <Slider
         aria-label={label}
         className="min-w-0 flex-1"
@@ -246,6 +247,6 @@ export const SliderField: React.FC<{
       >
         {format(value)}
       </Text>
-    </div>
+    </Box>
   </Field>
 )

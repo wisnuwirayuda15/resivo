@@ -1,4 +1,5 @@
 import {
+  Box,
   AppShell,
   Badge,
   ScrollArea,
@@ -66,7 +67,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <Badge variant="default" size="xs" radius="pill">
           local
         </Badge>
-        <div className="flex-1" />
+        <Box className="flex-1" />
         <Tooltip label="New resume">
           <UnstyledButton
             onClick={onNewResume}

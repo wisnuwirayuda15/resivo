@@ -1,8 +1,16 @@
 import { useState } from 'react'
-import { Menu, Text, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
+import {
+  Box,
+  Menu,
+  Text,
+  TextInput,
+  Tooltip,
+  UnstyledButton,
+} from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { cn } from '@/lib/utils'
 import { SECTION_KINDS } from '@/features/resume/model/document'
 import { plainText, text } from '@/features/resume/model/index'
 import {
@@ -77,7 +85,7 @@ const SectionRow: React.FC<{
 
   return (
     <li className="border-line-soft hover:bg-hover flex items-center gap-1 border-b px-2 py-1.5 last:border-b-0">
-      <div className="flex flex-none flex-col">
+      <Box className="flex flex-none flex-col">
         <Tooltip label="Move up">
           <UnstyledButton
             aria-label={`Move ${label} up`}
@@ -98,9 +106,9 @@ const SectionRow: React.FC<{
             <Icon name="caret-down" size={10} />
           </UnstyledButton>
         </Tooltip>
-      </div>
+      </Box>
 
-      <div className="min-w-0 flex-1">
+      <Box className="min-w-0 flex-1">
         {editable ? (
           <TextInput
             aria-label={`${label} title`}
@@ -130,7 +138,7 @@ const SectionRow: React.FC<{
         <Text span className="text-subtle font-mono text-[10px] tabular-nums">
           {blocks} {blocks === 1 ? 'block' : 'blocks'}
         </Text>
-      </div>
+      </Box>
 
       <Tooltip label={section.hidden === true ? 'Show' : 'Hide'}>
         <UnstyledButton
@@ -138,12 +146,12 @@ const SectionRow: React.FC<{
             section.hidden === true ? `Show ${label}` : `Hide ${label}`
           }
           aria-pressed={section.hidden === true}
-          className={[
+          className={cn(
             'rounded-control flex size-[22px] flex-none items-center justify-center',
             section.hidden === true
               ? 'text-accent bg-selected'
               : 'text-subtle hover:text-body hover:bg-active',
-          ].join(' ')}
+          )}
           onClick={() =>
             apply(setSectionHidden(section.id, section.hidden !== true))
           }
@@ -176,7 +184,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
   const sections = content.sections
 
   return (
-    <div>
+    <Box>
       <ul className="list-none">
         {sections.map((section, index) => (
           <SectionRow
@@ -190,7 +198,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
         ))}
       </ul>
 
-      <div className="px-2 py-2">
+      <Box className="px-2 py-2">
         <Menu position="bottom-start" width={200} withinPortal>
           <Menu.Target>
             <UnstyledButton className="border-line text-body hover:bg-hover rounded-control flex h-[26px] w-full items-center justify-center gap-1.5 border border-dashed text-[12px]">
@@ -209,7 +217,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
             ))}
           </Menu.Dropdown>
         </Menu>
-      </div>
+      </Box>
 
       {/* Deleting takes its blocks with it, so it is confirmed rather than
           undo-only — undo is a keystroke away but not obvious mid-edit. Hiding
@@ -234,6 +242,6 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
             : `"${plainText(pendingRemoval.title)}" and its ${pendingRemoval.blocks.length} ${pendingRemoval.blocks.length === 1 ? 'block' : 'blocks'} will be removed. Hide it instead if you only want it off this version.`}
         </Text>
       </ConfirmDialog>
-    </div>
+    </Box>
   )
 }
