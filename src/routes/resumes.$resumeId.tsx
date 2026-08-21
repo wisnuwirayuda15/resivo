@@ -5,8 +5,7 @@ import { Loader } from '@mantine/core'
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
-import { PreviewPane } from '@/features/preview/PreviewPane'
-import { patchDesign } from '@/features/editor/mutations'
+import { EditorLayout } from '@/features/editor/EditorLayout'
 import { useAutosave } from '@/features/editor/useAutosave'
 import { useEditorStore } from '@/features/editor/store'
 import { useResume } from '@/features/resume/queries'
@@ -16,13 +15,12 @@ import { useResume } from '@/features/resume/queries'
  *
  * This route owns the open document: it loads the record once, hands it to the
  * editor store, and lets everything below read from the store rather than from
- * the query cache. That is why the preview updates from an edit without a
- * refetch, and why navigating between the preview and (later) the editor panels
- * will not rehydrate the model.
+ * the query cache. That is why the preview and the style inspector stay in step
+ * without either knowing about the other, and why switching tabs inside the
+ * inspector does not rehydrate the model.
  *
- * The three-panel layout arrives with the Markdown and style editors. For now
- * the preview fills the pane, which is the half of the editor that has to be
- * right first: every other surface is judged against what this shows.
+ * `EditorLayout` owns the panels. This route's job ends at deciding whether
+ * there is a document to edit at all.
  */
 const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   const resume = useResume(resumeId)
@@ -97,13 +95,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     )
   }
 
-  return (
-    <PreviewPane
-      className="h-full"
-      document={document}
-      onPaperSizeChange={(size) => apply(patchDesign({ paper: { size } }))}
-    />
-  )
+  return <EditorLayout apply={apply} document={document} />
 }
 
 const ResumeScreen: React.FC = () => {

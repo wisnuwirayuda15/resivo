@@ -1,3 +1,5 @@
+import { deepEqual } from '@/lib/deep-equal'
+
 import type {
   DesignConfig,
   FontRef,
@@ -21,6 +23,19 @@ import type {
 const SERIF: FontRef = { family: 'Source Serif 4 Variable', source: 'builtin' }
 const SANS: FontRef = { family: 'Instrument Sans Variable', source: 'builtin' }
 const MONO: FontRef = { family: 'JetBrains Mono Variable', source: 'builtin' }
+
+/**
+ * The same three, as an addressable set.
+ *
+ * The style panel offers exactly these until the font library arrives, and it
+ * has to offer the same objects a template seeds — otherwise picking "the font
+ * it already has" would register as a customisation.
+ */
+export const BUILTIN_FONTS: Record<'serif' | 'sans' | 'mono', FontRef> = {
+  serif: SERIF,
+  sans: SANS,
+  mono: MONO,
+}
 
 /** Ink, muted ink and rule colours are shared by every template. */
 const PAPER_INK = '#1a1a18'
@@ -101,4 +116,30 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
   }
 
   return design
+}
+
+/**
+ * Whether a document's style tokens are still exactly what its template seeded.
+ *
+ * This is the question behind "keep your customisations?" on a template switch.
+ * Asking it when the answer is no — when nothing has been touched — trains the
+ * user to dismiss the dialog, so the switch is silent in that case and only
+ * prompts when there is something real to lose.
+ *
+ * Paper size is excluded deliberately. It is chosen from the preview toolbar
+ * rather than the style panel, it is a property of the printer and not of the
+ * design, and no template seeds anything but Letter — so counting a switch to A4
+ * as "customised" would make the prompt appear for a choice the user does not
+ * think of as styling.
+ */
+export const designMatchesTemplate = (
+  design: DesignConfig,
+  templateId: TemplateId,
+): boolean => {
+  const seeded = templateDefaults(templateId)
+
+  return deepEqual(
+    { ...design, paper: { ...design.paper, size: seeded.paper.size } },
+    seeded,
+  )
 }

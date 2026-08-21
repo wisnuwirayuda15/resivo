@@ -18,6 +18,11 @@ import type { TemplateComponents } from './renderer/types'
  * `--paper-*` token scopes in `paper.css` and by `defaults.ts`, so a template
  * usually supplies a short CSS delta and nothing else. `components` exists for
  * the cases where a different look genuinely needs different markup.
+ *
+ * Every delta below is pure CSS for a reason: the paginator measures the markup
+ * the renderers produce, and four templates producing four different DOM shapes
+ * would be four sets of measurement behaviour to keep honest. Restyling the same
+ * elements keeps one flow and one set of guarantees.
  */
 
 export interface ResumeTemplate {
@@ -58,24 +63,104 @@ const classic: ResumeTemplate = {
 }
 
 /**
- * The remaining three are token-only for now.
+ * Modern — clean contemporary sans.
  *
- * They are not stubs: `paper.css` gives each its own fonts, accent and body
- * size, and `defaults.ts` its own spacing and rules, so all three already render
- * as distinctly different resumes. Phase 6 gives them the layout deltas that
- * make them fully themselves.
+ * The rule moves from under the heading to beside it, filling the line, and the
+ * heading drops the uppercase tracking. Both are the same two elements the
+ * shared stylesheet renders, re-laid-out: `.rp-section` becomes a row and the
+ * rule takes the leftover width.
+ *
+ * The heading stays literal text either way, which is what an applicant tracking
+ * system reads — a decorative rule beside it changes nothing about parsing.
  */
-const tokenOnly = (id: TemplateId): ResumeTemplate => ({
-  id,
+const modern: ResumeTemplate = {
+  id: 'modern',
   version: 1,
-  baseCss: '',
-})
+  baseCss: `
+.resivo-paper[data-template='modern'] .rp-section {
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+}
+
+.resivo-paper[data-template='modern'] .rp-section-title {
+  letter-spacing: 0.02em;
+  text-transform: none;
+}
+
+.resivo-paper[data-template='modern'] .rp-section-rule {
+  flex: 1 1 auto;
+  margin-top: 0;
+}
+
+/* Weight, not colour, separates an entry's title from its employer. */
+.resivo-paper[data-template='modern'] .rp-entry-subtitle {
+  color: var(--paper-ink);
+}
+`,
+}
+
+/**
+ * Technical — denser, with monospace headings.
+ *
+ * Dates and locations move to the monospace face with tabular figures so the
+ * right-hand column of a long history lines up digit for digit. Square markers
+ * and a tighter bullet indent buy back the horizontal space a mono face costs.
+ */
+const technical: ResumeTemplate = {
+  id: 'technical',
+  version: 1,
+  baseCss: `
+.resivo-paper[data-template='technical'] .rp-section-title {
+  letter-spacing: 0.02em;
+}
+
+.resivo-paper[data-template='technical'] .rp-entry-meta {
+  font-family: var(--paper-font-head);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.resivo-paper[data-template='technical'] .rp-bullets {
+  padding-left: 0.95em;
+  list-style: square;
+}
+`,
+}
+
+/**
+ * Editorial — serif throughout, hierarchy from type size rather than rules.
+ *
+ * Dividers are off in this template's defaults, so the section heading has to
+ * carry the separation on its own: it is set larger, in the accent, without the
+ * uppercase tracking, and the headline under the name is italic.
+ */
+const editorial: ResumeTemplate = {
+  id: 'editorial',
+  version: 1,
+  baseCss: `
+.resivo-paper[data-template='editorial'] .rp-headline {
+  font-style: italic;
+  margin-top: 0.3em;
+}
+
+.resivo-paper[data-template='editorial'] .rp-section-title {
+  font-size: calc(var(--paper-fs-section) * 1.1);
+  letter-spacing: -0.005em;
+  text-transform: none;
+}
+
+.resivo-paper[data-template='editorial'] .rp-entry-subtitle {
+  font-style: italic;
+}
+`,
+}
 
 const TEMPLATES: Record<TemplateId, ResumeTemplate> = {
   classic,
-  modern: tokenOnly('modern'),
-  technical: tokenOnly('technical'),
-  editorial: tokenOnly('editorial'),
+  modern,
+  technical,
+  editorial,
 }
 
 export interface ResolvedTemplate {

@@ -4,15 +4,14 @@ import { resolveTemplate } from '@/features/templates/registry'
 
 import { documentFlow, flowItemClass } from './flow'
 import { paginate } from './paginate'
+import { renderFlow } from './renderFlow'
 
 import type { FlowItem } from './flow'
 import type { FlowMetric } from './paginate'
 import type { RenderContext } from '@/features/templates/renderer/types'
 import type {
-  Block,
   DesignConfig,
   ResumeDocument,
-  Section,
   TemplateId,
 } from '@/features/resume/model/document'
 
@@ -38,11 +37,6 @@ interface PreviewPaperProps {
   zoom: number
   /** Called whenever pagination settles on a different number of pages. */
   onPageCountChange?: (count: number) => void
-}
-
-interface RenderedItem {
-  item: FlowItem
-  node: React.ReactNode
 }
 
 /** Everything that, if it changed, invalidates a set of page breaks. */
@@ -182,60 +176,10 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * diverge, and a divergence here means page breaks computed against markup
    * that never appears on screen.
    */
-  const rendered = useMemo<Array<RenderedItem>>(() => {
-    const { Header, SectionHeading, Block: BlockView } = template.components
-
-    const sections = new Map<string, Section>(
-      document.content.sections.map((section) => [section.id, section]),
-    )
-    const blocks = new Map<string, { section: Section; block: Block }>()
-
-    for (const section of document.content.sections) {
-      for (const block of section.blocks) {
-        blocks.set(block.id, { section, block })
-      }
-    }
-
-    return items.map((item) => {
-      switch (item.type) {
-        case 'header':
-          return {
-            item,
-            node: (
-              <Header header={document.content.header} context={context} />
-            ),
-          }
-
-        case 'sectionHeading': {
-          const section = sections.get(item.sectionId ?? '')
-
-          return {
-            item,
-            node:
-              section === undefined ? null : (
-                <SectionHeading section={section} context={context} />
-              ),
-          }
-        }
-
-        case 'block': {
-          const found = blocks.get(item.blockId ?? '')
-
-          return {
-            item,
-            node:
-              found === undefined ? null : (
-                <BlockView
-                  block={found.block}
-                  section={found.section}
-                  context={context}
-                />
-              ),
-          }
-        }
-      }
-    })
-  }, [items, document.content, context, template])
+  const rendered = useMemo(
+    () => renderFlow(document, template, context, items),
+    [document, template, context, items],
+  )
 
   const nodeById = useMemo(
     () => new Map(rendered.map(({ item, node }) => [item.id, node])),
