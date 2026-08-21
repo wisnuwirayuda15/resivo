@@ -200,6 +200,13 @@ export const designVars = (design: DesignConfig): string => {
 export interface StylesheetInput {
   templateId: TemplateId
   design: DesignConfig
+  /**
+   * The user's CSS, already sanitized. Taking it pre-sanitized rather than
+   * sanitizing here is deliberate: the editor has to show the warnings, so the
+   * check runs once, where its result can be reported, and this function is
+   * left with nothing to decide.
+   */
+  customCss?: string
 }
 
 /**
@@ -209,13 +216,15 @@ export interface StylesheetInput {
  * layer used before it is declared would sort itself by first appearance
  * instead.
  *
- * The user's `customCss` is not here yet. Phase 8 adds it, together with the
- * sanitizer that has to run first; injecting it before that exists would be
- * shipping the hole and the feature in the wrong order.
+ * `custom` is last and therefore wins over the template and the style panel,
+ * which is the point of it. It still cannot reach the page geometry, because
+ * that is unlayered and unlayered beats every layer — so a user stylesheet can
+ * restyle the resume but not break the pagination it was measured against.
  */
 export const previewStylesheet = ({
   templateId,
   design,
+  customCss,
 }: StylesheetInput): string =>
   [
     LAYER_ORDER,
@@ -223,4 +232,7 @@ export const previewStylesheet = ({
     frameCssText,
     `@layer template {\n${templateLayerCss(templateId)}\n}`,
     `@layer tokens {\n${designVars(design)}\n}`,
+    ...(customCss === undefined || customCss.trim() === ''
+      ? []
+      : [`@layer custom {\n${customCss}\n}`]),
   ].join('\n\n')

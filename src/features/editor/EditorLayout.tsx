@@ -4,7 +4,7 @@ import { Splitter } from '@mantine/core'
 import { PreviewPane } from '@/features/preview/PreviewPane'
 import { StyleInspector } from '@/features/style/StyleInspector'
 import { applyMarkdown } from '@/features/markdown/index'
-import { patchDesign } from '@/features/editor/mutations'
+import { patchDesign, setCustomCss } from '@/features/editor/mutations'
 
 import { readPaneSizes, writePaneSizes } from './panels'
 import { CodePane } from './CodePane'
@@ -69,6 +69,15 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
     [document, replace],
   )
 
+  /**
+   * Custom CSS is stored verbatim; the preview sanitizes it on the way out. One
+   * coalesce key, so a stylesheet typed in one sitting is one undo step.
+   */
+  const handleCustomCss = useCallback(
+    (css: string) => apply(setCustomCss(css), { coalesce: 'customCss' }),
+    [apply],
+  )
+
   return (
     <Splitter
       className="h-full"
@@ -81,6 +90,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
         <CodePane
           className="h-full"
           document={document}
+          onCustomCssChange={handleCustomCss}
           onSourceChange={handleSourceChange}
           warnings={warnings}
         />

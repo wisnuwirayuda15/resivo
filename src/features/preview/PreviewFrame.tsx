@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 import { PreviewPaper } from './PreviewPaper'
+import { sanitizeCss } from '@/features/css/sanitize'
 import { previewStylesheet } from './css'
 
 import paperFontsHref from './paper-fonts.css?url'
@@ -64,13 +65,19 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
    */
   const [fontEpoch, setFontEpoch] = useState(0)
 
+  /**
+   * The user's CSS is sanitized here rather than stored sanitized, so tightening
+   * the rules later applies to every existing resume instead of only to what is
+   * edited afterwards. The document keeps what the user wrote.
+   */
   const css = useMemo(
     () =>
       previewStylesheet({
         templateId: resume.templateId,
         design: resume.design,
+        customCss: sanitizeCss(resume.customCss).css,
       }),
-    [resume.templateId, resume.design],
+    [resume.templateId, resume.design, resume.customCss],
   )
 
   // Create the head elements once per document, and tear them down with it.
