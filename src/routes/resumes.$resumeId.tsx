@@ -26,6 +26,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   const resume = useResume(resumeId)
   const load = useEditorStore((state) => state.load)
   const apply = useEditorStore((state) => state.apply)
+  const replace = useEditorStore((state) => state.replace)
   const openResumeId = useEditorStore((state) => state.resumeId)
   const document = useEditorStore((state) => state.document)
 
@@ -99,7 +100,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     )
   }
 
-  return <EditorLayout apply={apply} document={document} />
+  return <EditorLayout apply={apply} document={document} replace={replace} />
 }
 
 const ResumeScreen: React.FC = () => {
