@@ -1,6 +1,7 @@
 import { Box } from '@mantine/core'
 
 import { BUILTIN_FONTS } from '@/features/templates/defaults'
+import { useFonts } from '@/features/assets/queries'
 import { patchDesign } from '@/features/editor/mutations'
 
 import {
@@ -13,6 +14,7 @@ import {
 } from './controls'
 
 import type { Recipe } from '@/features/editor/mutations'
+import type { FontSummary } from '@/database/index'
 import type {
   DesignConfig,
   FontRef,
@@ -28,14 +30,21 @@ import type {
  * preview directly.
  */
 
-type FontKey = 'serif' | 'sans' | 'mono'
+/**
+ * A built-in family, or `custom:<row id>` for an uploaded one.
+ *
+ * The id, not the family name: two uploads can legitimately share a family — a
+ * regular and an italic of the same face — and selecting one has to mean one
+ * row, because that row is what the `@font-face` rule is built from.
+ */
+type FontKey = 'serif' | 'sans' | 'mono' | `custom:${string}`
 
 interface StylePanelProps {
   design: DesignConfig
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void
 }
 
-const FONT_OPTIONS: Array<{ value: FontKey; label: string }> = [
+const BUILTIN_OPTIONS: Array<{ value: FontKey; label: string }> = [
   { value: 'serif', label: 'Source Serif 4' },
   { value: 'sans', label: 'Instrument Sans' },
   { value: 'mono', label: 'JetBrains Mono' },
@@ -44,18 +53,47 @@ const FONT_OPTIONS: Array<{ value: FontKey; label: string }> = [
 /**
  * Maps a stored `FontRef` back to the option that produced it.
  *
- * Matched on family rather than by object identity, because the document has
- * been through JSON by the time it comes back from IndexedDB. A custom family
- * (phase 10) matches nothing and falls back to serif in the *control* only — the
- * document keeps its real value, so opening this panel cannot quietly rewrite a
- * font the user uploaded.
+ * A custom font is matched on its row id, and a built-in on its family, because
+ * the document has been through JSON by the time it comes back from IndexedDB
+ * and object identity is gone.
+ *
+ * A reference to a font that is no longer stored — deleted, or a backup restored
+ * on another device — falls back to serif in the *control only*. The document
+ * keeps its real value, so opening this panel cannot quietly rewrite a font the
+ * user chose, and the preview still shows the fallback face the browser picks.
  */
-const fontKey = (font: FontRef | undefined): FontKey => {
+const fontKey = (
+  font: FontRef | undefined,
+  fonts: ReadonlyArray<FontSummary>,
+): FontKey => {
+  if (font?.source === 'custom' && font.fontId !== undefined) {
+    return fonts.some((stored) => stored.id === font.fontId)
+      ? `custom:${font.fontId}`
+      : 'serif'
+  }
+
   const entry = Object.entries(BUILTIN_FONTS).find(
     ([, candidate]) => candidate.family === font?.family,
   )
 
   return (entry?.[0] as FontKey | undefined) ?? 'serif'
+}
+
+/** The `FontRef` a selected option stands for. */
+const fontRefFor = (
+  key: FontKey,
+  fonts: ReadonlyArray<FontSummary>,
+): FontRef | undefined => {
+  if (!key.startsWith('custom:')) {
+    return BUILTIN_FONTS[key as 'serif' | 'sans' | 'mono']
+  }
+
+  const fontId = key.slice('custom:'.length)
+  const stored = fonts.find((font) => font.id === fontId)
+
+  return stored === undefined
+    ? undefined
+    : { family: stored.family, source: 'custom', fontId }
 }
 
 const PAPER_SIZES: Array<{ value: PaperSize; label: string }> = [
@@ -88,6 +126,27 @@ const MARGIN_EDGES = [
 ] as const
 
 export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
+  /**
+   * Uploaded fonts join the same two selects rather than getting a list of their
+   * own: from the user's side there is one decision — what this resume is set in
+   * — and where the file came from is not part of it.
+   */
+  const { data: storedFonts } = useFonts()
+  const fonts = storedFonts ?? []
+
+  const fontOptions = [
+    ...BUILTIN_OPTIONS,
+    ...fonts.map((font) => ({
+      value: `custom:${font.id}` as FontKey,
+      // The family alone would be ambiguous where a face was uploaded in more
+      // than one weight, and both rows would read identically in the list.
+      label:
+        font.weight === 400 && font.style === 'normal'
+          ? font.family
+          : `${font.family} ${font.weight}${font.style === 'italic' ? ' italic' : ''}`,
+    })),
+  ]
+
   /**
    * Dragging a slider or holding a stepper produces a stream of edits.
    * Coalescing them under one key per control collapses the stream into a single
@@ -134,20 +193,28 @@ export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
 
       <ControlGroup title="Typography">
         <SelectField
-          data={FONT_OPTIONS}
+          data={fontOptions}
           label="Body font"
-          onChange={(key) =>
-            patch({ typography: { bodyFont: BUILTIN_FONTS[key] } })
-          }
-          value={fontKey(typography.bodyFont)}
+          onChange={(key) => {
+            const bodyFont = fontRefFor(key, fonts)
+
+            if (bodyFont !== undefined) {
+              patch({ typography: { bodyFont } })
+            }
+          }}
+          value={fontKey(typography.bodyFont, fonts)}
         />
         <SelectField
-          data={FONT_OPTIONS}
+          data={fontOptions}
           label="Heading font"
-          onChange={(key) =>
-            patch({ typography: { headingFont: BUILTIN_FONTS[key] } })
-          }
-          value={fontKey(typography.headingFont ?? typography.bodyFont)}
+          onChange={(key) => {
+            const headingFont = fontRefFor(key, fonts)
+
+            if (headingFont !== undefined) {
+              patch({ typography: { headingFont } })
+            }
+          }}
+          value={fontKey(typography.headingFont ?? typography.bodyFont, fonts)}
         />
 
         <NumberField

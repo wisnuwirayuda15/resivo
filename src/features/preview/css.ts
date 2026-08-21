@@ -207,6 +207,13 @@ export interface StylesheetInput {
    * left with nothing to decide.
    */
   customCss?: string
+  /**
+   * `@font-face` rules for the uploaded families this document uses, built by
+   * `features/assets/fontFaces`. Passed in rather than built here because the
+   * URLs inside them have lifetimes — object URLs in the preview, `data:` URLs
+   * in an export — and this function is pure.
+   */
+  fontFaces?: string
 }
 
 /**
@@ -225,10 +232,17 @@ export const previewStylesheet = ({
   templateId,
   design,
   customCss,
+  fontFaces,
 }: StylesheetInput): string =>
   [
     LAYER_ORDER,
     pageRule(design.paper.size),
+    /**
+     * Unlayered and before everything else. `@font-face` is not a style rule, so
+     * no layer can override it — but a face has to be declared before the rule
+     * that names it is resolved, and the token layer names it.
+     */
+    ...(fontFaces === undefined || fontFaces.trim() === '' ? [] : [fontFaces]),
     frameCssText,
     `@layer template {\n${templateLayerCss(templateId)}\n}`,
     `@layer tokens {\n${designVars(design)}\n}`,

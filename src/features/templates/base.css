@@ -254,6 +254,21 @@
   color: var(--paper-ink-muted);
 }
 
+/* ---- Images ---- */
+
+.rp-figure {
+  margin: 0;
+}
+
+/* The height comes from the `aspect-ratio` the renderer sets from the stored
+   intrinsic size — so the box is correct before the bytes decode, and the page
+   breaks around it do not move when they do. */
+.rp-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
 /* A referenced image that is not available yet. Reserves a visible box instead
    of collapsing, so the gap is legible rather than mysterious. */
 .rp-image-missing {

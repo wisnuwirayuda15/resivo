@@ -1,6 +1,6 @@
 import { ScrollArea, Tabs } from '@mantine/core'
 
-import { EmptyState } from '@/components/EmptyState'
+import { AssetsPanel } from '@/features/assets/AssetsPanel'
 import { cn } from '@/lib/utils'
 import { Icon } from '@/features/icons/IconRenderer'
 
@@ -87,17 +87,9 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
       </Tabs.Panel>
 
       <Tabs.Panel className="min-h-0 flex-1" value="assets">
-        {/**
-         * The tab exists now, empty, on purpose: it is where images and fonts
-         * will be picked, and settling the panel's shape once means the controls
-         * beside it do not move when that lands. Saying so is better than
-         * hiding the tab and having it appear later where something else was.
-         */}
-        <EmptyState
-          body="Images and custom fonts are stored on this device and picked from here. That library is not built yet."
-          icon="image"
-          title="No assets yet"
-        />
+        <ScrollArea className="h-full" scrollbarSize={8} type="hover">
+          <AssetsPanel apply={apply} document={document} />
+        </ScrollArea>
       </Tabs.Panel>
     </Tabs>
   </aside>

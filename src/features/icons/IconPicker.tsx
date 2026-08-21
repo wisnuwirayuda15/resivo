@@ -1,4 +1,3 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
   Loader,
@@ -9,6 +8,7 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ICON_WEIGHTS } from '@/features/resume/model/document'
 
@@ -22,8 +22,8 @@ import {
   searchIcons,
 } from './catalog'
 
-import type { IconCatalog, IconEntry } from './catalog'
 import type { IconWeight } from '@/features/resume/model/document'
+import type { IconCatalog, IconEntry } from './catalog'
 
 /**
  * The icon picker: all 1512 Phosphor icons, in all six weights, searchable.
@@ -244,6 +244,7 @@ const Cell: React.FC<{
   onSelect: () => void
 }> = ({ entry, selected, active, weight, onSelect }) => (
   <UnstyledButton
+    title={entry.name}
     aria-label={entry.name}
     aria-selected={selected}
     className={cn(

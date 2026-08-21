@@ -6,6 +6,7 @@ import { formatDateRange } from './dates'
 import type {
   BlockProps,
   HeaderProps,
+  RenderContext,
   SectionHeadingProps,
   TemplateComponents,
 } from './types'
@@ -35,61 +36,73 @@ import type {
  * document.
  */
 
-const DefaultHeader: React.FC<HeaderProps> = ({ header }) => (
-  <header className="rp-header">
-    {/**
-     * The avatar is deliberately unrendered until phase 10 wires blob URLs from
-     * the images table. Reserving the box now would be worse than not: it would
-     * bake a size into the page layout that the real image may not match, moving
-     * every page break once it loads.
-     */}
-    <div className="rp-header-text">
-      <div className="rp-name">
-        <InlineTextView value={header.name} />
-      </div>
+const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
+  const avatar =
+    header.avatarImageId === undefined
+      ? undefined
+      : context.images.get(header.avatarImageId)
 
-      {header.headline === undefined ? null : (
-        <div className="rp-headline">
-          <InlineTextView value={header.headline} />
-        </div>
+  return (
+    <header className="rp-header">
+      {/**
+       * Rendered only once the blob resolves, and never as a reserved box. The
+       * avatar's size is a style token, so an empty box of exactly that size
+       * would be indistinguishable from a photograph that failed — and drawing
+       * nothing costs nothing here, because the flex row simply closes up and
+       * re-opens when the image arrives, which re-paginates anyway.
+       */}
+      {avatar === undefined || avatar === null ? null : (
+        <img alt="" className="rp-avatar" src={avatar.url} />
       )}
 
-      {header.contacts.length === 0 ? null : (
-        <div className="rp-contacts">
-          {header.contacts.map((contact) => {
-            const label = (
-              <>
-                {contact.icon === undefined ? null : (
-                  <DocumentIcon icon={contact.icon} />
-                )}
-                <span>
-                  <InlineTextView value={contact.label} />
+      <div className="rp-header-text">
+        <div className="rp-name">
+          <InlineTextView value={header.name} />
+        </div>
+
+        {header.headline === undefined ? null : (
+          <div className="rp-headline">
+            <InlineTextView value={header.headline} />
+          </div>
+        )}
+
+        {header.contacts.length === 0 ? null : (
+          <div className="rp-contacts">
+            {header.contacts.map((contact) => {
+              const label = (
+                <>
+                  {contact.icon === undefined ? null : (
+                    <DocumentIcon icon={contact.icon} />
+                  )}
+                  <span>
+                    <InlineTextView value={contact.label} />
+                  </span>
+                </>
+              )
+
+              return (
+                <span className="rp-contact" key={contact.id}>
+                  {contact.href === undefined ? (
+                    label
+                  ) : (
+                    <a
+                      className="rp-link"
+                      href={contact.href}
+                      rel="noreferrer noopener"
+                      target="_blank"
+                    >
+                      {label}
+                    </a>
+                  )}
                 </span>
-              </>
-            )
-
-            return (
-              <span className="rp-contact" key={contact.id}>
-                {contact.href === undefined ? (
-                  label
-                ) : (
-                  <a
-                    className="rp-link"
-                    href={contact.href}
-                    rel="noreferrer noopener"
-                    target="_blank"
-                  >
-                    {label}
-                  </a>
-                )}
-              </span>
-            )
-          })}
-        </div>
-      )}
-    </div>
-  </header>
-)
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </header>
+  )
+}
 
 /**
  * A section's heading, and the rule under it.
@@ -214,26 +227,49 @@ const IconLabel: React.FC<{ block: IconLabelBlock }> = ({ block }) => (
 )
 
 /**
- * An image the renderer cannot resolve yet.
+ * A referenced image.
  *
- * Blob resolution from the images table arrives in phase 10. Until then the
- * reference is shown as a labelled placeholder rather than dropped, because
- * silently discarding something the document contains is the one thing this
- * renderer must never do.
+ * Three states, drawn differently on purpose. Resolved, it is an `<img>` given
+ * its intrinsic `aspect-ratio` from the stored record — so the box is the right
+ * height before a single byte is decoded, and the page breaks around it do not
+ * move when it paints. Absent from the map, the blob is still being read.
+ * Mapped to `null`, the row is gone: that one never resolves, so it says so
+ * rather than looking like a slow load forever.
  */
-const Image: React.FC<{ block: ImageBlock }> = ({ block }) => (
-  <figure
-    style={
-      block.widthPercent === undefined
-        ? undefined
-        : { width: `${block.widthPercent}%` }
-    }
-  >
-    <div className="rp-image-missing" data-image-id={block.imageId}>
-      {block.alt === '' ? 'Image' : block.alt}
-    </div>
-  </figure>
-)
+const Image: React.FC<{ block: ImageBlock; context: RenderContext }> = ({
+  block,
+  context,
+}) => {
+  const resolved = context.images.get(block.imageId)
+
+  return (
+    <figure
+      className="rp-figure"
+      style={
+        block.widthPercent === undefined
+          ? undefined
+          : { width: `${block.widthPercent}%` }
+      }
+    >
+      {resolved === undefined || resolved === null ? (
+        <div className="rp-image-missing" data-image-id={block.imageId}>
+          {resolved === null
+            ? `Missing image${block.alt === '' ? '' : `: ${block.alt}`}`
+            : block.alt === ''
+              ? 'Image'
+              : block.alt}
+        </div>
+      ) : (
+        <img
+          alt={block.alt}
+          className="rp-image"
+          src={resolved.url}
+          style={{ aspectRatio: `${resolved.width} / ${resolved.height}` }}
+        />
+      )}
+    </figure>
+  )
+}
 
 const Raw: React.FC<{ block: RawBlock }> = ({ block }) => (
   <pre className="rp-raw">{block.markdown}</pre>
@@ -250,7 +286,7 @@ const DefaultBlock: React.FC<BlockProps> = ({ block, context }) => {
     case 'tagList':
       return <TagList block={block} />
     case 'image':
-      return <Image block={block} />
+      return <Image block={block} context={context} />
     case 'divider':
       return <Divider block={block} />
     case 'iconLabel':

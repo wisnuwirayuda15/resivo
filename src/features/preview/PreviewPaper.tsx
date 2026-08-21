@@ -15,6 +15,7 @@ import { documentFlow, flowItemClass } from './flow'
 import { paginate } from './paginate'
 import { renderFlow } from './renderFlow'
 
+import type { ImageMap } from '@/features/assets/useAssetUrls'
 import type { FlowItem } from './flow'
 import type { FlowMetric } from './paginate'
 import type { RenderContext } from '@/features/templates/renderer/types'
@@ -49,6 +50,12 @@ interface PreviewPaperProps {
    * fallback face are wrong and must be discarded once the real face lands.
    */
   fontEpoch: number
+  /**
+   * Object URLs for the images this document references. Resolved by the host,
+   * because reading a blob is asynchronous and this component is inside the
+   * iframe, where a suspense boundary would blank the paper.
+   */
+  images: ImageMap
   /** 1 = 100%. */
   zoom: number
   /** Called whenever pagination settles on a different number of pages. */
@@ -63,6 +70,12 @@ interface PaginationKey {
   fontEpoch: number
   /** Bumped when the icon catalog arrives — see below. */
   glyphEpoch: number
+  /**
+   * An image landing changes the height of whatever holds it, so the breaks
+   * computed without it are wrong. Compared by identity, which is why
+   * `useImageUrls` returns a map that only changes when its contents do.
+   */
+  images: ImageMap
   /** The iframe's width — see the observer below. */
   width: number
 }
@@ -135,6 +148,7 @@ const readMetrics = (
 export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   document,
   fontEpoch,
+  images,
   zoom,
   onPageCountChange,
 }) => {
@@ -161,8 +175,12 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   const items = useMemo(() => documentFlow(document), [document])
 
   const context = useMemo<RenderContext>(
-    () => ({ locale: document.meta.locale, design: document.design }),
-    [document.meta.locale, document.design],
+    () => ({
+      locale: document.meta.locale,
+      design: document.design,
+      images,
+    }),
+    [document.meta.locale, document.design, images],
   )
 
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -202,6 +220,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     paged.templateId !== document.templateId ||
     paged.fontEpoch !== fontEpoch ||
     paged.glyphEpoch !== glyphEpoch ||
+    paged.images !== images ||
     paged.width !== width
 
   /**
@@ -248,6 +267,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       templateId: document.templateId,
       fontEpoch,
       glyphEpoch,
+      images,
       width,
       pages: paginate(measured.metrics, measured.contentHeight),
     })
@@ -258,6 +278,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     document.templateId,
     fontEpoch,
     glyphEpoch,
+    images,
     width,
   ])
 

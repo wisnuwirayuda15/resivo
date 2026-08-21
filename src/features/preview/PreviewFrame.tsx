@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
+import { fontFaceCss } from '@/features/assets/fontFaces'
+import { documentFontIds, documentImageIds } from '@/features/assets/references'
+import { useFontUrls, useImageUrls } from '@/features/assets/useAssetUrls'
+import { useFonts } from '@/features/assets/queries'
+
 import { PreviewPaper } from './PreviewPaper'
 import { sanitizeCss } from '@/features/css/sanitize'
 import { previewStylesheet } from './css'
@@ -66,6 +71,36 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   const [fontEpoch, setFontEpoch] = useState(0)
 
   /**
+   * Only the assets this document names. Holding every uploaded image would mean
+   * a gallery's worth of blobs alive for as long as the editor is open, and
+   * every declared face delaying the first paint — see `font-display: block`.
+   */
+  const imageIds = useMemo(() => documentImageIds(resume), [resume])
+  const fontIds = useMemo(() => documentFontIds(resume), [resume])
+
+  const images = useImageUrls(imageIds)
+  const fontUrls = useFontUrls(fontIds)
+  const { data: fonts } = useFonts()
+
+  /**
+   * A face needs both halves: the row, for its family and weight, and the blob
+   * URL. They arrive from different reads, so a font contributes nothing until
+   * both are here — and when the second lands, `loadingdone` bumps `fontEpoch`
+   * and the paper re-paginates against the real metrics.
+   */
+  const fontFaces = useMemo(
+    () =>
+      fontFaceCss(
+        (fonts ?? []).flatMap((font) => {
+          const url = fontUrls.get(font.id)
+
+          return url === undefined ? [] : [{ font, url }]
+        }),
+      ),
+    [fonts, fontUrls],
+  )
+
+  /**
    * The user's CSS is sanitized here rather than stored sanitized, so tightening
    * the rules later applies to every existing resume instead of only to what is
    * edited afterwards. The document keeps what the user wrote.
@@ -76,8 +111,9 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         templateId: resume.templateId,
         design: resume.design,
         customCss: sanitizeCss(resume.customCss).css,
+        fontFaces,
       }),
-    [resume.templateId, resume.design, resume.customCss],
+    [resume.templateId, resume.design, resume.customCss, fontFaces],
   )
 
   // Create the head elements once per document, and tear them down with it.
@@ -121,12 +157,12 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
       return
     }
 
-    const fonts = frameDocument.fonts
+    const faces = frameDocument.fonts
     const bump = () => setFontEpoch((epoch) => epoch + 1)
 
-    fonts.addEventListener('loadingdone', bump)
+    faces.addEventListener('loadingdone', bump)
 
-    return () => fonts.removeEventListener('loadingdone', bump)
+    return () => faces.removeEventListener('loadingdone', bump)
   }, [frameDocument])
 
   return (
@@ -154,6 +190,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             <PreviewPaper
               document={resume}
               fontEpoch={fontEpoch}
+              images={images}
               onPageCountChange={onPageCountChange}
               zoom={zoom}
             />,

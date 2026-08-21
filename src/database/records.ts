@@ -75,7 +75,8 @@ export interface FontRecord {
   family: string
   weight: number
   style: 'normal' | 'italic'
-  format: 'woff2' | 'woff' | 'ttf'
+  /** Not indexed, so widening this needs no schema version bump. */
+  format: 'woff2' | 'woff' | 'ttf' | 'otf'
   blob: Blob
   size: number
   createdAt: number

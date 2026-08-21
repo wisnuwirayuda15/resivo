@@ -1,3 +1,4 @@
+import type { ImageMap } from '@/features/assets/useAssetUrls'
 import type {
   Block,
   DesignConfig,
@@ -24,6 +25,19 @@ export interface RenderContext {
    * change it without a re-render of this tree.
    */
   design: DesignConfig
+  /**
+   * Object URLs for the images this document references, keyed by row id.
+   *
+   * Passed in rather than looked up here: the renderer is synchronous and runs
+   * inside the preview iframe, and it is also what HTML export serialises — so
+   * export can hand it `data:` URLs through the same field and produce a file
+   * with no external references at all.
+   *
+   * An id that is absent means the blob is still being read, or the row is
+   * gone. The two are drawn differently, because one resolves itself and the
+   * other never will.
+   */
+  images: ImageMap
 }
 
 export interface HeaderProps {

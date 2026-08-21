@@ -33,6 +33,7 @@ const sample = (): ResumeDocument => {
 const contextFor = (document: ResumeDocument): RenderContext => ({
   locale: document.meta.locale,
   design: document.design,
+  images: new Map(),
 })
 
 describe('renderFlow', () => {
