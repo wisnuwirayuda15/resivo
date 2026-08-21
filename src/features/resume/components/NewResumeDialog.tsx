@@ -1,5 +1,13 @@
 import { useState } from 'react'
-import { Button, Group, Modal, Select, Stack, TextInput } from '@mantine/core'
+import {
+  Button,
+  Group,
+  Modal,
+  Select,
+  Stack,
+  Text,
+  TextInput,
+} from '@mantine/core'
 
 import { UNGROUPED } from '@/database/index'
 import { templateList } from '@/features/templates/catalog'
@@ -63,9 +71,12 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     <Modal opened={opened} onClose={close} title="New resume" size={620}>
       <Stack gap="lg">
         <div>
-          <div className="text-muted mb-2 text-[12px] font-medium">
+          <Text
+            className="text-muted mb-2 text-[12px] font-medium"
+            component="div"
+          >
             Template
-          </div>
+          </Text>
           <div className="grid grid-cols-4 gap-2">
             {templateList.map((template) => (
               <TemplateTile

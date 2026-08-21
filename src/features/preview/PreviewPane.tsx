@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { SegmentedControl, Tooltip, UnstyledButton } from '@mantine/core'
+import { SegmentedControl, Text, Tooltip, UnstyledButton } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
 
 import { PreviewFrame } from './PreviewFrame'
 import { PAGE_DIMENSIONS } from './css'
 
-import type { PaperSize, ResumeDocument } from '@/features/resume/model/document'
+import type {
+  PaperSize,
+  ResumeDocument,
+} from '@/features/resume/model/document'
 
 /**
  * The preview panel: a header strip with page count, paper size and zoom, over
@@ -94,7 +97,9 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
     const next =
       direction === 1
         ? ZOOM_STEPS.find((candidate) => candidate > zoom + 0.001)
-        : [...ZOOM_STEPS].reverse().find((candidate) => candidate < zoom - 0.001)
+        : [...ZOOM_STEPS]
+            .reverse()
+            .find((candidate) => candidate < zoom - 0.001)
 
     setPinnedZoom(next ?? clamp(zoom, ZOOM_STEPS[0] ?? 0.5, 2))
   }
@@ -110,10 +115,10 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   return (
     <section className={`flex min-h-0 flex-col ${className ?? ''}`}>
       <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
-        <span className="text-subtle font-mono text-[11px]">
-          {pageCount} {pageCount === 1 ? 'page' : 'pages'} ·{' '}
-          {dimensions.width} × {dimensions.height}
-        </span>
+        <Text span className="text-subtle font-mono text-[11px]">
+          {pageCount} {pageCount === 1 ? 'page' : 'pages'} · {dimensions.width}{' '}
+          × {dimensions.height}
+        </Text>
 
         <div className="ml-auto flex items-center gap-1">
           {onPaperSizeChange === undefined ? null : (
@@ -140,9 +145,12 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
           {/* Monospace, because it is a number that changes in place — the design
               system's rule for every numeric readout. */}
-          <span className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums">
+          <Text
+            span
+            className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
+          >
             {Math.round(zoom * 100)}%
-          </span>
+          </Text>
 
           <Tooltip label="Zoom in">
             <UnstyledButton

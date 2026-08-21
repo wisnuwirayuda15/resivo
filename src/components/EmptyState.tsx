@@ -1,3 +1,5 @@
+import { Text } from '@mantine/core'
+
 import { Icon } from '@/features/icons/IconRenderer'
 
 import type { ReactNode } from 'react'
@@ -27,10 +29,12 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     <div className="border-line-strong text-subtle flex h-11 w-11 items-center justify-center rounded-md border border-dashed">
       <Icon name={icon} size={20} />
     </div>
-    <div className="text-title mt-4 text-[14px] font-semibold">{title}</div>
-    <p className="text-muted mt-1.5 max-w-[46ch] text-[13px] leading-normal">
+    <Text className="text-title mt-4 text-[14px] font-semibold" component="div">
+      {title}
+    </Text>
+    <Text className="text-muted mt-1.5 max-w-[46ch] text-[13px] leading-normal">
       {body}
-    </p>
+    </Text>
     {action === undefined ? null : <div className="mt-4">{action}</div>}
   </div>
 )

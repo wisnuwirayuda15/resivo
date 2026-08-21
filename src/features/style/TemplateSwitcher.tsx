@@ -1,5 +1,12 @@
 import { useState } from 'react'
-import { Button, Group, Modal, Stack, UnstyledButton } from '@mantine/core'
+import {
+  Button,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  UnstyledButton,
+} from '@mantine/core'
 
 import {
   designMatchesTemplate,
@@ -34,6 +41,10 @@ interface TemplateSwitcherProps {
  * A row-sized swatch: the template's accent over its two faces, in the real
  * paper tokens. Small enough to sit in a 288px panel, and honest, because it
  * reads the same `data-template` scope the page does.
+ *
+ * Plain elements rather than `Text`, unlike the rest of this panel: everything
+ * inside `.resivo-paper` shows paper tokens, and Mantine's `Text` would put the
+ * chrome's own font size and leading on the specimen it is meant to preview.
  */
 const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
   const design = templateDefaults(id)
@@ -106,12 +117,12 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
             >
               <TemplateSwatch id={template.id} />
               <span className="min-w-0 flex-1">
-                <span className="text-title block text-[12px] font-medium">
+                <Text span className="text-title block text-[12px] font-medium">
                   {template.name}
-                </span>
-                <span className="text-subtle block truncate text-[11px]">
+                </Text>
+                <Text span className="text-subtle block truncate text-[11px]">
                   {template.description}
-                </span>
+                </Text>
               </span>
             </UnstyledButton>
           )
@@ -125,12 +136,12 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
         title="Keep your style changes?"
       >
         <Stack gap="lg">
-          <p className="text-body text-[13px] leading-normal">
+          <Text className="text-body text-[13px] leading-normal">
             You have changed the style tokens on this resume. Switching to{' '}
             {pending === null ? '' : TEMPLATE_CATALOG[pending].name} can keep
             those changes, or replace them with that template&rsquo;s own
             defaults. Your content is untouched either way.
-          </p>
+          </Text>
           <Group gap="xs" justify="flex-end">
             <Button onClick={() => setPending(null)} variant="subtle">
               Cancel

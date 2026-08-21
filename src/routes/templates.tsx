@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Text } from '@mantine/core'
 
 import { Shell } from '@/components/shell/Shell'
 import { TemplateTile } from '@/features/resume/components/TemplateTile'
@@ -15,11 +16,11 @@ import { templateList } from '@/features/templates/catalog'
 const TemplatesRoute: React.FC = () => (
   <Shell title="Templates">
     <div className="p-6">
-      <p className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
+      <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
         Every template is single-column and parser-safe. They differ in
         typeface, spacing and how much hierarchy comes from rules rather than
         type size.
-      </p>
+      </Text>
 
       <div className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
         {templateList.map((template) => (
@@ -30,9 +31,9 @@ const TemplatesRoute: React.FC = () => (
               selected={false}
               onSelect={() => {}}
             />
-            <p className="text-subtle px-1 text-[11px] leading-snug">
+            <Text className="text-subtle px-1 text-[11px] leading-snug">
               {template.atsNotes}
-            </p>
+            </Text>
           </div>
         ))}
       </div>

@@ -1,4 +1,4 @@
-import { UnstyledButton } from '@mantine/core'
+import { Text, UnstyledButton } from '@mantine/core'
 
 import type { TemplateMeta } from '@/features/templates/catalog'
 
@@ -90,10 +90,15 @@ export const TemplateTile: React.FC<TemplateTileProps> = ({
     </div>
 
     <div className="px-1 pt-2 pb-0.5">
-      <div className="text-title text-[13px] font-medium">{template.name}</div>
-      <div className="text-muted mt-0.5 text-[11px] leading-snug">
+      <Text className="text-title text-[13px] font-medium" component="div">
+        {template.name}
+      </Text>
+      <Text
+        className="text-muted mt-0.5 text-[11px] leading-snug"
+        component="div"
+      >
         {template.description}
-      </div>
+      </Text>
     </div>
   </UnstyledButton>
 )

@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Text } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
 
@@ -40,9 +41,13 @@ export const NavItemContent: React.FC<NavItemContentProps> = ({
 }) => (
   <>
     <Icon name={icon} size={16} />
-    <span className="flex-1 truncate text-left">{label}</span>
+    <Text className="flex-1 truncate text-left" span>
+      {label}
+    </Text>
     {count === undefined || count === 0 ? null : (
-      <span className="text-subtle font-mono text-[11px]">{count}</span>
+      <Text className="text-subtle font-mono text-[11px]" span>
+        {count}
+      </Text>
     )}
   </>
 )
@@ -93,9 +98,12 @@ interface NavGroupProps {
 export const NavGroup: React.FC<NavGroupProps> = ({ label, children }) => (
   <div className="px-2.5 pb-1.5">
     {label === undefined ? null : (
-      <div className="text-subtle px-2.5 pt-3 pb-1.5 text-[10px] font-medium tracking-[0.06em] uppercase">
+      <Text
+        className="text-subtle px-2.5 pt-3 pb-1.5 text-[10px] font-medium tracking-[0.06em] uppercase"
+        component="div"
+      >
         {label}
-      </div>
+      </Text>
     )}
     <div className="flex flex-col gap-px">{children}</div>
   </div>

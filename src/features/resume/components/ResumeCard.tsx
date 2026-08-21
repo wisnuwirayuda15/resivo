@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { Menu, Tooltip, UnstyledButton } from '@mantine/core'
+import { Menu, Text, Tooltip, UnstyledButton } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
 import { RelativeTime } from '@/components/RelativeTime'
@@ -99,14 +99,20 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
         </div>
 
         <div className="px-3.5 pt-3 pb-3.5">
-          <div className="text-title truncate text-[13px] font-medium">
+          <Text
+            className="text-title truncate text-[13px] font-medium"
+            component="div"
+          >
             {resume.title}
-          </div>
+          </Text>
           {/* Middle dot separates metadata, per the design system. */}
-          <div className="text-subtle mt-1 truncate font-mono text-[11px]">
+          <Text
+            className="text-subtle mt-1 truncate font-mono text-[11px]"
+            component="div"
+          >
             Edited <RelativeTime value={resume.updatedAt} /> ·{' '}
             {templateName(resume.templateId)}
-          </div>
+          </Text>
         </div>
       </Link>
 

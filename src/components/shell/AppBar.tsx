@@ -1,5 +1,6 @@
 import {
   Menu,
+  Text,
   Tooltip,
   UnstyledButton,
   useComputedColorScheme,
@@ -61,9 +62,9 @@ export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
     <div className="flex h-full items-center gap-2 px-4">
       {burger}
 
-      <span className="text-title text-[14px] leading-none font-semibold">
+      <Text span className="text-title text-[14px] leading-none font-semibold">
         {title}
-      </span>
+      </Text>
 
       <div className="flex-1" />
 

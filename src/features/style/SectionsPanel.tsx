@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Menu, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
+import { Menu, Text, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
 import { ConfirmDialog } from '@/components/ConfirmDialog'
@@ -122,14 +122,14 @@ const SectionRow: React.FC<{
             multiline
             w={220}
           >
-            <span className="text-body block truncate text-[12px]">
+            <Text span className="text-body block truncate text-[12px]">
               {label}
-            </span>
+            </Text>
           </Tooltip>
         )}
-        <span className="text-subtle font-mono text-[10px] tabular-nums">
+        <Text span className="text-subtle font-mono text-[10px] tabular-nums">
           {blocks} {blocks === 1 ? 'block' : 'blocks'}
-        </span>
+        </Text>
       </div>
 
       <Tooltip label={section.hidden === true ? 'Show' : 'Hide'}>
@@ -228,11 +228,11 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
         opened={pendingRemoval !== null}
         title="Delete section"
       >
-        <p className="text-body text-[13px]">
+        <Text className="text-body text-[13px]">
           {pendingRemoval === null
             ? null
             : `"${plainText(pendingRemoval.title)}" and its ${pendingRemoval.blocks.length} ${pendingRemoval.blocks.length === 1 ? 'block' : 'blocks'} will be removed. Hide it instead if you only want it off this version.`}
-        </p>
+        </Text>
       </ConfirmDialog>
     </div>
   )

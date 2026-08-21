@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Text } from '@mantine/core'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import utc from 'dayjs/plugin/utc'
@@ -62,8 +63,12 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({
   }, [value])
 
   return (
-    <time dateTime={new Date(value).toISOString()} className={className}>
+    <Text
+      className={className}
+      component="time"
+      dateTime={new Date(value).toISOString()}
+    >
       {label}
-    </time>
+    </Text>
   )
 }

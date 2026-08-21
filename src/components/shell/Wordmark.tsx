@@ -1,3 +1,5 @@
+import { Text } from '@mantine/core'
+
 /**
  * The Resivo wordmark.
  *
@@ -5,7 +7,13 @@
  * explicit that none was invented. The accent period is the only mark.
  */
 export const Wordmark: React.FC = () => (
-  <span className="text-title text-[15px] leading-none font-semibold tracking-[-0.015em]">
-    Resivo<span className="text-accent">.</span>
-  </span>
+  <Text
+    className="text-title text-[15px] leading-none font-semibold tracking-[-0.015em]"
+    span
+  >
+    Resivo
+    <Text className="text-accent" span>
+      .
+    </Text>
+  </Text>
 )

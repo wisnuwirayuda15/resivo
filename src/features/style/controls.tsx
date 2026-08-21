@@ -4,6 +4,7 @@ import {
   Select,
   Slider,
   Switch,
+  Text,
   Tooltip,
 } from '@mantine/core'
 
@@ -26,9 +27,12 @@ export const ControlGroup: React.FC<{
   children: ReactNode
 }> = ({ title, children }) => (
   <section className="border-line-soft border-b px-3 py-3 last:border-b-0">
-    <h3 className="text-subtle mb-2 text-[10px] font-medium tracking-[0.06em] uppercase">
+    <Text
+      className="text-subtle mb-2 text-[10px] font-medium tracking-[0.06em] uppercase"
+      component="h3"
+    >
       {title}
-    </h3>
+    </Text>
     <div className="flex flex-col gap-1.5">{children}</div>
   </section>
 )
@@ -48,12 +52,13 @@ export const Field: React.FC<{
 }> = ({ label, hint, htmlFor, children }) => (
   <div className="flex items-center gap-2">
     <Tooltip disabled={hint === undefined} label={hint} multiline w={220}>
-      <label
+      <Text
         className="text-muted w-[86px] flex-none text-[12px] leading-snug"
+        component="label"
         htmlFor={htmlFor}
       >
         {label}
-      </label>
+      </Text>
     </Tooltip>
     <div className="min-w-0 flex-1">{children}</div>
   </div>
@@ -235,9 +240,12 @@ export const SliderField: React.FC<{
         step={step}
         value={value}
       />
-      <span className="text-subtle w-[3.2em] flex-none text-right font-mono text-[11px] tabular-nums">
+      <Text
+        span
+        className="text-subtle w-[3.2em] flex-none text-right font-mono text-[11px] tabular-nums"
+      >
         {format(value)}
-      </span>
+      </Text>
     </div>
   </Field>
 )
