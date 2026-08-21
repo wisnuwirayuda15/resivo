@@ -13,7 +13,10 @@ describe('formatDateRange', () => {
     // `current` winning over `end` is the model's rule, so ticking the box never
     // requires clearing the old end date first.
     expect(
-      formatDateRange({ start: '2021-03', end: '2024-08', current: true }, 'en'),
+      formatDateRange(
+        { start: '2021-03', end: '2024-08', current: true },
+        'en',
+      ),
     ).toBe(`Mar 2021 ${RANGE_DASH} Present`)
   })
 

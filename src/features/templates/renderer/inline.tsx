@@ -2,7 +2,11 @@ import { Fragment } from 'react'
 
 import { DocumentIcon } from '@/features/icons/IconRenderer'
 
-import type { InlineNode, InlineText, Mark } from '@/features/resume/model/document'
+import type {
+  InlineNode,
+  InlineText,
+  Mark,
+} from '@/features/resume/model/document'
 
 /**
  * Renders the document's rich inline text.
@@ -42,7 +46,9 @@ const InlineNodeView: React.FC<{ node: InlineNode }> = ({ node }) => {
 
       return (
         <>
-          {MARK_ORDER.filter((mark) => marks.includes(mark)).reduceRight<React.ReactNode>(
+          {MARK_ORDER.filter((mark) =>
+            marks.includes(mark),
+          ).reduceRight<React.ReactNode>(
             (children, mark) => wrapMark(mark, children),
             node.text,
           )}
