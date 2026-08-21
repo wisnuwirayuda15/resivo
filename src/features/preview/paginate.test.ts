@@ -38,10 +38,7 @@ describe('paginate', () => {
   })
 
   it('starts a new page when the next item would overflow', () => {
-    const pages = paginate(
-      [item('a', 60), item('b', 60), item('c', 30)],
-      PAGE,
-    )
+    const pages = paginate([item('a', 60), item('b', 60), item('c', 30)], PAGE)
 
     expect(pages).toEqual([['a'], ['b', 'c']])
   })
@@ -100,13 +97,20 @@ describe('paginate', () => {
 
   it('does not strand a heading whose block only just fails to pair with it', () => {
     // Heading plus block is 105 against a 100 page, so they can never share one.
-    const items = [item('filler', 30), item('heading', 20, { keepWithNext: true }), item('block', 85)]
+    const items = [
+      item('filler', 30),
+      item('heading', 20, { keepWithNext: true }),
+      item('block', 85),
+    ]
 
     expect(paginate(items, PAGE)).toEqual([['filler', 'heading'], ['block']])
   })
 
   it('ignores keepWithNext on the last item, which has nothing to keep', () => {
-    const items = [item('filler', 70), item('heading', 25, { keepWithNext: true })]
+    const items = [
+      item('filler', 70),
+      item('heading', 25, { keepWithNext: true }),
+    ]
 
     expect(paginate(items, PAGE)).toEqual([['filler', 'heading']])
   })
