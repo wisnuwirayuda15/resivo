@@ -29,7 +29,6 @@ a {
 
 a:hover {
   color: var(--text-link-hover);
-  text-decoration: underline;
 }
 
 /* Every numeric readout, file name and path is monospace. */
