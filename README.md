@@ -1,202 +1,164 @@
-Welcome to your new TanStack Start app!
+# Resivo
 
-# Getting Started
+A local-first resume builder. Everything lives in your browser — no account, no
+server, no network request that carries your data anywhere.
 
-To run this application:
+Write a resume in Markdown or edit it directly on the page, style it with a
+visual panel or your own CSS, and export it as a PDF, a single self-contained
+HTML file, or Markdown.
+
+## Why local-first
+
+A resume is a document about you: where you live, who employs you, what you are
+paid. Resivo keeps all of it in IndexedDB on the device you typed it on. There is
+no backend to breach and no account to delete.
+
+The consequence is the tradeoff: clearing your browser storage deletes your
+resumes, and there is no copy anywhere else. Backup and restore in Settings is
+the only thing that survives a cleared browser or a lost machine.
+
+## Getting started
 
 ```bash
 bun install
-bun --bun run dev
 ```
-
-# Building For Production
-
-To build this application for production:
 
 ```bash
-bun --bun run build
+bun run dev
 ```
 
-## Styling
+The app runs at http://localhost:3000.
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+## What it does
 
-### Removing Tailwind CSS
+**Library.** Multiple resumes, organised into groups, with search, duplicate and
+archive. Archived resumes are hidden, never deleted.
 
-If you prefer not to use Tailwind CSS:
+**Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
+style controls on the right. Panel widths are draggable and remembered.
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
+**Markdown.** A small dialect — headings for sections, directives such as
+`:::entry{title="…" start="2021-03"}` for structured entries. It round-trips
+losslessly: anything the model cannot represent (tables, raw HTML, code fences)
+is kept verbatim and flagged as a warning rather than silently dropped.
 
-## Linting & Formatting
+**Visual editing.** Click any text on the paper to edit it in place; drag blocks
+and sections to reorder them, or use the move buttons beside them. Switching the
+editor on cannot move a page break — the chrome is never part of what the
+paginator measures.
 
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
+**Templates and style.** Four ATS-friendly templates (`classic`, `modern`,
+`technical`, `editorial`), all pure CSS over one shared markup, plus a control
+for every design token: paper size, margins, fonts, sizes, colours, rhythm,
+rules, icons.
+
+**Custom CSS.** Your own stylesheet, applied to the resume only. It is
+sanitized — no `@import`, no external `url()`, no `position: fixed` — and injected
+into a cascade layer above the template, so it can restyle the paper but cannot
+reach the app around it or break the pagination it was measured against.
+
+**Assets.** An image gallery and custom font upload, shared across every resume
+on the device. Fonts are validated by the browser's own font parser on upload,
+so a bad file is refused rather than silently falling back.
+
+**Icons.** All 1512 Phosphor icons in all six weights, searchable, rendered as
+inline SVG so they survive into an export.
+
+**Export.** PDF is the browser printing the preview — the same document, so the
+PDF _is_ what you were looking at. HTML is one file with no external reference of
+any kind: images, custom fonts and the bundled typefaces are all inlined.
+Markdown uses the same serializer the editor reads.
+
+## How it works
+
+The preview is a same-origin **iframe**, and that choice drives much of the
+architecture. Only a separate document gives its own `@page` rule, its own root
+font size, and a cascade the app cannot leak into — so the paper stays light
+while the app is dark, and the document whose HTML is exported is the one on
+screen.
+
+Pagination is **measured, not guessed**: every block is laid out once in a hidden
+container at the exact page width, measured, and then distributed into page boxes
+using the breaks that produced. Both passes render the same React elements, so
+what was measured is what appears. Export reuses those breaks rather than
+re-deriving them.
+
+The document is one typed model, and every edit — a keystroke in the Markdown
+pane, a slider in the style panel, a drag on the paper — goes through the same
+typed recipes. That is what keeps one undo history coherent across three very
+different editing surfaces.
+
+## Stack
+
+TanStack Start (SSR shell) · TanStack Router, Query · Mantine 9 · Tailwind CSS 4
+· Zustand + Immer · Dexie / IndexedDB · Zod · Monaco · unified / remark ·
+dnd-kit · Phosphor
+
+The SSR shell is kept, but nothing that touches user data runs on the server:
+IndexedDB, Monaco, the preview iframe and dnd-kit all sit behind client-only
+boundaries.
+
+## Project layout
+
+```
+src/
+  routes/          file-based routes (library, editor, assets, settings)
+  features/
+    resume/        the document model, schema and queries
+    editor/        store, autosave, undo, Markdown and CSS panes
+    preview/       iframe host, paginator, flow, reorder
+    templates/     template registry and the renderers
+    markdown/      the Markdown codec, both directions
+    css/           the custom-CSS sanitizer
+    style/         the style inspector
+    icons/         generated icon catalog and picker
+    assets/        images and fonts
+    export/        PDF, HTML and Markdown adapters
+    backup/        whole-database backup and restore
+  database/        Dexie schema, repositories, migrations
+  components/      app chrome
+  lib/             small shared utilities
+```
+
+## Scripts
 
 ```bash
-bun --bun run lint
-bun --bun run format
-bun --bun run check
+bun run dev            # dev server on :3000
+bun run build          # production build
+bun run typecheck      # tsc --noEmit
+bun run test           # vitest
+bun run lint           # eslint
+bun run format         # prettier --write, then eslint --fix
+bun run generate-icons # rebuild the icon catalog from @phosphor-icons/core
 ```
 
-## Deploy with Nitro
+`generate-icons` writes `src/features/icons/*.gen.ts`, which is **committed**.
+Codegen deliberately stays out of the build so a clean checkout does not depend
+on a dev dependency resolving to the same icon-set version.
 
-This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
+## Testing
 
 ```bash
-npm run build
-node dist/server/index.mjs
+bun run test
 ```
 
-The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
+The suite is unit-level and runs without a browser: the model, the Markdown
+codec, the paginator, the CSS sanitizer, the reorder logic, the export writer and
+the backup format. Repository tests use `fake-indexeddb`; the few that need a DOM
+opt in per file with `// @vitest-environment happy-dom`.
 
-For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
+## Deploying
 
-## Routing
+The build output is a self-contained Node server (Nitro).
 
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from '@tanstack/react-router'
+```bash
+bun run build
 ```
 
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
+```bash
+node .output/server/index.mjs
 ```
 
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+Any static or Node-compatible host works — there is no database to provision and
+no environment variable to set, because the server only ever ships the app
+itself. For host-specific presets see https://v3.nitro.build/deploy.
