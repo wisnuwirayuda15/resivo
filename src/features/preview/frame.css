@@ -254,3 +254,154 @@
     break-after: auto;
   }
 }
+
+/**
+ * Editing chrome.
+ *
+ * Unlayered, like the page geometry above it, and every rule here is either
+ * absolutely positioned or a property that cannot affect layout — outline,
+ * background, cursor. That is load-bearing, and it is the CSS half of a
+ * two-part guarantee that switching the editor on cannot move a page break:
+ *
+ *   the chrome — handles, drop rules — is rendered only in the paged pass, so
+ *   the paginator never measures it at all;
+ *
+ *   the editable wrapper *is* in the measured tree, so it is a bare inline
+ *   `span` given nothing here but outline, background and cursor.
+ *
+ * `editMarkup.test.tsx` holds the structural half: unwrapping those spans
+ * reproduces the view-mode markup exactly.
+ *
+ * `@media print` below removes what remains, so a print started while Visual
+ * mode is on still produces the clean document.
+ */
+
+.rp-item {
+  position: relative;
+}
+
+.rp-chrome {
+  position: absolute;
+  top: 0;
+  /* Outside the page's content box, in the margin. Nothing in the flow moves to
+     make room for it. */
+  right: 100%;
+  display: flex;
+  gap: 2px;
+  padding-right: 6px;
+  opacity: 0;
+  transition: opacity 120ms ease-out;
+}
+
+.rp-item:hover .rp-chrome,
+.rp-chrome:focus-within {
+  opacity: 1;
+}
+
+.rp-chrome-grip,
+.rp-chrome-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 1px solid rgba(18, 18, 16, 0.12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.94);
+  color: rgba(18, 18, 16, 0.55);
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.rp-chrome-grip {
+  cursor: grab;
+}
+
+.rp-chrome-grip:hover,
+.rp-chrome-button:hover:not(:disabled) {
+  color: rgba(18, 18, 16, 0.9);
+}
+
+.rp-chrome-button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.rp-chrome-danger:hover:not(:disabled) {
+  border-color: rgba(176, 42, 42, 0.4);
+  color: rgb(176, 42, 42);
+}
+
+.rp-chrome-grip:focus-visible,
+.rp-chrome-button:focus-visible {
+  outline: 2px solid rgb(14, 124, 118);
+  outline-offset: 1px;
+}
+
+/* The item being dragged. Dimmed rather than hidden, so the page it came from
+   does not reflow while the pointer is still down. */
+.rp-item[data-dragging] {
+  opacity: 0.4;
+}
+
+/**
+ * Where the drop would land.
+ *
+ * A rule above the target, not a gap opened by translating everything below it:
+ * one section's items can be split across two page boxes, and a translate would
+ * slide content off the bottom of one page without it appearing on the next.
+ */
+.rp-item[data-over]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  border-top: 2px solid rgb(14, 124, 118);
+}
+
+/* An editable field. Outline, never border: a border would take space and move
+   the text it surrounds. */
+.rp-editable {
+  border-radius: 2px;
+  cursor: text;
+}
+
+.rp-editable:hover {
+  outline: 1px dashed rgba(14, 124, 118, 0.5);
+  outline-offset: 2px;
+}
+
+.rp-editable:focus-visible {
+  outline: 2px solid rgb(14, 124, 118);
+  outline-offset: 2px;
+}
+
+.rp-editing {
+  outline: 2px solid rgb(14, 124, 118);
+  outline-offset: 2px;
+  background: rgba(14, 124, 118, 0.06);
+}
+
+@media print {
+  .rp-chrome {
+    display: none;
+  }
+
+  .rp-item[data-over]::before {
+    display: none;
+  }
+
+  .rp-item[data-dragging] {
+    opacity: 1;
+  }
+
+  .rp-editable,
+  .rp-editing {
+    outline: none;
+    background: none;
+  }
+}

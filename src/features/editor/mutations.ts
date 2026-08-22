@@ -352,6 +352,97 @@ export const setBulletItem =
     }
   }
 
+/**
+ * One field of an entry.
+ *
+ * Separate from `setBlockText` because an entry is the one block with several
+ * independent runs of text, and the visual editor edits each in place. Naming the
+ * field rather than adding four near-identical recipes keeps the call sites at
+ * the paper honest about which one they are writing.
+ *
+ * An empty value clears the optional fields rather than storing an empty array:
+ * the renderer branches on `undefined` to decide whether the comma, the dates
+ * block or the summary paragraph exist at all, and an empty array would leave
+ * their punctuation and spacing behind.
+ */
+export const setEntryField =
+  (
+    sectionId: string,
+    blockId: string,
+    field: 'title' | 'subtitle' | 'location' | 'summary',
+    value: InlineText,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block?.kind !== 'entry') {
+      return
+    }
+
+    if (field === 'title') {
+      block.title = value
+      return
+    }
+
+    if (value.length === 0) {
+      delete block[field]
+      return
+    }
+
+    block[field] = value
+  }
+
+/** One bullet of an entry. Entry bullets are a different array from a bullet
+ * list's items, so they need their own operation. */
+export const setEntryBullet =
+  (
+    sectionId: string,
+    blockId: string,
+    itemIndex: number,
+    value: InlineText,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block?.kind === 'entry' && itemIndex < block.bullets.length) {
+      block.bullets[itemIndex] = value
+    }
+  }
+
+/**
+ * One tag.
+ *
+ * Tags are plain strings, not rich text, so this takes a string — and an emptied
+ * tag is removed rather than left as a blank chip, which is what the user means
+ * when they clear one.
+ */
+export const setTag =
+  (
+    sectionId: string,
+    blockId: string,
+    itemIndex: number,
+    value: string,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block?.kind !== 'tagList' || itemIndex >= block.tags.length) {
+      return
+    }
+
+    const trimmed = value.trim()
+
+    if (trimmed === '') {
+      block.tags.splice(itemIndex, 1)
+      return
+    }
+
+    block.tags[itemIndex] = trimmed
+  }
+
 /** Replaces a block wholesale. Used by the Markdown codec, which reconstructs
  * blocks rather than patching fields. */
 export const replaceBlock =

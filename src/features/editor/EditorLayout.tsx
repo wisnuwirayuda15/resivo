@@ -98,6 +98,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 
       <Splitter.Pane defaultSize={100} min="340px">
         <PreviewPane
+          apply={apply}
           className="h-full"
           document={document}
           onPaperSizeChange={(size) => apply(patchDesign({ paper: { size } }))}

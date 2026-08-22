@@ -1,3 +1,4 @@
+import type { Recipe } from '@/features/editor/mutations'
 import type { ImageMap } from '@/features/assets/useAssetUrls'
 import type {
   Block,
@@ -15,7 +16,23 @@ import type {
  * can land on different pages, so nothing may render a section as one box.
  */
 
+/**
+ * What the rendered paper is *for*.
+ *
+ * `view` and `print` produce identical markup; `edit` adds the editing chrome.
+ * Three values rather than a boolean because print is not merely non-editable —
+ * a later pass has decisions of its own to make there, and a call site reading
+ * `mode === 'print'` says what it means where `!editable` would not.
+ */
+export type RenderMode = 'view' | 'edit' | 'print'
+
 export interface RenderContext {
+  mode: RenderMode
+  /**
+   * How an edit reaches the store. Absent outside `edit` mode, which is what
+   * makes an editable field structurally unable to exist in an export.
+   */
+  apply?: (recipe: Recipe) => void
   /** BCP 47 tag from the document's meta. Affects date formatting, not text. */
   locale: string
   /**

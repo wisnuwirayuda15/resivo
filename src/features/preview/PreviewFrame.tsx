@@ -12,6 +12,8 @@ import { previewStylesheet } from './css'
 
 import paperFontsHref from './paper-fonts.css?url'
 
+import type { Recipe } from '@/features/editor/mutations'
+import type { RenderMode } from '@/features/templates/renderer/types'
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
@@ -41,6 +43,10 @@ const SKELETON = '<!doctype html><html><head></head><body></body></html>'
 
 interface PreviewFrameProps {
   document: ResumeDocument
+  /** `view` by default: a preview is a preview until something asks for the
+   * editing surface. */
+  mode?: RenderMode
+  apply?: (recipe: Recipe) => void
   /** 1 = 100%. */
   zoom?: number
   className?: string
@@ -51,6 +57,8 @@ interface PreviewFrameProps {
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   document: resume,
+  mode = 'view',
+  apply,
   zoom = 1,
   className,
   title = 'Resume preview',
@@ -191,6 +199,8 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               document={resume}
               fontEpoch={fontEpoch}
               images={images}
+              mode={mode}
+              apply={apply}
               onPageCountChange={onPageCountChange}
               zoom={zoom}
             />,

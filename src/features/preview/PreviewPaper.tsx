@@ -7,18 +7,36 @@ import {
   useSyncExternalStore,
 } from 'react'
 
+import {
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
+
 import { loadedGlyphCount, onIconCatalogLoaded } from '@/features/icons/catalog'
+import { removeBlock } from '@/features/editor/mutations'
 
 import { resolveTemplate } from '@/features/templates/registry'
 
 import { documentFlow, flowItemClass } from './flow'
+import { ItemChrome } from './ItemChrome'
+import { isMovable, moveRecipe, stepRecipe } from './reorder'
 import { paginate } from './paginate'
 import { renderFlow } from './renderFlow'
 
+import type { DragEndEvent } from '@dnd-kit/core'
+import type { Recipe } from '@/features/editor/mutations'
 import type { ImageMap } from '@/features/assets/useAssetUrls'
 import type { FlowItem } from './flow'
 import type { FlowMetric } from './paginate'
-import type { RenderContext } from '@/features/templates/renderer/types'
+import type {
+  RenderContext,
+  RenderMode,
+} from '@/features/templates/renderer/types'
 import type {
   DesignConfig,
   ResumeDocument,
@@ -56,6 +74,14 @@ interface PreviewPaperProps {
    * iframe, where a suspense boundary would blank the paper.
    */
   images: ImageMap
+  /**
+   * `edit` mounts the editing chrome and makes every field writable. The
+   * measuring pass ignores it entirely — see below — so switching modes cannot
+   * move a page break.
+   */
+  mode: RenderMode
+  /** How an edit reaches the store. Required for `edit` to do anything. */
+  apply?: (recipe: Recipe) => void
   /** 1 = 100%. */
   zoom: number
   /** Called whenever pagination settles on a different number of pages. */
@@ -149,6 +175,8 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   document,
   fontEpoch,
   images,
+  mode,
+  apply,
   zoom,
   onPageCountChange,
 }) => {
@@ -179,8 +207,15 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       locale: document.meta.locale,
       design: document.design,
       images,
+      mode,
+      /**
+       * Deliberately absent unless editing. A field decides whether it is
+       * writable by whether it was handed a way to write, so an export or a
+       * print render cannot produce an editable node even by mistake.
+       */
+      ...(mode === 'edit' ? { apply } : {}),
     }),
-    [document.meta.locale, document.design, images],
+    [document.meta.locale, document.design, images, mode, apply],
   )
 
   const rootRef = useRef<HTMLDivElement | null>(null)
@@ -290,38 +325,151 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     }
   }, [pageCount, onPageCountChange])
 
+  /**
+   * A one-step keyboard move, or `null` when there is nowhere to go.
+   *
+   * Returned as a callback-or-null rather than a boolean plus a handler, so the
+   * button renders disabled from the same fact that would make the move a
+   * no-op — the two cannot disagree.
+   */
+  const step = (item: FlowItem, direction: -1 | 1) => {
+    if (apply === undefined) {
+      return null
+    }
+
+    const index = items.indexOf(item)
+    const recipe =
+      index === -1
+        ? null
+        : stepRecipe(document, items, { item, index }, direction)
+
+    return recipe === null ? null : () => apply(recipe)
+  }
+
+  /**
+   * Pointer and keyboard, because the keyboard path is not a nicety here: the
+   * grip is the only affordance, and a control reachable by Tab that then does
+   * nothing is worse than no control. The move buttons cover the same ground
+   * with plain clicks, which is what a screen reader or a trackpad-averse user
+   * gets.
+   */
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      // A few pixels of slop, so clicking a field inside a draggable item is a
+      // click and not a one-pixel drag.
+      activationConstraint: { distance: 4 },
+    }),
+    useSensor(KeyboardSensor),
+  )
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event
+
+    if (apply === undefined || over === null || active.id === over.id) {
+      return
+    }
+
+    const subject = itemById.get(String(active.id))
+    const target = itemById.get(String(over.id))
+
+    if (subject === undefined || target === undefined) {
+      return
+    }
+
+    const recipe = moveRecipe(document, subject, target)
+
+    if (recipe !== null) {
+      apply(recipe)
+    }
+  }
+
   const pageAttributes = {
     'data-template': document.templateId,
     'data-size': document.design.paper.size,
   }
 
+  /**
+   * The pages, and — while editing — the drag context around them.
+   *
+   * The context wraps only the paged pass. The measuring pass has no draggables
+   * in it, which is what keeps drag measurement from seeing two copies of every
+   * item.
+   */
+  const pages = (
+    <div className="rp-pages" style={{ zoom: String(zoom) }}>
+      {(paged?.pages ?? []).map((ids, index) => (
+        <div
+          className="resivo-paper rp-page"
+          key={index}
+          {...pageAttributes}
+          aria-label={`Page ${index + 1}`}
+          role="group"
+        >
+          <div className="rp-page-body" data-paged>
+            {ids.map((id) => {
+              const item = itemById.get(id)
+
+              if (item === undefined) {
+                return null
+              }
+
+              const node = nodeById.get(id)
+
+              if (mode !== 'edit' || apply === undefined) {
+                return (
+                  <div className={flowItemClass(item.type)} key={id}>
+                    {node}
+                  </div>
+                )
+              }
+
+              return (
+                <ItemChrome
+                  className={flowItemClass(item.type)}
+                  id={id}
+                  key={id}
+                  movable={isMovable(item)}
+                  onMoveDown={step(item, 1)}
+                  onMoveUp={step(item, -1)}
+                  onRemove={
+                    item.type === 'block'
+                      ? () =>
+                          apply(
+                            removeBlock(
+                              item.sectionId ?? '',
+                              item.blockId ?? '',
+                            ),
+                          )
+                      : undefined
+                  }
+                >
+                  {node}
+                </ItemChrome>
+              )
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+
   return (
     <div className="rp-root" ref={rootRef}>
       {/* The zoomed subtree. The measuring container is a sibling, never a
           descendant, because `zoom` scales the numbers it would read. */}
-      <div className="rp-pages" style={{ zoom: String(zoom) }}>
-        {(paged?.pages ?? []).map((ids, index) => (
-          <div
-            className="resivo-paper rp-page"
-            key={index}
-            {...pageAttributes}
-            aria-label={`Page ${index + 1}`}
-            role="group"
-          >
-            <div className="rp-page-body" data-paged>
-              {ids.map((id) => {
-                const item = itemById.get(id)
-
-                return item === undefined ? null : (
-                  <div className={flowItemClass(item.type)} key={id}>
-                    {nodeById.get(id)}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ))}
-      </div>
+      {mode === 'edit' && apply !== undefined ? (
+        <DndContext
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+          sensors={sensors}
+        >
+          <SortableContext items={items.map((item) => item.id)}>
+            {pages}
+          </SortableContext>
+        </DndContext>
+      ) : (
+        pages
+      )}
 
       {/**
        * Mounted only while a measurement is owed, so a settled preview does not

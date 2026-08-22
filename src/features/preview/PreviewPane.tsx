@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils'
 import { PreviewFrame } from './PreviewFrame'
 import { PAGE_DIMENSIONS } from './css'
 
+import type { Recipe } from '@/features/editor/mutations'
 import type {
   PaperSize,
   ResumeDocument,
@@ -48,12 +49,19 @@ const clamp = (value: number, min: number, max: number) =>
 interface PreviewPaneProps {
   document: ResumeDocument
   onPaperSizeChange?: (size: PaperSize) => void
+  /**
+   * How an edit from the paper reaches the store. Its presence is what makes
+   * Visual mode available at all — without it the toggle would offer a mode that
+   * cannot write.
+   */
+  apply?: (recipe: Recipe) => void
   className?: string
 }
 
 export const PreviewPane: React.FC<PreviewPaneProps> = ({
   document: resume,
   onPaperSizeChange,
+  apply,
   className,
 }) => {
   const size = resume.design.paper.size
@@ -68,6 +76,15 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
    * Choosing an explicit magnification pins it until the user asks to fit again.
    */
   const [pinnedZoom, setPinnedZoom] = useState<number | null>(null)
+
+  /**
+   * Read, not Visual, by default.
+   *
+   * The paper is what the user is judging — whether it fits, whether it reads —
+   * and edit chrome sits on top of exactly the thing being judged. Editing is a
+   * mode you ask for.
+   */
+  const [editing, setEditing] = useState(false)
 
   useEffect(() => {
     const well = wellRef.current
@@ -129,6 +146,19 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
         </Text>
 
         <Box className="ml-auto flex items-center gap-1">
+          {apply === undefined ? null : (
+            <SegmentedControl
+              aria-label="Preview mode"
+              data={[
+                { value: 'read', label: 'Read' },
+                { value: 'visual', label: 'Visual' },
+              ]}
+              onChange={(next) => setEditing(next === 'visual')}
+              size="xs"
+              value={editing ? 'visual' : 'read'}
+            />
+          )}
+
           {onPaperSizeChange === undefined ? null : (
             <SegmentedControl
               aria-label="Paper size"
@@ -191,7 +221,9 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
       <Box className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
         <PreviewFrame
           className="block size-full border-0 bg-transparent"
+          apply={apply}
           document={resume}
+          mode={editing && apply !== undefined ? 'edit' : 'view'}
           onPageCountChange={handlePageCount}
           zoom={zoom}
         />

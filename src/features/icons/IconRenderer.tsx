@@ -64,6 +64,8 @@ export const Icon: React.FC<IconProps> = ({
           aria-hidden
           className={className}
           style={{ display: 'inline-block', width: size, height: size }}
+          data-icon-name={name}
+          data-icon-weight={weight}
           data-unknown-icon={name}
         />
       )
@@ -72,6 +74,13 @@ export const Icon: React.FC<IconProps> = ({
     return (
       <svg
         className={className}
+        /**
+         * The name and weight, on the element itself. An icon is a model node
+         * with no textual form, so this is what lets `domToInline` read one back
+         * out of an edited field instead of losing it.
+         */
+        data-icon-name={name}
+        data-icon-weight={weight}
         // Phosphor's own viewBox. Every glyph in the catalog is drawn in it, so
         // a catalog icon and a curated one are the same size at the same
         // `size`.
@@ -97,6 +106,8 @@ export const Icon: React.FC<IconProps> = ({
   return (
     <Component
       className={className}
+      data-icon-name={name}
+      data-icon-weight={weight}
       size={size}
       weight={weight}
       color={color}
