@@ -68,13 +68,17 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const [value, setValue] = useState(serialized)
 
   /**
-   * Whether the caret is in this editor.
+   * A trigger, not a source of truth.
    *
-   * Kept in state rather than read from Monaco on demand, because losing focus
-   * has to *cause* a synchronization — and only a state change can make the
-   * effect below run again when the model itself has not changed.
+   * `hasTextFocus()` is what the effect below actually decides on, because it
+   * cannot be stale. This exists only so that *losing* focus re-runs that effect
+   * when the model itself has not changed — a state change is the only thing
+   * that can. Reading it as the condition instead would reintroduce the bug it
+   * is here to fix: Monaco does not always report a blur when focus leaves for
+   * another document, and a `focused` stuck at `true` would then block every
+   * later synchronization.
    */
-  const [focused, setFocused] = useState(false)
+  const [focusTick, setFocusTick] = useState(false)
 
   /**
    * The view state to put back after the buffer is replaced.
@@ -97,14 +101,17 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    *
    * Only the second one can happen while someone is typing, and replacing the
    * buffer under them is exactly the wrong moment to normalize: half-written
-   * Markdown reformats itself mid-keystroke. So a focused editor is left alone
-   * and synchronized when it loses focus instead.
+   * Markdown reformats itself mid-keystroke. So an editor with the caret in it is
+   * left alone and synchronized once the caret is elsewhere.
+   *
+   * The one condition is `hasTextFocus()`, asked at the moment of the decision.
+   * `focusTick` is in the dependencies to make this run again on focus and blur;
+   * it is deliberately not part of the condition.
    */
   useEffect(() => {
     const instance = editorRef.current
 
     if (
-      focused ||
       instance === null ||
       instance.getValue() === serialized ||
       instance.hasTextFocus()
@@ -114,7 +121,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
     viewStateRef.current = instance.saveViewState()
     setValue(serialized)
-  }, [focused, serialized])
+  }, [focusTick, serialized])
 
   /**
    * Runs after the child editor has applied the new `value` — child effects
@@ -235,14 +242,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       onMount={(instance) => {
         editorRef.current = instance
 
-        instance.onDidFocusEditorText(() => setFocused(true))
+        instance.onDidFocusEditorText(() => setFocusTick((tick) => !tick))
 
         // Blur is when a normalization that was withheld becomes safe to apply.
         // Flushing first is what makes the sync that follows a serialization of
         // everything typed, rather than of everything typed but the last word.
         instance.onDidBlurEditorText(() => {
           flush()
-          setFocused(false)
+          setFocusTick((tick) => !tick)
         })
       }}
       options={EDITOR_OPTIONS}

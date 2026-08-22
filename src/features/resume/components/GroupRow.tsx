@@ -86,7 +86,7 @@ export const GroupRow: React.FC<GroupRowProps> = ({
               <Icon name="dots-three" size={14} />
             </UnstyledButton>
           </Menu.Target>
-          <Menu.Dropdown>
+          <Menu.Dropdown aria-label={`Actions for ${group.name}`}>
             <Menu.Item
               leftSection={<Icon name="cursor-text" size={15} />}
               onClick={() => {

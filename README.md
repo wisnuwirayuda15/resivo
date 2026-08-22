@@ -106,6 +106,7 @@ boundaries.
 ## Project layout
 
 ```
+e2e/               Playwright specs, and the moves they share
 src/
   routes/          file-based routes (library, editor, assets, settings)
   features/
@@ -132,6 +133,7 @@ bun run dev            # dev server on :3000
 bun run build          # production build
 bun run typecheck      # tsc --noEmit
 bun run test           # vitest
+bun run test:e2e       # playwright, in a real browser
 bun run lint           # eslint
 bun run format         # prettier --write, then eslint --fix
 bun run generate-icons # rebuild the icon catalog from @phosphor-icons/core
@@ -143,14 +145,31 @@ on a dev dependency resolving to the same icon-set version.
 
 ## Testing
 
+Two suites, for two different questions.
+
 ```bash
 bun run test
 ```
 
-The suite is unit-level and runs without a browser: the model, the Markdown
-codec, the paginator, the CSS sanitizer, the reorder logic, the export writer and
-the backup format. Repository tests use `fake-indexeddb`; the few that need a DOM
-opt in per file with `// @vitest-environment happy-dom`.
+Unit-level, no browser: the model, the Markdown codec, the paginator, the CSS
+sanitizer, the reorder logic, the export writer, the backup format and the
+document migrations. Repository tests use `fake-indexeddb`; the few that need a
+DOM opt in per file with `// @vitest-environment happy-dom`.
+
+```bash
+bun run test:e2e
+```
+
+Playwright, in a real Chromium. This is the only place the parts that exist only
+in a browser get exercised: a Mantine modal, a Monaco editor that has actually
+laid itself out, the preview iframe, an edit made by clicking on the paper, and
+IndexedDB surviving a reload. `e2e/workflow.spec.ts` is the whole thing end to
+end — create, edit, restyle, add an image, export, group, back up, reload, wipe,
+restore — and it is the test that says the app works, rather than that its parts
+do.
+
+`bun run test:e2e:ui` opens Playwright's runner if you want to watch it happen.
+The dev server is started automatically, and reused if one is already running.
 
 ## Deploying
 

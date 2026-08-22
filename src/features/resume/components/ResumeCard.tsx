@@ -87,7 +87,10 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
               </UnstyledButton>
             </Tooltip>
           </Menu.Target>
-          <Menu.Dropdown>
+          {/* Named. There is one of these on every card, and an unnamed menu is
+              announced as just "menu" — which says nothing about which resume is
+              about to be archived. */}
+          <Menu.Dropdown aria-label={`Actions for ${resume.title}`}>
             <Menu.Item
               leftSection={<Icon name="cursor-text" size={15} />}
               onClick={onRename}

@@ -97,11 +97,19 @@ export const useGroupCounts = () =>
 // Writes
 // ---------------------------------------------------------------------------
 
-/** Invalidates every list affected by a structural change. */
+/**
+ * Invalidates every list affected by a structural change.
+ *
+ * `groupKeys.all` rather than only the counts. Invalidating the counts alone
+ * left the group *list* stale, and every query here is `staleTime: Infinity`, so
+ * a group the user had just created did not appear in the sidebar until the page
+ * was reloaded. The list is a handful of rows; refetching it after any structural
+ * change costs nothing next to being wrong.
+ */
 const invalidateLibrary = async (client: QueryClient): Promise<void> => {
   await Promise.all([
     client.invalidateQueries({ queryKey: resumeKeys.all }),
-    client.invalidateQueries({ queryKey: groupKeys.counts() }),
+    client.invalidateQueries({ queryKey: groupKeys.all }),
   ])
 }
 
