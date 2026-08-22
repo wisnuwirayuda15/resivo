@@ -249,6 +249,31 @@ describe('round trip', () => {
     )
   })
 
+  /**
+   * An attribute holds literal text, and the writer used to put Markdown in it:
+   * a title of `Lead* a_b` was written as `title="Lead\* a\_b"` and read back
+   * with the backslashes still in it, because `parse` correctly treats an
+   * attribute as plain text. The value is now flattened before it is written,
+   * and the directive writer does whatever quoting it needs.
+   */
+  it('keeps markup characters in an entry attribute', () => {
+    const document = documentWith([
+      section('s1', 'Experience', [
+        {
+          id: 'b1',
+          kind: 'entry',
+          title: text('Lead* a_b'),
+          location: text('Say "hello"'),
+          bullets: [],
+        },
+      ]),
+    ])
+
+    expect(roundTrip(document).content.sections).toEqual(
+      document.content.sections,
+    )
+  })
+
   it('does not let a colon in text become a directive', () => {
     const document = documentWith([
       section('s1', 'Summary', [
@@ -339,19 +364,30 @@ describe('the rest of Markdown', () => {
     return [once, again]
   }
 
+  /**
+   * `written` is given where the canonical form differs from the input — a
+   * table's delimiter row is written at its minimum width rather than padded to
+   * the column. The construct still round-trips; it is simply normalized on the
+   * way out, which is what every other block does too.
+   */
   it.each([
-    ['a table', '| a | b |\n| --- | --- |\n| 1 | 2 |', 'table'],
-    ['a code fence', '```js\nconst a = 1\n```', 'code'],
-    ['a block quote', '> quoted', 'quote'],
-    ['a numbered list', '1. first\n2. second', 'bulletList'],
-    ['a task list', '- [x] done\n- [ ] pending', 'bulletList'],
-    ['a subheading', '### Deeper', 'heading'],
-  ])('reads %s as a block of its own', (_label, body, kind) => {
+    [
+      'a table',
+      '| a | b |\n| --- | --- |\n| 1 | 2 |',
+      'table',
+      '| a | b |\n| - | - |\n| 1 | 2 |',
+    ],
+    ['a code fence', '```js\nconst a = 1\n```', 'code', undefined],
+    ['a block quote', '> quoted', 'quote', undefined],
+    ['a numbered list', '1. first\n2. second', 'bulletList', undefined],
+    ['a task list', '- [x] done\n- [ ] pending', 'bulletList', undefined],
+    ['a subheading', '### Deeper', 'heading', undefined],
+  ])('reads %s as a block of its own', (_label, body, kind, written) => {
     expect(firstBlock(body)?.kind).toBe(kind)
 
     const [once, again] = settle(body)
 
-    expect(once).toContain(body)
+    expect(once).toContain(written ?? body)
     expect(again).toBe(once)
   })
 
@@ -546,7 +582,16 @@ describe('headings and content with nowhere to go', () => {
     const { content } = parseDocument(pasted)
     const source = serializeDocument(documentWith(content.sections))
 
-    // Every line of prose the paste contained is still in the file it becomes.
+    /**
+     * Escapes are stripped before comparing.
+     *
+     * The writer escapes what would otherwise be read back as markup — an email
+     * becomes `ada\@example.com`, because unescaped it is a GFM autolink rather
+     * than the text someone typed. That backslash is not content, and the point
+     * of this test is content: no line of the paste is missing.
+     */
+    const written = source.replace(/\\(?=[!-/:-@[-`{-~])/g, '')
+
     for (const line of [
       '(+62) 8123 | ada@example.com | Jakarta',
       'A sentence about the work.',
@@ -555,7 +600,7 @@ describe('headings and content with nowhere to go', () => {
       '1. First',
       '2. Second',
     ]) {
-      expect(source).toContain(line)
+      expect(written).toContain(line)
     }
   })
 })

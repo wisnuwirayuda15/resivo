@@ -1,3 +1,7 @@
+import { directiveToMarkdown } from 'mdast-util-directive'
+import { gfmToMarkdown } from 'mdast-util-gfm'
+import { toMarkdown } from 'mdast-util-to-markdown'
+
 import { plainText } from '@/features/resume/model/index'
 
 import {
@@ -10,73 +14,101 @@ import {
   TAG_SEPARATOR,
 } from './spec'
 
+import type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
+import type {
+  BlockContent,
+  Heading,
+  List,
+  ListItem as MdastListItem,
+  PhrasingContent,
+  Root,
+  RootContent,
+  TableRow,
+} from 'mdast'
 import type {
   Block,
-  CodeBlock,
   EntryBlock,
   InlineNode,
   InlineText,
+  ListItem,
   Mark,
   NestedList,
   ResumeDocument,
   Section,
-  TableAlign,
-  TableBlock,
 } from '@/features/resume/model/document'
 
 /**
  * The document as Resivo-Markdown.
  *
- * Hand-rolled rather than `remark-stringify`, for one reason: this output is
- * compared against itself. The editor shows it, autosave stores the model, and a
- * reparse has to produce the same tree — so the same document must always
- * produce the same bytes, down to blank lines. A general stringifier is free to
- * change its formatting between versions, and each of those changes would read
- * to the user as an edit they did not make.
+ * Two steps, deliberately separate: this file maps the model onto an mdast tree,
+ * and `mdast-util-to-markdown` writes that tree out. Nothing here emits a
+ * character of Markdown itself.
  *
- * Everything the model can hold has a written form here except three fields that
- * have no syntax: a section's `hidden` flag, its icon, and its style override.
- * Those survive a round trip because `parse` matches each section back to the one
- * it came from and carries them across — see the note there. Writing them into
- * the source would put editor state in the user's document, where the first
- * thing they would do is delete it.
+ * It was a hand-rolled string emitter until it had to grow tables, fences and
+ * nested lists — at which point it was reimplementing, less well, the escaping
+ * rules, fence-length arithmetic, cell padding and list indentation that the
+ * `mdast` writer already has. The parser has always been `mdast`; making the
+ * writer `mdast` too means one library defines what round-trips, in both
+ * directions, rather than two implementations that agree until they do not.
+ *
+ * The output still has to be byte-stable — the editor shows it, autosave stores
+ * the model, and a reparse has to produce the same tree, so the same document
+ * must always produce the same bytes down to blank lines. `toMarkdown` is
+ * deterministic given its options, so stability comes from pinning the options
+ * here (see `WRITER`) and from the round-trip tests, rather than from writing
+ * the characters by hand.
+ *
+ * Everything the model can hold has a written form except three fields that have
+ * no syntax: a section's `hidden` flag, its icon, and its style override. Those
+ * survive a round trip because `parse` matches each section back to the one it
+ * came from and carries them across. Writing them into the source would put
+ * editor state in the user's document, where the first thing they would do is
+ * delete it.
  */
-
-// ---------------------------------------------------------------------------
-// Escaping
-// ---------------------------------------------------------------------------
 
 /**
- * Characters that would otherwise be read as markup.
+ * Every formatting choice the writer makes, fixed.
  *
- * Escaped everywhere in a text run, not only where they happen to be
- * significant: a conservative escape is always safe to read back, whereas
- * deciding case by case means a literal asterisk in someone's job title
- * eventually turns their bullet list italic.
+ * Left to its defaults `toMarkdown` would write `*` for emphasis and for bullets
+ * and `***` for a rule, all of which are legal and none of which are what this
+ * format looks like. Naming them here is also what makes the output stable
+ * across a dependency upgrade: a default may change between versions, an option
+ * that is set may not.
  */
-const ESCAPE_PATTERN = /[\\`*_[\]<>~]/g
-
-const escapeText = (value: string): string =>
-  value
-    .replace(ESCAPE_PATTERN, (character) => `\\${character}`)
-    // A colon only matters where a directive could start: directly before a
-    // name, or doubled. Escaping every colon would ruin every URL and time.
-    .replace(/:(?=:|[A-Za-z][A-Za-z0-9-]*[[{])/g, '\\:')
-
-/** Escapes what would otherwise close a directive's attribute list. */
-const escapeAttribute = (value: string): string =>
-  value.replace(/["\\]/g, (character) => `\\${character}`)
-
-const attributes = (entries: Array<[string, string | undefined]>): string => {
-  const written = entries
-    .filter((entry): entry is [string, string] => {
-      const [, value] = entry
-
-      return value !== undefined && value !== ''
-    })
-    .map(([name, value]) => `${name}="${escapeAttribute(value)}"`)
-
-  return written.length === 0 ? '' : `{${written.join(' ')}}`
+const WRITER: ToMarkdownOptions = {
+  bullet: '-',
+  emphasis: '_',
+  strong: '*',
+  rule: '-',
+  // Content one space after the marker, so a nested list is indented by exactly
+  // the width of its parent's marker — which is what makes it a sublist rather
+  // than a new list.
+  listItemIndent: 'one',
+  // Never indented code: four spaces of indentation is indistinguishable from a
+  // deeply nested list item, and reads back as one.
+  fences: true,
+  extensions: [
+    // Compact cells. The alternative pads every column to its widest value,
+    // which turns a one-character edit in a table into a diff of every row.
+    gfmToMarkdown({ tablePipeAlign: false }),
+    directiveToMarkdown(),
+  ],
+  join: [
+    /**
+     * Contacts are written one per line with no blank line between them.
+     *
+     * Everything else in the document is separated by a blank line, which is
+     * what `toMarkdown` does by default. Returning `0` here means "one newline",
+     * and keeps the contact rows reading as the single block they are.
+     */
+    (left, right) =>
+      left.type === 'leafDirective' &&
+      right.type === 'leafDirective' &&
+      left.name === CONTACT_DIRECTIVE &&
+      right.name === CONTACT_DIRECTIVE
+        ? 0
+        : undefined,
+  ],
 }
 
 // ---------------------------------------------------------------------------
@@ -84,7 +116,7 @@ const attributes = (entries: Array<[string, string | undefined]>): string => {
 // ---------------------------------------------------------------------------
 
 /**
- * Marks are written in a fixed order, outermost first.
+ * Marks are applied in a fixed order, outermost first.
  *
  * `code` is innermost because its content is literal — anything wrapped inside a
  * code span stops being markup. The rest have no meaning to their order, so
@@ -93,223 +125,238 @@ const attributes = (entries: Array<[string, string | undefined]>): string => {
  */
 const MARK_ORDER: Array<Mark> = ['bold', 'italic', 'strike', 'code']
 
-const MARK_DELIMITERS: Record<Mark, string> = {
-  bold: '**',
-  italic: '_',
-  strike: '~~',
-  code: '`',
+const WRAPPERS: Record<
+  Exclude<Mark, 'code'>,
+  (children: Array<PhrasingContent>) => PhrasingContent
+> = {
+  bold: (children) => ({ type: 'strong', children }),
+  italic: (children) => ({ type: 'emphasis', children }),
+  strike: (children) => ({ type: 'delete', children }),
 }
 
-const serializeNode = (node: InlineNode): string => {
+/**
+ * A directive attribute holding text.
+ *
+ * Flattened, not serialized: an attribute's value is literal text in the source,
+ * so writing Markdown into one would mean the reader had to parse it back out —
+ * and `parse` deliberately does not, because an entry title of `**Lead**` is a
+ * title containing asterisks. Whatever quoting the value needs is
+ * `directiveToMarkdown`'s job, which is the same library that reads it.
+ */
+const attributeText = (text: InlineText | undefined): string | undefined => {
+  if (text === undefined) {
+    return undefined
+  }
+
+  const flat = plainText(text)
+
+  return flat === '' ? undefined : flat
+}
+
+/** Drops the attributes that have no value, so an absent field writes nothing
+ * rather than an empty pair of quotes. */
+const attributes = (
+  entries: Record<string, string | undefined>,
+): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(entries).filter(
+      (entry): entry is [string, string] => entry[1] !== undefined,
+    ),
+  )
+
+const inlineNode = (node: InlineNode): PhrasingContent => {
   switch (node.type) {
     case 'text': {
       const marks = node.marks ?? []
-      // Inside a code span the text is literal, so escaping it would put the
-      // backslashes on screen.
-      const inner = marks.includes('code') ? node.text : escapeText(node.text)
+      const inner: PhrasingContent = marks.includes('code')
+        ? { type: 'inlineCode', value: node.text }
+        : { type: 'text', value: node.text }
 
-      return MARK_ORDER.filter((mark) => marks.includes(mark)).reduceRight(
-        (text, mark) => {
-          const delimiter = MARK_DELIMITERS[mark]
-
-          return `${delimiter}${text}${delimiter}`
-        },
-        inner,
+      // Innermost outwards, so the fixed order above reads as written.
+      return MARK_ORDER.filter(
+        (mark): mark is Exclude<Mark, 'code'> => mark !== 'code',
       )
+        .filter((mark) => marks.includes(mark))
+        .reduceRight<PhrasingContent>(
+          (children, mark) => WRAPPERS[mark]([children]),
+          inner,
+        )
     }
 
     case 'link':
-      return `[${serializeInline(node.children)}](${node.href})`
+      return {
+        type: 'link',
+        url: node.href,
+        children: inlineText(node.children),
+      }
 
     case 'icon':
-      return `:${ICON_DIRECTIVE}${attributes([
-        ['name', node.icon.name],
-        ['weight', node.icon.weight],
-      ])}`
+      return {
+        type: 'textDirective',
+        name: ICON_DIRECTIVE,
+        attributes: attributes({
+          name: node.icon.name,
+          weight: node.icon.weight,
+        }),
+        children: [],
+      }
   }
 }
 
-export const serializeInline = (text: InlineText): string =>
-  text.map(serializeNode).join('')
+const inlineText = (text: InlineText): Array<PhrasingContent> =>
+  text.map(inlineNode)
+
+/** A run on its own line. An empty run is an empty paragraph rather than a
+ * missing one, so the block it belongs to keeps its shape. */
+const paragraph = (text: InlineText): BlockContent => ({
+  type: 'paragraph',
+  children: inlineText(text),
+})
 
 // ---------------------------------------------------------------------------
 // Blocks
 // ---------------------------------------------------------------------------
 
-const serializeBullets = (items: Array<InlineText>): Array<string> =>
-  items.map((item) => `- ${serializeInline(item)}`)
+const listItem = (item: ListItem): MdastListItem => ({
+  type: 'listItem',
+  // `null` rather than absent: that is how mdast says "not a task item", and
+  // `undefined` would write an empty checkbox.
+  checked: item.checked ?? null,
+  spread: false,
+  children: [
+    paragraph(item.text),
+    ...(item.list === undefined ? [] : [list(item.list)]),
+  ],
+})
 
-/**
- * A list, nesting and all.
- *
- * Each level is indented by exactly the width of its parent's marker, which is
- * what CommonMark requires for the sublist to belong to the item above rather
- * than start a new list. That is why the indent is computed from the marker
- * instead of being a fixed two spaces: `10. ` is four columns wide and `- ` is
- * two.
- */
-const serializeList = (list: NestedList, indent: string): Array<string> => {
-  const lines: Array<string> = []
-  const first = list.start ?? 1
+const list = (source: NestedList): List => ({
+  type: 'list',
+  ordered: source.ordered ?? false,
+  start: source.ordered === true ? (source.start ?? 1) : null,
+  spread: false,
+  children: source.items.map(listItem),
+})
 
-  list.items.forEach((item, index) => {
-    const marker = list.ordered === true ? `${first + index}. ` : '- '
-    // `[x] ` is part of the item's content in GFM, so it goes after the marker
-    // and before the text, and the indent below still measures only the marker.
-    const box = item.checked === undefined ? '' : item.checked ? '[x] ' : '[ ] '
-
-    lines.push(`${indent}${marker}${box}${serializeInline(item.text)}`)
-
-    if (item.list !== undefined) {
-      lines.push(
-        ...serializeList(item.list, `${indent}${' '.repeat(marker.length)}`),
-      )
-    }
-  })
-
-  return lines
-}
-
-/** Escapes what would otherwise be read as a cell boundary. */
-const escapeCell = (text: InlineText): string =>
-  serializeInline(text).replace(/\|/g, '\\|')
-
-const ALIGN_RULE: Record<TableAlign, string> = {
-  left: ':---',
-  center: ':---:',
-  right: '---:',
-}
-
-const serializeTable = (block: TableBlock): string => {
-  // A GFM table's delimiter row fixes the column count, so every row is written
-  // to the width of the widest one. A short row would otherwise silently drop
-  // its missing cells on the next parse.
-  const width = Math.max(
-    block.head.length,
-    ...block.rows.map((row) => row.length),
-    1,
-  )
-
-  const row = (cells: Array<InlineText>): string =>
-    `| ${Array.from({ length: width }, (_, index) =>
-      escapeCell(cells[index] ?? []),
-    ).join(' | ')} |`
-
-  const rule = `| ${Array.from({ length: width }, (_, index) => {
-    const align = block.align[index]
-
-    return align === undefined || align === null ? '---' : ALIGN_RULE[align]
-  }).join(' | ')} |`
-
-  return [row(block.head), rule, ...block.rows.map(row)].join('\n')
-}
-
-/**
- * A fenced code block, with a fence long enough to hold its content.
- *
- * Three backticks is the usual fence, but code that itself contains a run of
- * three would end the block early — so the fence is always one backtick longer
- * than the longest run inside it.
- */
-const serializeCode = (block: CodeBlock): string => {
-  const longest = [...block.code.matchAll(/`+/g)].reduce(
-    (length, match) => Math.max(length, match[0].length),
-    0,
-  )
-  const fence = '`'.repeat(Math.max(3, longest + 1))
-
-  return `${fence}${block.language ?? ''}\n${block.code}\n${fence}`
-}
-
-/** Every line prefixed, with a bare `>` between paragraphs — which is what keeps
- * two paragraphs inside one quote instead of splitting it in two. */
-const serializeQuote = (paragraphs: Array<InlineText>): string =>
-  paragraphs.map((text) => `> ${serializeInline(text)}`).join('\n>\n')
-
-const serializeEntry = (block: EntryBlock): string => {
+const entry = (block: EntryBlock): RootContent => {
   const range = block.dateRange
-  const open = `:::${ENTRY_DIRECTIVE}${attributes([
-    ['title', serializeInline(block.title)],
-    ['subtitle', block.subtitle && serializeInline(block.subtitle)],
-    ['location', block.location && serializeInline(block.location)],
-    ['start', range?.start],
-    ['end', range?.end],
-    ['current', range?.current === true ? 'true' : undefined],
-  ])}`
 
-  const body: Array<string> = []
-
-  if (block.summary !== undefined && block.summary.length > 0) {
-    body.push(serializeInline(block.summary))
+  return {
+    type: 'containerDirective',
+    name: ENTRY_DIRECTIVE,
+    attributes: attributes({
+      title: attributeText(block.title),
+      subtitle: attributeText(block.subtitle),
+      location: attributeText(block.location),
+      start: range?.start,
+      end: range?.end,
+      current: range?.current === true ? 'true' : undefined,
+    }),
+    children: [
+      ...(block.summary === undefined || block.summary.length === 0
+        ? []
+        : [paragraph(block.summary)]),
+      ...(block.bullets.length === 0
+        ? []
+        : [
+            list({
+              items: block.bullets.map((bullet) => ({ text: bullet })),
+            }),
+          ]),
+    ],
   }
-
-  if (block.bullets.length > 0) {
-    body.push(serializeBullets(block.bullets).join('\n'))
-  }
-
-  // A container directive needs a blank line before its fence when it has
-  // content, and reads better with one when it does not.
-  return [open, ...body, ':::'].join('\n\n')
 }
 
-const serializeBlock = (block: Block): string => {
+const tableRow = (cells: Array<InlineText>): TableRow => ({
+  type: 'tableRow',
+  children: cells.map((cell) => ({
+    type: 'tableCell',
+    children: inlineText(cell),
+  })),
+})
+
+const blockNode = (block: Block): RootContent => {
   switch (block.kind) {
     case 'paragraph':
-      return serializeInline(block.text)
+      return paragraph(block.text)
 
     case 'heading':
-      return `${'#'.repeat(block.level)} ${serializeInline(block.text)}`
+      return {
+        type: 'heading',
+        depth: block.level,
+        children: inlineText(block.text),
+      }
 
     case 'bulletList':
-      return serializeList(block, '').join('\n')
+      return list(block)
 
     case 'quote':
-      return serializeQuote(block.paragraphs)
+      return {
+        type: 'blockquote',
+        children: block.paragraphs.map(paragraph),
+      }
 
     case 'code':
-      return serializeCode(block)
+      return {
+        type: 'code',
+        lang: block.language ?? null,
+        meta: null,
+        value: block.code,
+      }
 
     case 'table':
-      return serializeTable(block)
+      return {
+        type: 'table',
+        align: block.align,
+        children: [tableRow(block.head), ...block.rows.map(tableRow)],
+      }
 
     case 'entry':
-      return serializeEntry(block)
+      return entry(block)
 
     case 'tagList':
-      return `::${TAGS_DIRECTIVE}[${block.tags
-        .map(escapeText)
-        .join(TAG_SEPARATOR)}]`
+      return {
+        type: 'leafDirective',
+        name: TAGS_DIRECTIVE,
+        attributes: {},
+        children: [{ type: 'text', value: block.tags.join(TAG_SEPARATOR) }],
+      }
 
     case 'divider':
-      return '---'
+      return { type: 'thematicBreak' }
 
     case 'iconLabel':
-      return `::${LABEL_DIRECTIVE}[${serializeInline(block.label)}]${attributes(
-        [
-          ['icon', block.icon.name],
-          ['weight', block.icon.weight],
-        ],
-      )}`
+      return {
+        type: 'leafDirective',
+        name: LABEL_DIRECTIVE,
+        attributes: attributes({
+          icon: block.icon.name,
+          weight: block.icon.weight,
+        }),
+        children: inlineText(block.label),
+      }
 
     case 'image':
-      return `::${IMAGE_DIRECTIVE}[${escapeText(block.alt)}]${attributes([
-        ['id', block.imageId],
-        [
-          'width',
-          block.widthPercent === undefined
-            ? undefined
-            : String(block.widthPercent),
-        ],
-      ])}`
+      return {
+        type: 'leafDirective',
+        name: IMAGE_DIRECTIVE,
+        attributes: attributes({
+          id: block.imageId,
+          width:
+            block.widthPercent === undefined
+              ? undefined
+              : String(block.widthPercent),
+        }),
+        children: [{ type: 'text', value: block.alt }],
+      }
 
     /**
-     * Written back exactly as it arrived. This is the block that makes "never
-     * silently drop input" true: anything the model cannot represent is kept as
-     * source text and reproduced verbatim, so a table someone pasted survives
-     * every save even though nothing understands it.
+     * Written back exactly as it arrived. An `html` node is the one mdast node
+     * whose value is emitted verbatim, which is what makes "never silently drop
+     * input" true: Markdown the model cannot represent is kept as source text
+     * and reproduced character for character.
      */
     case 'raw':
-      return block.markdown
+      return { type: 'html', value: block.markdown }
   }
 }
 
@@ -318,59 +365,63 @@ const serializeBlock = (block: Block): string => {
 // ---------------------------------------------------------------------------
 
 /**
- * Always `##`, whatever depth the source used.
+ * A section's heading is always `##`, whatever depth the source used.
  *
  * The parser takes the shallowest heading in the file as the section level, so a
- * document written with `###` headings is understood — and then normalized to
- * `##` here, once, on the first save. Writing the original depth back instead
- * would mean storing it in the document, and a heading level is not a fact about
- * a resume.
+ * document written with `###` headings is understood — and then normalized here,
+ * once, on the first save. Writing the original depth back instead would mean
+ * storing it in the document, and a heading level is not a fact about a resume.
+ *
+ * The title is flattened, because a section's title is written as a heading and
+ * read back as one; formatting inside it has nowhere to go.
  */
-const serializeSection = (section: Section): Array<string> => {
+const sectionHeading = (section: Section): Heading => {
   const title = plainText(section.title)
-  // An untitled section is where content that arrived before any heading lives.
-  // `##` alone is a valid empty heading, and reads back as the same section.
-  const heading = title === '' ? '##' : `## ${title}`
 
-  return [heading, ...section.blocks.map(serializeBlock)]
+  return {
+    type: 'heading',
+    depth: 2,
+    // An untitled section — where content that arrived before any heading lives
+    // — is a bare `##`, which reads back as the same empty title.
+    children: title === '' ? [] : [{ type: 'text', value: title }],
+  }
 }
 
-export const serializeDocument = (document: ResumeDocument): string => {
+const documentToMdast = (document: ResumeDocument): Root => {
   const { header, sections } = document.content
-  const parts: Array<string> = []
+  const children: Array<RootContent> = []
 
   // The name is the document's H1 whether or not it is set, so the file always
   // has the shape the parser expects and an empty resume is still editable.
-  parts.push(`# ${serializeInline(header.name)}`)
+  children.push({
+    type: 'heading',
+    depth: 1,
+    children: inlineText(header.name),
+  })
 
   if (header.headline !== undefined && header.headline.length > 0) {
-    parts.push(serializeInline(header.headline))
+    children.push(paragraph(header.headline))
   }
 
-  if (header.contacts.length > 0) {
-    // One line each, kept as a single block so a blank line never lands between
-    // two contacts.
-    parts.push(
-      header.contacts
-        .map(
-          (contact) =>
-            `::${CONTACT_DIRECTIVE}[${serializeInline(
-              contact.label,
-            )}]${attributes([
-              ['icon', contact.icon?.name],
-              ['weight', contact.icon?.weight],
-              ['href', contact.href],
-            ])}`,
-        )
-        .join('\n'),
-    )
+  for (const contact of header.contacts) {
+    children.push({
+      type: 'leafDirective',
+      name: CONTACT_DIRECTIVE,
+      attributes: attributes({
+        icon: contact.icon?.name,
+        weight: contact.icon?.weight,
+        href: contact.href,
+      }),
+      children: inlineText(contact.label),
+    })
   }
 
   for (const section of sections) {
-    parts.push(...serializeSection(section))
+    children.push(sectionHeading(section), ...section.blocks.map(blockNode))
   }
 
-  // One blank line between blocks, and a trailing newline, which is what every
-  // editor and every diff expects a text file to end with.
-  return `${parts.join('\n\n')}\n`
+  return { type: 'root', children }
 }
+
+export const serializeDocument = (document: ResumeDocument): string =>
+  toMarkdown(documentToMdast(document), WRITER)
