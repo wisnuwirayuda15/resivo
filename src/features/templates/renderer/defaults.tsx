@@ -1,0 +1,450 @@
+import { DocumentIcon } from '@/features/icons/IconRenderer'
+import {
+  setBlockText,
+  setBulletItem,
+  setEntryBullet,
+  setEntryField,
+  setHeaderHeadline,
+  setHeaderName,
+  setSectionTitle,
+  setTag,
+  updateContactLabel,
+} from '@/features/editor/mutations'
+import { plainText } from '@/features/resume/model/index'
+
+import { EditableText } from './EditableText'
+import { formatDateRange } from './dates'
+
+import type { Recipe } from '@/features/editor/mutations'
+import type {
+  BlockProps,
+  HeaderProps,
+  RenderContext,
+  SectionHeadingProps,
+  TemplateComponents,
+} from './types'
+import type {
+  BulletListBlock,
+  EntryBlock,
+  IconLabelBlock,
+  ImageBlock,
+  InlineText,
+  ParagraphBlock,
+  RawBlock,
+  Section,
+  TagListBlock,
+} from '@/features/resume/model/document'
+
+/**
+ * The default renderers — the resume every template starts from.
+ *
+ * A template supplies only the pieces it wants to change; `resolveTemplate`
+ * fills the rest from here. Almost all visual difference between templates is
+ * carried by CSS tokens rather than by markup, which is what keeps four
+ * templates from becoming four renderers to keep in sync.
+ *
+ * Plain elements and `rp-` class names throughout, never `Box`/`Text` or a
+ * Tailwind utility: this markup is serialised into the iframe and, later, into
+ * the HTML export, neither of which carries the app's stylesheets. The one
+ * inline style is an image's width, which is a per-block value from the
+ * document.
+ *
+ * Every run of text goes through `EditableText`, which is what makes the paper
+ * the editing surface. Outside `edit` mode that component renders exactly what
+ * `InlineTextView` renders — so this file has one markup, not one per mode, and
+ * an export cannot accidentally carry editing chrome.
+ */
+
+/**
+ * Wires a field to the store, or returns `undefined` when there is no store to
+ * write to — which is what makes the field non-editable in view and print.
+ */
+const commitWith = (
+  context: RenderContext,
+  build: (value: InlineText) => Recipe,
+): ((value: InlineText) => void) | undefined => {
+  const { apply } = context
+
+  return apply === undefined ? undefined : (value) => apply(build(value))
+}
+
+const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
+  const avatar =
+    header.avatarImageId === undefined
+      ? undefined
+      : context.images.get(header.avatarImageId)
+
+  return (
+    <header className="rp-header">
+      {/**
+       * Rendered only once the blob resolves, and never as a reserved box. The
+       * avatar's size is a style token, so an empty box of exactly that size
+       * would be indistinguishable from a photograph that failed — and drawing
+       * nothing costs nothing here, because the flex row simply closes up and
+       * re-opens when the image arrives, which re-paginates anyway.
+       */}
+      {avatar === undefined || avatar === null ? null : (
+        <img alt="" className="rp-avatar" src={avatar.url} />
+      )}
+
+      <div className="rp-header-text">
+        <div className="rp-name">
+          <EditableText
+            context={context}
+            label="name"
+            onCommit={commitWith(context, setHeaderName)}
+            value={header.name}
+          />
+        </div>
+
+        {header.headline === undefined ? null : (
+          <div className="rp-headline">
+            <EditableText
+              context={context}
+              label="headline"
+              onCommit={commitWith(context, setHeaderHeadline)}
+              value={header.headline}
+            />
+          </div>
+        )}
+
+        {header.contacts.length === 0 ? null : (
+          <div className="rp-contacts">
+            {header.contacts.map((contact) => {
+              const label = (
+                <>
+                  {contact.icon === undefined ? null : (
+                    <DocumentIcon icon={contact.icon} />
+                  )}
+                  <span>
+                    <EditableText
+                      context={context}
+                      label="contact"
+                      onCommit={commitWith(context, (value) =>
+                        updateContactLabel(contact.id, value),
+                      )}
+                      value={contact.label}
+                    />
+                  </span>
+                </>
+              )
+
+              return (
+                <span className="rp-contact" key={contact.id}>
+                  {contact.href === undefined ? (
+                    label
+                  ) : (
+                    <a
+                      className="rp-link"
+                      href={contact.href}
+                      rel="noreferrer noopener"
+                      target="_blank"
+                    >
+                      {label}
+                    </a>
+                  )}
+                </span>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </header>
+  )
+}
+
+/**
+ * A section's heading, and the rule under it.
+ *
+ * The rule is a token decision (`design.rules.showDividers`) rather than a
+ * per-template one, because a user who turns dividers off expects them off in
+ * every template.
+ */
+const DefaultSectionHeading: React.FC<SectionHeadingProps> = ({
+  section,
+  context,
+}) => (
+  <div className="rp-section">
+    <div className="rp-section-title-row">
+      {section.icon === undefined ? null : <DocumentIcon icon={section.icon} />}
+      <h2 className="rp-section-title">
+        <EditableText
+          context={context}
+          label="section heading"
+          onCommit={commitWith(context, (value) =>
+            setSectionTitle(section.id, value),
+          )}
+          value={section.title}
+        />
+      </h2>
+    </div>
+
+    {(section.style?.showDivider ?? context.design.rules.showDividers) ? (
+      <div className="rp-section-rule" />
+    ) : null}
+  </div>
+)
+
+interface BlockViewProps<T> {
+  block: T
+  section: Section
+  context: RenderContext
+}
+
+const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
+  block,
+  section,
+  context,
+}) => (
+  <p>
+    <EditableText
+      context={context}
+      label="paragraph"
+      onCommit={commitWith(context, (value) =>
+        setBlockText(section.id, block.id, value),
+      )}
+      value={block.text}
+    />
+  </p>
+)
+
+const BulletList: React.FC<BlockViewProps<BulletListBlock>> = ({
+  block,
+  section,
+  context,
+}) => (
+  <ul className="rp-bullets">
+    {block.items.map((item, index) => (
+      // Bullet items carry no id in the model — they are a plain array of runs,
+      // replaced wholesale on edit, so the index is their identity.
+      <li key={index}>
+        <EditableText
+          context={context}
+          label="bullet"
+          onCommit={commitWith(context, (value) =>
+            setBulletItem(section.id, block.id, index, value),
+          )}
+          value={item}
+        />
+      </li>
+    ))}
+  </ul>
+)
+
+const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
+  block,
+  section,
+  context,
+}) => {
+  const dates = formatDateRange(block.dateRange, context.locale)
+
+  const field = (name: 'title' | 'subtitle' | 'location' | 'summary') =>
+    commitWith(context, (value) =>
+      setEntryField(section.id, block.id, name, value),
+    )
+
+  return (
+    <div className="rp-entry">
+      <div className="rp-entry-head">
+        <div>
+          <span className="rp-entry-title">
+            <EditableText
+              context={context}
+              label="entry title"
+              onCommit={field('title')}
+              value={block.title}
+            />
+          </span>
+          {block.subtitle === undefined ? null : (
+            <>
+              {/* A comma rather than a separate line: role and employer read as
+                  one fact, and one line per entry saves a page over a resume. */}
+              <span className="rp-entry-subtitle">
+                {', '}
+                <EditableText
+                  context={context}
+                  label="entry subtitle"
+                  onCommit={field('subtitle')}
+                  value={block.subtitle}
+                />
+              </span>
+            </>
+          )}
+        </div>
+
+        {dates === '' && block.location === undefined ? null : (
+          <div className="rp-entry-meta">
+            {/**
+             * The dates are the one run of text on the paper that is *derived* —
+             * `formatDateRange` turns two ISO strings into whatever the locale
+             * writes. Editing the rendered string would mean parsing prose back
+             * into dates, and a resume that silently misreads "Mar 2019" is worse
+             * than one whose dates are edited in the Markdown pane. So this stays
+             * read-only here, deliberately.
+             */}
+            {dates === '' ? null : <div>{dates}</div>}
+            {block.location === undefined ? null : (
+              <div>
+                <EditableText
+                  context={context}
+                  label="entry location"
+                  onCommit={field('location')}
+                  value={block.location}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {block.summary === undefined ? null : (
+        <p className="rp-entry-summary">
+          <EditableText
+            context={context}
+            label="entry summary"
+            onCommit={field('summary')}
+            value={block.summary}
+          />
+        </p>
+      )}
+
+      {block.bullets.length === 0 ? null : (
+        <ul className="rp-bullets">
+          {block.bullets.map((bullet, index) => (
+            <li key={index}>
+              <EditableText
+                context={context}
+                label="entry bullet"
+                onCommit={commitWith(context, (value) =>
+                  setEntryBullet(section.id, block.id, index, value),
+                )}
+                value={bullet}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
+
+const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
+  block,
+  section,
+  context,
+}) => (
+  <div className="rp-tags">
+    {block.tags.map((tag, index) => (
+      <span className="rp-tag" key={`${tag}-${index}`}>
+        {/* A tag is a plain string in the model, so whatever formatting is typed
+            into it is flattened on commit — the chip is a keyword, not prose. */}
+        <EditableText
+          context={context}
+          label="tag"
+          onCommit={commitWith(context, (value) =>
+            setTag(section.id, block.id, index, plainText(value)),
+          )}
+          value={[{ type: 'text', text: tag }]}
+        />
+      </span>
+    ))}
+  </div>
+)
+
+const Divider: React.FC = () => <div className="rp-divider" />
+
+const IconLabel: React.FC<BlockViewProps<IconLabelBlock>> = ({
+  block,
+  section,
+  context,
+}) => (
+  <div className="rp-icon-label">
+    <DocumentIcon icon={block.icon} />
+    <span>
+      <EditableText
+        context={context}
+        label="label"
+        onCommit={commitWith(context, (value) =>
+          setBlockText(section.id, block.id, value),
+        )}
+        value={block.label}
+      />
+    </span>
+  </div>
+)
+
+/**
+ * A referenced image.
+ *
+ * Three states, drawn differently on purpose. Resolved, it is an `<img>` given
+ * its intrinsic `aspect-ratio` from the stored record — so the box is the right
+ * height before a single byte is decoded, and the page breaks around it do not
+ * move when it paints. Absent from the map, the blob is still being read.
+ * Mapped to `null`, the row is gone: that one never resolves, so it says so
+ * rather than looking like a slow load forever.
+ */
+const Image: React.FC<{ block: ImageBlock; context: RenderContext }> = ({
+  block,
+  context,
+}) => {
+  const resolved = context.images.get(block.imageId)
+
+  return (
+    <figure
+      className="rp-figure"
+      style={
+        block.widthPercent === undefined
+          ? undefined
+          : { width: `${block.widthPercent}%` }
+      }
+    >
+      {resolved === undefined || resolved === null ? (
+        <div className="rp-image-missing" data-image-id={block.imageId}>
+          {resolved === null
+            ? `Missing image${block.alt === '' ? '' : `: ${block.alt}`}`
+            : block.alt === ''
+              ? 'Image'
+              : block.alt}
+        </div>
+      ) : (
+        <img
+          alt={block.alt}
+          className="rp-image"
+          src={resolved.url}
+          style={{ aspectRatio: `${resolved.width} / ${resolved.height}` }}
+        />
+      )}
+    </figure>
+  )
+}
+
+const Raw: React.FC<{ block: RawBlock }> = ({ block }) => (
+  <pre className="rp-raw">{block.markdown}</pre>
+)
+
+const DefaultBlock: React.FC<BlockProps> = ({ block, section, context }) => {
+  switch (block.kind) {
+    case 'paragraph':
+      return <Paragraph block={block} context={context} section={section} />
+    case 'bulletList':
+      return <BulletList block={block} context={context} section={section} />
+    case 'entry':
+      return <Entry block={block} context={context} section={section} />
+    case 'tagList':
+      return <TagList block={block} context={context} section={section} />
+    case 'image':
+      return <Image block={block} context={context} />
+    case 'divider':
+      return <Divider />
+    case 'iconLabel':
+      return <IconLabel block={block} context={context} section={section} />
+    case 'raw':
+      return <Raw block={block} />
+  }
+}
+
+export const defaultComponents: TemplateComponents = {
+  Header: DefaultHeader,
+  SectionHeading: DefaultSectionHeading,
+  Block: DefaultBlock,
+}

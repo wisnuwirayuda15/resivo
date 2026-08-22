@@ -1,0 +1,304 @@
+/**
+ * Shared paper element styles — the look every template starts from.
+ *
+ * Loaded as text (`?raw`) and injected into the preview iframe inside
+ * `@layer template`, immediately after `paper.css`. A template's own `baseCss`
+ * is appended after this, so a template overrides by simply restating a rule.
+ *
+ * The division of labour:
+ *
+ *   paper.css   — the `--paper-*` token values, per template scope
+ *   this file   — how the resume's elements use those tokens
+ *   baseCss     — the deltas that make one template look unlike another
+ *
+ * Class names are `rp-` prefixed and live only inside the iframe, so they never
+ * meet the app's Tailwind utilities.
+ *
+ * The block at the top declares every token this file reads that `paper.css`
+ * does not. They are defaults, not the real values: the style panel writes the
+ * document's `DesignConfig` into `@layer tokens`, which overrides all of them.
+ * Keeping them here means the paper still renders correctly with no tokens layer
+ * at all — which is what the in-app miniatures rely on.
+ */
+.resivo-paper {
+  --paper-fw-body: 400;
+  --paper-fw-head: 600;
+
+  /* Derived from the body size and the modular scale — see `designVars`. */
+  --paper-fs-headline: 12.6pt;
+  --paper-fs-section: 12.6pt;
+  --paper-fs-small: 9.7pt;
+
+  --paper-rule-w: 1px;
+  --paper-rule-color: var(--paper-rule);
+
+  /* Vertical rhythm. `section` is the air above a section heading, `block` the
+     air between blocks, `heading` the gap under a heading's rule. */
+  --paper-space-section: 0.9rem;
+  --paper-space-block: 0.35rem;
+  --paper-space-heading: 0.4rem;
+
+  --paper-icon-size: 12px;
+  --paper-icon-color: var(--paper-ink-muted);
+
+  --paper-avatar-size: 84px;
+  --paper-avatar-radius: 50%;
+
+  font-weight: var(--paper-fw-body);
+}
+
+/* ---- Header ---- */
+
+.rp-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1em;
+}
+
+.rp-header-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.rp-avatar {
+  flex: none;
+  width: var(--paper-avatar-size);
+  height: var(--paper-avatar-size);
+  border-radius: var(--paper-avatar-radius);
+  object-fit: cover;
+}
+
+.rp-name {
+  font-family: var(--paper-font-head);
+  font-size: var(--paper-fs-name);
+  font-weight: var(--paper-fw-head);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  color: var(--paper-heading, var(--paper-ink));
+}
+
+.rp-headline {
+  margin-top: 0.15em;
+  font-size: var(--paper-fs-headline);
+  color: var(--paper-ink-muted);
+}
+
+/* `gap: 0 1em` rather than separators, so a contact row that wraps to a second
+   line does not leave a dangling middle dot at the break. */
+.rp-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15em 1em;
+  margin-top: 0.55em;
+  font-size: var(--paper-fs-small);
+  color: var(--paper-ink-muted);
+}
+
+.rp-contact {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+}
+
+.rp-contact svg {
+  flex: none;
+  width: var(--paper-icon-size);
+  height: var(--paper-icon-size);
+  color: var(--paper-icon-color);
+}
+
+/* ---- Sections ---- */
+
+.rp-section-title {
+  font-family: var(--paper-font-head);
+  font-size: var(--paper-fs-section);
+  font-weight: var(--paper-fw-head);
+  line-height: 1.2;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--paper-accent);
+}
+
+.rp-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.rp-section-title-row svg {
+  flex: none;
+  width: var(--paper-icon-size);
+  height: var(--paper-icon-size);
+  color: var(--paper-accent);
+}
+
+.rp-section-rule {
+  height: var(--paper-rule-w);
+  margin-top: 0.28em;
+  background: var(--paper-rule-color);
+}
+
+/* The gap under a heading belongs to the heading, not to the block that happens
+   to follow it — otherwise a heading that lands last on a page carries trailing
+   space onto the fold. */
+.rp-section {
+  padding-bottom: var(--paper-space-heading);
+}
+
+/* ---- Entries ---- */
+
+.rp-entry-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.rp-entry-title {
+  font-weight: var(--paper-fw-head);
+  color: var(--paper-heading, var(--paper-ink));
+}
+
+.rp-entry-subtitle {
+  color: var(--paper-ink-muted);
+}
+
+/* Dates never wrap: a range broken across two lines reads as two dates. */
+.rp-entry-meta {
+  flex: none;
+  font-size: var(--paper-fs-small);
+  color: var(--paper-ink-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.rp-entry-summary {
+  margin-top: 0.2em;
+}
+
+/* ---- Lists ---- */
+
+.rp-bullets {
+  margin-top: 0.22em;
+  padding-left: 1.15em;
+  list-style: disc;
+}
+
+.rp-bullets > li {
+  margin-top: 0.12em;
+}
+
+.rp-bullets > li::marker {
+  color: var(--paper-ink-muted);
+}
+
+/* ---- Tags ---- */
+
+/**
+ * Skills render as separated text rather than filled chips.
+ *
+ * Chips would need borders or backgrounds, which print as ink and read badly to
+ * an applicant tracking system; a comma-joined run is parsed as the list it is.
+ */
+.rp-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1em 0.75em;
+}
+
+.rp-tag + .rp-tag::before {
+  content: '·';
+  margin-right: 0.7em;
+  color: var(--paper-rule-color);
+}
+
+/* ---- Standalone blocks ---- */
+
+.rp-divider {
+  height: var(--paper-rule-w);
+  background: var(--paper-rule-color);
+}
+
+.rp-icon-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4em;
+}
+
+.rp-icon-label svg {
+  flex: none;
+  width: var(--paper-icon-size);
+  height: var(--paper-icon-size);
+  color: var(--paper-icon-color);
+}
+
+.rp-figure-caption {
+  margin-top: 0.3em;
+  font-size: var(--paper-fs-small);
+  color: var(--paper-ink-muted);
+}
+
+/**
+ * Markdown this model does not represent, kept verbatim.
+ *
+ * Shown as what it is — source text — rather than dressed up as prose, so it is
+ * obvious that it round-trips untouched and equally obvious that it is not
+ * really typeset yet.
+ */
+.rp-raw {
+  padding: 0.4em 0.6em;
+  border-left: 2px solid var(--paper-rule-color);
+  font-family: var(--font-mono);
+  font-size: var(--paper-fs-small);
+  white-space: pre-wrap;
+  color: var(--paper-ink-muted);
+}
+
+/* ---- Images ---- */
+
+.rp-figure {
+  margin: 0;
+}
+
+/* The height comes from the `aspect-ratio` the renderer sets from the stored
+   intrinsic size — so the box is correct before the bytes decode, and the page
+   breaks around it do not move when they do. */
+.rp-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* A referenced image that is not available yet. Reserves a visible box instead
+   of collapsing, so the gap is legible rather than mysterious. */
+.rp-image-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 3em;
+  padding: 0.6em;
+  border: var(--paper-rule-w) dashed var(--paper-rule-color);
+  font-size: var(--paper-fs-small);
+  color: var(--paper-ink-muted);
+  text-align: center;
+}
+
+/* ---- Inline marks ---- */
+
+.rp-strong {
+  font-weight: var(--paper-fw-head);
+}
+
+.rp-code {
+  padding: 0.05em 0.25em;
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+/* Underlined in the rule colour rather than the accent: a printed resume's links
+   should be readable as text first. */
+.rp-link {
+  text-decoration: underline;
+  text-decoration-color: var(--paper-rule-color);
+  text-underline-offset: 0.15em;
+}

@@ -1,40 +1,193 @@
 /**
- * Semantic color ramp. Mantine sets `data-mantine-color-scheme="light" | "dark"`
- * on <html> (it resolves "auto" to one of those at runtime), so we flip a small
- * set of app-level semantic tokens off that attribute.
+ * Semantic colour aliases — the layer everything else consumes.
  *
- * The `@theme inline` block then exposes each semantic token as a Tailwind color
- * (`bg-app-surface`, `text-app-text`, `border-app-border`, ...). Because it
- * references the `var(--app-*)` at use-time, those utilities are theme-aware and
- * flip automatically between light and dark.
+ * Mantine sets `data-mantine-color-scheme="light" | "dark"` on <html> (it
+ * resolves "auto" to one of those at runtime), so the design system's
+ * `[data-theme="dark"]` block is remapped onto that attribute here.
+ *
+ * Dark is a real theme, not an inversion: its own surface ramp, a lifted accent
+ * so teal still holds against dark, and text that tops out at #f2f2f0 rather
+ * than pure white.
+ *
+ * The `@theme inline` block at the bottom exposes each alias as a Tailwind
+ * colour (`bg-surface`, `text-muted`, `border-subtle`, ...). Because those
+ * utilities resolve `var(--*)` at use-time, they flip with the scheme for free.
+ *
+ * NOTE: nothing here reaches the resume. The preview renders inside
+ * `.resivo-paper`, which resets to `--paper-*` tokens and stays light in both
+ * schemes — see `src/features/templates/paper.css`.
  */
 
-/* Light (also the default before the scheme attribute is applied) */
+/* Light — also the default before the scheme attribute is applied */
 :root,
 [data-mantine-color-scheme='light'] {
-  --app-bg: var(--mantine-color-white);
-  --app-surface: var(--mantine-color-gray-0);
-  --app-surface-hover: var(--mantine-color-gray-1);
-  --app-border: var(--mantine-color-gray-3);
-  --app-text: var(--mantine-color-gray-9);
-  --app-muted: var(--mantine-color-gray-6);
+  /* Max two background values per view: --bg-app plus --bg-surface */
+  --bg-app: var(--n-50);
+  --bg-surface: var(--n-0);
+  --bg-raised: var(--n-0);
+  --bg-sunken: var(--n-100);
+  --bg-code: var(--n-25);
+  /* Hover/active are low-alpha ink so they compose over any surface */
+  --bg-hover: rgba(18, 18, 16, 0.045);
+  --bg-active: rgba(18, 18, 16, 0.075);
+  --bg-selected: var(--p-50);
+  --bg-overlay: rgba(18, 18, 16, 0.42);
+
+  --text-title: var(--n-900);
+  --text-body: var(--n-800);
+  --text-muted: var(--n-600);
+  --text-subtle: var(--n-500);
+  --text-disabled: var(--n-400);
+  --text-invert: var(--n-0);
+  --text-accent: var(--p-600);
+  --text-link: var(--p-600);
+  --text-link-hover: var(--p-700);
+
+  /* Three weights: subtle inside surfaces, default between regions, strong
+     for interactive edges */
+  --border-subtle: var(--n-100);
+  --border-default: var(--n-200);
+  --border-strong: var(--n-300);
+  --border-accent: var(--p-500);
+
+  --accent: var(--p-500);
+  --accent-hover: var(--p-600);
+  --accent-active: var(--p-700);
+  --accent-quiet: var(--p-50);
+  --accent-on: var(--n-0);
+
+  --success: var(--green-500);
+  --success-quiet: var(--green-100);
+  --success-text: var(--green-700);
+  --warning: var(--amber-500);
+  --warning-quiet: var(--amber-100);
+  --warning-text: var(--amber-700);
+  --danger: var(--red-500);
+  --danger-quiet: var(--red-100);
+  --danger-text: var(--red-700);
+  --info: var(--blue-500);
+  --info-quiet: var(--blue-100);
+  --info-text: var(--blue-700);
+
+  --focus-ring: 0 0 0 3px color-mix(in oklab, var(--p-500) 30%, transparent);
+
+  /* Monaco syntax palette for the Markdown + CSS panes */
+  --syn-comment: var(--n-400);
+  --syn-key: var(--p-600);
+  --syn-string: #8a5606;
+  --syn-number: #2563a8;
+  --syn-heading: var(--n-900);
+  --syn-punct: var(--n-500);
+  --syn-selector: #7a3ea8;
+  --syn-gutter: var(--n-400);
 }
 
 /* Dark */
 [data-mantine-color-scheme='dark'] {
-  --app-bg: var(--mantine-color-dark-7);
-  --app-surface: var(--mantine-color-dark-6);
-  --app-surface-hover: var(--mantine-color-dark-5);
-  --app-border: var(--mantine-color-dark-4);
-  --app-text: var(--mantine-color-dark-0);
-  --app-muted: var(--mantine-color-dark-2);
+  --bg-app: #101113;
+  --bg-surface: #17191c;
+  --bg-raised: #1e2125;
+  --bg-sunken: #0b0c0d;
+  --bg-code: #141619;
+  --bg-hover: rgba(255, 255, 255, 0.055);
+  --bg-active: rgba(255, 255, 255, 0.09);
+  --bg-selected: rgba(50, 148, 142, 0.16);
+  --bg-overlay: rgba(6, 7, 8, 0.6);
+
+  --text-title: #f2f2f0;
+  --text-body: #dcdcd8;
+  --text-muted: #a2a29b;
+  --text-subtle: #8a8a83;
+  --text-disabled: #65655f;
+  --text-invert: #101113;
+  --text-accent: #4fb3ac;
+  --text-link: #4fb3ac;
+  --text-link-hover: #7ccbc5;
+
+  --border-subtle: #232629;
+  --border-default: #2d3135;
+  --border-strong: #3d4247;
+  --border-accent: #32948e;
+
+  --accent: #159089;
+  --accent-hover: #1aa39b;
+  --accent-active: #0e7c76;
+  --accent-quiet: rgba(50, 148, 142, 0.14);
+  --accent-on: #f2f2f0;
+
+  --success: #3aa96b;
+  --success-quiet: rgba(58, 169, 107, 0.14);
+  --success-text: #7fd3a2;
+  --warning: #d59220;
+  --warning-quiet: rgba(213, 146, 32, 0.14);
+  --warning-text: #e8bb70;
+  --danger: #d9584b;
+  --danger-quiet: rgba(217, 88, 75, 0.14);
+  --danger-text: #f0938a;
+  --info: #4a8fd6;
+  --info-quiet: rgba(74, 143, 214, 0.14);
+  --info-text: #8fbde9;
+
+  --focus-ring: 0 0 0 3px color-mix(in oklab, #32948e 40%, transparent);
+
+  --syn-comment: #6f6f68;
+  --syn-key: #57b6ae;
+  --syn-string: #d9a95c;
+  --syn-number: #7fb0e6;
+  --syn-heading: #f2f2f0;
+  --syn-punct: #8a8a83;
+  --syn-selector: #b98ad9;
+  --syn-gutter: #4d4d47;
 }
 
+/**
+ * Tailwind shares ONE colour namespace across `bg-*`, `text-*` and `border-*`,
+ * so each key here is named once and reads correctly in whichever position it
+ * is used: `bg-surface`, `text-muted`, `border-line`.
+ *
+ * Borders are `line*` rather than the design system's `border-subtle` /
+ * `border-default` naming, because `subtle` is already a text level and the two
+ * would collide in this single namespace.
+ */
 @theme inline {
-  --color-app-bg: var(--app-bg);
-  --color-app-surface: var(--app-surface);
-  --color-app-surface-hover: var(--app-surface-hover);
-  --color-app-border: var(--app-border);
-  --color-app-text: var(--app-text);
-  --color-app-muted: var(--app-muted);
+  --color-app: var(--bg-app);
+  --color-surface: var(--bg-surface);
+  --color-raised: var(--bg-raised);
+  --color-sunken: var(--bg-sunken);
+  --color-code: var(--bg-code);
+  --color-hover: var(--bg-hover);
+  --color-active: var(--bg-active);
+  --color-selected: var(--bg-selected);
+  --color-overlay: var(--bg-overlay);
+
+  --color-title: var(--text-title);
+  --color-body: var(--text-body);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-disabled: var(--text-disabled);
+  --color-invert: var(--text-invert);
+
+  --color-line-soft: var(--border-subtle);
+  --color-line: var(--border-default);
+  --color-line-strong: var(--border-strong);
+  --color-line-accent: var(--border-accent);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-quiet: var(--accent-quiet);
+  --color-accent-on: var(--accent-on);
+
+  --color-success: var(--success);
+  --color-success-quiet: var(--success-quiet);
+  --color-success-text: var(--success-text);
+  --color-warning: var(--warning);
+  --color-warning-quiet: var(--warning-quiet);
+  --color-warning-text: var(--warning-text);
+  --color-danger: var(--danger);
+  --color-danger-quiet: var(--danger-quiet);
+  --color-danger-text: var(--danger-text);
+  --color-info: var(--info);
+  --color-info-quiet: var(--info-quiet);
+  --color-info-text: var(--info-text);
 }

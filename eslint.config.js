@@ -15,6 +15,17 @@ export default [
     },
   },
   {
-    ignores: ['eslint.config.js', 'prettier.config.js'],
+    ignores: [
+      'eslint.config.js',
+      'prettier.config.js',
+      // Build output and generated sources: not typed by tsconfig, so the
+      // type-aware parser errors on them rather than linting them.
+      '.output/**',
+      '.tanstack/**',
+      'dist/**',
+      'src/routeTree.gen.ts',
+      'src/features/icons/*.gen.ts',
+      'scripts/**',
+    ],
   },
 ]

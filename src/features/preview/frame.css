@@ -1,0 +1,256 @@
+/**
+ * The preview iframe's structural stylesheet.
+ *
+ * Loaded as text (`?raw`) and injected into the iframe, never into the app — so
+ * `.rp-*` class names are free of the app's Tailwind pipeline and cannot collide
+ * with chrome styling.
+ *
+ * Three groups, and which cascade layer each lands in is the whole point:
+ *
+ *   @layer reset  — the weakest thing in the document, so a template or the
+ *                   user's custom CSS can override any of it without specificity
+ *                   tricks.
+ *   unlayered     — page geometry. Unlayered CSS beats every layer, including
+ *                   the user's, which is deliberate: custom CSS may restyle the
+ *                   resume freely but must not be able to break pagination by
+ *                   resizing the page box out from under the paginator. Paper
+ *                   dimensions are still fully adjustable — through the
+ *                   `--paper-*` tokens these rules read.
+ *   @layer template — the page's decoration (shadow, corner), which is styling
+ *                   rather than structure and so stays overridable.
+ */
+
+@layer reset {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    /* The paper is always light. Pinning the scheme stops a dark OS preference
+       from tinting the canvas or any UA-drawn detail inside the iframe. */
+    color-scheme: light;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+    /* Transparent, so the app's preview well shows through. The well is chrome
+       and follows the app theme; the paper does not. */
+    background: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  p,
+  figure,
+  blockquote,
+  pre,
+  ul,
+  ol,
+  li {
+    margin: 0;
+    padding: 0;
+  }
+
+  ul,
+  ol {
+    list-style: none;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* ---- Page geometry (unlayered — see the note above) ---- */
+
+.rp-root {
+  position: relative;
+}
+
+/**
+ * The visible stack of pages.
+ *
+ * Zoom is applied here as the CSS `zoom` property rather than a transform,
+ * because `zoom` participates in layout: the iframe's scrollable area shrinks
+ * and grows with it, so scrollbars stay correct at every magnification. A
+ * transform would scale the pixels while leaving the layout box — and therefore
+ * the scroll extent — at 100%.
+ *
+ * The measuring container is a SIBLING of this element, never a descendant,
+ * precisely because `zoom` would scale the numbers the paginator reads.
+ */
+.rp-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+.rp-page {
+  position: relative;
+  flex: none;
+  width: var(--paper-w);
+  height: var(--paper-h);
+  padding: var(--paper-margin-top, var(--paper-margin))
+    var(--paper-margin-right, var(--paper-margin))
+    var(--paper-margin-bottom, var(--paper-margin))
+    var(--paper-margin-left, var(--paper-margin));
+  /* Clipped, not scrollable: a block taller than the content area is a layout
+     problem to see, not one to hide behind a scrollbar. */
+  overflow: hidden;
+}
+
+/**
+ * The content area. Exists so the paginator can read one number —
+ * `clientHeight` — instead of subtracting margins it would first have to
+ * convert from inches or millimetres.
+ */
+.rp-page-body {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  /* Establishes a block formatting context, so a child's margin cannot collapse
+     out through the top of the content area. */
+  display: flow-root;
+}
+
+/**
+ * The measuring pass.
+ *
+ * Laid out for real (`visibility: hidden`, not `display: none`) because heights
+ * are the entire point, and left in the flow of a positioned ancestor so it
+ * cannot affect the visible stack's size.
+ */
+.rp-measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.rp-measure .rp-page {
+  height: auto;
+  overflow: visible;
+}
+
+.rp-measure .rp-page-body {
+  height: auto;
+  overflow: visible;
+}
+
+/* One page at its true height, so `clientHeight` on its body yields the content
+   height in pixels with no unit arithmetic. */
+.rp-measure .rp-page.rp-probe {
+  height: var(--paper-h);
+}
+
+.rp-measure .rp-page.rp-probe .rp-page-body {
+  height: 100%;
+}
+
+/**
+ * Flow items — what the paginator distributes across pages.
+ *
+ * Vertical rhythm is `padding-top` rather than `margin-top` on purpose: margins
+ * collapse, and a collapsed margin is invisible to `getBoundingClientRect`,
+ * which would make every measurement quietly wrong. Padding always shows up in
+ * the box.
+ */
+.rp-item {
+  padding-top: var(--rp-space, 0);
+  /**
+   * A block formatting context, so no descendant margin can collapse through
+   * the item's edges.
+   *
+   * This is what makes the measuring pass and the visible pass agree exactly. An
+   * item whose leading space is dropped at the top of a page has no padding
+   * left to block collapsing, so its first child's margin would escape the box —
+   * measured height and rendered height would differ by that margin, and the
+   * error would accumulate down the page.
+   */
+  display: flow-root;
+}
+
+.rp-item--header {
+  --rp-space: 0;
+}
+
+.rp-item--section {
+  --rp-space: var(--paper-space-section);
+}
+
+.rp-item--block {
+  --rp-space: var(--paper-space-block);
+}
+
+/**
+ * Space above an item is dropped when the item lands at the top of a page.
+ *
+ * Scoped to `[data-paged]` so it applies only to the visible pass — the
+ * measuring pass has to report every item's real spacing, including the first,
+ * since the paginator subtracts it per page.
+ */
+.rp-page-body[data-paged] > .rp-item:first-child {
+  padding-top: 0;
+}
+
+@layer template {
+  /* Decoration, not structure, so a template or the user may replace it. The
+     page's background comes from `.resivo-paper` in `paper.css`. */
+  .rp-page {
+    border-radius: var(--paper-radius, 2px);
+    box-shadow:
+      0 1px 2px rgba(18, 18, 16, 0.08),
+      0 12px 32px rgba(18, 18, 16, 0.1);
+  }
+
+  .rp-measure .rp-page {
+    box-shadow: none;
+  }
+}
+
+/**
+ * Print.
+ *
+ * The same document that renders the preview is what prints, so this is the
+ * whole of the difference between the two: drop the screen affordances (gaps,
+ * shadows, magnification) and break between pages at exactly the points the
+ * paginator already chose. `zoom` needs `!important` because the visible zoom is
+ * an inline style.
+ */
+@media print {
+  .rp-measure {
+    display: none;
+  }
+
+  .rp-pages {
+    gap: 0;
+    padding: 0;
+    zoom: 1 !important;
+  }
+
+  .rp-page {
+    border-radius: 0;
+    box-shadow: none !important;
+    break-after: page;
+  }
+
+  .rp-page:last-child {
+    break-after: auto;
+  }
+}
