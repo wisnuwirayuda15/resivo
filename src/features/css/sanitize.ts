@@ -1,3 +1,8 @@
+import { parse } from 'postcss'
+import safeParser from 'postcss-safe-parser'
+
+import type { AtRule, ChildNode, Container, Declaration, Rule } from 'postcss'
+
 /**
  * The custom-CSS sanitizer.
  *
@@ -27,10 +32,15 @@
  * cheap to refuse, and this text may be read by something other than the browser
  * it was written in — an exported HTML file opened years from now.
  *
- * Written as a tokenizer rather than a set of regular expressions because the
- * hard cases are all about context: a brace inside a string, a semicolon inside
- * `url()`, a comment that hides either. A pattern that ignores context is a
- * pattern that can be walked around.
+ * The parsing is PostCSS's. It used to be a hand-rolled tokenizer, for a good
+ * reason — the hard cases are all about context: a brace inside a string, a
+ * semicolon inside `url()`, a comment that hides either — but that is an
+ * argument for a real parser, not for writing one here. A sanitizer is the last
+ * place to keep a bespoke tokenizer, because every bypass it will ever have is a
+ * disagreement between how it reads CSS and how the browser does.
+ *
+ * Only the policy below is ours. The output is still assembled by hand, in one
+ * canonical shape, from nodes that have already been vetted.
  */
 
 export interface CssWarning {
@@ -56,7 +66,7 @@ export interface SanitizeResult {
  * at-rules grows with the platform and a deny-list would silently admit the next
  * one.
  */
-const AT_RULES: Record<string, 'declarations' | 'rules' | 'none'> = {
+const AT_RULES: Record<string, 'declarations' | 'rules'> = {
   media: 'rules',
   supports: 'rules',
   container: 'rules',
@@ -95,226 +105,13 @@ const REFUSED_POSITIONS = new Set(['fixed', 'sticky'])
  * would reach for the app's own assets. */
 const ALLOWED_URL = /^(?:data:|blob:|#)/i
 
-// ---------------------------------------------------------------------------
-// Reader
-// ---------------------------------------------------------------------------
-
-class Reader {
-  private readonly lineStarts: Array<number>
-
-  constructor(
-    readonly source: string,
-    public index = 0,
-  ) {
-    this.lineStarts = [0]
-
-    for (let at = 0; at < source.length; at += 1) {
-      if (source[at] === '\n') {
-        this.lineStarts.push(at + 1)
-      }
-    }
-  }
-
-  get done(): boolean {
-    return this.index >= this.source.length
-  }
-
-  peek(offset = 0): string {
-    return this.source[this.index + offset] ?? ''
-  }
-
-  /** Line and column of an offset, for a warning. */
-  positionOf(offset: number): { line: number; column: number } {
-    let low = 0
-    let high = this.lineStarts.length - 1
-
-    while (low < high) {
-      const middle = Math.ceil((low + high) / 2)
-
-      if ((this.lineStarts[middle] ?? 0) <= offset) {
-        low = middle
-      } else {
-        high = middle - 1
-      }
-    }
-
-    return { line: low + 1, column: offset - (this.lineStarts[low] ?? 0) + 1 }
-  }
-
-  /** Advances past whitespace and comments. Comments are dropped rather than
-   * kept: they can hold anything, and nothing downstream reads them. */
-  skipTrivia(): void {
-    for (;;) {
-      const character = this.peek()
-
-      if (character === '') {
-        return
-      }
-
-      if (/\s/.test(character)) {
-        this.index += 1
-        continue
-      }
-
-      if (character === '/' && this.peek(1) === '*') {
-        const close = this.source.indexOf('*/', this.index + 2)
-
-        // An unterminated comment swallows the rest of the file, which is what a
-        // browser does too.
-        this.index = close === -1 ? this.source.length : close + 2
-        continue
-      }
-
-      return
-    }
-  }
-
-  /** Reads one token's worth of raw text, keeping strings, comments and nested
-   * brackets intact, until one of `stops` is reached at depth zero. */
-  readUntil(stops: string): string {
-    const start = this.index
-    let depth = 0
-
-    while (!this.done) {
-      const character = this.peek()
-
-      if (character === '"' || character === "'") {
-        this.skipString()
-        continue
-      }
-
-      if (character === '/' && this.peek(1) === '*') {
-        const close = this.source.indexOf('*/', this.index + 2)
-
-        this.index = close === -1 ? this.source.length : close + 2
-        continue
-      }
-
-      if (character === '(' || character === '[') {
-        depth += 1
-      } else if (character === ')' || character === ']') {
-        depth = Math.max(0, depth - 1)
-      } else if (depth === 0 && stops.includes(character)) {
-        break
-      }
-
-      this.index += 1
-    }
-
-    return this.source.slice(start, this.index)
-  }
-
-  private skipString(): void {
-    const quote = this.peek()
-
-    this.index += 1
-
-    while (!this.done) {
-      const character = this.peek()
-
-      if (character === '\\') {
-        this.index += 2
-        continue
-      }
-
-      this.index += 1
-
-      if (character === quote || character === '\n') {
-        return
-      }
-    }
-  }
-
-  /** Skips a `{ … }` block, wherever the cursor is inside it. */
-  skipBlock(): void {
-    let depth = 0
-
-    while (!this.done) {
-      this.readUntil('{}')
-
-      const character = this.peek()
-
-      if (character === '{') {
-        depth += 1
-      } else if (character === '}') {
-        depth -= 1
-      } else {
-        return
-      }
-
-      this.index += 1
-
-      if (depth === 0) {
-        return
-      }
-    }
-  }
-}
+const REMOTE_URL_MESSAGE =
+  'Only data: and blob: URLs are allowed — a remote URL would fetch over the network.'
 
 // ---------------------------------------------------------------------------
 // Values
 // ---------------------------------------------------------------------------
 
-/**
- * Removes comments from a captured span, and reports whether it contains a
- * brace outside a string.
- *
- * Both answers come from the same pass because both need the same context. A
- * comment can hide anything, and a brace in a declaration means either CSS
- * nesting — which the model's own stylesheet does not use and which this build
- * does not support — or an attempt to close the enclosing layer early. Either
- * way the declaration is dropped, so no brace can ever reach the output from
- * here.
- */
-const clean = (raw: string): { text: string; brace: boolean } => {
-  let text = ''
-  let brace = false
-  let at = 0
-
-  while (at < raw.length) {
-    const character = raw[at] ?? ''
-
-    if (character === '"' || character === "'") {
-      text += character
-      at += 1
-
-      while (at < raw.length) {
-        const inner = raw[at] ?? ''
-
-        if (inner === '\\') {
-          text += raw.slice(at, at + 2)
-          at += 2
-          continue
-        }
-
-        text += inner
-        at += 1
-
-        if (inner === character) {
-          break
-        }
-      }
-
-      continue
-    }
-
-    if (character === '/' && raw[at + 1] === '*') {
-      const close = raw.indexOf('*/', at + 2)
-
-      at = close === -1 ? raw.length : close + 2
-      continue
-    }
-
-    if (character === '{' || character === '}') {
-      brace = true
-    }
-
-    text += character
-    at += 1
-  }
-
-  return { text, brace }
-}
 const URL_PATTERN = /url\(\s*("([^"]*)"|'([^']*)'|([^)]*))\s*\)/gi
 
 /** Whether every `url()` in a value points somewhere that stays local. */
@@ -334,240 +131,225 @@ const hasExpression = (value: string): boolean =>
   /expression\s*\(/i.test(value) || /javascript\s*:/i.test(value)
 
 // ---------------------------------------------------------------------------
-// Parsing
+// Walking
 // ---------------------------------------------------------------------------
 
 interface Context {
-  reader: Reader
   warnings: Array<CssWarning>
 }
 
-const warn = (context: Context, offset: number, message: string): void => {
-  context.warnings.push({ ...context.reader.positionOf(offset), message })
+const warn = (context: Context, node: ChildNode, message: string): void => {
+  const start = node.source?.start
+
+  context.warnings.push({
+    line: start?.line ?? 1,
+    column: start?.column ?? 1,
+    message,
+  })
 }
 
-/** Splits a block's body into declarations, then keeps the allowed ones. */
-const declarations = (context: Context, end: number): Array<string> => {
-  const { reader } = context
+/**
+ * The declarations of one block, in the order they were written.
+ *
+ * Anything that is not a declaration is refused here rather than descended into:
+ * a rule nested inside another rule is either CSS nesting, which this build does
+ * not support, or an attempt to close the enclosing layer early, and refusing
+ * both is what keeps a brace from ever reaching the output through a
+ * declaration.
+ */
+const declarations = (container: Container, context: Context): Array<string> => {
   const kept: Array<string> = []
 
-  while (reader.index < end) {
-    reader.skipTrivia()
-
-    if (reader.index >= end) {
-      break
+  container.each((node) => {
+    if (node.type === 'comment') {
+      // Dropped rather than kept: a comment can hold anything, and nothing
+      // downstream reads them.
+      return
     }
 
-    const start = reader.index
-    const captured = reader.readUntil(';}')
-
-    // Step over the terminator, if there is one before the block's end.
-    if (reader.peek() === ';') {
-      reader.index += 1
+    if (node.type !== 'decl') {
+      warn(context, node, 'Nested rules are not supported here.')
+      return
     }
 
-    const { text, brace } = clean(captured)
-    const raw = text.trim()
+    const declaration: Declaration = node
+    const property = declaration.prop.trim()
+    const value = declaration.value.trim()
 
-    if (raw === '') {
-      continue
+    /**
+     * `color: ;` — a property that was opened and then not given a value. Worth
+     * saying out loud, because it is invisible in the preview and the rest of
+     * the block around it still applies.
+     *
+     * A declaration with no colon at all never reaches here: the recovering
+     * parser drops it, and the strict pass reports it by name and column.
+     */
+    if (value === '') {
+      warn(context, node, 'Not a declaration; expected "property: value".')
+      return
     }
 
-    if (brace) {
-      // Either CSS nesting, which this build does not support, or an attempt to
-      // close the enclosing layer early. Refusing both is what guarantees no
-      // brace ever reaches the output from a declaration.
-      warn(context, start, 'Nested rules are not supported here.')
-      continue
-    }
-
-    const colon = raw.indexOf(':')
-
-    if (colon === -1) {
-      warn(context, start, 'Not a declaration; expected "property: value".')
-      continue
-    }
-
-    const property = raw.slice(0, colon).trim().toLowerCase()
-    const value = raw.slice(colon + 1).trim()
-
-    const refused = REFUSED_PROPERTIES[property]
+    const refused = REFUSED_PROPERTIES[property.toLowerCase()]
 
     if (refused !== undefined) {
-      warn(context, start, refused)
-      continue
+      warn(context, node, refused)
+      return
     }
 
     if (hasExpression(value)) {
-      warn(context, start, 'This value could execute script.')
-      continue
+      warn(context, node, 'This value could execute script.')
+      return
     }
 
     if (!urlsAreLocal(value)) {
-      warn(
-        context,
-        start,
-        'Only data: and blob: URLs are allowed — a remote URL would fetch over the network.',
-      )
-      continue
+      warn(context, node, REMOTE_URL_MESSAGE)
+      return
     }
 
-    if (property === 'position' && REFUSED_POSITIONS.has(value.toLowerCase())) {
+    if (
+      property.toLowerCase() === 'position' &&
+      REFUSED_POSITIONS.has(value.toLowerCase())
+    ) {
       warn(
         context,
-        start,
+        node,
         `position: ${value} would take the element out of the page, so the print would not match the preview.`,
       )
-      continue
+      return
     }
 
-    kept.push(`${raw.slice(0, colon).trim()}: ${value}`)
-  }
-
-  reader.index = end
+    kept.push(`${property}: ${value}`)
+  })
 
   return kept
 }
 
-/** Finds the offset of the `}` closing the block that starts at the cursor's
- * `{`, so the body can be parsed within known bounds. */
-const blockEnd = (reader: Reader): number => {
-  const restore = reader.index
+const atRule = (node: AtRule, context: Context): string | undefined => {
+  const name = node.name.toLowerCase()
+  const refused = REFUSED_AT_RULES[name]
 
-  reader.skipBlock()
+  if (refused !== undefined) {
+    warn(context, node, refused)
+    return undefined
+  }
 
-  const end = reader.index
-  reader.index = restore
+  const kind = AT_RULES[name]
 
-  // One before the closing brace: the body, not the brace.
-  return Math.max(restore, end - 1)
+  if (kind === undefined) {
+    warn(context, node, `"@${name}" is not supported here.`)
+    return undefined
+  }
+
+  if (node.nodes === undefined) {
+    // A statement at-rule with no block, and nothing this build honours as one.
+    warn(context, node, `"@${name}" needs a block.`)
+    return undefined
+  }
+
+  const prelude = `@${node.name}${node.params === '' ? '' : ` ${node.params}`}`
+
+  if (!urlsAreLocal(node.params)) {
+    warn(context, node, REMOTE_URL_MESSAGE)
+    return undefined
+  }
+
+  const body =
+    kind === 'declarations'
+      ? declarations(node, context).join('; ')
+      : statements(node, context).join('\n')
+
+  // An at-rule whose body is entirely refused is dropped rather than emitted
+  // empty, so the output stays readable when inspected.
+  return body === '' ? undefined : `${prelude} { ${body} }`
 }
 
-const parseStatements = (context: Context, limit: number): Array<string> => {
-  const { reader } = context
+const rule = (node: Rule, context: Context): string | undefined => {
+  const selector = node.selector.trim()
+
+  if (selector === '') {
+    warn(context, node, 'A rule needs a selector.')
+    return undefined
+  }
+
+  const body = declarations(node, context).join('; ')
+
+  return body === '' ? undefined : `${selector} { ${body} }`
+}
+
+const statements = (container: Container, context: Context): Array<string> => {
   const out: Array<string> = []
 
-  while (reader.index < limit) {
-    reader.skipTrivia()
-
-    if (reader.index >= limit) {
-      break
+  container.each((node) => {
+    if (node.type === 'comment') {
+      return
     }
 
-    const start = reader.index
-
-    // A stray closing brace at this level: the user's braces do not balance.
-    // Stepping over it is what keeps the rest of the sheet usable.
-    if (reader.peek() === '}') {
-      reader.index += 1
-      warn(context, start, 'Unmatched "}".')
-      continue
+    if (node.type === 'decl') {
+      // A declaration where a rule belongs — outside any block.
+      warn(context, node, 'Expected "{" after the selector.')
+      return
     }
 
-    const prelude = reader.readUntil('{;').trim()
-    const terminator = reader.peek()
+    const emitted =
+      node.type === 'atrule' ? atRule(node, context) : rule(node, context)
 
-    if (prelude.startsWith('@')) {
-      const name = (/^@([\w-]+)/.exec(prelude)?.[1] ?? '').toLowerCase()
-      const refused = REFUSED_AT_RULES[name]
-      const allowed = AT_RULES[name]
-
-      if (terminator === ';') {
-        reader.index += 1
-      }
-
-      if (refused !== undefined) {
-        warn(context, start, refused)
-
-        if (terminator === '{') {
-          reader.skipBlock()
-        }
-
-        continue
-      }
-
-      if (allowed === undefined) {
-        warn(context, start, `"@${name}" is not supported here.`)
-
-        if (terminator === '{') {
-          reader.skipBlock()
-        }
-
-        continue
-      }
-
-      if (terminator !== '{') {
-        // A statement at-rule with no block and nothing this build honours.
-        warn(context, start, `"@${name}" needs a block.`)
-        continue
-      }
-
-      if (!urlsAreLocal(prelude)) {
-        warn(
-          context,
-          start,
-          'Only data: and blob: URLs are allowed — a remote URL would fetch over the network.',
-        )
-        reader.skipBlock()
-        continue
-      }
-
-      const end = blockEnd(reader)
-      reader.index += 1
-
-      const body =
-        allowed === 'declarations'
-          ? declarations(context, end).join('; ')
-          : parseStatements(context, end).join('\n')
-
-      reader.index = end + 1
-
-      // An at-rule whose body is entirely refused is dropped rather than
-      // emitted empty, so the output stays readable when inspected.
-      if (body !== '') {
-        out.push(`${prelude} { ${body} }`)
-      }
-
-      continue
+    if (emitted !== undefined) {
+      out.push(emitted)
     }
-
-    if (terminator !== '{') {
-      // A selector with no block: everything up to the next `;` is not CSS.
-      if (terminator === ';') {
-        reader.index += 1
-      }
-
-      if (prelude !== '') {
-        warn(context, start, 'Expected "{" after the selector.')
-      }
-
-      continue
-    }
-
-    const end = blockEnd(reader)
-    reader.index += 1
-
-    const body = declarations(context, end).join('; ')
-
-    reader.index = end + 1
-
-    if (prelude === '') {
-      warn(context, start, 'A rule needs a selector.')
-      continue
-    }
-
-    if (body !== '') {
-      out.push(`${prelude} { ${body} }`)
-    }
-  }
+  })
 
   return out
 }
 
+// ---------------------------------------------------------------------------
+// Entry point
+// ---------------------------------------------------------------------------
+
+/**
+ * Parses twice, on purpose.
+ *
+ * The strict parser is run first only for its diagnostics: it reports an
+ * unbalanced brace or an unclosed block with a position, which is exactly what
+ * the author needs to see and what a recovering parser silently swallows. The
+ * recovering parser then does the parse that is actually used, because
+ * discarding somebody's whole stylesheet over one typo would be hostile — a
+ * browser keeps going too, and so should this.
+ *
+ * Both are cheap: a resume's custom CSS is a few dozen rules, and this already
+ * runs debounced behind the editor.
+ */
+const diagnose = (source: string, context: Context): void => {
+  try {
+    parse(source, { from: undefined })
+  } catch (error) {
+    const syntax = error as { line?: number; column?: number; reason?: string }
+
+    context.warnings.push({
+      line: syntax.line ?? 1,
+      column: syntax.column ?? 1,
+      message:
+        syntax.reason === undefined
+          ? 'This is not valid CSS; the rules that could be read were kept.'
+          : `${syntax.reason}. The rules that could be read were kept.`,
+    })
+  }
+}
+
 export const sanitizeCss = (source: string): SanitizeResult => {
-  const reader = new Reader(source)
-  const context: Context = { reader, warnings: [] }
-  const rules = parseStatements(context, source.length)
+  const context: Context = { warnings: [] }
+
+  diagnose(source, context)
+
+  const root = safeParser(source, { from: undefined })
+  const rules = statements(root, context)
+
+  // Warnings are collected in two passes, so the syntax diagnostic can arrive
+  // before a policy warning that is earlier in the file.
+  context.warnings.sort((left, right) =>
+    left.line === right.line
+      ? left.column - right.column
+      : left.line - right.line,
+  )
 
   return { css: rules.join('\n'), warnings: context.warnings }
 }

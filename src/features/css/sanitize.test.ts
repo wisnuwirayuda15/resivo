@@ -209,7 +209,9 @@ describe('breaking out of the layer', () => {
     )
 
     expect(braces(css)).toBe(0)
-    expect(warnings.some((w) => w.message.includes('Unmatched'))).toBe(true)
+    // The diagnostic comes from the strict parser, which names the character it
+    // did not expect and where it was.
+    expect(warnings.some((w) => w.message.includes('}'))).toBe(true)
     expect(css).not.toContain('fixed')
   })
 
@@ -279,10 +281,23 @@ describe('reporting', () => {
     expect(warnings[0]?.column).toBe(1)
   })
 
-  it('reports a declaration with no colon', () => {
+  it('reports a declaration with no colon, and where it is', () => {
     const { css, warnings } = sanitizeCss('.a { color red }')
 
     expect(css).toBe('')
+    // The parser's own diagnostic: it names the word it could not read and
+    // points at the column, which is more use than "this is not a declaration".
+    expect(warnings[0]?.message).toContain('color')
+    expect(warnings[0]?.line).toBe(1)
+    expect(warnings[0]?.column).toBe(6)
+  })
+
+  it('reports a declaration with no value', () => {
+    const { css, warnings } = sanitizeCss('.a { color: ; font-size: 9pt }')
+
+    // The rest of the block survives — one broken declaration is a typo, not a
+    // reason to drop the rule around it.
+    expect(css).toBe('.a { font-size: 9pt }')
     expect(warnings[0]?.message).toContain('property: value')
   })
 
