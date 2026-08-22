@@ -271,20 +271,24 @@ describe('block edits', () => {
       edit.addBlock(sectionId, {
         id: 'list-1',
         kind: 'bulletList',
-        items: [text('One'), text('Two'), text('Three')],
+        items: [
+          { text: text('One') },
+          { text: text('Two') },
+          { text: text('Three') },
+        ],
       }),
     )
 
     const next = apply(
       withList,
-      edit.setBulletItem(sectionId, 'list-1', 1, text('Second')),
+      edit.setBulletItem(sectionId, 'list-1', [1], text('Second')),
     )
     const block = next.content.sections.find((s) => s.id === sectionId)
       ?.blocks[0]
 
     expect(
       block?.kind === 'bulletList' &&
-        block.items.map((item) => plainText(item)),
+        block.items.map((item) => plainText(item.text)),
     ).toEqual(['One', 'Second', 'Three'])
   })
 
@@ -296,13 +300,13 @@ describe('block edits', () => {
       edit.addBlock(sectionId, {
         id: 'list-1',
         kind: 'bulletList',
-        items: [text('One')],
+        items: [{ text: text('One') }],
       }),
     )
 
     const next = apply(
       withList,
-      edit.setBulletItem(sectionId, 'list-1', 5, text('Nope')),
+      edit.setBulletItem(sectionId, 'list-1', [5], text('Nope')),
     )
     const block = next.content.sections.find((s) => s.id === sectionId)
       ?.blocks[0]

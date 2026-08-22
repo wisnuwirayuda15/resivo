@@ -6,7 +6,9 @@ import {
   setEntryField,
   setHeaderHeadline,
   setHeaderName,
+  setQuoteParagraph,
   setSectionTitle,
+  setTableCell,
   setTag,
   updateContactLabel,
 } from '@/features/editor/mutations'
@@ -25,13 +27,18 @@ import type {
 } from './types'
 import type {
   BulletListBlock,
+  CodeBlock,
   EntryBlock,
+  HeadingBlock,
   IconLabelBlock,
   ImageBlock,
   InlineText,
+  NestedList,
   ParagraphBlock,
+  QuoteBlock,
   RawBlock,
   Section,
+  TableBlock,
   TagListBlock,
 } from '@/features/resume/model/document'
 
@@ -45,9 +52,9 @@ import type {
  *
  * Plain elements and `rp-` class names throughout, never `Box`/`Text` or a
  * Tailwind utility: this markup is serialised into the iframe and, later, into
- * the HTML export, neither of which carries the app's stylesheets. The one
- * inline style is an image's width, which is a per-block value from the
- * document.
+ * the HTML export, neither of which carries the app's stylesheets. The only
+ * inline styles are per-block values out of the document that no class could
+ * name — an image's width, a table column's alignment.
  *
  * Every run of text goes through `EditableText`, which is what makes the paper
  * the editing surface. Outside `edit` mode that component renders exactly what
@@ -163,27 +170,38 @@ const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
 const DefaultSectionHeading: React.FC<SectionHeadingProps> = ({
   section,
   context,
-}) => (
-  <div className="rp-section">
-    <div className="rp-section-title-row">
-      {section.icon === undefined ? null : <DocumentIcon icon={section.icon} />}
-      <h2 className="rp-section-title">
-        <EditableText
-          context={context}
-          label="section heading"
-          onCommit={commitWith(context, (value) =>
-            setSectionTitle(section.id, value),
-          )}
-          value={section.title}
-        />
-      </h2>
-    </div>
+}) =>
+  /**
+   * An untitled section draws no heading and no rule.
+   *
+   * This is where content that arrived above the first heading lives — pasted
+   * text, usually — and giving it an empty heading row would print a rule with
+   * nothing over it. Titling it is done in the Markdown pane, by writing the
+   * heading the paste did not have.
+   */
+  plainText(section.title) === '' ? null : (
+    <div className="rp-section">
+      <div className="rp-section-title-row">
+        {section.icon === undefined ? null : (
+          <DocumentIcon icon={section.icon} />
+        )}
+        <h2 className="rp-section-title">
+          <EditableText
+            context={context}
+            label="section heading"
+            onCommit={commitWith(context, (value) =>
+              setSectionTitle(section.id, value),
+            )}
+            value={section.title}
+          />
+        </h2>
+      </div>
 
-    {(section.style?.showDivider ?? context.design.rules.showDividers) ? (
-      <div className="rp-section-rule" />
-    ) : null}
-  </div>
-)
+      {(section.style?.showDivider ?? context.design.rules.showDividers) ? (
+        <div className="rp-section-rule" />
+      ) : null}
+    </div>
+  )
 
 interface BlockViewProps<T> {
   block: T
@@ -208,28 +226,192 @@ const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
   </p>
 )
 
+/**
+ * A list, at any depth.
+ *
+ * Items carry no id in the model — they are positions in an array, replaced
+ * wholesale on edit — so the path down to an item is its identity, both as the
+ * React key and as what the mutation is told to write.
+ *
+ * A task list renders its checkbox as text rather than an `<input>`: this markup
+ * is printed and exported, where a form control is neither meaningful nor
+ * reliably drawn.
+ */
+const ListItems: React.FC<{
+  list: NestedList
+  path: ReadonlyArray<number>
+  block: BulletListBlock
+  section: Section
+  context: RenderContext
+}> = ({ list, path, block, section, context }) => {
+  const Tag = list.ordered === true ? 'ol' : 'ul'
+
+  return (
+    <Tag
+      className={list.ordered === true ? 'rp-list rp-list-ordered' : 'rp-list'}
+      start={list.ordered === true ? list.start : undefined}
+    >
+      {list.items.map((item, index) => {
+        const here = [...path, index]
+
+        return (
+          <li
+            className={item.checked === undefined ? undefined : 'rp-task'}
+            key={here.join('.')}
+          >
+            {item.checked === undefined ? null : (
+              <span aria-hidden="true" className="rp-checkbox">
+                {item.checked ? '☑' : '☐'}
+              </span>
+            )}
+            <EditableText
+              context={context}
+              label="bullet"
+              onCommit={commitWith(context, (value) =>
+                setBulletItem(section.id, block.id, here, value),
+              )}
+              value={item.text}
+            />
+            {item.list === undefined ? null : (
+              <ListItems
+                block={block}
+                context={context}
+                list={item.list}
+                path={here}
+                section={section}
+              />
+            )}
+          </li>
+        )
+      })}
+    </Tag>
+  )
+}
+
 const BulletList: React.FC<BlockViewProps<BulletListBlock>> = ({
   block,
   section,
   context,
 }) => (
-  <ul className="rp-bullets">
-    {block.items.map((item, index) => (
-      // Bullet items carry no id in the model — they are a plain array of runs,
-      // replaced wholesale on edit, so the index is their identity.
-      <li key={index}>
+  <ListItems
+    block={block}
+    context={context}
+    list={block}
+    path={[]}
+    section={section}
+  />
+)
+
+/** Written out rather than built from the level, so the tag is a known element
+ * name to the type system and to JSX rather than an interpolated string. */
+const HEADING_TAGS = { 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6' } as const
+
+/**
+ * A subheading inside a section.
+ *
+ * The level comes from the document, so the element does too — a resume read by
+ * a screen reader or an applicant tracking system should have the outline its
+ * author wrote, not one flattened to a single tag.
+ */
+const Heading: React.FC<BlockViewProps<HeadingBlock>> = ({
+  block,
+  section,
+  context,
+}) => {
+  const Tag = HEADING_TAGS[block.level]
+
+  return (
+    <Tag className="rp-heading" data-level={block.level}>
+      <EditableText
+        context={context}
+        label="heading"
+        onCommit={commitWith(context, (value) =>
+          setBlockText(section.id, block.id, value),
+        )}
+        value={block.text}
+      />
+    </Tag>
+  )
+}
+
+const Quote: React.FC<BlockViewProps<QuoteBlock>> = ({
+  block,
+  section,
+  context,
+}) => (
+  <blockquote className="rp-quote">
+    {block.paragraphs.map((paragraph, index) => (
+      <p key={index}>
         <EditableText
           context={context}
-          label="bullet"
+          label="quote"
           onCommit={commitWith(context, (value) =>
-            setBulletItem(section.id, block.id, index, value),
+            setQuoteParagraph(section.id, block.id, index, value),
           )}
-          value={item}
+          value={paragraph}
         />
-      </li>
+      </p>
     ))}
-  </ul>
+  </blockquote>
 )
+
+/**
+ * A fenced code block.
+ *
+ * Not editable on the paper, deliberately: everything inside a fence is literal,
+ * and a `contenteditable` region would let the browser normalize whitespace and
+ * insert markup into text whose whole point is that it is exact. It is edited in
+ * the Markdown pane.
+ */
+const Code: React.FC<BlockViewProps<CodeBlock>> = ({ block }) => (
+  <pre className="rp-code-block" data-language={block.language}>
+    <code>{block.code}</code>
+  </pre>
+)
+
+const Table: React.FC<BlockViewProps<TableBlock>> = ({
+  block,
+  section,
+  context,
+}) => {
+  const cell = (row: number, column: number, value: InlineText) => (
+    <EditableText
+      context={context}
+      label="table cell"
+      onCommit={commitWith(context, (next) =>
+        setTableCell(section.id, block.id, row, column, next),
+      )}
+      value={value}
+    />
+  )
+
+  const align = (column: number) => block.align[column] ?? undefined
+
+  return (
+    <table className="rp-table">
+      <thead>
+        <tr>
+          {block.head.map((heading, column) => (
+            <th key={column} style={{ textAlign: align(column) }}>
+              {cell(-1, column, heading)}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {block.rows.map((row, rowIndex) => (
+          <tr key={rowIndex}>
+            {row.map((value, column) => (
+              <td key={column} style={{ textAlign: align(column) }}>
+                {cell(rowIndex, column, value)}
+              </td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
 
 const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
   block,
@@ -426,8 +608,16 @@ const DefaultBlock: React.FC<BlockProps> = ({ block, section, context }) => {
   switch (block.kind) {
     case 'paragraph':
       return <Paragraph block={block} context={context} section={section} />
+    case 'heading':
+      return <Heading block={block} context={context} section={section} />
     case 'bulletList':
       return <BulletList block={block} context={context} section={section} />
+    case 'quote':
+      return <Quote block={block} context={context} section={section} />
+    case 'code':
+      return <Code block={block} context={context} section={section} />
+    case 'table':
+      return <Table block={block} context={context} section={section} />
     case 'entry':
       return <Entry block={block} context={context} section={section} />
     case 'tagList':

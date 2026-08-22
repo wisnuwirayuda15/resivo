@@ -84,7 +84,35 @@ const sample = (): ResumeDocument =>
           {
             id: 'b1',
             kind: 'bulletList',
-            items: [[{ type: 'text', text: 'One' }]],
+            items: [
+              {
+                text: [{ type: 'text', text: 'One' }],
+                list: {
+                  ordered: true,
+                  items: [{ text: [{ type: 'text', text: 'Nested' }] }],
+                },
+              },
+              { text: [{ type: 'text', text: 'Done' }], checked: true },
+            ],
+          },
+          {
+            id: 'h1',
+            kind: 'heading',
+            level: 3,
+            text: [{ type: 'text', text: 'A subheading' }],
+          },
+          {
+            id: 'q1',
+            kind: 'quote',
+            paragraphs: [[{ type: 'text', text: 'A quoted line.' }]],
+          },
+          { id: 'c1', kind: 'code', language: 'go', code: 'func main() {}' },
+          {
+            id: 'tb1',
+            kind: 'table',
+            head: [[{ type: 'text', text: 'Area' }]],
+            rows: [[[{ type: 'text', text: 'Web' }]]],
+            align: ['center'],
           },
           { id: 't1', kind: 'tagList', tags: ['Go', 'Rust'] },
           {
@@ -192,8 +220,10 @@ describe('edit mode markup', () => {
     const count = (edit.match(/class="rp-editable"/g) ?? []).length
 
     // name, headline, two contacts, section title, entry title/subtitle/
-    // location/summary, two entry bullets, paragraph, one bullet item, two
-    // tags, one icon label.
-    expect(count).toBe(16)
+    // location/summary, two entry bullets, paragraph, three list items across
+    // two levels, a subheading, a quoted paragraph, a table heading and a table
+    // cell, two tags, one icon label. A code block is not counted: its content
+    // is literal, so it is edited in the Markdown pane rather than on the paper.
+    expect(count).toBe(22)
   })
 })

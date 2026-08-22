@@ -23,7 +23,7 @@
  * lazily on read (see `database/migrations/documents.ts`), so a content change
  * never forces an IndexedDB schema migration.
  */
-export const DOCUMENT_VERSION = 1
+export const DOCUMENT_VERSION = 2
 
 /** Paper baselines defined by the design system's `.resivo-paper` scopes. */
 export const TEMPLATE_IDS = [
@@ -87,10 +87,88 @@ export interface ParagraphBlock {
   text: InlineText
 }
 
+/**
+ * One item of a list.
+ *
+ * `list` is what makes nesting possible, and it holds a whole list rather than
+ * just items so a bulleted list can contain a numbered one — which is exactly
+ * what Markdown allows and what a flat `Array<InlineText>` could not express.
+ */
+export interface ListItem {
+  text: InlineText
+  /** A GFM task list checkbox. Absent when the item is not one. */
+  checked?: boolean
+  list?: NestedList
+}
+
+export interface NestedList {
+  ordered?: boolean
+  /** First number of an ordered list, when it is not 1. */
+  start?: number
+  items: Array<ListItem>
+}
+
+/**
+ * A list. Bulleted by default, numbered when `ordered` is set.
+ *
+ * The kind is still `bulletList` because a list is a list — the marker is a
+ * property of it, not a different kind of block, and templates that override
+ * the renderer key off the kind.
+ */
 export interface BulletListBlock {
   id: string
   kind: 'bulletList'
-  items: Array<InlineText>
+  ordered?: boolean
+  start?: number
+  items: Array<ListItem>
+}
+
+/**
+ * A subheading inside a section.
+ *
+ * The level is the Markdown depth it is written at. Depth 2 is what opens a
+ * section, so a heading block is always deeper than that — there is no level
+ * that could be read back as a section boundary.
+ */
+export interface HeadingBlock {
+  id: string
+  kind: 'heading'
+  level: 3 | 4 | 5 | 6
+  text: InlineText
+}
+
+/** A block quote. One run per paragraph; a quote containing anything richer is
+ * kept as a `raw` block instead, because the model has no nesting here. */
+export interface QuoteBlock {
+  id: string
+  kind: 'quote'
+  paragraphs: Array<InlineText>
+}
+
+/**
+ * A fenced code block.
+ *
+ * `code` is a plain string, not `InlineText`: everything inside a fence is
+ * literal, so marks would be a lie about what the source says.
+ */
+export interface CodeBlock {
+  id: string
+  kind: 'code'
+  language?: string
+  code: string
+}
+
+export type TableAlign = 'left' | 'center' | 'right'
+
+/** A GFM table. The header row is separate because GFM always has exactly one
+ * and every renderer treats it differently. */
+export interface TableBlock {
+  id: string
+  kind: 'table'
+  head: Array<InlineText>
+  rows: Array<Array<InlineText>>
+  /** Per column, `null` where the source gave no alignment. */
+  align: Array<TableAlign | null>
 }
 
 /**
@@ -150,8 +228,8 @@ export interface IconLabelBlock {
 }
 
 /**
- * Escape hatch for Markdown this model does not represent (tables, raw HTML,
- * footnotes, code fences). The original source is kept verbatim so the
+ * Escape hatch for Markdown this model does not represent — raw HTML,
+ * footnotes, definitions. The original source is kept verbatim so the
  * round-trip stays lossless; the preview renders it as preformatted text and
  * the editor shows a non-blocking warning. Never silently drop input.
  */
@@ -163,7 +241,11 @@ export interface RawBlock {
 
 export type Block =
   | ParagraphBlock
+  | HeadingBlock
   | BulletListBlock
+  | QuoteBlock
+  | CodeBlock
+  | TableBlock
   | EntryBlock
   | TagListBlock
   | ImageBlock

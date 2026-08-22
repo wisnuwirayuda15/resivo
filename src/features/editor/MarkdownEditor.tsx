@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Editor from '@monaco-editor/react'
 import { Loader, useComputedColorScheme } from '@mantine/core'
 
@@ -16,10 +16,12 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * The document model stays the source of truth: this shows a serialization of
  * it, and typing is parsed straight back into it. What makes that work rather
- * than fight itself is one rule — the buffer is only replaced from the model
- * when the two have genuinely diverged. Pushing the model into the buffer on
- * every store change would move the caret to the end of the document while
- * someone was typing in the middle of it.
+ * than fight itself is two rules — the buffer is replaced from the model only
+ * when the two have genuinely diverged, and never while the caret is in it. The
+ * first stops every unrelated store change from rewriting the file; the second
+ * is what stops half-typed Markdown from reformatting itself under the reader's
+ * hands, which is what a parse-and-reserialize loop does if nothing holds it
+ * back. A withheld normalization is applied on blur instead.
  *
  * Parsing belongs to the caller, which owns the store. This component reports
  * text and is handed the resulting warnings back, so one keystroke causes one
@@ -65,12 +67,69 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const serialized = useMemo(() => serializeDocument(resume), [resume])
   const [value, setValue] = useState(serialized)
 
+  /**
+   * Whether the caret is in this editor.
+   *
+   * Kept in state rather than read from Monaco on demand, because losing focus
+   * has to *cause* a synchronization — and only a state change can make the
+   * effect below run again when the model itself has not changed.
+   */
+  const [focused, setFocused] = useState(false)
+
+  /**
+   * The view state to put back after the buffer is replaced.
+   *
+   * `@monaco-editor/react` applies a changed `value` as one full-range
+   * `executeEdits` with `forceMoveMarkers`, which leaves the caret at the end of
+   * the document. Saving the state before the replacement and restoring it after
+   * is what keeps the caret and the scroll position where the reader left them.
+   */
+  const viewStateRef = useRef<editor.ICodeEditorViewState | null>(null)
+
+  /**
+   * Replaces the buffer from the model, unless the reader is typing in it.
+   *
+   * The buffer diverges for two quite different reasons. The model may have
+   * changed elsewhere — undo, the style panel, an edit on the paper — and then
+   * the buffer is simply out of date. Or the parse of what was typed serializes
+   * differently from how it was written, which is the canonical form of the same
+   * document.
+   *
+   * Only the second one can happen while someone is typing, and replacing the
+   * buffer under them is exactly the wrong moment to normalize: half-written
+   * Markdown reformats itself mid-keystroke. So a focused editor is left alone
+   * and synchronized when it loses focus instead.
+   */
   useEffect(() => {
-    // The model changed from somewhere else — undo, the style panel, a template
-    // switch — or the parse of what was typed serializes differently from how
-    // it was written. Either way the buffer is stale.
-    setValue((current) => (current === serialized ? current : serialized))
-  }, [serialized])
+    const instance = editorRef.current
+
+    if (
+      focused ||
+      instance === null ||
+      instance.getValue() === serialized ||
+      instance.hasTextFocus()
+    ) {
+      return
+    }
+
+    viewStateRef.current = instance.saveViewState()
+    setValue(serialized)
+  }, [focused, serialized])
+
+  /**
+   * Runs after the child editor has applied the new `value` — child effects
+   * commit before a parent's, which is what makes this ordering reliable rather
+   * than a race against a frame.
+   */
+  useEffect(() => {
+    const instance = editorRef.current
+    const state = viewStateRef.current
+
+    if (instance !== null && state !== null) {
+      viewStateRef.current = null
+      instance.restoreViewState(state)
+    }
+  }, [value])
 
   /**
    * The theme is rebuilt whenever the colour scheme changes, under one name.
@@ -137,27 +196,29 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }
 
   /**
-   * A pending parse is flushed on unmount rather than dropped. The text is
-   * already on screen, so losing it would read as the edit having been silently
-   * rejected — and unmount is exactly what happens when the user switches to
-   * the CSS tab.
+   * Parses what is in the buffer now, instead of when the timer would have.
+   *
+   * Called on unmount — which is what switching to the CSS tab is — and on blur,
+   * where it has to run *before* the buffer may be replaced from the model:
+   * otherwise the replacement would be a serialization of a document that does
+   * not yet include the last few keystrokes, and they would be erased.
    */
-  useEffect(() => {
-    const flush = () => {
-      if (timerRef.current !== null) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
-
-        const current = editorRef.current?.getValue()
-
-        if (current !== undefined) {
-          onSourceChange(current)
-        }
-      }
+  const flush = useCallback(() => {
+    if (timerRef.current === null) {
+      return
     }
 
-    return flush
+    clearTimeout(timerRef.current)
+    timerRef.current = null
+
+    const current = editorRef.current?.getValue()
+
+    if (current !== undefined) {
+      onSourceChange(current)
+    }
   }, [onSourceChange])
+
+  useEffect(() => flush, [flush])
 
   return (
     <Editor
@@ -173,6 +234,16 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       onChange={handleChange}
       onMount={(instance) => {
         editorRef.current = instance
+
+        instance.onDidFocusEditorText(() => setFocused(true))
+
+        // Blur is when a normalization that was withheld becomes safe to apply.
+        // Flushing first is what makes the sync that follows a serialization of
+        // everything typed, rather than of everything typed but the last word.
+        instance.onDidBlurEditorText(() => {
+          flush()
+          setFocused(false)
+        })
       }}
       options={EDITOR_OPTIONS}
       theme={RESIVO_THEME}

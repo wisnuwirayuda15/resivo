@@ -13,6 +13,7 @@ import type {
   Block,
   DesignConfig,
   InlineNode,
+  ListItem,
   ResumeDocument,
   Section,
 } from './document'
@@ -89,12 +90,57 @@ const dateRangeSchema = z.object({
   current: z.boolean().optional(),
 })
 
+/**
+ * A list item nests a whole list, so like `link` this has to be lazy. The depth
+ * is bounded by the Markdown parser rather than here — mdast will not produce a
+ * list deeper than the source is indented.
+ */
+const listItemSchema: z.ZodType<ListItem> = z.lazy(() =>
+  z.object({
+    text: inlineTextSchema,
+    checked: z.boolean().optional(),
+    list: z
+      .object({
+        ordered: z.boolean().optional(),
+        start: z.number().int().min(0).max(1_000_000).optional(),
+        items: z.array(listItemSchema),
+      })
+      .optional(),
+  }),
+)
+
 const blockSchema = z.discriminatedUnion('kind', [
   z.object({ id, kind: z.literal('paragraph'), text: inlineTextSchema }),
   z.object({
     id,
+    kind: z.literal('heading'),
+    level: z.union([z.literal(3), z.literal(4), z.literal(5), z.literal(6)]),
+    text: inlineTextSchema,
+  }),
+  z.object({
+    id,
     kind: z.literal('bulletList'),
-    items: z.array(inlineTextSchema),
+    ordered: z.boolean().optional(),
+    start: z.number().int().min(0).max(1_000_000).optional(),
+    items: z.array(listItemSchema),
+  }),
+  z.object({
+    id,
+    kind: z.literal('quote'),
+    paragraphs: z.array(inlineTextSchema),
+  }),
+  z.object({
+    id,
+    kind: z.literal('code'),
+    language: z.string().max(64).optional(),
+    code: z.string(),
+  }),
+  z.object({
+    id,
+    kind: z.literal('table'),
+    head: z.array(inlineTextSchema),
+    rows: z.array(z.array(inlineTextSchema)),
+    align: z.array(z.enum(['left', 'center', 'right']).nullable()),
   }),
   z.object({
     id,

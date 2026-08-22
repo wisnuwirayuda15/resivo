@@ -80,7 +80,10 @@ describe('round trip', () => {
         {
           id: 'b2',
           kind: 'bulletList',
-          items: [text('First point'), text('Second point')],
+          items: [
+            { text: text('First point') },
+            { text: text('Second point') },
+          ],
         },
         { id: 'b3', kind: 'divider' },
         { id: 'b4', kind: 'tagList', tags: ['Analysis', 'Notation'] },
@@ -305,16 +308,136 @@ describe('serializing', () => {
   })
 })
 
-describe('constructs the model cannot represent', () => {
+/**
+ * The rest of Markdown.
+ *
+ * Each of these used to be kept as source text and printed as-is; each now has a
+ * block in the model. The test that matters for all of them is the same one:
+ * parse, write, parse again, and check the second text equals the first — a
+ * construct that survives one round trip but drifts on the next is not
+ * supported, it is merely tolerated once.
+ */
+describe('the rest of Markdown', () => {
+  const parseSource = (body: string) =>
+    parseDocument(`# Ada\n\n## Notes\n\n${body}\n`)
+
+  const firstBlock = (body: string): Block | undefined => {
+    const { content } = parseSource(body)
+
+    return content.sections[0]?.blocks[0]
+  }
+
+  /** Writes the parse of `body`, then the parse of that. Stable output means the
+   * codec has reached its canonical form rather than drifting each save. */
+  const settle = (body: string): [string, string] => {
+    const first = parseSource(body)
+    const once = serializeDocument(documentWith(first.content.sections))
+    const again = serializeDocument(
+      documentWith(parseDocument(once).content.sections),
+    )
+
+    return [once, again]
+  }
+
+  it.each([
+    ['a table', '| a | b |\n| --- | --- |\n| 1 | 2 |', 'table'],
+    ['a code fence', '```js\nconst a = 1\n```', 'code'],
+    ['a block quote', '> quoted', 'quote'],
+    ['a numbered list', '1. first\n2. second', 'bulletList'],
+    ['a task list', '- [x] done\n- [ ] pending', 'bulletList'],
+    ['a subheading', '### Deeper', 'heading'],
+  ])('reads %s as a block of its own', (_label, body, kind) => {
+    expect(firstBlock(body)?.kind).toBe(kind)
+
+    const [once, again] = settle(body)
+
+    expect(once).toContain(body)
+    expect(again).toBe(once)
+  })
+
+  it('keeps a nested list nested', () => {
+    const block = firstBlock('- one\n  - inner\n- two')
+
+    expect(
+      block?.kind === 'bulletList'
+        ? block.items.map((item) => [
+            plainText(item.text),
+            (item.list?.items ?? []).map((child) => plainText(child.text)),
+          ])
+        : undefined,
+    ).toEqual([
+      ['one', ['inner']],
+      ['two', []],
+    ])
+  })
+
+  it('keeps a numbered list inside a bulleted one', () => {
+    const [once, again] = settle('- one\n  1. first\n  2. second')
+
+    expect(once).toContain('- one\n  1. first\n  2. second')
+    expect(again).toBe(once)
+  })
+
+  it('numbers an ordered list from where it started', () => {
+    const block = firstBlock('4. four\n5. five')
+
+    expect(block?.kind === 'bulletList' ? block.start : undefined).toBe(4)
+    expect(settle('4. four\n5. five')[0]).toContain('4. four\n5. five')
+  })
+
+  it('keeps a table column alignment', () => {
+    const block = firstBlock('| a | b | c |\n| :- | :-: | -: |\n| 1 | 2 | 3 |')
+
+    expect(block?.kind === 'table' ? block.align : undefined).toEqual([
+      'left',
+      'center',
+      'right',
+    ])
+  })
+
+  it('fences code that itself contains a fence', () => {
+    const block: Block = {
+      id: 'c1',
+      kind: 'code',
+      code: '```\ninner\n```',
+    }
+    const document = documentWith([section('s1', 'Notes', [block])])
+    const source = serializeDocument(document)
+
+    expect(source).toContain('````\n```\ninner\n```\n````')
+    expect(roundTrip(document).content.sections).toEqual(
+      document.content.sections,
+    )
+  })
+
+  it('escapes a pipe inside a table cell', () => {
+    const document = documentWith([
+      section('s1', 'Notes', [
+        {
+          id: 't1',
+          kind: 'table',
+          head: [text('a | b')],
+          rows: [[text('c')]],
+          align: [null],
+        },
+      ]),
+    ])
+    const source = serializeDocument(document)
+
+    expect(source).toContain('a \\| b')
+    expect(roundTrip(document).content.sections).toEqual(
+      document.content.sections,
+    )
+  })
+})
+
+describe('constructs the model still cannot represent', () => {
   const parseSource = (body: string) =>
     parseDocument(`# Ada\n\n## Notes\n\n${body}\n`)
 
   it.each([
-    ['a table', '| a | b |\n| - | - |\n| 1 | 2 |'],
-    ['a code fence', '```js\nconst a = 1\n```'],
-    ['a block quote', '> quoted'],
-    ['a numbered list', '1. first\n2. second'],
     ['raw HTML', '<div>hello</div>'],
+    ['a quote holding a list', '> - one\n> - two'],
   ])('keeps %s verbatim and warns', (_label, body) => {
     const { content, warnings } = parseSource(body)
     const [block] = content.sections[0]?.blocks ?? []
@@ -326,11 +449,11 @@ describe('constructs the model cannot represent', () => {
   })
 
   it('round-trips a raw block unchanged', () => {
-    const table = '| a | b |\n| - | - |'
-    const { content } = parseSource(table)
+    const html = '<div>hello</div>'
+    const { content } = parseSource(html)
     const document = documentWith(content.sections)
 
-    expect(serializeDocument(document)).toContain(table)
+    expect(serializeDocument(document)).toContain(html)
   })
 
   it('warns about an unknown directive rather than dropping it', () => {
@@ -340,20 +463,100 @@ describe('constructs the model cannot represent', () => {
     expect(block?.kind).toBe('raw')
     expect(warnings[0]?.message).toContain('mystery')
   })
+})
 
-  it('warns about content above the first section', () => {
-    const { warnings } = parseDocument('# Ada\n\nHeadline\n\nStray paragraph\n')
+/**
+ * Where the section boundary is, and what happens to text that arrives before
+ * one. Both used to lose content: a document whose headings were all one level
+ * too deep had no sections at all, and anything above the first section was
+ * warned about and then dropped — which erased it from the file, because the
+ * editor's buffer is a serialization of the model.
+ */
+describe('headings and content with nowhere to go', () => {
+  it('takes the shallowest heading as the section level', () => {
+    const { content } = parseDocument(
+      '# Ada\n\n### Summary\n\nA sentence.\n\n### Skills\n\n- Go\n',
+    )
 
-    expect(warnings).toHaveLength(1)
-    expect(warnings[0]?.message).toContain('above the first')
+    expect(content.sections.map((s) => plainText(s.title))).toEqual([
+      'Summary',
+      'Skills',
+    ])
   })
 
-  it('treats a deeper heading as content, not as a section', () => {
-    const { content, warnings } = parseSource('### Too deep')
+  it('reads a heading below the section level as a subheading', () => {
+    const { content } = parseDocument(
+      '# Ada\n\n### Summary\n\n#### Detail\n\nA sentence.\n',
+    )
+    const [block] = content.sections[0]?.blocks ?? []
 
-    expect(content.sections).toHaveLength(1)
-    expect(content.sections[0]?.blocks[0]?.kind).toBe('raw')
-    expect(warnings[0]?.message).toContain('"##"')
+    expect(block?.kind).toBe('heading')
+    expect(block?.kind === 'heading' ? block.level : undefined).toBe(4)
+  })
+
+  it('normalizes the section level to "##" on the way back out', () => {
+    const { content } = parseDocument('# Ada\n\n### Summary\n\nA sentence.\n')
+    const source = serializeDocument(documentWith(content.sections))
+
+    expect(source).toContain('## Summary')
+    expect(
+      serializeDocument(documentWith(parseDocument(source).content.sections)),
+    ).toBe(source)
+  })
+
+  it('keeps content above the first heading in an untitled section', () => {
+    const { content } = parseDocument('# Ada\n\nHeadline\n\nStray paragraph\n')
+    const [first] = content.sections
+
+    expect(plainText(first?.title ?? [])).toBe('')
+    expect(
+      first?.blocks[0]?.kind === 'paragraph'
+        ? plainText(first.blocks[0].text)
+        : undefined,
+    ).toBe('Stray paragraph')
+  })
+
+  it('does not lose a line of a resume written for another tool', () => {
+    const pasted = [
+      '# Ada Lovelace',
+      '',
+      '**Analyst**',
+      '',
+      '(+62) 8123 | ada@example.com | Jakarta',
+      '',
+      '---',
+      '',
+      '### Summary',
+      '',
+      'A sentence about the work.',
+      '',
+      '### Skills',
+      '',
+      '| Area | Tools |',
+      '| --- | --- |',
+      '| Web | Go |',
+      '',
+      '> A quoted note.',
+      '',
+      '1. First',
+      '2. Second',
+      '',
+    ].join('\n')
+
+    const { content } = parseDocument(pasted)
+    const source = serializeDocument(documentWith(content.sections))
+
+    // Every line of prose the paste contained is still in the file it becomes.
+    for (const line of [
+      '(+62) 8123 | ada@example.com | Jakarta',
+      'A sentence about the work.',
+      '| Web | Go |',
+      '> A quoted note.',
+      '1. First',
+      '2. Second',
+    ]) {
+      expect(source).toContain(line)
+    }
   })
 })
 

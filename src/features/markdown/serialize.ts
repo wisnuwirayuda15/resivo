@@ -12,12 +12,16 @@ import {
 
 import type {
   Block,
+  CodeBlock,
   EntryBlock,
   InlineNode,
   InlineText,
   Mark,
+  NestedList,
   ResumeDocument,
   Section,
+  TableAlign,
+  TableBlock,
 } from '@/features/resume/model/document'
 
 /**
@@ -135,6 +139,93 @@ export const serializeInline = (text: InlineText): string =>
 const serializeBullets = (items: Array<InlineText>): Array<string> =>
   items.map((item) => `- ${serializeInline(item)}`)
 
+/**
+ * A list, nesting and all.
+ *
+ * Each level is indented by exactly the width of its parent's marker, which is
+ * what CommonMark requires for the sublist to belong to the item above rather
+ * than start a new list. That is why the indent is computed from the marker
+ * instead of being a fixed two spaces: `10. ` is four columns wide and `- ` is
+ * two.
+ */
+const serializeList = (list: NestedList, indent: string): Array<string> => {
+  const lines: Array<string> = []
+  const first = list.start ?? 1
+
+  list.items.forEach((item, index) => {
+    const marker = list.ordered === true ? `${first + index}. ` : '- '
+    // `[x] ` is part of the item's content in GFM, so it goes after the marker
+    // and before the text, and the indent below still measures only the marker.
+    const box = item.checked === undefined ? '' : item.checked ? '[x] ' : '[ ] '
+
+    lines.push(`${indent}${marker}${box}${serializeInline(item.text)}`)
+
+    if (item.list !== undefined) {
+      lines.push(
+        ...serializeList(item.list, `${indent}${' '.repeat(marker.length)}`),
+      )
+    }
+  })
+
+  return lines
+}
+
+/** Escapes what would otherwise be read as a cell boundary. */
+const escapeCell = (text: InlineText): string =>
+  serializeInline(text).replace(/\|/g, '\\|')
+
+const ALIGN_RULE: Record<TableAlign, string> = {
+  left: ':---',
+  center: ':---:',
+  right: '---:',
+}
+
+const serializeTable = (block: TableBlock): string => {
+  // A GFM table's delimiter row fixes the column count, so every row is written
+  // to the width of the widest one. A short row would otherwise silently drop
+  // its missing cells on the next parse.
+  const width = Math.max(
+    block.head.length,
+    ...block.rows.map((row) => row.length),
+    1,
+  )
+
+  const row = (cells: Array<InlineText>): string =>
+    `| ${Array.from({ length: width }, (_, index) =>
+      escapeCell(cells[index] ?? []),
+    ).join(' | ')} |`
+
+  const rule = `| ${Array.from({ length: width }, (_, index) => {
+    const align = block.align[index]
+
+    return align === undefined || align === null ? '---' : ALIGN_RULE[align]
+  }).join(' | ')} |`
+
+  return [row(block.head), rule, ...block.rows.map(row)].join('\n')
+}
+
+/**
+ * A fenced code block, with a fence long enough to hold its content.
+ *
+ * Three backticks is the usual fence, but code that itself contains a run of
+ * three would end the block early — so the fence is always one backtick longer
+ * than the longest run inside it.
+ */
+const serializeCode = (block: CodeBlock): string => {
+  const longest = [...block.code.matchAll(/`+/g)].reduce(
+    (length, match) => Math.max(length, match[0].length),
+    0,
+  )
+  const fence = '`'.repeat(Math.max(3, longest + 1))
+
+  return `${fence}${block.language ?? ''}\n${block.code}\n${fence}`
+}
+
+/** Every line prefixed, with a bare `>` between paragraphs — which is what keeps
+ * two paragraphs inside one quote instead of splitting it in two. */
+const serializeQuote = (paragraphs: Array<InlineText>): string =>
+  paragraphs.map((text) => `> ${serializeInline(text)}`).join('\n>\n')
+
 const serializeEntry = (block: EntryBlock): string => {
   const range = block.dateRange
   const open = `:::${ENTRY_DIRECTIVE}${attributes([
@@ -166,8 +257,20 @@ const serializeBlock = (block: Block): string => {
     case 'paragraph':
       return serializeInline(block.text)
 
+    case 'heading':
+      return `${'#'.repeat(block.level)} ${serializeInline(block.text)}`
+
     case 'bulletList':
-      return serializeBullets(block.items).join('\n')
+      return serializeList(block, '').join('\n')
+
+    case 'quote':
+      return serializeQuote(block.paragraphs)
+
+    case 'code':
+      return serializeCode(block)
+
+    case 'table':
+      return serializeTable(block)
 
     case 'entry':
       return serializeEntry(block)
@@ -214,8 +317,20 @@ const serializeBlock = (block: Block): string => {
 // Document
 // ---------------------------------------------------------------------------
 
+/**
+ * Always `##`, whatever depth the source used.
+ *
+ * The parser takes the shallowest heading in the file as the section level, so a
+ * document written with `###` headings is understood — and then normalized to
+ * `##` here, once, on the first save. Writing the original depth back instead
+ * would mean storing it in the document, and a heading level is not a fact about
+ * a resume.
+ */
 const serializeSection = (section: Section): Array<string> => {
-  const heading = `## ${plainText(section.title)}`
+  const title = plainText(section.title)
+  // An untitled section is where content that arrived before any heading lives.
+  // `##` alone is a valid empty heading, and reads back as the same section.
+  const heading = title === '' ? '##' : `## ${title}`
 
   return [heading, ...section.blocks.map(serializeBlock)]
 }

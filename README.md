@@ -37,10 +37,15 @@ archive. Archived resumes are hidden, never deleted.
 **Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
 style controls on the right. Panel widths are draggable and remembered.
 
-**Markdown.** A small dialect — headings for sections, directives such as
-`:::entry{title="…" start="2021-03"}` for structured entries. It round-trips
-losslessly: anything the model cannot represent (tables, raw HTML, code fences)
-is kept verbatim and flagged as a warning rather than silently dropped.
+**Markdown.** CommonMark and GFM, plus directives such as
+`:::entry{title="…" start="2021-03"}` for the structured entries a heading
+convention could never recover reliably. Headings, lists of either kind at any
+depth, task lists, tables, quotes and fences are all typeset. Sections are
+opened by the shallowest heading level in the file, so a resume written
+elsewhere with `###` headings works as pasted. It round-trips losslessly:
+what is left — raw HTML, footnotes, link definitions — is kept verbatim and
+flagged as a warning rather than silently dropped, and text that arrives above
+the first heading goes into an untitled section rather than being refused.
 
 **Visual editing.** Click any text on the paper to edit it in place; drag blocks
 and sections to reorder them, or use the move buttons beside them. Switching the
