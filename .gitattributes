@@ -1,0 +1,7 @@
+# Line endings are normalized to LF in the repository, on every platform.
+#
+# Without this, a checkout on Windows writes CRLF, Prettier reads CRLF as a
+# formatting difference, and `bun run check` reports every file in the tree as
+# unformatted — which makes the command useless and so nobody runs it. The
+# working tree is left alone; only what Git stores is normalized.
+* text=auto eol=lf

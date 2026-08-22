@@ -157,7 +157,10 @@ const warn = (context: Context, node: ChildNode, message: string): void => {
  * both is what keeps a brace from ever reaching the output through a
  * declaration.
  */
-const declarations = (container: Container, context: Context): Array<string> => {
+const declarations = (
+  container: Container,
+  context: Context,
+): Array<string> => {
   const kept: Array<string> = []
 
   container.each((node) => {
