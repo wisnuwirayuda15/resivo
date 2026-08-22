@@ -25,13 +25,43 @@ import type { ResumeDocument } from '@/features/resume/model/document'
 type Migrator = (document: Record<string, unknown>) => Record<string, unknown>
 
 /**
+ * v1 to v2: a bullet list's items became objects.
+ *
+ * v1 stored each item as an `InlineText` — an array of inline nodes. v2 wraps
+ * that in `{ text }` so an item can also carry a checkbox and a nested list.
+ * The two are told apart by shape, which is safe because an item was never
+ * anything but an array before and is never an array now.
+ */
+const listItemsToObjects = (items: unknown): unknown =>
+  !Array.isArray(items)
+    ? items
+    : items.map((item) => (Array.isArray(item) ? { text: item } : item))
+
+const v1ToV2: Migrator = (input) => {
+  // Cloned rather than edited in place: the runner only shallow-copies, so
+  // writing into the nested content would mutate the caller's record.
+  const document = structuredClone(input)
+  const content = document.content as
+    | { sections?: Array<{ blocks?: Array<Record<string, unknown>> }> }
+    | undefined
+
+  for (const section of content?.sections ?? []) {
+    for (const block of section.blocks ?? []) {
+      if (block.kind === 'bulletList') {
+        block.items = listItemsToObjects(block.items)
+      }
+    }
+  }
+
+  return document
+}
+
+/**
  * Keyed by the version being migrated FROM. To add a migration, bump
  * `DOCUMENT_VERSION` and add the entry for the previous version — the runner
  * then walks every step in order.
- *
- * Empty at v1: there is nothing older than the first shape.
  */
-const migrators: Record<number, Migrator> = {}
+const migrators: Record<number, Migrator> = { 1: v1ToV2 }
 
 export interface MigrationResult {
   document: ResumeDocument

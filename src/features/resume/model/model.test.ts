@@ -144,7 +144,7 @@ describe('documentSchema', () => {
     document.content.sections = [
       createSection('custom', 'Everything', [
         { id: 'b1', kind: 'paragraph', text: text('Hello') },
-        { id: 'b2', kind: 'bulletList', items: [text('One'), text('Two')] },
+        { id: 'b2', kind: 'bulletList', items: [{ text: text('One') }, { text: text('Two') }] },
         {
           id: 'b3',
           kind: 'entry',

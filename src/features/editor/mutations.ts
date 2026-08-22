@@ -8,6 +8,7 @@ import type {
   DesignConfig,
   IconRef,
   InlineText,
+  ListItem,
   ResumeDocument,
   Section,
   SectionKind,
@@ -325,9 +326,16 @@ export const setBlockText =
       case 'iconLabel':
         block.label = value
         break
-      // Lists, tags, images, dividers and raw passthrough have no single text
-      // field; they are edited through their own operations.
+      case 'heading':
+        block.text = value
+        break
+      // Lists, quotes, tables, tags, images, dividers, code and raw passthrough
+      // have no single text field; they are edited through their own operations,
+      // or in the Markdown pane where their content is literal.
       case 'bulletList':
+      case 'quote':
+      case 'table':
+      case 'code':
       case 'tagList':
       case 'image':
       case 'divider':
@@ -336,19 +344,86 @@ export const setBlockText =
     }
   }
 
+/**
+ * One item of a list, at any nesting depth.
+ *
+ * The path is one index per level, outermost first — `[2, 0]` is the first
+ * sub-item of the third item. Items carry no id in the model, so position is
+ * their identity, and a path is what a position means once lists can nest.
+ */
 export const setBulletItem =
   (
     sectionId: string,
     blockId: string,
-    itemIndex: number,
+    path: ReadonlyArray<number>,
     value: InlineText,
   ): Recipe =>
   (draft) => {
     const section = findSection(draft, sectionId)
     const block = section?.blocks.find((candidate) => candidate.id === blockId)
 
-    if (block?.kind === 'bulletList' && itemIndex < block.items.length) {
-      block.items[itemIndex] = value
+    if (block?.kind !== 'bulletList' || path.length === 0) {
+      return
+    }
+
+    let items: Array<ListItem> | undefined = block.items
+
+    for (const index of path.slice(0, -1)) {
+      items = items?.[index]?.list?.items
+    }
+
+    const last = path[path.length - 1] as number
+    const item = items?.[last]
+
+    if (item !== undefined) {
+      item.text = value
+    }
+  }
+
+/** One paragraph of a block quote. */
+export const setQuoteParagraph =
+  (
+    sectionId: string,
+    blockId: string,
+    index: number,
+    value: InlineText,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block?.kind === 'quote' && index < block.paragraphs.length) {
+      block.paragraphs[index] = value
+    }
+  }
+
+/**
+ * One cell of a table.
+ *
+ * `row` is `-1` for the header, because GFM keeps the header outside the body
+ * and so does the model — and a sentinel reads better at the call site than a
+ * second recipe that differs in one line.
+ */
+export const setTableCell =
+  (
+    sectionId: string,
+    blockId: string,
+    row: number,
+    column: number,
+    value: InlineText,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block?.kind !== 'table') {
+      return
+    }
+
+    const cells = row < 0 ? block.head : block.rows[row]
+
+    if (cells !== undefined && column < cells.length) {
+      cells[column] = value
     }
   }
 

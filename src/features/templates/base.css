@@ -178,18 +178,123 @@
 
 /* ---- Lists ---- */
 
-.rp-bullets {
+.rp-bullets,
+.rp-list {
   margin-top: 0.22em;
   padding-left: 1.15em;
   list-style: disc;
 }
 
-.rp-bullets > li {
+.rp-list-ordered {
+  list-style: decimal;
+}
+
+.rp-bullets > li,
+.rp-list > li {
   margin-top: 0.12em;
 }
 
-.rp-bullets > li::marker {
+.rp-bullets > li::marker,
+.rp-list > li::marker {
   color: var(--paper-ink-muted);
+}
+
+/* A nested list is tighter than the one above it: the indent already says it is
+   subordinate, so the extra air would only cost lines on the page. */
+.rp-list .rp-list {
+  margin-top: 0.06em;
+}
+
+/* Second level is a hollow marker, third a square — the same convention print
+   has used for a century, and it survives being photocopied or ATS-parsed. */
+.rp-list .rp-list:not(.rp-list-ordered) {
+  list-style: circle;
+}
+
+.rp-list .rp-list .rp-list:not(.rp-list-ordered) {
+  list-style: square;
+}
+
+/* A task list carries its own box, so the bullet would be a second marker. */
+.rp-list > li.rp-task {
+  list-style: none;
+  margin-left: -1.15em;
+}
+
+.rp-checkbox {
+  margin-right: 0.35em;
+  color: var(--paper-ink-muted);
+}
+
+/* ---- Headings inside a section ---- */
+
+/**
+ * A subheading. Sized from the section heading rather than from the body, so it
+ * reads as a step down from the heading above it at every base size.
+ */
+.rp-heading {
+  margin-top: 0.35em;
+  font-family: var(--paper-font-head);
+  font-weight: var(--paper-fw-head);
+  font-size: calc(var(--paper-fs-section) * 0.88);
+  color: var(--paper-ink-head);
+}
+
+.rp-heading[data-level='4'] {
+  font-size: calc(var(--paper-fs-section) * 0.82);
+}
+
+.rp-heading[data-level='5'],
+.rp-heading[data-level='6'] {
+  font-size: 1em;
+  font-style: italic;
+}
+
+/* ---- Quotes, code and tables ---- */
+
+.rp-quote {
+  padding-left: 0.8em;
+  border-left: 2px solid var(--paper-rule-color);
+  color: var(--paper-ink-muted);
+  font-style: italic;
+}
+
+.rp-quote > p + p {
+  margin-top: 0.3em;
+}
+
+/**
+ * A fenced code block.
+ *
+ * `pre-wrap`, not `pre`: the paper is a fixed width and cannot scroll, so a long
+ * line has to wrap or it is simply gone from the printed page.
+ */
+.rp-code-block {
+  padding: 0.4em 0.6em;
+  border: var(--paper-rule-w) solid var(--paper-rule-color);
+  font-family: var(--font-mono);
+  font-size: var(--paper-fs-small);
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+.rp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--paper-fs-small);
+}
+
+.rp-table th,
+.rp-table td {
+  padding: 0.2em 0.45em;
+  border: var(--paper-rule-w) solid var(--paper-rule-color);
+  text-align: left;
+  vertical-align: top;
+}
+
+.rp-table th {
+  font-weight: var(--paper-fw-head);
+  color: var(--paper-ink-head);
 }
 
 /* ---- Tags ---- */
