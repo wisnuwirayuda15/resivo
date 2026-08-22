@@ -10,7 +10,9 @@ import {
   useArchiveResume,
   useDeleteResume,
   useDuplicateResume,
+  useGroups,
   useRestoreResume,
+  useUpdateResume,
 } from '../queries'
 
 import type { ResumeSummary } from '@/database/index'
@@ -60,6 +62,8 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
   const archive = useArchiveResume()
   const restore = useRestoreResume()
   const remove = useDeleteResume()
+  const update = useUpdateResume()
+  const groups = useGroups()
 
   const visible = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -110,7 +114,11 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
             key={resume.id}
             resume={resume}
             onRename={() => setRenaming(resume)}
+            groups={groups.data ?? []}
             onDuplicate={() => duplicate.mutate(resume.id)}
+            onMove={(groupId) =>
+              update.mutate({ id: resume.id, changes: { groupId } })
+            }
             onArchive={() => archive.mutate(resume.id)}
             onRestore={() => restore.mutate(resume.id)}
             onDelete={() => setDeleting(resume)}

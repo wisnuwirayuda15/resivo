@@ -6,12 +6,17 @@ import { PaperMiniature } from '@/features/templates/PaperMiniature'
 import { RelativeTime } from '@/components/RelativeTime'
 import { templateName } from '@/features/templates/catalog'
 
-import type { ResumeSummary } from '@/database/index'
+import { moveDestinations } from '../groups'
+
+import type { GroupRecord, ResumeSummary } from '@/database/index'
 
 interface ResumeCardProps {
   resume: ResumeSummary
+  /** Every group the resume could be moved to, in the sidebar's order. */
+  groups: ReadonlyArray<GroupRecord>
   onRename: () => void
   onDuplicate: () => void
+  onMove: (groupId: string) => void
   onArchive: () => void
   onRestore: () => void
   onDelete: () => void
@@ -26,13 +31,17 @@ interface ResumeCardProps {
  */
 export const ResumeCard: React.FC<ResumeCardProps> = ({
   resume,
+  groups,
   onRename,
   onDuplicate,
+  onMove,
   onArchive,
   onRestore,
   onDelete,
 }) => {
   const archived = resume.archivedAt !== 0
+
+  const destinations = moveDestinations(groups, resume.groupId)
 
   return (
     // Only colour and shadow cross-fade — never layout properties, which
@@ -91,6 +100,22 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             >
               Duplicate
             </Menu.Item>
+            {destinations.length === 0 ? null : (
+              <Menu.Sub>
+                <Menu.Sub.Target>
+                  <Menu.Sub.Item leftSection={<Icon name="folder" size={15} />}>
+                    Move to
+                  </Menu.Sub.Item>
+                </Menu.Sub.Target>
+                <Menu.Sub.Dropdown>
+                  {destinations.map((group) => (
+                    <Menu.Item key={group.id} onClick={() => onMove(group.id)}>
+                      {group.name}
+                    </Menu.Item>
+                  ))}
+                </Menu.Sub.Dropdown>
+              </Menu.Sub>
+            )}
             <Menu.Divider />
             {archived ? (
               <Menu.Item

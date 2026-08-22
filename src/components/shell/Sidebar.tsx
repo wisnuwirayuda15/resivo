@@ -9,6 +9,7 @@ import {
 import { Link } from '@tanstack/react-router'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { GroupRow } from '@/features/resume/components/GroupRow'
 import { UNGROUPED } from '@/database/index'
 import { useGroupCounts, useGroups } from '@/features/resume/queries'
 
@@ -99,20 +100,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <NavGroup label="Groups">
           {groups.data?.map((group) => (
-            <Link
+            <GroupRow
+              active={activeGroupId === group.id}
+              count={counts.data?.get(group.id)}
+              group={group}
               key={group.id}
-              to="/resumes"
-              search={{ group: group.id }}
-              onClick={onNavigate}
-              className={navItemClassName(activeGroupId === group.id)}
-              aria-current={activeGroupId === group.id ? 'page' : undefined}
-            >
-              <NavItemContent
-                icon="folder"
-                label={group.name}
-                count={counts.data?.get(group.id)}
-              />
-            </Link>
+              onNavigate={onNavigate}
+            />
           ))}
 
           {/* Only worth showing once at least one group exists — otherwise

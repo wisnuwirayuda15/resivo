@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import {
+  Alert,
   Box,
   Button,
+  FileButton,
   Group,
   Modal,
   Select,
@@ -11,12 +13,58 @@ import {
 } from '@mantine/core'
 
 import { UNGROUPED } from '@/database/index'
+import { Icon } from '@/features/icons/IconRenderer'
+import { applyMarkdown } from '@/features/markdown/index'
+import { createEmptyDocument } from '../model/index'
 import { templateList } from '@/features/templates/catalog'
 
 import { TemplateTile } from './TemplateTile'
 import { useCreateResume, useGroups } from '../queries'
 
-import type { TemplateId } from '../model/document'
+import type { ResumeDocument, TemplateId } from '../model/document'
+
+/**
+ * A Markdown file the dialog has read but not yet turned into a resume.
+ *
+ * The source text is kept rather than the parsed document, because the template
+ * is chosen in this same dialog and the document is built from it — so the parse
+ * is redone at submit against whatever template is selected by then. Parsing is
+ * cheap; a stale `templateId` inside a stored document is not.
+ */
+interface ImportedMarkdown {
+  filename: string
+  source: string
+  /** Counted, not listed: the file is not open yet, so there is nowhere to point
+   * at. The editor shows each one against its line once the resume exists. */
+  warningCount: number
+  /** The name the file's own `#` heading gave, if it gave one. */
+  fullName: string
+}
+
+/** Enough for any resume, and small enough that reading it cannot hang the
+ * dialog. A Markdown resume is a few kilobytes. */
+const MAX_IMPORT_BYTES = 1024 * 1024
+
+const documentFrom = (
+  templateId: TemplateId,
+  source: string,
+): { document: ResumeDocument; warningCount: number; fullName: string } => {
+  const { document, warnings } = applyMarkdown(
+    createEmptyDocument(templateId),
+    source,
+  )
+
+  return {
+    document,
+    warningCount: warnings.length,
+    fullName: document.meta.fullName,
+  }
+}
+
+/** `resume.md` becomes `resume`. A fallback for when the file has no `#`
+ * heading to take a name from. */
+const withoutExtension = (filename: string): string =>
+  filename.replace(/\.[^.]+$/, '')
 
 interface NewResumeDialogProps {
   opened: boolean
@@ -42,6 +90,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   const [title, setTitle] = useState('')
   const [templateId, setTemplateId] = useState<TemplateId>('classic')
   const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED)
+  const [imported, setImported] = useState<ImportedMarkdown | null>(null)
+  const [importError, setImportError] = useState<string | null>(null)
 
   const groups = useGroups()
   const createResume = useCreateResume()
@@ -53,6 +103,55 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     setTitle('')
     setTemplateId('classic')
     setGroupId(defaultGroupId ?? UNGROUPED)
+    setImported(null)
+    setImportError(null)
+  }
+
+  /**
+   * Reads a Markdown file and parses it once, to report what came of it.
+   *
+   * The file is not the resume yet — nothing is written until the dialog is
+   * submitted — so a file that turns out to be empty or unreadable costs
+   * nothing but a message.
+   */
+  const importFile = async (file: File | null) => {
+    if (file === null) {
+      return
+    }
+
+    setImportError(null)
+
+    if (file.size > MAX_IMPORT_BYTES) {
+      setImportError(
+        `${file.name} is ${Math.round(file.size / 1024)} KB. Markdown resumes are a few kilobytes; this is probably not one.`,
+      )
+      return
+    }
+
+    const source = await file.text()
+
+    if (source.trim() === '') {
+      setImportError(`${file.name} is empty.`)
+      return
+    }
+
+    const parsed = documentFrom(templateId, source)
+
+    setImported({
+      filename: file.name,
+      source,
+      warningCount: parsed.warningCount,
+      fullName: parsed.fullName,
+    })
+
+    // Only a name the user has not already typed is overwritten.
+    setTitle((current) =>
+      current.trim() === ''
+        ? parsed.fullName === ''
+          ? withoutExtension(file.name)
+          : parsed.fullName
+        : current,
+    )
   }
 
   const submit = async () => {
@@ -62,6 +161,11 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
       ...(title.trim() === '' ? {} : { title: title.trim() }),
       templateId,
       ...(groupId === UNGROUPED ? {} : { groupId }),
+      // Parsed here rather than at import, so the template chosen by now is the
+      // one the document carries.
+      ...(imported === null
+        ? {}
+        : { document: documentFrom(templateId, imported.source).document }),
     })
 
     close()
@@ -118,7 +222,49 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
           />
         </Group>
 
+        {importError === null ? null : (
+          <Alert color="red" variant="light">
+            {importError}
+          </Alert>
+        )}
+
+        {imported === null ? null : (
+          <Alert
+            color="blue"
+            icon={<Icon name="markdown-logo" size={16} />}
+            variant="light"
+            withCloseButton
+            onClose={() => setImported(null)}
+            title={imported.filename}
+          >
+            {imported.warningCount === 0
+              ? 'Read with nothing left over.'
+              : `Read. ${imported.warningCount} ${
+                  imported.warningCount === 1 ? 'line' : 'lines'
+                } could not be typeset and are kept as source text — the editor points at each one.`}
+          </Alert>
+        )}
+
         <Group justify="flex-end" gap="xs">
+          {/* Import is an alternative starting point, not a separate flow: the
+              template, name and group above still apply to what it produces. */}
+          <FileButton
+            accept=".md,.markdown,.txt,text/markdown"
+            onChange={(file) => void importFile(file)}
+          >
+            {(props) => (
+              <Button
+                {...props}
+                leftSection={<Icon name="file-arrow-down" size={15} />}
+                variant="subtle"
+              >
+                {imported === null ? 'Import Markdown' : 'Choose another file'}
+              </Button>
+            )}
+          </FileButton>
+
+          <Box className="flex-1" />
+
           <Button variant="default" onClick={close}>
             Cancel
           </Button>

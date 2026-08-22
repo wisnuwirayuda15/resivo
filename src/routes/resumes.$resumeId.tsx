@@ -6,7 +6,9 @@ import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
 import { EditorLayout } from '@/features/editor/EditorLayout'
+import { HistoryControls } from '@/features/editor/HistoryControls'
 import { useAutosave } from '@/features/editor/useAutosave'
+import { useDocumentHistoryShortcuts } from '@/features/editor/useDocumentHistoryShortcuts'
 import { useEditorStore } from '@/features/editor/store'
 import { useResume } from '@/features/resume/queries'
 
@@ -31,6 +33,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
   const document = useEditorStore((state) => state.document)
 
   useAutosave(resumeId)
+  useDocumentHistoryShortcuts()
 
   useEffect(() => {
     // Guarded on the id rather than on `document === null`, so navigating from
@@ -108,7 +111,16 @@ const ResumeScreen: React.FC = () => {
   const resume = useResume(resumeId)
 
   return (
-    <Shell title={resume.data?.title ?? 'Resume'}>
+    <Shell
+      // Client-only because the history lives in the editor store, which only
+      // exists once a document has been loaded from IndexedDB.
+      actions={
+        <ClientOnly>
+          <HistoryControls />
+        </ClientOnly>
+      }
+      title={resume.data?.title ?? 'Resume'}
+    >
       {/* The editor fills the viewport rather than scrolling the page: the pane
           inside it owns its own scrolling, so the chrome never moves. */}
       <Box className="h-[calc(100dvh-44px)]">
