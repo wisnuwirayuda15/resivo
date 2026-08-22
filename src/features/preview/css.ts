@@ -1,6 +1,7 @@
 import { templateLayerCss } from '@/features/templates/registry'
 
 import frameCssText from './frame.css?raw'
+import editingCssText from './editing.css?raw'
 
 import type {
   DesignConfig,
@@ -214,6 +215,15 @@ export interface StylesheetInput {
    * in an export — and this function is pure.
    */
   fontFaces?: string
+  /**
+   * Include the editing chrome's rules.
+   *
+   * Off by default, and off for every export, so a file nobody can edit does not
+   * carry styles for a drag handle it will never show — and "the export contains
+   * nothing from the editor" is a property of the whole file rather than of its
+   * body.
+   */
+  editing?: boolean
 }
 
 /**
@@ -233,6 +243,7 @@ export const previewStylesheet = ({
   design,
   customCss,
   fontFaces,
+  editing = false,
 }: StylesheetInput): string =>
   [
     LAYER_ORDER,
@@ -244,6 +255,7 @@ export const previewStylesheet = ({
      */
     ...(fontFaces === undefined || fontFaces.trim() === '' ? [] : [fontFaces]),
     frameCssText,
+    ...(editing ? [editingCssText] : []),
     `@layer template {\n${templateLayerCss(templateId)}\n}`,
     `@layer tokens {\n${designVars(design)}\n}`,
     ...(customCss === undefined || customCss.trim() === ''

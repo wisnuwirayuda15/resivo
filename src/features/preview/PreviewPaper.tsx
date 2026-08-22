@@ -86,6 +86,14 @@ interface PreviewPaperProps {
   zoom: number
   /** Called whenever pagination settles on a different number of pages. */
   onPageCountChange?: (count: number) => void
+  /**
+   * Called with the flow-item ids on each page whenever pagination settles.
+   *
+   * Published rather than kept private because HTML export needs the breaks the
+   * user is looking at. Pagination is a measurement, and there is nothing to
+   * measure in a string — so export reuses this instead of estimating.
+   */
+  onPaginated?: (pages: Array<Array<string>>) => void
 }
 
 /** Everything that, if it changed, invalidates a set of page breaks. */
@@ -179,6 +187,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   apply,
   zoom,
   onPageCountChange,
+  onPaginated,
 }) => {
   /**
    * Glyphs load asynchronously, one file per weight, and one that appears after
@@ -324,6 +333,14 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       onPageCountChange?.(pageCount)
     }
   }, [pageCount, onPageCountChange])
+
+  const breaks = paged?.pages
+
+  useEffect(() => {
+    if (breaks !== undefined) {
+      onPaginated?.(breaks)
+    }
+  }, [breaks, onPaginated])
 
   /**
    * A one-step keyboard move, or `null` when there is nowhere to go.

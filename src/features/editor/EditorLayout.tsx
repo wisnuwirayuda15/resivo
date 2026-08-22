@@ -102,6 +102,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
           className="h-full"
           document={document}
           onPaperSizeChange={(size) => apply(patchDesign({ paper: { size } }))}
+          title={document.meta.fullName}
         />
       </Splitter.Pane>
 

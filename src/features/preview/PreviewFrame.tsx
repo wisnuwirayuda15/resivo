@@ -53,6 +53,17 @@ interface PreviewFrameProps {
   title?: string
   /** Called whenever pagination settles on a different number of pages. */
   onPageCountChange?: (count: number) => void
+  /** Called with the flow-item ids on each page whenever pagination settles. */
+  onPaginated?: (pages: Array<Array<string>>) => void
+  /**
+   * Handed a function that prints the iframe.
+   *
+   * PDF export is the browser printing *this* document — not a second renderer
+   * producing something that ought to match it. That is what makes "the PDF is
+   * the preview" true rather than aspirational, and it is why the print handle
+   * comes from here instead of from a separate route.
+   */
+  onPrintReady?: (print: (() => void) | null) => void
 }
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
@@ -63,6 +74,8 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   className,
   title = 'Resume preview',
   onPageCountChange,
+  onPaginated,
+  onPrintReady,
 }) => {
   const frameRef = useRef<HTMLIFrameElement | null>(null)
   const styleRef = useRef<HTMLStyleElement | null>(null)
@@ -120,8 +133,9 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         design: resume.design,
         customCss: sanitizeCss(resume.customCss).css,
         fontFaces,
+        editing: mode === 'edit',
       }),
-    [resume.templateId, resume.design, resume.customCss, fontFaces],
+    [resume.templateId, resume.design, resume.customCss, fontFaces, mode],
   )
 
   // Create the head elements once per document, and tear them down with it.
@@ -159,6 +173,21 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
       style.textContent = css
     }
   }, [frameDocument, css])
+
+  /**
+   * Publish the print handle for as long as the frame is loaded.
+   *
+   * `contentWindow.print()`, not `window.print()`: printing the app window would
+   * print the editor. The iframe carries the `@page` rule and the page boxes, so
+   * printing it is printing exactly the document on screen.
+   */
+  useEffect(() => {
+    const view = frameDocument?.defaultView ?? null
+
+    onPrintReady?.(view === null ? null : () => view.print())
+
+    return () => onPrintReady?.(null)
+  }, [frameDocument, onPrintReady])
 
   useEffect(() => {
     if (frameDocument === null) {
@@ -202,6 +231,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
               mode={mode}
               apply={apply}
               onPageCountChange={onPageCountChange}
+              onPaginated={onPaginated}
               zoom={zoom}
             />,
             frameDocument.body,
