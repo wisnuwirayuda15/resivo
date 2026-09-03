@@ -1,8 +1,10 @@
 import { Suspense, lazy, useState } from 'react'
 import { Button } from '@mantine/core'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 import { useDisclosure } from '@mantine/hooks'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 
 /**
  * The way into the guide, and the drawer it opens.
@@ -31,17 +33,22 @@ export const GuideButton: React.FC = () => {
 
   return (
     <>
-      <Button
-        leftSection={<Icon name="book-open" size={13} />}
-        onClick={() => {
-          setEverOpened(true)
-          open()
-        }}
-        size="compact-xs"
-        variant="default"
-      >
-        Guide
-      </Button>
+      {/* A tour step of its own, because this is the least discoverable thing
+          in the editor and the most useful once found: a format nobody can
+          guess, and a prompt that hands it to an assistant. */}
+      <OnboardingTour.Target id={TOUR_TARGET_IDS.guide}>
+        <Button
+          leftSection={<Icon name="book-open" size={13} />}
+          onClick={() => {
+            setEverOpened(true)
+            open()
+          }}
+          size="compact-xs"
+          variant="default"
+        >
+          Guide
+        </Button>
+      </OnboardingTour.Target>
 
       {everOpened ? (
         // No fallback: the chunk arrives in a frame or two, and a spinner where

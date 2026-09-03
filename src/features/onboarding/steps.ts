@@ -23,6 +23,7 @@ export const TOUR_TARGET_IDS = {
   settings: 'tour-settings',
   appMenu: 'tour-app-menu',
   code: 'tour-code',
+  guide: 'tour-guide',
   paper: 'tour-paper',
   paperTitlebar: 'tour-paper-titlebar',
   inspector: 'tour-inspector',
@@ -62,6 +63,12 @@ const EDITOR_STEPS: Array<OnboardingTourStep> = [
     title: 'Markdown, and your own CSS',
     content:
       'Two tabs. The Markdown is the document — headings, lists, tables, task lists — and the CSS is yours to restyle the paper with. It is sanitized and scoped, so it cannot reach the app around it or break the pagination it was measured against.',
+  },
+  {
+    id: TOUR_TARGET_IDS.guide,
+    title: 'Every directive, with an example',
+    content:
+      'The format is Markdown plus a few directives — an entry, a contact, a list of skills — and this is where each one is written down, with an example that is checked against the real parser. It also copies a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.',
   },
   {
     id: TOUR_TARGET_IDS.paper,

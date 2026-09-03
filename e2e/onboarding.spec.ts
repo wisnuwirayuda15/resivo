@@ -65,6 +65,11 @@ test('runs a second tour the first time the editor is opened', async ({
     timeout: 20_000,
   })
 
+  // The format is the one thing in this app nobody can guess, so the step for
+  // where it is written down comes straight after the pane it is written in.
+  await nextStep(page).click()
+  await expect(page.getByText('Every directive, with an example')).toBeVisible()
+
   await nextStep(page).click()
   await expect(page.getByText('The paper is editable too')).toBeVisible()
 
