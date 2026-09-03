@@ -8,6 +8,8 @@ import {
   useMantineColorScheme,
 } from '@mantine/core'
 
+import { Link } from '@tanstack/react-router'
+
 import { Icon } from '@/features/icons/IconRenderer'
 import { cn } from '@/lib/utils'
 
@@ -19,6 +21,9 @@ interface AppBarProps {
   actions?: ReactNode
   /** Navbar toggle, shown only below the navbar breakpoint. */
   burger?: ReactNode
+  /** Opens the shortcuts sheet, which the shell owns so the palette can open
+   * the same one. */
+  onShowShortcuts: () => void
 }
 
 interface BarButtonProps extends ComponentProps<'button'> {
@@ -69,7 +74,12 @@ const BarButton = ({
  * height (`--spacing-toolbar`), the fixed placement and the bottom border. This
  * is only the row of controls inside it.
  */
-export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
+export const AppBar: React.FC<AppBarProps> = ({
+  title,
+  actions,
+  burger,
+  onShowShortcuts,
+}) => {
   const { setColorScheme } = useMantineColorScheme()
   const scheme = useComputedColorScheme('light', {
     getInitialValueInEffect: true,
@@ -111,11 +121,15 @@ export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
           <Menu.Dropdown>
             <Menu.Item
               leftSection={<Icon name="keyboard" size={15} />}
-              disabled
+              onClick={onShowShortcuts}
             >
               Keyboard shortcuts
             </Menu.Item>
-            <Menu.Item leftSection={<Icon name="info" size={15} />} disabled>
+            <Menu.Item
+              component={Link}
+              leftSection={<Icon name="info" size={15} />}
+              to="/about"
+            >
               About Resivo
             </Menu.Item>
           </Menu.Dropdown>

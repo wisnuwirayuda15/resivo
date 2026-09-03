@@ -4,6 +4,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { useNavigate } from '@tanstack/react-router'
 
 import { ClientOnly } from '@/components/client-only'
+import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
 import { NewGroupDialog } from '@/features/resume/components/NewGroupDialog'
 import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
 
@@ -48,6 +49,9 @@ export const Shell: React.FC<ShellProps> = ({
     useDisclosure(false)
   const [newResumeOpen, setNewResumeOpen] = useState(false)
   const [newGroupOpen, setNewGroupOpen] = useState(false)
+  // Owned here rather than in the app bar, so the same sheet can be opened from
+  // anywhere that needs to.
+  const [shortcutsOpen, shortcuts] = useDisclosure(false)
 
   return (
     <AppShell
@@ -90,6 +94,7 @@ export const Shell: React.FC<ShellProps> = ({
         <AppBar
           title={title}
           actions={actions}
+          onShowShortcuts={shortcuts.open}
           burger={
             <Burger
               opened={navOpened}
@@ -116,6 +121,7 @@ export const Shell: React.FC<ShellProps> = ({
           opened={newGroupOpen}
           onClose={() => setNewGroupOpen(false)}
         />
+        <KeyboardShortcuts onClose={shortcuts.close} opened={shortcutsOpen} />
       </ClientOnly>
     </AppShell>
   )
