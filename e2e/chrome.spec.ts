@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-import { createResume, openEmptyApp } from './app'
+import { createResume, expectPaperReady, openEmptyApp, paper } from './app'
 
 /**
  * The application menu, and what it opens.
@@ -162,4 +162,48 @@ test('the rail still reaches every destination', async ({ page }) => {
   // header — where there is no room beside the mark — into the list.
   await page.getByRole('button', { name: 'New resume' }).first().click()
   await expect(page.getByRole('dialog', { name: 'New resume' })).toBeVisible()
+})
+
+/**
+ * Collapsing the sidebar while a resume is open.
+ *
+ * This is a regression test with a specific shape in mind. The preview used to
+ * re-paginate whenever its container's width changed, and that width was fed by
+ * the frame's own scrollbar, which the zoom moved: a loop that mostly settled
+ * after a few passes and, at the wrong geometry, did not — at which point React
+ * gives up on a chain of nested updates with "Maximum update depth exceeded".
+ * Collapsing the sidebar repeatedly is what walks the zoom across geometries.
+ */
+test('the sidebar can be collapsed repeatedly with a resume open', async ({
+  page,
+}) => {
+  test.slow()
+
+  const errors: Array<string> = []
+
+  page.on('console', (message) => {
+    if (message.type() === 'error') {
+      errors.push(message.text())
+    }
+  })
+
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+
+  const toggle = page.getByRole('button', { name: 'Toggle sidebar' })
+
+  for (let round = 0; round < 12; round += 1) {
+    await toggle.click()
+  }
+
+  // Named exactly, rather than asserting no console error at all: an unrelated
+  // warning from somewhere else should not fail this test, and this is the one
+  // thing it is here to catch.
+  expect(
+    errors.filter((text) => text.includes('Maximum update depth')),
+  ).toEqual([])
+
+  // And the paper survived the trip, rather than being left mid-measurement.
+  await expectPaperReady(page)
+  await expect(paper(page).locator('.rp-page').first()).toBeVisible()
 })

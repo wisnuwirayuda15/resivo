@@ -115,8 +115,8 @@ interface PaginationKey {
    * `useImageUrls` returns a map that only changes when its contents do.
    */
   images: ImageMap
-  /** The iframe's width — see the observer below. */
-  width: number
+  /** Whether the frame has been laid out yet — see the observer below. */
+  laidOut: boolean
 }
 
 interface PaginationResult extends PaginationKey {
@@ -245,12 +245,27 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   const [paged, setPaged] = useState<PaginationResult | null>(null)
 
   /**
-   * Width is tracked rather than the whole size, because the page box is a fixed
-   * physical size and only ever needs re-pagination when it is first laid out.
-   * Watching height instead would feed back on itself: more pages makes the root
-   * taller, which would trigger another pass.
+   * Whether the root has been laid out at all — not how wide it is.
+   *
+   * The page box is a fixed physical size, so the container's width cannot
+   * change what the paginator measures. What it can do is be zero, before the
+   * first layout, and `readMetrics` has nothing to read then. So one bit is the
+   * whole requirement: has this been laid out yet.
+   *
+   * It was the width, and that was a feedback loop. The chain: the well's width
+   * sets the zoom, `zoom` participates in layout inside the frame, so the
+   * frame's own scrollbar appears or disappears, which changes this element's
+   * width by the width of a scrollbar, which re-ran a pagination that could only
+   * produce the same pages — and each pass could move the scrollbar again. Most
+   * geometries settled after a few rounds; at the wrong one it never settled,
+   * and React stops a chain of nested updates at 50 with "Maximum update depth
+   * exceeded". Repeatedly collapsing the sidebar is a way to walk the zoom
+   * across those geometries one after another.
+   *
+   * Watching height would have fed back on itself even more obviously: more
+   * pages makes the root taller.
    */
-  const [width, setWidth] = useState(0)
+  const [laidOut, setLaidOut] = useState(false)
 
   useEffect(() => {
     const root = rootRef.current
@@ -259,10 +274,17 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       return
     }
 
+    /**
+     * One transition, false to true, and never back.
+     *
+     * A width of zero after the first layout means the pane was hidden, not that
+     * the pagination became invalid — and going back would throw away pages that
+     * are still correct only to compute them again on the way in.
+     */
     const observer = new ResizeObserver((entries) => {
-      const measured = entries[0]?.contentRect.width ?? 0
-
-      setWidth((previous) => (previous === measured ? previous : measured))
+      if ((entries[0]?.contentRect.width ?? 0) > 0) {
+        setLaidOut(true)
+      }
     })
 
     observer.observe(root)
@@ -278,7 +300,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     paged.fontEpoch !== fontEpoch ||
     paged.glyphEpoch !== glyphEpoch ||
     paged.images !== images ||
-    paged.width !== width
+    paged.laidOut !== laidOut
 
   /**
    * Build every item's markup once, then place the same elements in both passes.
@@ -325,7 +347,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       fontEpoch,
       glyphEpoch,
       images,
-      width,
+      laidOut,
       pages: paginate(measured.metrics, measured.contentHeight),
     })
   }, [
@@ -336,7 +358,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     fontEpoch,
     glyphEpoch,
     images,
-    width,
+    laidOut,
   ])
 
   const pageCount = paged?.pages.length
