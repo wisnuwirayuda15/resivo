@@ -32,6 +32,7 @@ interface CommandPaletteProps {
   onNewGroup: () => void
   onShowShortcuts: () => void
   onStartTour: () => void
+  onToggleSidebar: () => void
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
@@ -39,6 +40,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onNewGroup,
   onShowShortcuts,
   onStartTour,
+  onToggleSidebar,
 }) => {
   const navigate = useNavigate()
   const { setColorScheme } = useMantineColorScheme()
@@ -136,6 +138,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           keywords: 'dark light appearance colour color',
           leftSection: <Icon name={isDark ? 'sun' : 'moon'} size={16} />,
           onClick: () => setColorScheme(isDark ? 'light' : 'dark'),
+        },
+        {
+          id: 'sidebar',
+          label: 'Toggle sidebar',
+          description: 'Collapse it to a rail of icons, or bring it back',
+          keywords: 'navbar rail collapse expand hide narrow',
+          leftSection: <Icon name="sidebar-simple" size={16} />,
+          onClick: onToggleSidebar,
         },
         {
           id: 'shortcuts',

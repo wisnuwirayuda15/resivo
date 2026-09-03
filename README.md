@@ -34,6 +34,11 @@ The app runs at http://localhost:3000.
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 
+**Sidebar.** Collapses to a 60px rail of icons, from the header or Ctrl/Cmd+B,
+and stays that way across a reload. The rail drops the group list rather than
+shrinking it: every group is the same folder glyph, so a column of them asks you
+to hover each one to find out which is which.
+
 **Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
 style controls on the right. Panel widths are draggable and remembered. Below
 1200px — where three panes and the sidebar no longer fit — the same three become

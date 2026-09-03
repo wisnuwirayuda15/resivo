@@ -96,3 +96,70 @@ test('the application menu reaches the about page', async ({ page }) => {
   await page.getByRole('link', { name: 'Settings', exact: true }).last().click()
   await expect(page).toHaveURL(/\/settings$/)
 })
+
+/**
+ * The sidebar's two widths.
+ *
+ * Worth a test rather than an eyeball because the interesting half is not the
+ * collapse, it is that the width is restored by a script in the document head
+ * rather than by React — so a reload is the assertion that matters.
+ */
+test('the sidebar collapses to a rail, and stays collapsed', async ({
+  page,
+}) => {
+  await openEmptyApp(page)
+
+  const navbar = page.getByRole('navigation')
+  const width = () =>
+    navbar.evaluate((node) => Math.round(node.getBoundingClientRect().width))
+
+  expect(await width()).toBe(232)
+  await expect(page.getByText('Groups')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Toggle sidebar' }).click()
+
+  expect(await width()).toBe(60)
+  // The rail drops what a 60px column cannot hold: the group list, whose rows
+  // are all the same folder glyph, and the micro-labels above each section.
+  await expect(page.getByText('Groups')).toBeHidden()
+  await expect(page.getByText('No account. No cloud.')).toBeHidden()
+
+  await page.reload()
+
+  // Restored before the first paint, so this is not React catching up.
+  await expect(page.getByRole('link', { name: 'Templates' })).toBeVisible()
+  expect(await width()).toBe(60)
+
+  await page.getByRole('button', { name: 'Toggle sidebar' }).click()
+  expect(await width()).toBe(232)
+  await expect(page.getByText('Groups')).toBeVisible()
+})
+
+test('the rail still reaches every destination', async ({ page }) => {
+  await openEmptyApp(page)
+
+  // The keyboard, since that is the other way in — and Mantine cancels the
+  // browser's own binding, which on Firefox is the bookmarks sidebar.
+  await page.keyboard.press('ControlOrMeta+B')
+  expect(
+    await page
+      .getByRole('navigation')
+      .evaluate((node) => Math.round(node.getBoundingClientRect().width)),
+  ).toBe(60)
+
+  /**
+   * Found by name with no text on screen.
+   *
+   * A rail row is a glyph and a tooltip, and a tooltip is not an accessible
+   * name — so each one carries an `aria-label` while collapsed. This clicks the
+   * way a screen reader would find it, which is the only reason the assertion
+   * is worth making.
+   */
+  await page.getByRole('link', { name: 'Images' }).click()
+  await expect(page).toHaveURL(/\/images$/)
+
+  // And the one action a new user needs is still there, having moved out of the
+  // header — where there is no room beside the mark — into the list.
+  await page.getByRole('button', { name: 'New resume' }).first().click()
+  await expect(page.getByRole('dialog', { name: 'New resume' })).toBeVisible()
+})

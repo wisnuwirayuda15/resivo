@@ -1,6 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppShell, Burger } from '@mantine/core'
-import { useDisclosure } from '@mantine/hooks'
+import { useDisclosure, useHotkeys } from '@mantine/hooks'
 import { useNavigate } from '@tanstack/react-router'
 
 import { ClientOnly } from '@/components/client-only'
@@ -12,6 +12,7 @@ import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
 
 import { AppBar } from './AppBar'
 import { Sidebar } from './Sidebar'
+import { applySidebarCollapsed, readSidebarCollapsed } from './sidebarState'
 
 import type { ReactNode } from 'react'
 
@@ -63,6 +64,34 @@ export const Shell: React.FC<ShellProps> = ({
    */
   const [tourRequests, setTourRequests] = useState(0)
 
+  /**
+   * Read lazily rather than in an effect, and safe to: nothing the server
+   * renders depends on it. The width is a CSS variable that a script in the
+   * document head has already set, the toggle's label does not change with the
+   * state, and the sidebar itself is client-only — so this can be the stored
+   * value on the very first client render without contradicting the markup it
+   * is hydrating.
+   */
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
+  const toggleSidebar = () => setSidebarCollapsed((collapsed) => !collapsed)
+
+  // Declarative rather than done in the toggle, so the attribute and the
+  // preference cannot drift from the state that drives the rail's contents. On
+  // the first pass it agrees with the head script and does nothing.
+  useEffect(() => {
+    applySidebarCollapsed(sidebarCollapsed)
+  }, [sidebarCollapsed])
+
+  /**
+   * The shortcut every editor with a sidebar has.
+   *
+   * Mantine's default `tagsToIgnore` keeps it out of the Markdown and CSS
+   * panes, whose editable surface is a `textarea` — the same exclusion the undo
+   * shortcut relies on. It also cancels the browser's own binding, which matters
+   * on Firefox, where Ctrl+B opens the bookmarks sidebar.
+   */
+  useHotkeys([['mod+B', toggleSidebar]])
+
   return (
     /* Outside the shell, because a tour step points at the sidebar and the app
        bar as well as at the content, and a target has to be below the provider
@@ -75,7 +104,9 @@ export const Shell: React.FC<ShellProps> = ({
         // the shell they are lining up against.
         header={{ height: 'var(--spacing-toolbar)' }}
         navbar={{
-          width: 'var(--spacing-sidebar)',
+          // Through the variable rather than the token, so the rail can be
+          // switched from an attribute on `<html>` before the first paint.
+          width: 'var(--sidebar-width)',
           breakpoint: 'sm',
           // Below the breakpoint the sidebar becomes an overlay, opened by the
           // burger in the header. Desktop keeps it permanently visible.
@@ -100,6 +131,7 @@ export const Shell: React.FC<ShellProps> = ({
               onNavigate={closeNav}
               activeGroupId={activeGroupId}
               allActive={allActive}
+              collapsed={sidebarCollapsed}
             />
           </ClientOnly>
         </AppShell.Navbar>
@@ -110,6 +142,7 @@ export const Shell: React.FC<ShellProps> = ({
             actions={actions}
             onShowShortcuts={shortcuts.open}
             onStartTour={() => setTourRequests((count) => count + 1)}
+            onToggleSidebar={toggleSidebar}
             burger={
               <Burger
                 opened={navOpened}
@@ -142,6 +175,7 @@ export const Shell: React.FC<ShellProps> = ({
             onNewResume={() => setNewResumeOpen(true)}
             onShowShortcuts={shortcuts.open}
             onStartTour={() => setTourRequests((count) => count + 1)}
+            onToggleSidebar={toggleSidebar}
           />
         </ClientOnly>
       </AppShell>

@@ -14,6 +14,7 @@ import {
 
 import { EmptyState } from '@/components/EmptyState'
 import { Providers } from '@/components/providers'
+import { SIDEBAR_RESTORE_SCRIPT } from '@/components/shell/sidebarState'
 
 import appCss from '@/styles/global.css?url'
 
@@ -136,6 +137,15 @@ function RootDocument({ children }: { children: React.ReactNode }) {
     <html lang="en" {...mantineHtmlProps}>
       <head>
         <ColorSchemeScript defaultColorScheme="auto" />
+        {/* Beside the colour-scheme script because it is the same problem: a
+            preference this browser holds that the server-rendered markup cannot
+            know, and that has to be settled before the first paint rather than
+            corrected after it. Without this the sidebar would paint at its full
+            width and then jump to the rail. */}
+        <script
+          dangerouslySetInnerHTML={{ __html: SIDEBAR_RESTORE_SCRIPT }}
+          suppressHydrationWarning
+        />
         <HeadContent />
       </head>
       <body>

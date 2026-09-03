@@ -76,3 +76,37 @@ test('uses all three panes once there is room', async ({ page }) => {
   await expect(page.getByLabel('Body size')).toBeVisible()
   await expectPaperReady(page)
 })
+
+/**
+ * The rail is for the permanent sidebar only.
+ *
+ * Below Mantine's `sm` the navbar is an overlay the burger shows and hides, and
+ * a third state between those two is not a state: 60px of icons is not a useful
+ * way to present the one thing the overlay was opened to show. So a preference
+ * carried over from a wide screen has to be ignored rather than honoured.
+ */
+test('ignores a collapsed sidebar where the sidebar is an overlay', async ({
+  page,
+}) => {
+  await openEmptyApp(page)
+
+  // Collapsed while the sidebar is still permanent, which is the only place the
+  // control exists.
+  await page.getByRole('button', { name: 'Toggle sidebar' }).click()
+
+  await page.setViewportSize({ width: 600, height: 800 })
+
+  // The toggle goes with the sidebar it toggles; the burger takes its place.
+  await expect(
+    page.getByRole('button', { name: 'Toggle sidebar' }),
+  ).toBeHidden()
+  await page.getByRole('button', { name: 'Toggle navigation' }).click()
+
+  // The whole viewport wide, which is `AppShell`'s own doing, and with its
+  // labels back — not the rail the stored preference still asks for.
+  const width = await page
+    .getByRole('navigation')
+    .evaluate((node) => Math.round(node.getBoundingClientRect().width))
+  expect(width).toBe(600)
+  await expect(page.getByText('No account. No cloud.')).toBeVisible()
+})

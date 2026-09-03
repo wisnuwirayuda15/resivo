@@ -99,3 +99,27 @@ pre {
     scroll-behavior: auto !important;
   }
 }
+
+/**
+ * The sidebar's width, as a variable so it can be switched before the first
+ * paint.
+ *
+ * `AppShell` is told `width: var(--sidebar-width)`, which puts the indirection
+ * inside its own inline `--app-shell-navbar-width`. Switching this therefore
+ * moves the sidebar and the content column together with no re-render — which
+ * is what lets the script in the document head restore a collapsed sidebar
+ * instead of React jumping it sideways after the fact.
+ *
+ * There is deliberately no breakpoint here. Below its own `navbar.breakpoint`
+ * `AppShell` sets `--app-shell-navbar-width: 100%` itself, so the overlay the
+ * burger opens is full width whatever this says — and an overlay has two states
+ * rather than three anyway. What does need the breakpoint is the rail's
+ * *contents*, since those are React's to choose; `Sidebar.tsx` has it.
+ */
+:root {
+  --sidebar-width: var(--spacing-sidebar);
+}
+
+html[data-sidebar='rail'] {
+  --sidebar-width: var(--spacing-sidebar-rail);
+}

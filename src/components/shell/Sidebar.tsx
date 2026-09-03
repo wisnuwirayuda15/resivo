@@ -1,18 +1,20 @@
 import {
-  Box,
   AppShell,
   Badge,
+  Box,
   ScrollArea,
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
 import { Link } from '@tanstack/react-router'
+import { useMediaQuery } from '@mantine/hooks'
 
 import { Icon } from '@/features/icons/IconRenderer'
 import { GroupRow } from '@/features/resume/components/GroupRow'
 import { UNGROUPED } from '@/database/index'
 import { useGroupCounts, useGroups } from '@/features/resume/queries'
 import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
+import { cn } from '@/lib/utils'
 
 import {
   NavButton,
@@ -21,7 +23,7 @@ import {
   NavLink,
   navItemClassName,
 } from './NavItem'
-import { Logo } from './Logo'
+import { Logo, LogoMark } from './Logo'
 
 interface SidebarProps {
   onNewResume: () => void
@@ -32,7 +34,23 @@ interface SidebarProps {
   activeGroupId?: string
   /** True when the library route is showing everything. */
   allActive: boolean
+  /** Asked for the rail. Honoured only where the sidebar is permanent. */
+  collapsed: boolean
 }
+
+/**
+ * Where the sidebar is a sidebar rather than an overlay.
+ *
+ * Mantine's `sm`, written out because it has to agree with `AppShell`'s
+ * `navbar.breakpoint` in `Shell.tsx`. Below this width the navbar is opened by
+ * the burger and closed by a tap, and a third state between those two is not a
+ * state anyone asked for.
+ *
+ * The width takes care of itself — `AppShell` sets the navbar to 100% below its
+ * own breakpoint regardless of `--sidebar-width`. This decides the part React
+ * owns: whether the rows are icons or icons with labels.
+ */
+const PERMANENT = '(min-width: 48em)'
 
 /**
  * Contents of the navbar.
@@ -43,6 +61,18 @@ interface SidebarProps {
  *
  * The logo block is 44px to match the header height, which is what makes the
  * sidebar's top edge line up with the application bar under `layout="alt"`.
+ *
+ * Collapsed, it is a 60px rail of icons, and two sections are deliberately not
+ * in it:
+ *
+ *  - **The groups.** Every group is the same folder glyph, so a rail would show
+ *    a column of identical icons and ask the user to hover each one to find out
+ *    which is which. That is a worse list than the one they collapsed.
+ *  - **New group.** It follows the groups, and it is in the command palette.
+ *
+ * What does move rather than disappear is "New resume": it is the one action a
+ * new user needs, so on the rail it leaves the header — where there is no room
+ * beside the mark — and becomes the first row of the list.
  */
 export const Sidebar: React.FC<SidebarProps> = ({
   onNewResume,
@@ -50,9 +80,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
   activeGroupId,
   allActive,
+  collapsed,
 }) => {
   const groups = useGroups()
   const counts = useGroupCounts()
+
+  /**
+   * Read during the first render, not in an effect. This only ever mounts inside
+   * a client-only boundary, so `matchMedia` is there, and deciding a frame later
+   * would draw the rail's icons inside a 232px overlay and then swap them.
+   */
+  const permanent = useMediaQuery(PERMANENT, true, {
+    getInitialValueInEffect: false,
+  })
+  const rail = collapsed && permanent
 
   const total = Array.from(counts.data?.values() ?? []).reduce(
     (sum, count) => sum + count,
@@ -63,27 +104,47 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <AppShell.Section className="border-line flex h-toolbar items-center gap-2 border-b px-3">
-        <Logo />
-        {/* Privacy stated as fact, not as a boast. */}
-        <Badge variant="default" size="xs" radius="pill">
-          local
-        </Badge>
-        <Box className="flex-1" />
-        <Tooltip label="New resume">
-          <UnstyledButton
-            onClick={onNewResume}
-            aria-label="New resume"
-            className="text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[26px] w-[26px] items-center justify-center transition-colors"
-          >
-            <Icon name="plus" size={16} />
-          </UnstyledButton>
-        </Tooltip>
+      <AppShell.Section
+        className={cn(
+          'border-line flex h-toolbar items-center border-b',
+          rail ? 'justify-center px-0' : 'gap-2 px-3',
+        )}
+      >
+        {rail ? (
+          <LogoMark />
+        ) : (
+          <>
+            <Logo />
+            {/* Privacy stated as fact, not as a boast. */}
+            <Badge variant="default" size="xs" radius="pill">
+              local
+            </Badge>
+            <Box className="flex-1" />
+            <Tooltip label="New resume">
+              <UnstyledButton
+                onClick={onNewResume}
+                aria-label="New resume"
+                className="text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[26px] w-[26px] items-center justify-center transition-colors"
+              >
+                <Icon name="plus" size={16} />
+              </UnstyledButton>
+            </Tooltip>
+          </>
+        )}
       </AppShell.Section>
 
       <AppShell.Section grow component={ScrollArea} className="py-1.5">
-        <NavGroup>
+        <NavGroup collapsed={rail}>
+          {rail ? (
+            <NavButton
+              collapsed
+              icon="plus"
+              label="New resume"
+              onClick={onNewResume}
+            />
+          ) : null}
           <NavLink
+            collapsed={rail}
             icon="squares-four"
             label="All resumes"
             count={total}
@@ -92,6 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onNavigate={onNavigate}
           />
           <NavLink
+            collapsed={rail}
             icon="archive"
             label="Archived"
             to="/archive"
@@ -99,46 +161,50 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         </NavGroup>
 
-        <NavGroup label="Groups">
-          {groups.data?.map((group) => (
-            <GroupRow
-              active={activeGroupId === group.id}
-              count={counts.data?.get(group.id)}
-              group={group}
-              key={group.id}
-              onNavigate={onNavigate}
-            />
-          ))}
-
-          {/* Only worth showing once at least one group exists — otherwise
-              every resume is ungrouped and the row is just a second "all". */}
-          {hasGroups && ungroupedCount !== undefined ? (
-            <Link
-              to="/resumes"
-              search={{ group: UNGROUPED }}
-              onClick={onNavigate}
-              className={navItemClassName(activeGroupId === UNGROUPED)}
-              aria-current={activeGroupId === UNGROUPED ? 'page' : undefined}
-            >
-              <NavItemContent
-                icon="folder-open"
-                label="Ungrouped"
-                count={ungroupedCount}
+        {rail ? null : (
+          <NavGroup label="Groups">
+            {groups.data?.map((group) => (
+              <GroupRow
+                active={activeGroupId === group.id}
+                count={counts.data?.get(group.id)}
+                group={group}
+                key={group.id}
+                onNavigate={onNavigate}
               />
-            </Link>
-          ) : null}
+            ))}
 
-          <NavButton icon="plus" label="New group" onClick={onNewGroup} />
-        </NavGroup>
+            {/* Only worth showing once at least one group exists — otherwise
+                every resume is ungrouped and the row is just a second "all". */}
+            {hasGroups && ungroupedCount !== undefined ? (
+              <Link
+                to="/resumes"
+                search={{ group: UNGROUPED }}
+                onClick={onNavigate}
+                className={navItemClassName(activeGroupId === UNGROUPED)}
+                aria-current={activeGroupId === UNGROUPED ? 'page' : undefined}
+              >
+                <NavItemContent
+                  icon="folder-open"
+                  label="Ungrouped"
+                  count={ungroupedCount}
+                />
+              </Link>
+            ) : null}
 
-        <NavGroup label="Library">
+            <NavButton icon="plus" label="New group" onClick={onNewGroup} />
+          </NavGroup>
+        )}
+
+        <NavGroup collapsed={rail} label="Library">
           <NavLink
+            collapsed={rail}
             icon="sparkle"
             label="Templates"
             to="/templates"
             onNavigate={onNavigate}
           />
           <NavLink
+            collapsed={rail}
             icon="image"
             label="Images"
             to="/images"
@@ -146,6 +212,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             tourId={TOUR_TARGET_IDS.assets}
           />
           <NavLink
+            collapsed={rail}
             icon="text-aa"
             label="Fonts"
             to="/fonts"
@@ -154,9 +221,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </NavGroup>
       </AppShell.Section>
 
-      <AppShell.Section className="border-line-soft border-t p-1.5">
-        <NavGroup>
+      <AppShell.Section
+        className={cn('border-line-soft border-t', rail ? 'p-1' : 'p-1.5')}
+      >
+        <NavGroup collapsed={rail}>
           <NavLink
+            collapsed={rail}
             icon="gear"
             label="Settings"
             to="/settings"
@@ -166,10 +236,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </NavGroup>
       </AppShell.Section>
 
-      <AppShell.Section className="text-subtle flex items-center gap-1.5 px-3 pt-2 pb-3 text-[11px]">
-        <Icon name="lock-simple" size={13} />
-        No account. No cloud.
-      </AppShell.Section>
+      {/* The rail keeps the padlock and drops the sentence, because the sentence
+          is the kind of thing a tooltip can hold. */}
+      {rail ? (
+        <AppShell.Section className="flex justify-center px-0 pt-2 pb-3">
+          <Tooltip label="No account. No cloud." offset={10} position="right">
+            <Box className="text-subtle flex items-center">
+              <Icon name="lock-simple" size={13} />
+            </Box>
+          </Tooltip>
+        </AppShell.Section>
+      ) : (
+        <AppShell.Section className="text-subtle flex items-center gap-1.5 px-3 pt-2 pb-3 text-[11px]">
+          <Icon name="lock-simple" size={13} />
+          No account. No cloud.
+        </AppShell.Section>
+      )}
     </>
   )
 }

@@ -28,6 +28,8 @@ interface AppBarProps {
   onShowShortcuts: () => void
   /** Starts the onboarding tour again. */
   onStartTour: () => void
+  /** Collapses the sidebar to its rail, or brings it back. */
+  onToggleSidebar: () => void
 }
 
 interface BarButtonProps extends ComponentProps<'button'> {
@@ -84,6 +86,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   burger,
   onShowShortcuts,
   onStartTour,
+  onToggleSidebar,
 }) => {
   const { setColorScheme } = useMantineColorScheme()
   const scheme = useComputedColorScheme('light', {
@@ -95,7 +98,27 @@ export const AppBar: React.FC<AppBarProps> = ({
     <Box className="flex h-full items-center gap-2 px-4">
       {burger}
 
-      <Text span className="text-title text-[14px] leading-none font-semibold">
+      {/* The same slot as the burger, and the two never both appear: below the
+          navbar's breakpoint the sidebar is an overlay, which the burger shows
+          and hides, and there is no rail to collapse it to. The label does not
+          change with the state — a control that renames itself is one the
+          server cannot render, and "Toggle" is what the burger says too. */}
+      <Box className="flex items-center" visibleFrom="sm">
+        <Tooltip label="Toggle sidebar">
+          <BarButton
+            icon="sidebar-simple"
+            label="Toggle sidebar"
+            onClick={onToggleSidebar}
+          />
+        </Tooltip>
+      </Box>
+
+      {/* `truncate` rather than letting it wrap: the bar is one 44px row, and a
+          two-line title in it pushes its own baseline off centre. */}
+      <Text
+        span
+        className="text-title truncate text-[14px] leading-none font-semibold"
+      >
         {title}
       </Text>
 
