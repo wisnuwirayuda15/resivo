@@ -31,12 +31,14 @@ interface CommandPaletteProps {
   onNewResume: () => void
   onNewGroup: () => void
   onShowShortcuts: () => void
+  onStartTour: () => void
 }
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onNewResume,
   onNewGroup,
   onShowShortcuts,
+  onStartTour,
 }) => {
   const navigate = useNavigate()
   const { setColorScheme } = useMantineColorScheme()
@@ -141,6 +143,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           keywords: 'keys help bindings',
           leftSection: <Icon name="keyboard" size={16} />,
           onClick: onShowShortcuts,
+        },
+        {
+          id: 'tour',
+          label: 'Take the tour',
+          description: 'A short walk through what is worth knowing',
+          keywords: 'onboarding help guide intro',
+          leftSection: <Icon name="sparkle" size={16} />,
+          onClick: onStartTour,
         },
       ],
     },

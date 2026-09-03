@@ -9,8 +9,10 @@ import {
 } from '@mantine/core'
 
 import { Link } from '@tanstack/react-router'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { cn } from '@/lib/utils'
 
 import type { ComponentProps, ReactNode } from 'react'
@@ -24,6 +26,8 @@ interface AppBarProps {
   /** Opens the shortcuts sheet, which the shell owns so the palette can open
    * the same one. */
   onShowShortcuts: () => void
+  /** Starts the onboarding tour again. */
+  onStartTour: () => void
 }
 
 interface BarButtonProps extends ComponentProps<'button'> {
@@ -79,6 +83,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   actions,
   burger,
   onShowShortcuts,
+  onStartTour,
 }) => {
   const { setColorScheme } = useMantineColorScheme()
   const scheme = useComputedColorScheme('light', {
@@ -104,37 +109,48 @@ export const AppBar: React.FC<AppBarProps> = ({
       <Box className="bg-line mx-1 h-[18px] w-px" />
 
       {/* The two icon buttons are the same kind of control, so they sit tighter
-          to each other than to anything else in the row. */}
-      <Box className="flex items-center gap-0.5">
-        <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
-          <BarButton
-            icon={isDark ? 'sun' : 'moon'}
-            label="Toggle theme"
-            onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
-          />
-        </Tooltip>
+          to each other than to anything else in the row. The tour points at the
+          pair rather than at either button: one of them is a `Menu.Target` and
+          the other a `Tooltip` child, and both work by cloning what they wrap. */}
+      <OnboardingTour.Target id={TOUR_TARGET_IDS.appMenu}>
+        <Box className="flex items-center gap-0.5">
+          <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
+            <BarButton
+              icon={isDark ? 'sun' : 'moon'}
+              label="Toggle theme"
+              onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+            />
+          </Tooltip>
 
-        <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
-          <Menu.Target>
-            <BarButton icon="dots-three" label="Application menu" />
-          </Menu.Target>
-          <Menu.Dropdown>
-            <Menu.Item
-              leftSection={<Icon name="keyboard" size={15} />}
-              onClick={onShowShortcuts}
-            >
-              Keyboard shortcuts
-            </Menu.Item>
-            <Menu.Item
-              component={Link}
-              leftSection={<Icon name="info" size={15} />}
-              to="/about"
-            >
-              About Resivo
-            </Menu.Item>
-          </Menu.Dropdown>
-        </Menu>
-      </Box>
+          <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
+            <Menu.Target>
+              <BarButton icon="dots-three" label="Application menu" />
+            </Menu.Target>
+            <Menu.Dropdown>
+              <Menu.Item
+                leftSection={<Icon name="keyboard" size={15} />}
+                onClick={onShowShortcuts}
+              >
+                Keyboard shortcuts
+              </Menu.Item>
+              <Menu.Item
+                component={Link}
+                leftSection={<Icon name="info" size={15} />}
+                to="/about"
+              >
+                About Resivo
+              </Menu.Item>
+              <Menu.Divider />
+              <Menu.Item
+                leftSection={<Icon name="sparkle" size={15} />}
+                onClick={onStartTour}
+              >
+                Take the tour
+              </Menu.Item>
+            </Menu.Dropdown>
+          </Menu>
+        </Box>
+      </OnboardingTour.Target>
     </Box>
   )
 }

@@ -1,8 +1,11 @@
 import { ScrollArea, Tabs } from '@mantine/core'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 
 import { AssetsPanel } from '@/features/assets/AssetsPanel'
 import { cn } from '@/lib/utils'
 import { Icon } from '@/features/icons/IconRenderer'
+
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 
 import { StylePanel } from './StylePanel'
 import { SectionsPanel } from './SectionsPanel'
@@ -35,69 +38,77 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
   apply,
   className,
 }) => (
-  <aside className={cn('bg-surface flex min-h-0 flex-col', className)}>
-    {/* `keepMounted={false}` so an inactive tab costs nothing: the style tab
+  <OnboardingTour.Target id={TOUR_TARGET_IDS.inspector}>
+    <aside className={cn('bg-surface flex min-h-0 flex-col', className)}>
+      {/* `keepMounted={false}` so an inactive tab costs nothing: the style tab
         alone is thirty controlled inputs, and none of them holds state worth
         preserving across a tab switch — every value they show lives in the
         document. It belongs on `Tabs`, not on each panel: the panel-level prop
         can only force a panel to stay mounted, never the reverse. */}
-    <Tabs
-      className="flex min-h-0 flex-1 flex-col"
-      defaultValue="style"
-      keepMounted={false}
-      variant="default"
-    >
-      <Tabs.List
-        aria-label="Inspector"
-        className="h-titlebar border-line-soft flex-none border-b px-1"
+      <Tabs
+        className="flex min-h-0 flex-1 flex-col"
+        defaultValue="style"
+        keepMounted={false}
+        variant="default"
       >
-        <Tabs.Tab leftSection={<Icon name="palette" size={13} />} value="style">
-          Style
-        </Tabs.Tab>
-        <Tabs.Tab
-          leftSection={<Icon name="list-dashes" size={13} />}
-          value="sections"
+        <Tabs.List
+          aria-label="Inspector"
+          className="h-titlebar border-line-soft flex-none border-b px-1"
         >
-          Sections
-        </Tabs.Tab>
-        <Tabs.Tab leftSection={<Icon name="image" size={13} />} value="assets">
-          Assets
-        </Tabs.Tab>
-      </Tabs.List>
+          <Tabs.Tab
+            leftSection={<Icon name="palette" size={13} />}
+            value="style"
+          >
+            Style
+          </Tabs.Tab>
+          <Tabs.Tab
+            leftSection={<Icon name="list-dashes" size={13} />}
+            value="sections"
+          >
+            Sections
+          </Tabs.Tab>
+          <Tabs.Tab
+            leftSection={<Icon name="image" size={13} />}
+            value="assets"
+          >
+            Assets
+          </Tabs.Tab>
+        </Tabs.List>
 
-      <Tabs.Panel className="min-h-0 flex-1" value="style">
-        <ScrollArea className="h-full" scrollbarSize={8} type="hover">
-          <ControlGroup title="Template">
-            <TemplateSwitcher
+        <Tabs.Panel className="min-h-0 flex-1" value="style">
+          <ScrollArea className="h-full" scrollbarSize={8} type="hover">
+            <ControlGroup title="Template">
+              <TemplateSwitcher
+                apply={apply}
+                design={document.design}
+                templateId={document.templateId}
+              />
+            </ControlGroup>
+
+            <StylePanel
               apply={apply}
               design={document.design}
-              templateId={document.templateId}
+              locale={document.meta.locale}
             />
-          </ControlGroup>
+          </ScrollArea>
+        </Tabs.Panel>
 
-          <StylePanel
-            apply={apply}
-            design={document.design}
-            locale={document.meta.locale}
-          />
-        </ScrollArea>
-      </Tabs.Panel>
+        <Tabs.Panel
+          className="min-h-0 flex-1"
 
-      <Tabs.Panel
-        className="min-h-0 flex-1"
+          value="sections"
+        >
+          <ScrollArea className="h-full" scrollbarSize={8} type="hover">
+            <SectionsPanel apply={apply} content={document.content} />
+          </ScrollArea>
+        </Tabs.Panel>
 
-        value="sections"
-      >
-        <ScrollArea className="h-full" scrollbarSize={8} type="hover">
-          <SectionsPanel apply={apply} content={document.content} />
-        </ScrollArea>
-      </Tabs.Panel>
-
-      <Tabs.Panel className="min-h-0 flex-1" value="assets">
-        <ScrollArea className="h-full" scrollbarSize={8} type="hover">
-          <AssetsPanel apply={apply} document={document} />
-        </ScrollArea>
-      </Tabs.Panel>
-    </Tabs>
-  </aside>
+        <Tabs.Panel className="min-h-0 flex-1" value="assets">
+          <ScrollArea className="h-full" scrollbarSize={8} type="hover">
+            <AssetsPanel apply={apply} document={document} />
+          </ScrollArea>
+        </Tabs.Panel>
+      </Tabs>
+    </aside>
+  </OnboardingTour.Target>
 )

@@ -2,6 +2,9 @@ import { Suspense, lazy, useCallback, useState } from 'react'
 import { Box, Loader, Tabs, Text } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { cn } from '@/lib/utils'
 
 import type { ParseWarning } from '@/features/markdown/index'
@@ -64,60 +67,62 @@ export const CodePane: React.FC<CodePaneProps> = ({
   const notices = warnings.length + refusals
 
   return (
-    <Box className={cn('bg-code flex min-h-0 flex-col', className)}>
-      <Tabs
-        className="flex min-h-0 flex-1 flex-col"
-        keepMounted={false}
-        onChange={setTab}
-        value={tab}
-      >
-        <Tabs.List
-          aria-label="Source files"
-          className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
+    <OnboardingTour.Target id={TOUR_TARGET_IDS.code}>
+      <Box className={cn('bg-code flex min-h-0 flex-col', className)}>
+        <Tabs
+          className="flex min-h-0 flex-1 flex-col"
+          keepMounted={false}
+          onChange={setTab}
+          value={tab}
         >
-          <Tabs.Tab
-            leftSection={<Icon name="markdown-logo" size={13} />}
-            value="markdown"
+          <Tabs.List
+            aria-label="Source files"
+            className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
           >
-            resume.md
-          </Tabs.Tab>
-          <Tabs.Tab
-            leftSection={<Icon name="file-css" size={13} />}
-            value="css"
-          >
-            style.css
-          </Tabs.Tab>
-
-          {notices === 0 ? null : (
-            <Text
-              className="text-warning-text ml-auto self-center pr-2 font-mono text-[11px] tabular-nums"
-              span
+            <Tabs.Tab
+              leftSection={<Icon name="markdown-logo" size={13} />}
+              value="markdown"
             >
-              {notices} {notices === 1 ? 'notice' : 'notices'}
-            </Text>
-          )}
-        </Tabs.List>
+              resume.md
+            </Tabs.Tab>
+            <Tabs.Tab
+              leftSection={<Icon name="file-css" size={13} />}
+              value="css"
+            >
+              style.css
+            </Tabs.Tab>
 
-        <Tabs.Panel className="min-h-0 flex-1" value="markdown">
-          <Suspense fallback={<EditorFallback />}>
-            <MarkdownEditor
-              document={resume}
-              onSourceChange={onSourceChange}
-              warnings={warnings}
-            />
-          </Suspense>
-        </Tabs.Panel>
+            {notices === 0 ? null : (
+              <Text
+                className="text-warning-text ml-auto self-center pr-2 font-mono text-[11px] tabular-nums"
+                span
+              >
+                {notices} {notices === 1 ? 'notice' : 'notices'}
+              </Text>
+            )}
+          </Tabs.List>
 
-        <Tabs.Panel className="min-h-0 flex-1" value="css">
-          <Suspense fallback={<EditorFallback />}>
-            <CssEditor
-              css={resume.customCss}
-              onChange={onCustomCssChange}
-              onRefusalCount={handleRefusals}
-            />
-          </Suspense>
-        </Tabs.Panel>
-      </Tabs>
-    </Box>
+          <Tabs.Panel className="min-h-0 flex-1" value="markdown">
+            <Suspense fallback={<EditorFallback />}>
+              <MarkdownEditor
+                document={resume}
+                onSourceChange={onSourceChange}
+                warnings={warnings}
+              />
+            </Suspense>
+          </Tabs.Panel>
+
+          <Tabs.Panel className="min-h-0 flex-1" value="css">
+            <Suspense fallback={<EditorFallback />}>
+              <CssEditor
+                css={resume.customCss}
+                onChange={onCustomCssChange}
+                onRefusalCount={handleRefusals}
+              />
+            </Suspense>
+          </Tabs.Panel>
+        </Tabs>
+      </Box>
+    </OnboardingTour.Target>
   )
 }

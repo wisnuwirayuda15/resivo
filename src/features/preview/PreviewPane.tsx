@@ -7,7 +7,10 @@ import {
   UnstyledButton,
 } from '@mantine/core'
 
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+
 import { Icon } from '@/features/icons/IconRenderer'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { ExportMenu } from '@/features/export/ExportMenu'
 
 import { cn } from '@/lib/utils'
@@ -165,104 +168,110 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
   return (
     <section className={cn('flex min-h-0 flex-col', className)}>
-      <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
-        <Text span className="text-subtle font-mono text-[11px]">
-          {pageCount} {pageCount === 1 ? 'page' : 'pages'} · {dimensions.width}{' '}
-          × {dimensions.height}
-        </Text>
-
-        <Box className="ml-auto flex items-center gap-1">
-          <ExportMenu
-            document={resume}
-            onPrint={print}
-            pages={pages}
-            title={title}
-          />
-
-          {apply === undefined ? null : (
-            <SegmentedControl
-              aria-label="Preview mode"
-              data={[
-                { value: 'read', label: 'Read' },
-                { value: 'visual', label: 'Visual' },
-              ]}
-              onChange={(next) => setEditing(next === 'visual')}
-              size="xs"
-              value={editing ? 'visual' : 'read'}
-            />
-          )}
-
-          {onPaperSizeChange === undefined ? null : (
-            <SegmentedControl
-              aria-label="Paper size"
-              // `satisfies` rather than a cast: the literals are checked against
-              // the model's sizes, and `onChange` still narrows to them.
-              data={['Letter', 'A4'] satisfies Array<PaperSize>}
-              onChange={onPaperSizeChange}
-              size="xs"
-              value={size}
-            />
-          )}
-
-          <Tooltip label="Zoom out">
-            <UnstyledButton
-              aria-label="Zoom out"
-              className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-              onClick={() => step(-1)}
-            >
-              <Icon name="minus" size={14} />
-            </UnstyledButton>
-          </Tooltip>
-
-          {/* Monospace, because it is a number that changes in place — the design
-              system's rule for every numeric readout. */}
-          <Text
-            span
-            className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
-          >
-            {Math.round(zoom * 100)}%
+      <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTitlebar}>
+        <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
+          <Text span className="text-subtle font-mono text-[11px]">
+            {pageCount} {pageCount === 1 ? 'page' : 'pages'} ·{' '}
+            {dimensions.width} × {dimensions.height}
           </Text>
 
-          <Tooltip label="Zoom in">
-            <UnstyledButton
-              aria-label="Zoom in"
-              className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-              onClick={() => step(1)}
-            >
-              <Icon name="plus" size={14} />
-            </UnstyledButton>
-          </Tooltip>
+          <Box className="ml-auto flex items-center gap-1">
+            <ExportMenu
+              document={resume}
+              onPrint={print}
+              pages={pages}
+              title={title}
+            />
 
-          <Tooltip label="Fit width">
-            <UnstyledButton
-              aria-label="Fit width"
-              aria-pressed={pinnedZoom === null}
-              className={cn(
-                'rounded-control flex size-[22px] items-center justify-center',
-                pinnedZoom === null
-                  ? 'text-accent bg-selected'
-                  : 'text-muted hover:text-body hover:bg-hover',
-              )}
-              onClick={() => setPinnedZoom(null)}
+            {apply === undefined ? null : (
+              <SegmentedControl
+                aria-label="Preview mode"
+                data={[
+                  { value: 'read', label: 'Read' },
+                  { value: 'visual', label: 'Visual' },
+                ]}
+                onChange={(next) => setEditing(next === 'visual')}
+                size="xs"
+                value={editing ? 'visual' : 'read'}
+              />
+            )}
+
+            {onPaperSizeChange === undefined ? null : (
+              <SegmentedControl
+                aria-label="Paper size"
+                // `satisfies` rather than a cast: the literals are checked against
+                // the model's sizes, and `onChange` still narrows to them.
+                data={['Letter', 'A4'] satisfies Array<PaperSize>}
+                onChange={onPaperSizeChange}
+                size="xs"
+                value={size}
+              />
+            )}
+
+            <Tooltip label="Zoom out">
+              <UnstyledButton
+                aria-label="Zoom out"
+                className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+                onClick={() => step(-1)}
+              >
+                <Icon name="minus" size={14} />
+              </UnstyledButton>
+            </Tooltip>
+
+            {/* Monospace, because it is a number that changes in place — the design
+              system's rule for every numeric readout. */}
+            <Text
+              span
+              className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
             >
-              <Icon name="arrows-horizontal" size={14} />
-            </UnstyledButton>
-          </Tooltip>
+              {Math.round(zoom * 100)}%
+            </Text>
+
+            <Tooltip label="Zoom in">
+              <UnstyledButton
+                aria-label="Zoom in"
+                className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+                onClick={() => step(1)}
+              >
+                <Icon name="plus" size={14} />
+              </UnstyledButton>
+            </Tooltip>
+
+            <Tooltip label="Fit width">
+              <UnstyledButton
+                aria-label="Fit width"
+                aria-pressed={pinnedZoom === null}
+                className={cn(
+                  'rounded-control flex size-[22px] items-center justify-center',
+                  pinnedZoom === null
+                    ? 'text-accent bg-selected'
+                    : 'text-muted hover:text-body hover:bg-hover',
+                )}
+                onClick={() => setPinnedZoom(null)}
+              >
+                <Icon name="arrows-horizontal" size={14} />
+              </UnstyledButton>
+            </Tooltip>
+          </Box>
+        </header>
+      </OnboardingTour.Target>
+
+      {/* The well, not the paper: the paper is inside an iframe, and nothing in
+          this document can point at a node in another one. */}
+      <OnboardingTour.Target id={TOUR_TARGET_IDS.paper}>
+        <Box className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
+          <PreviewFrame
+            className="block size-full border-0 bg-transparent"
+            apply={apply}
+            document={resume}
+            mode={editing && apply !== undefined ? 'edit' : 'view'}
+            onPageCountChange={handlePageCount}
+            onPaginated={handlePaginated}
+            onPrintReady={handlePrintReady}
+            zoom={zoom}
+          />
         </Box>
-      </header>
-
-      <Box className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
-        <PreviewFrame
-          className="block size-full border-0 bg-transparent"
-          apply={apply}
-          document={resume}
-          mode={editing && apply !== undefined ? 'edit' : 'view'}
-          onPageCountChange={handlePageCount}
-          onPaginated={handlePaginated}
-          onPrintReady={handlePrintReady}
-          zoom={zoom}
-        />
-      </Box>
+      </OnboardingTour.Target>
     </section>
   )
 }

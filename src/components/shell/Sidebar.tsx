@@ -12,6 +12,7 @@ import { Icon } from '@/features/icons/IconRenderer'
 import { GroupRow } from '@/features/resume/components/GroupRow'
 import { UNGROUPED } from '@/database/index'
 import { useGroupCounts, useGroups } from '@/features/resume/queries'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 
 import {
   NavButton,
@@ -142,6 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label="Images"
             to="/images"
             onNavigate={onNavigate}
+            tourId={TOUR_TARGET_IDS.assets}
           />
           <NavLink
             icon="text-aa"
@@ -159,6 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             label="Settings"
             to="/settings"
             onNavigate={onNavigate}
+            tourId={TOUR_TARGET_IDS.settings}
           />
         </NavGroup>
       </AppShell.Section>

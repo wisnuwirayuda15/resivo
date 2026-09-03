@@ -1,7 +1,9 @@
-import { Tooltip, UnstyledButton } from '@mantine/core'
+import { Box, Tooltip, UnstyledButton } from '@mantine/core'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 import { useOs } from '@mantine/hooks'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { cn } from '@/lib/utils'
 
 import { useEditorStore } from './store'
@@ -69,23 +71,27 @@ export const HistoryControls: React.FC = () => {
   const modifier = useOs() === 'macos' ? '⌘' : 'Ctrl+'
 
   return (
-    <>
-      <Tooltip label={`Undo (${modifier}Z)`}>
-        <HistoryButton
-          disabled={!canUndo}
-          icon="arrow-u-up-left"
-          label={`Undo (${modifier}Z)`}
-          onClick={undo}
-        />
-      </Tooltip>
-      <Tooltip label={`Redo (${modifier}⇧Z)`}>
-        <HistoryButton
-          disabled={!canRedo}
-          icon="arrow-u-up-right"
-          label={`Redo (${modifier}⇧Z)`}
-          onClick={redo}
-        />
-      </Tooltip>
-    </>
+    /* One control group, and the tour points at the pair — each button is a
+       Tooltip child, and Tooltip works by cloning what it wraps. */
+    <OnboardingTour.Target id={TOUR_TARGET_IDS.history}>
+      <Box className="flex items-center gap-0.5">
+        <Tooltip label={`Undo (${modifier}Z)`}>
+          <HistoryButton
+            disabled={!canUndo}
+            icon="arrow-u-up-left"
+            label={`Undo (${modifier}Z)`}
+            onClick={undo}
+          />
+        </Tooltip>
+        <Tooltip label={`Redo (${modifier}⇧Z)`}>
+          <HistoryButton
+            disabled={!canRedo}
+            icon="arrow-u-up-right"
+            label={`Redo (${modifier}⇧Z)`}
+            onClick={redo}
+          />
+        </Tooltip>
+      </Box>
+    </OnboardingTour.Target>
   )
 }

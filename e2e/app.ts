@@ -39,6 +39,23 @@ export const PNG_2X2 =
 export const openEmptyApp = async (page: Page): Promise<void> => {
   await page.goto('/')
 
+  /**
+   * Marked as a returning user, unless a spec asks otherwise.
+   *
+   * Every spec here starts from a deleted database — that is, as a brand-new
+   * user — and the onboarding tour opens over the app for exactly those. It is
+   * an overlay with a cutout, so it intercepts the clicks every other spec then
+   * makes. `e2e/onboarding.spec.ts` is the one that opts back in.
+   */
+  await page.evaluate(() => {
+    try {
+      localStorage.setItem('resivo.onboarding.library', '1')
+      localStorage.setItem('resivo.onboarding.editor', '1')
+    } catch {
+      // A browser that refuses storage would not show the tour either.
+    }
+  })
+
   await page.evaluate(
     (name) =>
       new Promise<void>((resolve, reject) => {

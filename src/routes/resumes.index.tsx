@@ -8,6 +8,8 @@ import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
 import { Icon } from '@/features/icons/IconRenderer'
 import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { ResumeLibrary } from '@/features/resume/components/ResumeLibrary'
 import { useGroups, useResumes } from '@/features/resume/queries'
 
@@ -83,12 +85,16 @@ const LibraryRoute: React.FC = () => {
             onChange={(value) => setSearch({ sort: value ?? 'edited' })}
             allowDeselect={false}
           />
-          <Button
-            leftSection={<Icon name="plus" size={15} />}
-            onClick={() => setNewResumeOpen(true)}
-          >
-            New resume
-          </Button>
+          {/* The header's button, not the sidebar's or the empty state's: it
+              is the one that is on screen whatever the library holds. */}
+          <OnboardingTour.Target id={TOUR_TARGET_IDS.newResume}>
+            <Button
+              leftSection={<Icon name="plus" size={15} />}
+              onClick={() => setNewResumeOpen(true)}
+            >
+              New resume
+            </Button>
+          </OnboardingTour.Target>
         </>
       }
     >

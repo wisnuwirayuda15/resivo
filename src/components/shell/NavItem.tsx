@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { Box, Text } from '@mantine/core'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 
 import { cn } from '@/lib/utils'
 import { Icon } from '@/features/icons/IconRenderer'
@@ -60,26 +61,41 @@ type NavLinkProps = NavItemContentProps &
     onNavigate?: () => void
   }
 
-/** A row that navigates to a route with no search params. */
-export const NavLink: React.FC<NavLinkProps> = ({
+/**
+ * A row that navigates to a route with no search params.
+ *
+ * `tourId` opts the row in as an onboarding-tour anchor. It is a prop rather
+ * than a spread of the rest, because these components deliberately do not
+ * forward arbitrary props — a nav row is not a generic element.
+ */
+export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
   icon,
   label,
   count,
   to,
   active = false,
   onNavigate,
-}) => (
-  <Link
-    to={to}
-    onClick={onNavigate}
-    className={navItemClassName(active)}
-    // Driven by the caller rather than by `activeProps`: several rows share one
-    // route and differ only by their search params.
-    aria-current={active ? 'page' : undefined}
-  >
-    <NavItemContent icon={icon} label={label} count={count} />
-  </Link>
-)
+  tourId,
+}) => {
+  const link = (
+    <Link
+      to={to}
+      onClick={onNavigate}
+      className={navItemClassName(active)}
+      // Driven by the caller rather than by `activeProps`: several rows share one
+      // route and differ only by their search params.
+      aria-current={active ? 'page' : undefined}
+    >
+      <NavItemContent icon={icon} label={label} count={count} />
+    </Link>
+  )
+
+  return tourId === undefined ? (
+    link
+  ) : (
+    <OnboardingTour.Target id={tourId}>{link}</OnboardingTour.Target>
+  )
+}
 
 /** A row that performs an action instead of navigating. */
 export const NavButton: React.FC<
