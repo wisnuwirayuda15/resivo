@@ -11,6 +11,7 @@ import {
   ENTRY_DIRECTIVE,
   ICON_DIRECTIVE,
   IMAGE_DIRECTIVE,
+  PAGE_BREAK_DIRECTIVE,
   LABEL_DIRECTIVE,
   TAGS_DIRECTIVE,
   sectionKindFromTitle,
@@ -603,6 +604,10 @@ const blockFrom = (
             block: { kind: 'iconLabel', icon, label: directiveLabel(typed) },
           }
         }
+      }
+
+      if (typed.name === PAGE_BREAK_DIRECTIVE) {
+        return { block: { kind: 'pageBreak' } }
       }
 
       if (typed.name === IMAGE_DIRECTIVE) {

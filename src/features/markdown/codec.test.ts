@@ -134,6 +134,20 @@ describe('round trip', () => {
     )
   })
 
+  it('keeps a page break', () => {
+    const document = documentWith([
+      section('s1', 'Experience', [
+        { id: 'b1', kind: 'paragraph', text: text('Before') },
+        { id: 'b2', kind: 'pageBreak' },
+        { id: 'b3', kind: 'paragraph', text: text('After') },
+      ]),
+    ])
+
+    expect(roundTrip(document).content.sections).toEqual(
+      document.content.sections,
+    )
+  })
+
   it('keeps inline marks and links', () => {
     const document = documentWith([
       section('s1', 'Summary', [

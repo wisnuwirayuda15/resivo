@@ -32,6 +32,7 @@ export const CONTACT_DIRECTIVE = 'contact'
 export const TAGS_DIRECTIVE = 'tags'
 export const LABEL_DIRECTIVE = 'label'
 export const IMAGE_DIRECTIVE = 'image'
+export const PAGE_BREAK_DIRECTIVE = 'pagebreak'
 
 /** Text directive: an icon inside a run of text. */
 export const ICON_DIRECTIVE = 'icon'

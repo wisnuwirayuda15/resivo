@@ -535,6 +535,23 @@ const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
 
 const Divider: React.FC = () => <div className="rp-divider" />
 
+/**
+ * A forced page break, drawn as a marker of no height.
+ *
+ * Zero height in every mode and every medium, with the dashed rule and its
+ * caption painted by an absolutely positioned pseudo-element. That is the whole
+ * design: the paginator measures this item like any other, and if the marker
+ * occupied space the measured height would differ from the printed one. It is
+ * also why the marker is not hidden in print — there is nothing to hide, only a
+ * rule that `@media print` stops painting.
+ *
+ * `aria-hidden` because a screen reader gets nothing from it: the break is a
+ * layout instruction, and the reading order is unchanged either side of it.
+ */
+const PageBreak: React.FC = () => (
+  <div aria-hidden className="rp-page-break" data-label="Page break" />
+)
+
 const IconLabel: React.FC<BlockViewProps<IconLabelBlock>> = ({
   block,
   section,
@@ -626,6 +643,8 @@ const DefaultBlock: React.FC<BlockProps> = ({ block, section, context }) => {
       return <Image block={block} context={context} />
     case 'divider':
       return <Divider />
+    case 'pageBreak':
+      return <PageBreak />
     case 'iconLabel':
       return <IconLabel block={block} context={context} section={section} />
     case 'raw':

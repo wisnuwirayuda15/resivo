@@ -9,6 +9,7 @@ import {
   ENTRY_DIRECTIVE,
   ICON_DIRECTIVE,
   IMAGE_DIRECTIVE,
+  PAGE_BREAK_DIRECTIVE,
   LABEL_DIRECTIVE,
   TAGS_DIRECTIVE,
   TAG_SEPARATOR,
@@ -323,6 +324,14 @@ const blockNode = (block: Block): RootContent => {
 
     case 'divider':
       return { type: 'thematicBreak' }
+
+    case 'pageBreak':
+      return {
+        type: 'leafDirective',
+        name: PAGE_BREAK_DIRECTIVE,
+        attributes: {},
+        children: [],
+      }
 
     case 'iconLabel':
       return {

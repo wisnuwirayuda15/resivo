@@ -165,6 +165,7 @@ const blockSchema = z.discriminatedUnion('kind', [
     widthPercent: z.number().min(1).max(100).optional(),
   }),
   z.object({ id, kind: z.literal('divider') }),
+  z.object({ id, kind: z.literal('pageBreak') }),
   z.object({
     id,
     kind: z.literal('iconLabel'),
@@ -190,6 +191,7 @@ const sectionSchema = z.object({
       spaceBefore: z.number().min(0).max(20).optional(),
       showDivider: z.boolean().optional(),
       columns: z.union([z.literal(1), z.literal(2)]).optional(),
+      breakBefore: z.enum(['auto', 'page']).optional(),
     })
     .optional(),
 })
@@ -277,6 +279,11 @@ const designConfigSchema = z.object({
     color: cssColor,
     defaultWeight: z.enum(ICON_WEIGHTS),
   }),
+  // Optional, so a document written before pagination had settings still
+  // validates. Its absence means the defaults.
+  pagination: z
+    .object({ keepHeadingWithContent: z.boolean().optional() })
+    .optional(),
 })
 
 // ---------------------------------------------------------------------------

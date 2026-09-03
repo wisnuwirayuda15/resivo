@@ -103,6 +103,74 @@ test('sets how wide an image draws', async ({ page }) => {
     .toBe('')
 })
 
+test('breaks a page where it is told to', async ({ page }) => {
+  test.slow()
+
+  const pages = paper(page).locator('.rp-page')
+
+  await typeMarkdown(
+    page,
+    [
+      '# Ada Lovelace',
+      '',
+      '## Summary',
+      '',
+      'Wrote the first algorithm.',
+      '',
+      '::pagebreak',
+      '',
+      'And then wrote the notes.',
+    ].join('\n'),
+  )
+
+  // Two pages from four lines of text: the break is the only thing that could
+  // have produced the second one.
+  await expect.poll(() => pages.count(), { timeout: 20_000 }).toBe(2)
+
+  const second = pages.nth(1)
+  await expect(second).toContainText('And then wrote the notes')
+  await expect(second).not.toContainText('Wrote the first algorithm.')
+})
+
+test('starts a section on a new page on request', async ({ page }) => {
+  test.slow()
+
+  const pages = paper(page).locator('.rp-page')
+
+  await typeMarkdown(
+    page,
+    [
+      '# Ada Lovelace',
+      '',
+      '## Summary',
+      '',
+      'Wrote the first algorithm.',
+      '',
+      '## Skills',
+      '',
+      '- Analysis',
+    ].join('\n'),
+  )
+
+  await expect.poll(() => pages.count(), { timeout: 20_000 }).toBe(1)
+
+  await openInspectorTab(page, 'Sections')
+  await page.getByRole('button', { name: 'Start Skills on a new page' }).click()
+
+  await expect.poll(() => pages.count(), { timeout: 20_000 }).toBe(2)
+
+  // The heading travels with its content rather than being stranded at the
+  // foot of page one.
+  await expect(pages.nth(1)).toContainText('Skills')
+  await expect(pages.nth(0)).not.toContainText('Skills')
+
+  await page
+    .getByRole('button', { name: 'Stop Skills starting on a new page' })
+    .click()
+
+  await expect.poll(() => pages.count(), { timeout: 20_000 }).toBe(1)
+})
+
 test('writes dates in the document language', async ({ page }) => {
   await typeMarkdown(
     page,

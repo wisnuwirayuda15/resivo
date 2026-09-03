@@ -187,6 +187,9 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   ) => apply(patchDesign(values), coalesce === undefined ? {} : { coalesce })
 
   const { paper, typography, colors, spacing, rules, image, icons } = design
+  // Absent in a document written before pagination had settings, and its
+  // absence means the default rather than "off".
+  const keepHeadings = design.pagination?.keepHeadingWithContent ?? true
 
   return (
     <Box>
@@ -434,6 +437,17 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           step={2}
           suffix="px"
           value={image.avatarSize}
+        />
+      </ControlGroup>
+
+      <ControlGroup title="Page breaks">
+        <SwitchField
+          checked={keepHeadings}
+          hint="Stops a section heading being the last thing on a page. Off packs the pages tighter, at the cost of the one break every reader notices."
+          label="Keep headings with content"
+          onChange={(keepHeadingWithContent) =>
+            patch({ pagination: { keepHeadingWithContent } })
+          }
         />
       </ControlGroup>
 

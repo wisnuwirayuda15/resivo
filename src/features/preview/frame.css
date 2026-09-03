@@ -199,6 +199,39 @@
 }
 
 /**
+ * A forced break's marker.
+ *
+ * Zero height, always and in every medium. The paginator measures this item like
+ * any other, so a marker that occupied space would make the measured height
+ * differ from the printed one — which is the one thing the preview promises it
+ * never does. The dashed rule and its caption are painted by a pseudo-element
+ * outside the box, and `@media print` simply stops painting them.
+ */
+.rp-item:has(> .rp-page-break) {
+  --rp-space: 0;
+}
+
+.rp-page-break {
+  position: relative;
+  height: 0;
+}
+
+.rp-page-break::before {
+  content: attr(data-label);
+  position: absolute;
+  inset-inline: 0;
+  top: -0.75em;
+  border-top: 1px dashed var(--paper-color-rule, rgba(18, 18, 16, 0.28));
+  padding-top: 2px;
+  color: var(--paper-color-muted, rgba(18, 18, 16, 0.45));
+  font-family: var(--paper-font-body, inherit);
+  font-size: 7pt;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+/**
  * Space above an item is dropped when the item lands at the top of a page.
  *
  * Scoped to `[data-paged]` so it applies only to the visible pass — the
@@ -252,5 +285,10 @@
 
   .rp-page:last-child {
     break-after: auto;
+  }
+
+  /* The marker is an instruction to the paginator, not part of the document. */
+  .rp-page-break::before {
+    display: none;
   }
 }

@@ -219,6 +219,20 @@ export interface DividerBlock {
   kind: 'divider'
 }
 
+/**
+ * A forced page break.
+ *
+ * A block rather than a section flag, because a break belongs between two
+ * particular things — half way down Experience, before the references — and only
+ * a block can sit there. It renders as a zero-height marker, so the height the
+ * paginator measures is the height the printer produces whether the marker is
+ * drawn or not.
+ */
+export interface PageBreakBlock {
+  id: string
+  kind: 'pageBreak'
+}
+
 /** Icon paired with a label — contact rows, links, locations. */
 export interface IconLabelBlock {
   id: string
@@ -250,6 +264,7 @@ export type Block =
   | TagListBlock
   | ImageBlock
   | DividerBlock
+  | PageBreakBlock
   | IconLabelBlock
   | RawBlock
 
@@ -283,6 +298,12 @@ export interface SectionStyleOverride {
   spaceBefore?: number
   showDivider?: boolean
   columns?: 1 | 2
+  /**
+   * `page` starts the section on a fresh sheet. Absent and `auto` both mean
+   * "wherever it falls", which is the default a resume wants — a forced break is
+   * a decision about one section, not a habit.
+   */
+  breakBefore?: 'auto' | 'page'
 }
 
 export interface Section {
@@ -397,6 +418,19 @@ export interface DesignConfig {
     size: number
     color: string
     defaultWeight: IconWeight
+  }
+  /**
+   * How pagination behaves. Optional because documents written before it
+   * existed have no such field, and its absence has to mean the default rather
+   * than making an old document invalid.
+   */
+  pagination?: {
+    /**
+     * Whether a section heading is forbidden from being the last thing on a
+     * page. On by default: a heading stranded at the foot of a page is the one
+     * break every reader notices. Off packs the pages tighter.
+     */
+    keepHeadingWithContent?: boolean
   }
 }
 

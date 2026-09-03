@@ -71,7 +71,9 @@ export const exportHtml = ({
   builtinFontCss = '',
   pages,
 }: HtmlExportInput): string => {
-  const items = documentFlow(resume)
+  const items = documentFlow(resume, {
+    keepHeadingWithContent: resume.design.pagination?.keepHeadingWithContent,
+  })
   const template = resolveTemplate(resume.templateId)
 
   /**

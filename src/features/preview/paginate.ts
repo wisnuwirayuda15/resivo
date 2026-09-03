@@ -31,6 +31,8 @@ export interface FlowMetric {
   spaceBefore: number
   /** Must not be the last item on a page. See `documentFlow`. */
   keepWithNext?: boolean
+  /** Must be the first item on a page. See `documentFlow`. */
+  breakBefore?: boolean
 }
 
 /**
@@ -67,6 +69,19 @@ export const paginate = (
     firstOnPage ? item.height - item.spaceBefore : item.height
 
   for (const [index, item] of items.entries()) {
+    /**
+     * A forced break, honoured before anything is measured.
+     *
+     * It wins over every fitting decision below, because it is the one break
+     * the user asked for by name. Two breaks in a row therefore produce a blank
+     * page, which is what asking for two breaks means.
+     */
+    if (item.breakBefore === true && current.length > 0) {
+      pages.push(current)
+      current = []
+      used = 0
+    }
+
     let height = heightOn(item, current.length === 0)
 
     /**

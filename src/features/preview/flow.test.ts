@@ -119,6 +119,100 @@ describe('documentFlow', () => {
   })
 })
 
+describe('documentFlow — forced breaks', () => {
+  const pageBreak = (id: string): Block => ({ id, kind: 'pageBreak' })
+
+  it('marks the item after a page break, not the break itself', () => {
+    const document = withHeader(createEmptyDocument())
+
+    document.content.sections = [
+      createSection('experience', 'Experience', [
+        paragraph('b1', 'One'),
+        pageBreak('pb1'),
+        paragraph('b2', 'Two'),
+      ]),
+    ]
+
+    const items = documentFlow(document)
+    const byId = new Map(items.map((item) => [item.id, item]))
+
+    // The break is in the flow like anything else — it has to be, or it could
+    // not be seen, moved or deleted on the paper.
+    expect(byId.get('block:pb1')?.breakBefore).toBeUndefined()
+    expect(byId.get('block:b2')?.breakBefore).toBe(true)
+  })
+
+  it('starts a section on a new page when its style says so', () => {
+    const document = withHeader(createEmptyDocument())
+    const projects = createSection('projects', 'Projects', [
+      paragraph('b2', 'Two'),
+    ])
+
+    document.content.sections = [
+      createSection('experience', 'Experience', [paragraph('b1', 'One')]),
+      { ...projects, style: { breakBefore: 'page' } },
+    ]
+
+    const heading = documentFlow(document).find(
+      (item) => item.id === `section:${projects.id}`,
+    )
+
+    expect(heading?.breakBefore).toBe(true)
+  })
+
+  it('ignores a forced break on the very first item', () => {
+    // Nothing precedes it, so honouring it would print a blank first sheet.
+    const document = createEmptyDocument()
+    const first = createSection('summary', 'Summary', [paragraph('b1', 'One')])
+
+    document.content.header.name = []
+    document.content.sections = [{ ...first, style: { breakBefore: 'page' } }]
+
+    expect(documentFlow(document)[0]?.breakBefore).toBeUndefined()
+  })
+
+  it("moves a break before a section's first block onto its heading", () => {
+    // Otherwise the break lands between heading and content and strands the
+    // heading at the foot of the previous page — the orphan `keepWithNext`
+    // exists to prevent, produced by the control meant to tidy the pages.
+    const document = withHeader(createEmptyDocument())
+    const projects = createSection('projects', 'Projects', [
+      pageBreak('pb1'),
+      paragraph('b2', 'Two'),
+    ])
+
+    document.content.sections = [
+      createSection('experience', 'Experience', [paragraph('b1', 'One')]),
+      projects,
+    ]
+
+    const items = documentFlow(document)
+    const byId = new Map(items.map((item) => [item.id, item]))
+
+    expect(byId.get(`section:${projects.id}`)?.breakBefore).toBe(true)
+    expect(byId.get('block:pb1')?.breakBefore).toBeUndefined()
+  })
+
+  it('drops both heading rules when heading-keeping is off', () => {
+    const document = withHeader(createEmptyDocument())
+    const projects = createSection('projects', 'Projects', [
+      pageBreak('pb1'),
+      paragraph('b2', 'Two'),
+    ])
+
+    document.content.sections = [projects]
+
+    const items = documentFlow(document, { keepHeadingWithContent: false })
+    const heading = items.find((item) => item.id === `section:${projects.id}`)
+
+    expect(heading?.keepWithNext).toBeUndefined()
+    expect(heading?.breakBefore).toBeUndefined()
+    // The break still applies exactly where it was written, which with the
+    // heading rule off is between the heading and the first block.
+    expect(items.find((item) => item.id === 'block:b2')?.breakBefore).toBe(true)
+  })
+})
+
 describe('flowItemClass', () => {
   it('gives every item type the shared class plus its own', () => {
     expect(flowItemClass('header')).toBe('rp-item rp-item--header')

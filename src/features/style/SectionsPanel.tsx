@@ -18,6 +18,7 @@ import {
   addSection,
   moveSection,
   removeSection,
+  setSectionBreakBefore,
   setSectionHidden,
   setSectionIcon,
   setSectionTitle,
@@ -178,6 +179,42 @@ const SectionRow: React.FC<{
         value={section.icon?.name}
         weight={section.icon?.weight}
       />
+
+      {/* A forced break belongs to one section, so it is a per-row toggle
+          rather than a style token. What the document stores is the override;
+          "auto" deletes it rather than writing the word. */}
+      <Tooltip
+        label={
+          section.style?.breakBefore === 'page'
+            ? 'Starts on a new page'
+            : 'Start on a new page'
+        }
+      >
+        <UnstyledButton
+          aria-label={
+            section.style?.breakBefore === 'page'
+              ? `Stop ${label} starting on a new page`
+              : `Start ${label} on a new page`
+          }
+          aria-pressed={section.style?.breakBefore === 'page'}
+          className={cn(
+            'rounded-control flex size-[22px] flex-none items-center justify-center',
+            section.style?.breakBefore === 'page'
+              ? 'text-accent bg-selected'
+              : 'text-subtle hover:text-body hover:bg-active',
+          )}
+          onClick={() =>
+            apply(
+              setSectionBreakBefore(
+                section.id,
+                section.style?.breakBefore === 'page' ? 'auto' : 'page',
+              ),
+            )
+          }
+        >
+          <Icon name="file-plus" size={13} />
+        </UnstyledButton>
+      </Tooltip>
 
       <Tooltip label={section.hidden === true ? 'Show' : 'Hide'}>
         <UnstyledButton

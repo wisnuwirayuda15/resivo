@@ -18,8 +18,13 @@ import {
 import { SortableContext } from '@dnd-kit/sortable'
 
 import { loadedGlyphCount, onIconCatalogLoaded } from '@/features/icons/catalog'
-import { removeBlock, setImageWidth } from '@/features/editor/mutations'
+import {
+  addBlock,
+  removeBlock,
+  setImageWidth,
+} from '@/features/editor/mutations'
 
+import { createId } from '@/lib/id'
 import { resolveTemplate } from '@/features/templates/registry'
 
 import { documentFlow, flowItemClass } from './flow'
@@ -173,6 +178,7 @@ const readMetrics = (
       // read back here; a collapsed margin would measure as nothing.
       spaceBefore: Number.isFinite(spaceBefore) ? spaceBefore : 0,
       ...(item.keepWithNext === true ? { keepWithNext: true } : {}),
+      ...(item.breakBefore === true ? { breakBefore: true } : {}),
     })
   }
 
@@ -209,7 +215,14 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     () => resolveTemplate(document.templateId),
     [document.templateId],
   )
-  const items = useMemo(() => documentFlow(document), [document])
+  const items = useMemo(
+    () =>
+      documentFlow(document, {
+        keepHeadingWithContent:
+          document.design.pagination?.keepHeadingWithContent,
+      }),
+    [document],
+  )
 
   const context = useMemo<RenderContext>(
     () => ({
@@ -406,6 +419,61 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   }
 
   /**
+   * Per-item controls, on the chrome's second row.
+   *
+   * Everything here is chrome, which is the only reason a control may sit on the
+   * paper at all: chrome is rendered in the paged pass alone and positioned in
+   * the page's margin, so nothing here is measured and nothing here can move a
+   * break.
+   */
+  const itemControls = (item: FlowItem): React.ReactNode => {
+    if (item.type !== 'block' || apply === undefined) {
+      return undefined
+    }
+
+    const section = document.content.sections.find(
+      (candidate) => candidate.id === item.sectionId,
+    )
+    const index = (section?.blocks ?? []).findIndex(
+      (candidate) => candidate.id === item.blockId,
+    )
+
+    if (section === undefined || index === -1) {
+      return undefined
+    }
+
+    const imageWidth = widthControl(item)
+    const isBreak = section.blocks[index]?.kind === 'pageBreak'
+
+    return (
+      <>
+        {/* Not offered on a break itself — two in a row means a blank page,
+            which nobody reaches for from this button. Deleting one is the
+            chrome's own × above. */}
+        {isBreak ? null : (
+          <button
+            aria-label="Insert a page break after this"
+            className="rp-chrome-button"
+            onClick={() =>
+              apply(
+                addBlock(
+                  section.id,
+                  { id: createId(), kind: 'pageBreak' },
+                  index + 1,
+                ),
+              )
+            }
+            type="button"
+          >
+            <span aria-hidden>⤓</span>
+          </button>
+        )}
+        {imageWidth}
+      </>
+    )
+  }
+
+  /**
    * The width control for an image block, or nothing for any other item.
    *
    * `widthPercent` was in the model, the Markdown codec and the renderer from
@@ -494,7 +562,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
               return (
                 <ItemChrome
                   className={flowItemClass(item.type)}
-                  extra={widthControl(item)}
+                  extra={itemControls(item)}
                   id={id}
                   key={id}
                   movable={isMovable(item)}

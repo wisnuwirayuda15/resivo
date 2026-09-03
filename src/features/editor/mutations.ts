@@ -257,6 +257,40 @@ export const setSectionIcon =
     }
   }
 
+/**
+ * Whether the section starts on a fresh sheet.
+ *
+ * `auto` deletes the key rather than storing the word, so a document carries a
+ * `style` object only when something in it is actually overridden — and a
+ * Markdown round trip, which has no syntax for section style, does not have to
+ * preserve a field that says "default".
+ */
+export const setSectionBreakBefore =
+  (sectionId: string, breakBefore: 'auto' | 'page'): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+
+    if (section === undefined) {
+      return
+    }
+
+    if (breakBefore === 'auto') {
+      if (section.style !== undefined) {
+        delete section.style.breakBefore
+
+        // An override object holding nothing is noise in the document and in
+        // every diff of it.
+        if (Object.keys(section.style).length === 0) {
+          delete section.style
+        }
+      }
+
+      return
+    }
+
+    section.style = { ...section.style, breakBefore }
+  }
+
 export const moveSection =
   (from: number, to: number): Recipe =>
   (draft) => {
@@ -615,7 +649,17 @@ export const patchDesign =
         continue
       }
 
-      Object.assign(draft.design[group], values)
+      const current = draft.design[group]
+
+      if (current === undefined) {
+        // A group that did not exist when this document was written —
+        // `pagination`, so far. Assigning it is what makes an old document
+        // settable without a migration that touches every row.
+        Object.assign(draft.design, { [group]: { ...values } })
+        continue
+      }
+
+      Object.assign(current, values)
     }
   }
 

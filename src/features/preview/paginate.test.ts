@@ -16,12 +16,17 @@ import type { FlowMetric } from './paginate'
 const item = (
   id: string,
   height: number,
-  options: { spaceBefore?: number; keepWithNext?: boolean } = {},
+  options: {
+    spaceBefore?: number
+    keepWithNext?: boolean
+    breakBefore?: boolean
+  } = {},
 ): FlowMetric => ({
   id,
   height,
   spaceBefore: options.spaceBefore ?? 0,
   ...(options.keepWithNext === true ? { keepWithNext: true } : {}),
+  ...(options.breakBefore === true ? { breakBefore: true } : {}),
 })
 
 const PAGE = 100
@@ -29,6 +34,40 @@ const PAGE = 100
 describe('paginate', () => {
   it('returns a single blank page for a document with no content', () => {
     expect(paginate([], PAGE)).toEqual([[]])
+  })
+
+  it('breaks where it is told to, even with room to spare', () => {
+    const pages = paginate(
+      [item('a', 10), item('b', 10, { breakBefore: true }), item('c', 10)],
+      PAGE,
+    )
+
+    expect(pages).toEqual([['a'], ['b', 'c']])
+  })
+
+  it('ignores a forced break with nothing before it', () => {
+    // There is no page to break away from, and honouring it would produce a
+    // blank first sheet. `documentFlow` will not emit this, but the paginator is
+    // reachable on its own and should not depend on that.
+    expect(paginate([item('a', 10, { breakBefore: true })], PAGE)).toEqual([
+      ['a'],
+    ])
+  })
+
+  it('lets two forced breaks in a row produce a blank page', () => {
+    // Which is what asking for two breaks means. The markers carry no height,
+    // so the middle page is genuinely empty rather than nearly so.
+    const pages = paginate(
+      [
+        item('a', 10),
+        item('break-1', 0, { breakBefore: true }),
+        item('break-2', 0, { breakBefore: true }),
+        item('b', 10, { breakBefore: true }),
+      ],
+      PAGE,
+    )
+
+    expect(pages).toEqual([['a'], ['break-1'], ['break-2'], ['b']])
   })
 
   it('keeps everything on one page when it fits', () => {
