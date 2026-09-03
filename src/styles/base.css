@@ -22,13 +22,32 @@ body {
   -webkit-text-size-adjust: 100%;
 }
 
-a {
-  color: var(--text-link);
-  text-decoration: none;
-}
+/**
+ * Links, in the `base` layer rather than unlayered.
+ *
+ * Unlayered CSS beats every layered rule regardless of specificity, so an
+ * unlayered `a { color }` was overriding both Tailwind's utilities and Mantine's
+ * own components. That was not a subtlety — it was visibly wrong in three
+ * places. Every sidebar row is a link, so all of them rendered in link teal
+ * instead of `--text-muted`, while "New group", which is a button, was correctly
+ * muted: one list, two colours. "About Resivo" was teal among black menu items,
+ * because it is the one `Menu.Item` rendered as a link. And the storage rows'
+ * `hover:text-accent` could not change what was already accent.
+ *
+ * `base` puts this under `mantine` and `utilities`, which is the order that was
+ * always intended: a Mantine component and an explicit utility class both know
+ * better than an element default. Tailwind's preflight also targets `a` in this
+ * layer, and this file is imported after it, so this still wins there.
+ */
+@layer base {
+  a {
+    color: var(--text-link);
+    text-decoration: none;
+  }
 
-a:hover {
-  color: var(--text-link-hover);
+  a:hover {
+    color: var(--text-link-hover);
+  }
 }
 
 /* Every numeric readout, file name and path is monospace. */
