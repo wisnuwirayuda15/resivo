@@ -12,4 +12,5 @@
 @import '@mantine/dates/styles.layer.css';
 @import '@mantine/notifications/styles.layer.css';
 @import '@mantine/spotlight/styles.layer.css';
+@import '@mantine/code-highlight/styles.layer.css';
 @import '@gfazioli/mantine-onboarding-tour/styles.layer.css';

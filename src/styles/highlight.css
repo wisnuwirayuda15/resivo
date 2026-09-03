@@ -1,0 +1,79 @@
+/**
+ * Token colours for highlighted code.
+ *
+ * `@mantine/code-highlight` draws the block — background, radius, the copy
+ * button — but the colours inside it come from the highlighter, and
+ * `highlight.js` ships them as separate theme stylesheets. None of those is
+ * usable here: each is a complete palette of its own, so `atom-one-dark` inside
+ * the app's light scheme is a black rectangle, and every theme picks its own
+ * hues regardless of the ones the design system already has.
+ *
+ * So this maps the classes the two registered grammars actually emit onto the
+ * app's semantic tokens. Those are already scheme-aware, which is why there is
+ * no dark variant below: the same four aliases resolve differently under
+ * `[data-mantine-color-scheme='dark']`.
+ *
+ * In the `components` layer, so a Tailwind utility on a snippet still wins.
+ */
+@layer components {
+  /* The theme stylesheets set both of these, and this file replaces them: the
+     block's own background comes from Mantine's `--ch-background`. */
+  .hljs {
+    background: transparent;
+    color: inherit;
+  }
+
+  .hljs-comment,
+  .hljs-quote,
+  .hljs-meta {
+    color: var(--text-subtle);
+    font-style: italic;
+  }
+
+  /* A Markdown heading, and a CSS at-rule or property name. */
+  .hljs-section,
+  .hljs-selector-tag,
+  .hljs-keyword,
+  .hljs-built_in {
+    color: var(--text-accent);
+  }
+
+  .hljs-attribute,
+  .hljs-attr,
+  .hljs-selector-class,
+  .hljs-selector-id,
+  .hljs-selector-pseudo,
+  .hljs-selector-attr {
+    color: var(--info-text);
+  }
+
+  .hljs-string,
+  .hljs-code {
+    color: var(--success-text);
+  }
+
+  .hljs-number,
+  .hljs-literal {
+    color: var(--warning-text);
+  }
+
+  /* A bullet, and the `-` of a list item. */
+  .hljs-bullet,
+  .hljs-symbol {
+    color: var(--text-accent);
+  }
+
+  .hljs-link {
+    color: var(--info-text);
+    text-decoration: underline;
+  }
+
+  /* Markdown's own emphasis, drawn as emphasis rather than as a colour. */
+  .hljs-strong {
+    font-weight: 600;
+  }
+
+  .hljs-emphasis {
+    font-style: italic;
+  }
+}

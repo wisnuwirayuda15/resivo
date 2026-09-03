@@ -7,11 +7,16 @@ import {
   Tabs,
   Text,
 } from '@mantine/core'
+import {
+  CodeHighlight,
+  CodeHighlightAdapterProvider,
+} from '@mantine/code-highlight'
 
 import { Icon } from '@/features/icons/IconRenderer'
 import { cn } from '@/lib/utils'
 
 import { AI_PROMPT, GUIDE, guideMarkdown } from './content'
+import { guideHighlighter } from './highlighter'
 
 import type { GuideSection } from './content'
 import type { ReactNode } from 'react'
@@ -98,31 +103,13 @@ const Snippet: React.FC<{ code: string; language: string }> = ({
   code,
   language,
 }) => (
-  <Box className="relative mt-2.5">
-    <Code
-      block
-      className="border-line-soft rounded-panel overflow-x-auto border py-2.5 pr-16 pl-3 text-[12px] leading-relaxed"
-    >
-      {code}
-    </Code>
-
-    {/* Inside the block rather than above it, so a page of snippets does not
-        become a page of buttons. */}
-    <Box className="absolute top-1.5 right-1.5">
-      <CopyButton timeout={1600} value={code}>
-        {({ copied, copy }) => (
-          <Button
-            aria-label={`Copy the ${language} example`}
-            onClick={copy}
-            size="compact-xs"
-            variant="default"
-          >
-            {copied ? 'Copied' : 'Copy'}
-          </Button>
-        )}
-      </CopyButton>
-    </Box>
-  </Box>
+  <CodeHighlight
+    className="mt-2.5 text-[12px]"
+    code={code}
+    language={language}
+    radius="panel"
+    withBorder
+  />
 )
 
 const Section: React.FC<{ section: GuideSection }> = ({ section }) => (
@@ -166,53 +153,59 @@ export const GuideDrawer: React.FC<GuideDrawerProps> = ({
     size={620}
     title="Writing guide"
   >
-    <Box className="flex flex-col gap-1.5">
-      <Box className="flex flex-wrap items-center gap-2">
-        <Copy
-          icon="sparkle"
-          label="Copy the AI prompt"
-          primary
-          value={AI_PROMPT}
-        />
-        <Copy
-          icon="clipboard-text"
-          label="Copy this guide"
-          value={guideMarkdown()}
-        />
+    {/* Around the content rather than the app: the adapter carries the
+        highlighter, and this drawer is the only place code is highlighted —
+        so it stays inside the chunk that is only fetched when the guide is
+        opened. */}
+    <CodeHighlightAdapterProvider adapter={guideHighlighter}>
+      <Box className="flex flex-col gap-1.5">
+        <Box className="flex flex-wrap items-center gap-2">
+          <Copy
+            icon="sparkle"
+            label="Copy the AI prompt"
+            primary
+            value={AI_PROMPT}
+          />
+          <Copy
+            icon="clipboard-text"
+            label="Copy this guide"
+            value={guideMarkdown()}
+          />
+        </Box>
+
+        <Text className="text-subtle max-w-[68ch] text-[11.5px] leading-normal">
+          The prompt states the whole format, and what not to write. Paste it
+          into any assistant, add your history under it, and paste what comes
+          back into the Markdown pane.
+        </Text>
       </Box>
 
-      <Text className="text-subtle max-w-[68ch] text-[11.5px] leading-normal">
-        The prompt states the whole format, and what not to write. Paste it into
-        any assistant, add your history under it, and paste what comes back into
-        the Markdown pane.
-      </Text>
-    </Box>
-
-    <Tabs className="mt-4" defaultValue={GUIDE[0]?.id}>
-      <Tabs.List aria-label="Guide">
-        {GUIDE.map((chapter) => (
-          <Tabs.Tab key={chapter.id} value={chapter.id}>
-            {chapter.title}
-          </Tabs.Tab>
-        ))}
-      </Tabs.List>
-
-      {GUIDE.map((chapter) => (
-        <Tabs.Panel key={chapter.id} value={chapter.id}>
-          <Text
-            className={cn(
-              'text-body max-w-[68ch] text-[12.5px] leading-relaxed',
-              'border-line-soft border-b pt-4 pb-4',
-            )}
-          >
-            {chapter.intro}
-          </Text>
-
-          {chapter.sections.map((section) => (
-            <Section key={section.id} section={section} />
+      <Tabs className="mt-4" defaultValue={GUIDE[0]?.id}>
+        <Tabs.List aria-label="Guide">
+          {GUIDE.map((chapter) => (
+            <Tabs.Tab key={chapter.id} value={chapter.id}>
+              {chapter.title}
+            </Tabs.Tab>
           ))}
-        </Tabs.Panel>
-      ))}
-    </Tabs>
+        </Tabs.List>
+
+        {GUIDE.map((chapter) => (
+          <Tabs.Panel key={chapter.id} value={chapter.id}>
+            <Text
+              className={cn(
+                'text-body max-w-[68ch] text-[12.5px] leading-relaxed',
+                'border-line-soft border-b pt-4 pb-4',
+              )}
+            >
+              {chapter.intro}
+            </Text>
+
+            {chapter.sections.map((section) => (
+              <Section key={section.id} section={section} />
+            ))}
+          </Tabs.Panel>
+        ))}
+      </Tabs>
+    </CodeHighlightAdapterProvider>
   </Drawer>
 )
