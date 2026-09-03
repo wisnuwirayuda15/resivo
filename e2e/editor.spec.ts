@@ -176,3 +176,58 @@ test('reports Markdown it cannot typeset, without losing it', async ({
     .poll(() => paperText(page), { timeout: 15_000 })
     .toContain('<div>raw</div>')
 })
+
+/**
+ * The writing guide.
+ *
+ * The assertion that matters is the copy, not the prose: the prompt exists so
+ * someone can hand the whole format to a language model in one click, and
+ * Mantine only switches the label to "Copied" once `writeText` has resolved —
+ * so the label is proof the clipboard write happened, without the test needing
+ * clipboard read permission.
+ */
+test('the guide explains the format, and hands it over', async ({ page }) => {
+  test.slow()
+
+  /**
+   * The browser gates the clipboard, not the app.
+   *
+   * Chromium refuses `writeText` from an automated context without this, and a
+   * refusal is indistinguishable from a broken button: Mantine leaves the label
+   * alone when the promise rejects. Granting it is what makes the assertion
+   * below about the app rather than about Playwright's defaults.
+   */
+  await page.context().grantPermissions(['clipboard-read', 'clipboard-write'])
+
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+
+  await page.getByRole('button', { name: 'Guide' }).click()
+
+  const guide = page.getByRole('dialog', { name: 'Writing guide' })
+  await expect(guide).toBeVisible()
+
+  // The block a heading convention cannot express, which is the reason the
+  // format has directives at all.
+  await expect(guide.getByText('Entries', { exact: true })).toBeVisible()
+  await expect(guide).toContainText(':::entry{title=')
+
+  await page.getByRole('button', { name: 'Copy the AI prompt' }).click()
+  await expect(page.getByRole('button', { name: 'Copied' })).toBeVisible()
+
+  // And what landed there is the prompt, not the guide: they are two different
+  // documents behind two buttons a few pixels apart.
+  const copied = await page.evaluate(() => navigator.clipboard.readText())
+  expect(copied).toContain('Output the file and nothing else')
+  expect(copied).toContain(':::entry{title=')
+
+  await guide.getByRole('tab', { name: 'Styling' }).click()
+
+  // The half that is not Markdown: what custom CSS can reach, and what it
+  // cannot do here at all.
+  await expect(guide).toContainText('.rp-name')
+  await expect(guide).toContainText('It cannot move a page break')
+
+  await page.keyboard.press('Escape')
+  await expect(guide).toBeHidden()
+})

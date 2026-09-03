@@ -54,6 +54,14 @@ what is left — raw HTML, footnotes, link definitions — is kept verbatim and
 flagged as a warning rather than silently dropped, and text that arrives above
 the first heading goes into an untitled section rather than being refused.
 
+**A guide, and a prompt.** The editor carries the format's own documentation:
+every directive with a working example, and what custom CSS can and cannot reach.
+Two buttons copy it — one the guide, one a prompt that states the whole format to
+a language model, including what never to emit, so a resume you asked an
+assistant to write comes back in a shape this app can read. Every example in it
+is parsed by the real codec in a test, because a syntax guide's failure mode is
+being wrong rather than being ugly.
+
 **Visual editing.** Click any text on the paper to edit it in place; drag blocks
 and sections to reorder them, or use the move buttons beside them. Switching the
 editor on cannot move a page break — the chrome is never part of what the
@@ -171,6 +179,7 @@ src/
     icons/         generated icon catalog and picker
     assets/        images and fonts
     export/        PDF, HTML and Markdown adapters
+    guide/         the writing guide, and the prompt for a model
     backup/        whole-database backup and restore
     settings/      app preferences and storage usage
     commands/      the command palette

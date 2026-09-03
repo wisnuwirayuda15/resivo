@@ -4,6 +4,7 @@ import { Box, Loader, Tabs, Text } from '@mantine/core'
 import { Icon } from '@/features/icons/IconRenderer'
 import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 
+import { GuideButton } from '@/features/guide/GuideButton'
 import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
 import { cn } from '@/lib/utils'
 
@@ -92,14 +93,19 @@ export const CodePane: React.FC<CodePaneProps> = ({
               style.css
             </Tabs.Tab>
 
-            {notices === 0 ? null : (
-              <Text
-                className="text-warning-text ml-auto self-center pr-2 font-mono text-[11px] tabular-nums"
-                span
-              >
-                {notices} {notices === 1 ? 'notice' : 'notices'}
-              </Text>
-            )}
+            {/* The right end of the strip: the notice count when there is one,
+                and the way into the guide, which is always there. */}
+            <Box className="ml-auto flex items-center gap-2 self-center pr-1">
+              {notices === 0 ? null : (
+                <Text
+                  className="text-warning-text font-mono text-[11px] tabular-nums"
+                  span
+                >
+                  {notices} {notices === 1 ? 'notice' : 'notices'}
+                </Text>
+              )}
+              <GuideButton />
+            </Box>
           </Tabs.List>
 
           <Tabs.Panel className="min-h-0 flex-1" value="markdown">
