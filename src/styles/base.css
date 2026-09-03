@@ -47,7 +47,6 @@ pre {
 
 /* Thin and track-less. */
 * {
-  scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
 }
 
