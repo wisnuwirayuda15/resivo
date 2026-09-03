@@ -37,6 +37,7 @@ const groups = (mod: string): Array<Group> => [
   {
     title: 'Anywhere in the app',
     shortcuts: [
+      { keys: [[mod, 'K']], description: 'Open the command palette' },
       { keys: [[mod, 'Z']], description: 'Undo the last change to the resume' },
       {
         keys: [

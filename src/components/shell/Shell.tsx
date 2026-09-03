@@ -4,6 +4,7 @@ import { useDisclosure } from '@mantine/hooks'
 import { useNavigate } from '@tanstack/react-router'
 
 import { ClientOnly } from '@/components/client-only'
+import { CommandPalette } from '@/features/commands/CommandPalette'
 import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
 import { NewGroupDialog } from '@/features/resume/components/NewGroupDialog'
 import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
@@ -122,6 +123,11 @@ export const Shell: React.FC<ShellProps> = ({
           onClose={() => setNewGroupOpen(false)}
         />
         <KeyboardShortcuts onClose={shortcuts.close} opened={shortcutsOpen} />
+        <CommandPalette
+          onNewGroup={() => setNewGroupOpen(true)}
+          onNewResume={() => setNewResumeOpen(true)}
+          onShowShortcuts={shortcuts.open}
+        />
       </ClientOnly>
     </AppShell>
   )
