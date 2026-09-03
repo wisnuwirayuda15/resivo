@@ -3,6 +3,7 @@ import { Splitter, Tabs } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { cn } from '@/lib/utils'
 import { PreviewPane } from '@/features/preview/PreviewPane'
 import { StyleInspector } from '@/features/style/StyleInspector'
 import { applyMarkdown } from '@/features/markdown/index'
@@ -68,6 +69,9 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
     () => readPaneSizes(PANE_COUNT) ?? DEFAULT_SIZES,
   )
   const [warnings, setWarnings] = useState<Array<ParseWarning>>([])
+
+  /** True only between pointerdown and pointerup on a splitter handle. */
+  const [resizing, setResizing] = useState(false)
 
   /**
    * Read during the first render rather than in an effect. This only mounts
@@ -186,9 +190,24 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 
   return (
     <Splitter
-      className="h-full"
+      /**
+       * The iframe stops taking the pointer while a handle is being dragged.
+       *
+       * A drag is tracked by listeners on *this* document, and a pointer over
+       * the preview is a pointer over another one — the iframe's — so the moves
+       * never arrived and the handle stuck the instant the cursor crossed into
+       * the paper. Which is most of a drag, since the preview is the pane in the
+       * middle. `pointer-events: none` for the duration hands those moves back
+       * to the document doing the tracking; nothing inside the frame wants a
+       * pointer while a pane is being resized anyway.
+       */
+      className={cn('h-full', resizing && '[&_iframe]:pointer-events-none')}
       lineSize={1}
-      onResizeEnd={(_handle, next) => writePaneSizes(PANE_COUNT, next)}
+      onResizeEnd={(_handle, next) => {
+        setResizing(false)
+        writePaneSizes(PANE_COUNT, next)
+      }}
+      onResizeStart={() => setResizing(true)}
       onSizeChange={setSizes}
       sizes={sizes}
     >

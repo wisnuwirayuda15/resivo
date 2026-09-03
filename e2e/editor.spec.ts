@@ -272,3 +272,71 @@ test('an edit survives leaving the editor and coming back', async ({
     .poll(() => markdownPaneText(page))
     .toContain('Analytical engines')
 })
+
+/**
+ * Dragging a pane divider across the preview.
+ *
+ * A drag is tracked by listeners on the app's document, and the preview is
+ * another document — so once the cursor crossed into the paper the moves went to
+ * the iframe and the handle stopped following. Since the preview is the pane in
+ * the middle, that was most of any drag: it felt like the divider was catching
+ * on something.
+ *
+ * The pointer is walked across in steps rather than jumped, because a single
+ * jump would land past the iframe and pass even while the bug was there.
+ */
+test('a pane divider keeps following the pointer over the preview', async ({
+  page,
+}) => {
+  test.slow()
+
+  /**
+   * Wider than the suite's default 1280.
+   *
+   * At 1280 there is no slack to drag into: 420 of code, 288 of inspector and
+   * the preview's 340px minimum add up to the whole width, so the code pane
+   * starts at its maximum and a drag to the right is correctly a no-op. The
+   * bug this covers is about the pointer, so the layout has to have somewhere
+   * to go.
+   */
+  await page.setViewportSize({ width: 1440, height: 900 })
+
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+  await expectPaperReady(page)
+
+  const codePane = page.locator('.mantine-Splitter-pane').first()
+  const width = () =>
+    codePane.evaluate((node) => Math.round(node.getBoundingClientRect().width))
+
+  const before = await width()
+  const handle = page.getByRole('separator').first()
+
+  // Hovered rather than moved to the box origin: the divider is one pixel
+  // wide, and grabbing it by a computed edge is a coin toss.
+  await handle.hover()
+  await page.mouse.down()
+
+  const box = await handle.boundingBox()
+
+  if (box === null) {
+    throw new Error('the splitter handle has no box to grab')
+  }
+
+  const y = box.y + box.height / 2
+
+  await page.mouse.move(box.x + 120, y, { steps: 6 })
+
+  // While the drag is live, the frame is not taking the pointer. This is the
+  // mechanism, so it is asserted rather than inferred from the width.
+  const frame = page.locator('iframe').first()
+  await expect(frame).toHaveCSS('pointer-events', 'none')
+
+  await page.mouse.up()
+
+  // The whole 120px, not the few pixels before the cursor reached the paper.
+  expect(await width()).toBeGreaterThan(before + 110)
+
+  // And the frame is clickable again — the paper is an editing surface.
+  await expect(frame).toHaveCSS('pointer-events', 'auto')
+})
