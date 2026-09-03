@@ -13,7 +13,7 @@ import type { TemplateId } from './model/document'
  * the loaded record — because it gives caching, invalidation and loading/error
  * states for free. The document being actively edited does NOT live here: it is
  * mutated on every keystroke, which would thrash this cache and re-render the
- * library. That belongs to the editor's Zustand store (phase 3), which writes
+ * library. That belongs to the editor's Zustand store, which writes
  * back through `useSaveResumeDocument`.
  *
  * Every query here reads IndexedDB, so all of them are client-only. They must be

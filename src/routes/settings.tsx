@@ -4,14 +4,14 @@ import { Box, Loader, Text } from '@mantine/core'
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { BackupPanel } from '@/features/backup/BackupPanel'
+import { StoragePanel } from '@/features/settings/StoragePanel'
 
 /**
  * Settings.
  *
- * Backup and restore only, for now, and that is the point of the page: it is
- * where the answer to "what happens if I lose this laptop" lives. Editor
- * preferences and storage usage will join it here rather than being scattered
- * through the app.
+ * Two things, and they are the two questions about a local-first app that are
+ * not about any one document: what happens if this laptop is lost, and how much
+ * of the device is this using.
  */
 const SettingsRoute: React.FC = () => (
   <Shell title="Settings">
@@ -38,6 +38,26 @@ const SettingsRoute: React.FC = () => (
       >
         <BackupPanel />
       </ClientOnly>
+
+      <Box className="border-line-soft border-t pt-6">
+        <Text className="text-body text-[15px] font-medium">Storage</Text>
+        <Text className="text-muted mt-1 max-w-[62ch] text-[13px]">
+          Every image and font is stored once and shared by every resume on this
+          device.
+        </Text>
+
+        <Box className="mt-4">
+          <ClientOnly
+            fallback={
+              <Box className="flex py-6">
+                <Loader size="sm" />
+              </Box>
+            }
+          >
+            <StoragePanel />
+          </ClientOnly>
+        </Box>
+      </Box>
     </Box>
   </Shell>
 )

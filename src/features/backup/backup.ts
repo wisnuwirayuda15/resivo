@@ -20,11 +20,12 @@ import type { Backup } from './format'
 export const createBackup = async (now: number): Promise<Backup> => {
   const db = getDb()
 
-  const [resumes, groups, images, fonts] = await Promise.all([
+  const [resumes, groups, images, fonts, settings] = await Promise.all([
     db.resumes.toArray(),
     db.groups.toArray(),
     db.images.toArray(),
     db.fonts.toArray(),
+    db.settings.toArray(),
   ])
 
   return {
@@ -45,6 +46,7 @@ export const createBackup = async (now: number): Promise<Backup> => {
         data: await blobToDataUrl(blob),
       })),
     ),
+    settings,
   }
 }
 
@@ -60,6 +62,9 @@ export interface RestoreReport {
   imagesAlreadyPresent: number
   fontsAdded: number
   fontsAlreadyPresent: number
+  /** Settings the device did not already have. An existing preference is never
+   * replaced — see the restore rule above. */
+  settingsAdded: number
 }
 
 const dataUrlToBlob = async (dataUrl: string, mime: string): Promise<Blob> => {
@@ -94,6 +99,7 @@ export const restoreBackup = async (
     imagesAlreadyPresent: 0,
     fontsAdded: 0,
     fontsAlreadyPresent: 0,
+    settingsAdded: 0,
   }
 
   /**
@@ -168,6 +174,24 @@ export const restoreBackup = async (
       blob: await dataUrlToBlob(data, `font/${font.format}`),
     })
     report.fontsAdded += 1
+  }
+
+  /**
+   * Settings, and only the ones this device has no opinion about yet.
+   *
+   * Restore never overwrites, and a preference is exactly the kind of thing
+   * where that matters: someone restoring one lost resume onto a working machine
+   * did not ask for their own settings to be replaced by an older file's.
+   *
+   * Keys this build does not know are stored anyway. The table is a loose
+   * key/value store by design, and dropping a key a newer build wrote would make
+   * a backup from that build quietly lossy on the way through this one.
+   */
+  for (const setting of backup.settings ?? []) {
+    if ((await db.settings.get(setting.key)) === undefined) {
+      await db.settings.add({ key: setting.key, value: setting.value })
+      report.settingsAdded += 1
+    }
   }
 
   for (const group of backup.groups) {

@@ -63,6 +63,12 @@ const summarise = (report: RestoreReport): Array<string> => {
     lines.push(`${report.fontsAlreadyPresent} fonts were already stored`)
   }
 
+  if (report.settingsAdded > 0) {
+    lines.push(
+      `${report.settingsAdded} ${report.settingsAdded === 1 ? 'setting' : 'settings'} restored, leaving the ones this device already had`,
+    )
+  }
+
   return lines.length === 0
     ? ['That backup was empty. Nothing changed.']
     : lines

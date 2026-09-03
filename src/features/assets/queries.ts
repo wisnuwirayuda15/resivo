@@ -24,6 +24,7 @@ export const assetKeys = {
   unusedImages: ['assets', 'images', 'unused'] as const,
   fonts: ['assets', 'fonts'] as const,
   unusedFonts: ['assets', 'fonts', 'unused'] as const,
+  usage: ['assets', 'usage'] as const,
 }
 
 /**
@@ -54,6 +55,28 @@ export const useUnusedFonts = () =>
   useQuery({
     queryKey: assetKeys.unusedFonts,
     queryFn: () => fontRepo.listUnusedFonts(),
+  })
+
+/**
+ * How much of the device's storage the assets take.
+ *
+ * Summed in the repositories rather than from the summary lists, because that is
+ * the only place the whole table is walked — and `totalImageBytes` has carried
+ * the comment "for the settings view" since it was written, with no settings
+ * view to call it. Under the `assets` key prefix, so an upload or a deletion
+ * invalidates it along with everything else.
+ */
+export const useAssetUsage = () =>
+  useQuery({
+    queryKey: assetKeys.usage,
+    queryFn: async () => {
+      const [images, fonts] = await Promise.all([
+        imageRepo.totalImageBytes(),
+        fontRepo.totalFontBytes(),
+      ])
+
+      return { images, fonts, total: images + fonts }
+    },
   })
 
 // ---------------------------------------------------------------------------

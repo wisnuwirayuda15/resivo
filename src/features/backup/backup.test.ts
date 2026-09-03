@@ -408,6 +408,45 @@ describe('restoreBackup', () => {
     expect((await db.resumes.get('r1'))?.groupId).toBe('')
   })
 
+  it('carries settings, and never replaces one the device already has', async () => {
+    await db.settings.add({ key: 'editor.lastTemplateId', value: 'modern' })
+
+    const report = await restoreBackup(
+      backupWith({
+        settings: [
+          // The device has its own answer for this one, and a restore adds
+          // rather than replaces — including for preferences.
+          { key: 'editor.lastTemplateId', value: 'classic' },
+          // A key this build does not know. Stored anyway: dropping it would
+          // make a backup written by a newer build lossy on the way through.
+          { key: 'future.thing', value: 42 },
+        ],
+      }),
+      NOW,
+    )
+
+    expect(report.settingsAdded).toBe(1)
+    expect((await db.settings.get('editor.lastTemplateId'))?.value).toBe(
+      'modern',
+    )
+    expect((await db.settings.get('future.thing'))?.value).toBe(42)
+  })
+
+  it('restores a file written before settings were carried', async () => {
+    // `settings` is optional for exactly this: every backup taken until now has
+    // no such key, and those files must still restore.
+    const { settings, ...withoutSettings } = backupWith({
+      groups: [{ id: 'g1', name: 'Old', order: 0, createdAt: 0 }],
+    })
+
+    expect(settings).toBeUndefined()
+
+    const report = await restoreBackup(withoutSettings, NOW)
+
+    expect(report.groupsAdded).toBe(1)
+    expect(report.settingsAdded).toBe(0)
+  })
+
   it('round-trips a database through a backup', async () => {
     await addResume('r1', 'Mine')
     await addImage('i1', 'hash-a')

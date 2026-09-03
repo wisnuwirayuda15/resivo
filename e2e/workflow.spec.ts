@@ -199,12 +199,18 @@ test('create, edit, style, export, back up, reload, restore', async ({
       resumes: Array<unknown>
       groups: Array<unknown>
       images: Array<unknown>
+      settings?: Array<{ key: string }>
     }
 
     expect(parsed.kind).toBe('resivo.backup')
     expect(parsed.resumes).toHaveLength(2)
     expect(parsed.groups).toHaveLength(1)
     expect(parsed.images).toHaveLength(1)
+    // Creating a resume records the template it was made with, so a backup
+    // taken after step 7 carries a preference as well as the documents.
+    expect(parsed.settings?.map((setting) => setting.key)).toContain(
+      'editor.lastTemplateId',
+    )
 
     backup = Buffer.concat(chunks)
   })

@@ -68,6 +68,19 @@ const groupSchema = z.object({
   createdAt: z.number(),
 })
 
+/**
+ * A setting, as stored.
+ *
+ * `value` is unvalidated on purpose: the table is a loose key/value store whose
+ * callers own the shape of their own value and pass a fallback, so a stale or
+ * unrecognised value degrades to a default rather than failing a restore of
+ * everything else in the file.
+ */
+const settingSchema = z.object({
+  key: z.string().min(1),
+  value: z.unknown(),
+})
+
 export const backupSchema = z.object({
   kind: z.literal(BACKUP_KIND),
   version: z.number().int().positive(),
@@ -78,6 +91,13 @@ export const backupSchema = z.object({
   groups: z.array(groupSchema),
   images: z.array(imageSchema),
   fonts: z.array(fontSchema),
+  /**
+   * Optional, and it has to be: every backup written before settings were
+   * carried has no such key, and those files must still restore. The version
+   * number is unchanged for the same reason — nothing about an older file became
+   * invalid.
+   */
+  settings: z.array(settingSchema).optional(),
 })
 
 export type Backup = z.infer<typeof backupSchema>

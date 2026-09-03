@@ -17,6 +17,10 @@ import { Icon } from '@/features/icons/IconRenderer'
 import { applyMarkdown } from '@/features/markdown/index'
 import { createEmptyDocument } from '../model/index'
 import { templateList } from '@/features/templates/catalog'
+import {
+  useLastTemplate,
+  useRememberTemplate,
+} from '@/features/settings/queries'
 
 import { TemplateTile } from './TemplateTile'
 import { useCreateResume, useGroups } from '../queries'
@@ -88,20 +92,33 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   defaultGroupId,
 }) => {
   const [title, setTitle] = useState('')
-  const [templateId, setTemplateId] = useState<TemplateId>('classic')
+  /**
+   * The template, as "what the user picked, or what they picked last time".
+   *
+   * Derived rather than synced from the query in an effect: the remembered value
+   * arrives a tick after the dialog mounts, and an effect writing it into state
+   * would show `classic` selected for that tick and then move the selection
+   * under the pointer.
+   */
+  const [picked, setPicked] = useState<TemplateId | null>(null)
   const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED)
   const [imported, setImported] = useState<ImportedMarkdown | null>(null)
   const [importError, setImportError] = useState<string | null>(null)
 
   const groups = useGroups()
   const createResume = useCreateResume()
+  const lastTemplate = useLastTemplate()
+  const rememberTemplate = useRememberTemplate()
+
+  const templateId = picked ?? lastTemplate.data ?? 'classic'
+  const setTemplateId = setPicked
 
   const close = () => {
     onClose()
     // Reset after closing so the fields do not visibly clear during the exit
     // transition.
     setTitle('')
-    setTemplateId('classic')
+    setPicked(null)
     setGroupId(defaultGroupId ?? UNGROUPED)
     setImported(null)
     setImportError(null)
@@ -167,6 +184,10 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
         ? {}
         : { document: documentFrom(templateId, imported.source).document }),
     })
+
+    // Remembered after the resume exists, so a failed create does not change
+    // what the dialog offers next time.
+    rememberTemplate.mutate(templateId)
 
     close()
     onCreated(created.id)

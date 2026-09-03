@@ -21,6 +21,8 @@ export * as imageRepo from './repositories/images'
 export * as fontRepo from './repositories/fonts'
 export * as settingsRepo from './repositories/settings'
 
+export { SETTING_KEYS } from './repositories/settings'
+
 export type { ResumeSummary } from './repositories/resumes'
 export type { ImageSummary } from './repositories/images'
 export type { FontSummary } from './repositories/fonts'

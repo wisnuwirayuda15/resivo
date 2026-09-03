@@ -454,39 +454,36 @@ describe('font repository', () => {
 
 describe('settings repository', () => {
   it('returns the fallback for a key that was never set', async () => {
-    const sizes = await settingsRepo.getSetting(
-      SETTING_KEYS.editorPanelSizes,
-      [30, 45, 25],
-    )
-
-    expect(sizes).toEqual([30, 45, 25])
+    expect(
+      await settingsRepo.getSetting(SETTING_KEYS.lastTemplateId, 'classic'),
+    ).toBe('classic')
   })
 
   it('round-trips a value', async () => {
-    await settingsRepo.setSetting(SETTING_KEYS.editorPanelSizes, [20, 60, 20])
+    await settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, 'editorial')
 
     expect(
-      await settingsRepo.getSetting(SETTING_KEYS.editorPanelSizes, [0, 0, 0]),
-    ).toEqual([20, 60, 20])
+      await settingsRepo.getSetting(SETTING_KEYS.lastTemplateId, 'classic'),
+    ).toBe('editorial')
   })
 
   it('overwrites rather than duplicating a key', async () => {
-    await settingsRepo.setSetting(SETTING_KEYS.libraryView, 'grid')
-    await settingsRepo.setSetting(SETTING_KEYS.libraryView, 'list')
+    await settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, 'modern')
+    await settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, 'technical')
 
     expect(await settingsRepo.listSettings()).toHaveLength(1)
     expect(
-      await settingsRepo.getSetting(SETTING_KEYS.libraryView, 'grid'),
-    ).toBe('list')
+      await settingsRepo.getSetting(SETTING_KEYS.lastTemplateId, 'classic'),
+    ).toBe('technical')
   })
 
   it('deletes a key', async () => {
-    await settingsRepo.setSetting(SETTING_KEYS.libraryView, 'list')
-    await settingsRepo.deleteSetting(SETTING_KEYS.libraryView)
+    await settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, 'modern')
+    await settingsRepo.deleteSetting(SETTING_KEYS.lastTemplateId)
 
     expect(
-      await settingsRepo.getSetting(SETTING_KEYS.libraryView, 'grid'),
-    ).toBe('grid')
+      await settingsRepo.getSetting(SETTING_KEYS.lastTemplateId, 'classic'),
+    ).toBe('classic')
   })
 })
 

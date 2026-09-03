@@ -11,16 +11,26 @@ import type { SettingRecord } from '../records'
  * of throwing.
  */
 
-/** Known keys, collected here so they cannot drift apart across the app. */
+/**
+ * Known keys, collected here so they cannot drift apart across the app.
+ *
+ * Deliberately short, and it used to be longer. Three keys were declared for
+ * state that ended up living somewhere better, and a key nothing reads is worse
+ * than no key: it reads as a feature that exists.
+ *
+ * Pane sizes are in `localStorage` (`features/editor/panels.ts`) because the
+ * editor reads them synchronously as it mounts, and an async read would cost a
+ * frame of the panes at the wrong width every time the editor opens. The
+ * library's sort is in the URL (`routes/resumes.index.tsx`) so a filtered view
+ * is linkable and survives a reload. A grid/list toggle was declared and never
+ * built.
+ *
+ * What belongs here is a preference that is device-wide, outlives a session, and
+ * has no better home.
+ */
 export const SETTING_KEYS = {
-  /** Editor splitter sizes, as a three-element array of percentages. */
-  editorPanelSizes: 'editor.panelSizes',
   /** Last template chosen in the new-resume dialog. */
   lastTemplateId: 'editor.lastTemplateId',
-  /** Library view mode: grid or list. */
-  libraryView: 'library.view',
-  /** Library sort field. */
-  librarySort: 'library.sort',
 } as const
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS]
