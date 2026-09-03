@@ -63,7 +63,6 @@ interface PreviewFrameProps {
    * the preview" true rather than aspirational, and it is why the print handle
    * comes from here instead of from a separate route.
    */
-  onPrintReady?: (print: (() => void) | null) => void
 }
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
@@ -75,7 +74,6 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   title = 'Resume preview',
   onPageCountChange,
   onPaginated,
-  onPrintReady,
 }) => {
   const frameRef = useRef<HTMLIFrameElement | null>(null)
   const styleRef = useRef<HTMLStyleElement | null>(null)
@@ -173,21 +171,6 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
       style.textContent = css
     }
   }, [frameDocument, css])
-
-  /**
-   * Publish the print handle for as long as the frame is loaded.
-   *
-   * `contentWindow.print()`, not `window.print()`: printing the app window would
-   * print the editor. The iframe carries the `@page` rule and the page boxes, so
-   * printing it is printing exactly the document on screen.
-   */
-  useEffect(() => {
-    const view = frameDocument?.defaultView ?? null
-
-    onPrintReady?.(view === null ? null : () => view.print())
-
-    return () => onPrintReady?.(null)
-  }, [frameDocument, onPrintReady])
 
   useEffect(() => {
     if (frameDocument === null) {

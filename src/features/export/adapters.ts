@@ -11,8 +11,9 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * One shape for all of them, so the menu is a list rather than a switch and a
  * new format is a new entry. PDF is deliberately *not* here: it is not a file
- * this app produces but a print the browser performs, and pretending otherwise
- * would mean a second renderer — see `ExportMenu`.
+ * this app writes but a print the browser performs, on the same document
+ * `buildExportHtml` produces below. `print.ts` says why that is the only path
+ * from CSS to vector text; `ExportMenu` is where it is offered.
  */
 
 export interface ExportContext {
@@ -37,29 +38,42 @@ export interface ExportAdapter {
   run: (context: ExportContext) => Promise<Blob>
 }
 
+/**
+ * The self-contained document, as text.
+ *
+ * Exported because two destinations want the same bytes: the HTML file below,
+ * and the print that produces a PDF. Building it once is what makes "the PDF is
+ * the HTML export is the preview" one claim rather than three that have to be
+ * kept in step.
+ *
+ * Assets are read and inlined here rather than in `exportHtml`, which is pure
+ * and synchronous. That split is what lets the HTML writer be tested without a
+ * database.
+ */
+export const buildExportHtml = async ({
+  document,
+  title,
+  pages,
+}: ExportContext): Promise<string> => {
+  const [images, fonts, builtinFontCss] = await Promise.all([
+    inlineImages(documentImageIds(document)),
+    inlineFonts(documentFontIds(document)),
+    inlineBuiltinFonts(),
+  ])
+
+  return exportHtml({ document, title, images, fonts, builtinFontCss, pages })
+}
+
 const htmlAdapter: ExportAdapter = {
   format: 'html',
   label: 'HTML',
   hint: 'One self-contained file. Same layout as the preview, no network.',
   mimeType: 'text/html;charset=utf-8',
   extension: 'html',
-  run: async ({ document, title, pages }) => {
-    /**
-     * Assets are read and inlined here rather than in `exportHtml`, which is
-     * pure and synchronous. That split is what lets the HTML writer be tested
-     * without a database.
-     */
-    const [images, fonts, builtinFontCss] = await Promise.all([
-      inlineImages(documentImageIds(document)),
-      inlineFonts(documentFontIds(document)),
-      inlineBuiltinFonts(),
-    ])
-
-    return new Blob(
-      [exportHtml({ document, title, images, fonts, builtinFontCss, pages })],
-      { type: 'text/html;charset=utf-8' },
-    )
-  },
+  run: async (context) =>
+    new Blob([await buildExportHtml(context)], {
+      type: 'text/html;charset=utf-8',
+    }),
 }
 
 const markdownAdapter: ExportAdapter = {

@@ -93,10 +93,11 @@ the device is holding.
 **Icons.** All 1512 Phosphor icons in all six weights, searchable, rendered as
 inline SVG so they survive into an export.
 
-**Export.** PDF is the browser printing the preview — the same document, so the
-PDF _is_ what you were looking at. HTML is one file with no external reference of
-any kind: images, custom fonts and the bundled typefaces are all inlined.
-Markdown uses the same serializer the editor reads.
+**Export.** HTML is one file with no external reference of any kind: images,
+custom fonts and the bundled typefaces are all inlined. PDF is that same file,
+printed — built, handed to the browser in a frame of its own and thrown away, so
+the PDF and the HTML export are one artefact with two destinations and neither
+can drift from the preview. Markdown uses the same serializer the editor reads.
 
 **Keyboard and discovery.** `Ctrl/Cmd+K` opens a command palette over every page
 and command; the application menu lists the shortcuts and the things worth

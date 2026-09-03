@@ -177,7 +177,7 @@ const STYLING_CHAPTER: GuideChapter = {
       title: 'Custom CSS, and what it can reach',
       body: [
         'The CSS tab beside the Markdown applies to the paper and nothing else. It is injected into the preview inside `@layer custom`, the highest layer, so it beats the template without needing `!important` — and cannot reach the app around it.',
-        'It travels with the resume: the HTML export inlines it, and the PDF is the browser printing the same document.',
+        'It travels with the resume: the HTML export inlines it, and the PDF is that exported file printed — so a rule written here is in every form of the document.',
       ],
       snippet: {
         language: 'css',

@@ -80,7 +80,7 @@ const EDITOR_STEPS: Array<OnboardingTourStep> = [
     id: TOUR_TARGET_IDS.paperTitlebar,
     title: 'Export is the same document',
     content:
-      'PDF is this browser printing exactly what you are looking at. HTML is one self-contained file — images and fonts inlined, no external reference of any kind. Markdown uses the same writer the editor reads.',
+      'HTML is one self-contained file — images and fonts inlined, no external reference of any kind — and PDF is that same file printed, so the two cannot disagree. Markdown uses the same writer the editor reads.',
   },
   {
     id: TOUR_TARGET_IDS.inspector,

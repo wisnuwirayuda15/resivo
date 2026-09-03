@@ -60,11 +60,11 @@ const AboutRoute: React.FC = () => (
           Exports and imports
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
-          PDF is this browser printing the preview. HTML is a single file with
-          no external reference of any kind — images, uploaded fonts and the
-          bundled typefaces are all inlined, so it opens on a machine that has
-          never seen Resivo. Markdown round-trips: what the app cannot typeset
-          is kept verbatim and reported rather than dropped.
+          HTML is a single file with no external reference of any kind — images,
+          uploaded fonts and the bundled typefaces are all inlined, so it opens
+          on a machine that has never seen Resivo. PDF is that same file,
+          printed. Markdown round-trips: what the app cannot typeset is kept
+          verbatim and reported rather than dropped.
         </Text>
       </Box>
 

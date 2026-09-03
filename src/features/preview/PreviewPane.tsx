@@ -94,14 +94,14 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   const [editing, setEditing] = useState(false)
 
   /**
-   * The breaks the paper measured, and the handle that prints it.
+   * The breaks the paper measured.
    *
-   * Both come from the frame rather than being recomputed here, because both are
-   * facts about the rendered document: what an export should contain is what the
-   * user can see, and what a PDF should be is what the iframe would print.
+   * Reported by the frame rather than recomputed here, because they are a fact
+   * about the rendered document: what an export contains should be what the user
+   * can see, and pagination is a measurement — there is nothing to measure in a
+   * string. Both file exports and the print reuse these.
    */
   const [pages, setPages] = useState<ReadonlyArray<ReadonlyArray<string>>>()
-  const [print, setPrint] = useState<(() => void) | null>(null)
 
   useEffect(() => {
     const well = wellRef.current
@@ -157,13 +157,6 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
     [],
   )
 
-  // Wrapped, because `setState` with a function argument would call it rather
-  // than store it.
-  const handlePrintReady = useCallback(
-    (next: (() => void) | null) => setPrint(() => next),
-    [],
-  )
-
   const dimensions = PAGE_DIMENSIONS[size]
 
   return (
@@ -176,12 +169,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
           </Text>
 
           <Box className="ml-auto flex items-center gap-1">
-            <ExportMenu
-              document={resume}
-              onPrint={print}
-              pages={pages}
-              title={title}
-            />
+            <ExportMenu document={resume} pages={pages} title={title} />
 
             {apply === undefined ? null : (
               <SegmentedControl
@@ -267,7 +255,6 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
             mode={editing && apply !== undefined ? 'edit' : 'view'}
             onPageCountChange={handlePageCount}
             onPaginated={handlePaginated}
-            onPrintReady={handlePrintReady}
             zoom={zoom}
           />
         </Box>

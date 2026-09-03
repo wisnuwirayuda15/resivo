@@ -4,18 +4,23 @@ import { Box, Button, Menu, Text } from '@mantine/core'
 import { Icon } from '@/features/icons/IconRenderer'
 import { downloadBlob, safeFilename } from '@/lib/download'
 
-import { exportAdapters } from './adapters'
+import { buildExportHtml, exportAdapters } from './adapters'
+import { printExportHtml } from './print'
 
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
  * The export menu.
  *
- * PDF sits above the file formats and is not one of them: it is the browser
- * printing the preview iframe, which is what makes the PDF *be* the preview
- * rather than resemble it. A second renderer producing a PDF would be a second
- * truth to keep in step, and the one thing this app promises about output is
- * that there is only one.
+ * PDF sits above the file formats and is not one of them: it produces no file,
+ * it hands a document to the browser to print. That document is the HTML export
+ * — the same bytes, with the typefaces and images inlined and the measured page
+ * breaks already in page boxes — so the PDF and the HTML file are one artefact
+ * with two destinations, and neither can drift from the preview.
+ *
+ * It is disabled until the first pagination lands, because the page breaks are
+ * a measurement. Printing before one would silently fall back to a single
+ * continuous page.
  */
 
 const ICONS: Record<string, string> = {
@@ -29,35 +34,46 @@ interface ExportMenuProps {
   /** The page breaks the preview measured, so a file export matches what is on
    * screen. Absent until the first measurement lands. */
   pages?: ReadonlyArray<ReadonlyArray<string>>
-  /** `null` while the preview iframe is not loaded. */
-  onPrint: (() => void) | null
 }
 
 export const ExportMenu: React.FC<ExportMenuProps> = ({
   document: resume,
   title,
   pages,
-  onPrint,
 }) => {
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  /**
+   * One path for every entry in the menu, including PDF.
+   *
+   * PDF is not an adapter because it produces no file — but it is the same
+   * build, the same failures and the same busy state, so it goes through the
+   * same function rather than a second one beside it.
+   */
   const run = async (format: string) => {
-    const adapter = exportAdapters.find(
-      (candidate) => candidate.format === format,
-    )
-
-    if (adapter === undefined) {
-      return
-    }
+    const context = { document: resume, title, pages }
 
     setBusy(format)
     setError(null)
 
     try {
-      const blob = await adapter.run({ document: resume, title, pages })
+      if (format === 'pdf') {
+        await printExportHtml(await buildExportHtml(context))
+      } else {
+        const adapter = exportAdapters.find(
+          (candidate) => candidate.format === format,
+        )
 
-      downloadBlob(blob, safeFilename(title, adapter.extension))
+        if (adapter === undefined) {
+          return
+        }
+
+        downloadBlob(
+          await adapter.run(context),
+          safeFilename(title, adapter.extension),
+        )
+      }
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -92,13 +108,14 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
         <Menu.Dropdown>
           <Menu.Label>Print</Menu.Label>
           <Menu.Item
-            disabled={onPrint === null}
+            disabled={pages === undefined}
             leftSection={<Icon name="file-pdf" size={14} />}
-            onClick={() => onPrint?.()}
+            onClick={() => void run('pdf')}
           >
             <Text className="text-[13px]">PDF</Text>
             <Text className="text-subtle text-[11px]">
-              Opens the print dialog. Choose &ldquo;Save as PDF&rdquo;.
+              Prints the exported document. Choose &ldquo;Save as PDF&rdquo;,
+              and leave the scale and margins as they are.
             </Text>
           </Menu.Item>
 

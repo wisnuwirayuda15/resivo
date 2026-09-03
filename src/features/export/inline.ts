@@ -12,7 +12,7 @@
 
 import { fontRepo, imageRepo } from '@/database/index'
 
-import paperFontsHref from '@/features/preview/paper-fonts.css?url'
+import paperFontsCss from '@/features/preview/paper-fonts.css?inline'
 
 import type { FontSource } from '@/features/assets/fontFaces'
 import type { ImageMap } from '@/features/assets/useAssetUrls'
@@ -99,20 +99,21 @@ export const inlineFonts = async (
  * breaks and therefore the pages, in a document whose whole purpose is to look
  * like the one that was laid out.
  *
- * The stylesheet and its `woff2` files are the app's own build output, fetched
- * from the same origin. Nothing here reaches the network in the sense that
- * matters: the export is still produced entirely by this device from files it
- * already served.
+ * The `woff2` files are the app's own build output, fetched from the same
+ * origin. Nothing here reaches the network in the sense that matters: the export
+ * is still produced entirely by this device from files it already served.
+ *
+ * The stylesheet arrives through `?inline`, as text, rather than being fetched
+ * from its own URL. Fetching it was a dev-only trap: Vite serves a CSS file as a
+ * JavaScript module in development, so what came back was a `/@vite/client`
+ * import with the `@font-face` rules inside a string literal — which is not CSS,
+ * and left every exported document in the reader's system serif while the
+ * production build was fine. `?inline` is the processed CSS in both modes, with
+ * the asset URLs already rewritten.
  */
 export const inlineBuiltinFonts = async (): Promise<string> => {
-  const response = await fetch(paperFontsHref)
-
-  if (!response.ok) {
-    return ''
-  }
-
-  const css = await response.text()
-  const base = new URL(paperFontsHref, window.location.href)
+  const css = paperFontsCss
+  const base = window.location.href
 
   // Every `url(...)` in the sheet, deduplicated: the same subset file is
   // referenced by more than one rule.
