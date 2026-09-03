@@ -171,6 +171,7 @@ src/
     commands/      the command palette
     onboarding/    the first-run tours
   database/        Dexie schema, repositories, migrations
+  assets/          the logo, as SVG
   components/      app chrome
   lib/             small shared utilities
 ```
@@ -187,6 +188,7 @@ bun run lint           # eslint
 bun run check          # prettier --check
 bun run format         # prettier --write, then eslint --fix
 bun run generate-icons # rebuild the icon catalog from @phosphor-icons/core
+bun run generate-favicon # re-render the favicon PNGs from public/favicon.svg
 ```
 
 `generate-icons` writes `src/features/icons/*.gen.ts`, which is **committed**.

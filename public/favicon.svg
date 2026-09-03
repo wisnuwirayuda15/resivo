@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
+  <title>Resivo</title>
+  <rect width="32" height="32" rx="7" fill="#121210" />
+  <g transform="translate(3.1 3.5) scale(0.26) translate(0 -12)">
+    <g
+      fill="none"
+      stroke="#f2f2f0"
+      stroke-width="16"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M8 100V20h30a22 22 0 0 1 0 44H8" />
+      <path d="M30 64l30 36" />
+    </g>
+    <circle cx="89" cy="98" r="10" fill="#32948e" />
+  </g>
+</svg>

@@ -21,7 +21,7 @@ import {
   NavLink,
   navItemClassName,
 } from './NavItem'
-import { Wordmark } from './Wordmark'
+import { Logo } from './Logo'
 
 interface SidebarProps {
   onNewResume: () => void
@@ -38,10 +38,10 @@ interface SidebarProps {
  * Contents of the navbar.
  *
  * Split into `AppShell.Section`s so the nav list is the only part that scrolls:
- * the wordmark stays pinned at the top and settings plus the privacy note stay
+ * the logo stays pinned at the top and settings plus the privacy note stay
  * pinned at the bottom, however long the group list grows.
  *
- * The wordmark block is 44px to match the header height, which is what makes the
+ * The logo block is 44px to match the header height, which is what makes the
  * sidebar's top edge line up with the application bar under `layout="alt"`.
  */
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -64,7 +64,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       <AppShell.Section className="border-line flex h-toolbar items-center gap-2 border-b px-3">
-        <Wordmark />
+        <Logo />
         {/* Privacy stated as fact, not as a boast. */}
         <Badge variant="default" size="xs" radius="pill">
           local

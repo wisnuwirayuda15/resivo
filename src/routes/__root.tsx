@@ -90,6 +90,31 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         rel: 'stylesheet',
         href: appCss,
       },
+      /**
+       * The `R.` mark, three times over, because no single format is enough.
+       *
+       * The SVG is the real one and every current browser prefers it. The 32px
+       * PNG is there for Safari, which has never honoured an SVG favicon, and
+       * `apple-touch-icon` for a home-screen shortcut, which is a bitmap by
+       * specification — without it iOS uses a screenshot of the page. All three
+       * are the same drawing; `bun run generate-favicon` writes the PNGs from
+       * the SVG.
+       */
+      {
+        rel: 'icon',
+        href: '/favicon.svg',
+        type: 'image/svg+xml',
+      },
+      {
+        rel: 'icon',
+        href: '/favicon-32.png',
+        type: 'image/png',
+        sizes: '32x32',
+      },
+      {
+        rel: 'apple-touch-icon',
+        href: '/apple-touch-icon.png',
+      },
     ],
   }),
   errorComponent: RootErrorComponent,
