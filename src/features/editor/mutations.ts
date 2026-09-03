@@ -195,35 +195,6 @@ export const moveSection =
     moveWithin(draft.content.sections, from, to)
   }
 
-/** Reorders by id — what drag-and-drop produces, since dnd-kit works in ids. */
-export const reorderSections =
-  (orderedIds: Array<string>): Recipe =>
-  (draft) => {
-    const byId = new Map(
-      draft.content.sections.map((section) => [section.id, section]),
-    )
-    const reordered = orderedIds
-      .map((id) => byId.get(id))
-      .filter((section): section is Draft<Section> => section !== undefined)
-
-    // Anything the caller did not mention keeps its relative position at the
-    // end, so a stale id list can never silently drop a section.
-    const missing = draft.content.sections.filter(
-      (section) => !orderedIds.includes(section.id),
-    )
-    const next = [...reordered, ...missing]
-
-    // Skip the assignment when the order is already correct, so a drag that
-    // ends where it started does not become an undo step.
-    const unchanged = next.every(
-      (section, index) => draft.content.sections[index]?.id === section.id,
-    )
-
-    if (!unchanged) {
-      draft.content.sections = next
-    }
-  }
-
 // ---------------------------------------------------------------------------
 // Blocks
 // ---------------------------------------------------------------------------
@@ -516,26 +487,6 @@ export const setTag =
     }
 
     block.tags[itemIndex] = trimmed
-  }
-
-/** Replaces a block wholesale. Used by the Markdown codec, which reconstructs
- * blocks rather than patching fields. */
-export const replaceBlock =
-  (sectionId: string, block: Block): Recipe =>
-  (draft) => {
-    const section = findSection(draft, sectionId)
-
-    if (section === undefined) {
-      return
-    }
-
-    const index = section.blocks.findIndex(
-      (candidate) => candidate.id === block.id,
-    )
-
-    if (index !== -1) {
-      section.blocks[index] = block
-    }
   }
 
 // ---------------------------------------------------------------------------

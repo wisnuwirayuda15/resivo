@@ -1,16 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Shell } from '@/components/shell/Shell'
-import { EmptyState } from '@/components/EmptyState'
+import { ClientOnly } from '@/components/client-only'
+import { ImageGalleryView } from '@/features/assets/ImageGalleryView'
 
-/** Image gallery. Storage and the object-URL cache land in phase 10. */
+/** Image gallery. Client-only, because it reads IndexedDB. */
 const ImagesRoute: React.FC = () => (
   <Shell title="Images">
-    <EmptyState
-      icon="image"
-      title="No images yet"
-      body="Upload an image to use it as an avatar or place it in a resume. Images are stored on this device and can be reused across resumes."
-    />
+    <ClientOnly>
+      <ImageGalleryView />
+    </ClientOnly>
   </Shell>
 )
 

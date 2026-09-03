@@ -1,19 +1,14 @@
 import { useState } from 'react'
 import {
-  Alert,
   Box,
   Button,
-  FileButton,
   Loader,
   Select,
   Text,
-  TextInput,
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
 
-import { ConfirmDialog } from '@/components/ConfirmDialog'
-import { Icon } from '@/features/icons/IconRenderer'
 import { ControlGroup } from '@/features/style/controls'
 import {
   addBlock,
@@ -22,11 +17,15 @@ import {
 } from '@/features/editor/mutations'
 import { plainText } from '@/features/resume/model/index'
 import { createId } from '@/lib/id'
-import { cn } from '@/lib/utils'
 
+import { AssetNameInput } from './components/AssetNameInput'
+import { AssetUpload, UploadError } from './components/AssetUpload'
+import { DeleteFontDialog, DeleteImageDialog } from './components/deleteDialogs'
+import { FontCard } from './components/FontCard'
+import { Thumb } from './components/Thumb'
 import { IMAGE_ACCEPT } from './readImage'
 import { FONT_ACCEPT } from './readFont'
-import { useImageUrl } from './useAssetUrls'
+import { formatBytes } from './format'
 import {
   useAddFont,
   useAddImage,
@@ -50,6 +49,12 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * usually wanted on every version of a CV, and duplicating it per document would
  * multiply both the storage and the work of replacing it.
  *
+ * What is here rather than on the standalone Images and Fonts pages is
+ * everything that needs a document to act on: placing an image into a section,
+ * making one the header photo, setting a resume in an uploaded face. The pages
+ * own the library itself. Both draw from `./components`, so the two never
+ * disagree about what a stored asset looks like or what deleting one costs.
+ *
  * Nothing here is deleted automatically. An asset can be unreferenced simply
  * because it has not been placed yet, so "unused" is shown as a fact and
  * reclaiming the space stays a decision.
@@ -58,42 +63,6 @@ import type { ResumeDocument } from '@/features/resume/model/document'
 interface AssetsPanelProps {
   document: ResumeDocument
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void
-}
-
-const formatBytes = (bytes: number): string =>
-  bytes < 1024 * 1024
-    ? `${Math.round(bytes / 1024)} KB`
-    : `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`
-
-/** The message from a rejected upload, which is written for the user. Anything
- * else is unexpected, so it is shown verbatim rather than paraphrased. */
-const errorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error)
-
-const Thumb: React.FC<{ image: ImageSummary; selected: boolean }> = ({
-  image,
-  selected,
-}) => {
-  const resolved = useImageUrl(image.id)
-
-  return (
-    <Box
-      className={cn(
-        'rounded-control border-line-soft relative flex size-full items-center justify-center overflow-hidden border',
-        selected ? 'border-accent' : null,
-      )}
-    >
-      {resolved === undefined ? (
-        <Loader size={14} />
-      ) : (
-        <img
-          alt={image.name}
-          className="size-full object-cover"
-          src={resolved.url}
-        />
-      )}
-    </Box>
-  )
 }
 
 const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
@@ -135,38 +104,19 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
   return (
     <ControlGroup title="Images">
       <Box className="flex items-center gap-2">
-        <FileButton
+        <AssetUpload
           accept={IMAGE_ACCEPT}
-          onChange={(file) => file && add.mutate(file)}
-        >
-          {(props) => (
-            <Button
-              {...props}
-              leftSection={<Icon name="upload-simple" size={13} />}
-              loading={add.isPending}
-              size="xs"
-              variant="default"
-            >
-              Add image
-            </Button>
-          )}
-        </FileButton>
+          label="Add image"
+          loading={add.isPending}
+          onFile={(file) => add.mutate(file)}
+        />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
           {(images ?? []).length} stored
         </Text>
       </Box>
 
-      {add.error === null ? null : (
-        <Alert
-          className="mt-2"
-          color="red"
-          icon={<Icon name="warning" size={14} />}
-          variant="light"
-        >
-          <Text className="text-[12px]">{errorMessage(add.error)}</Text>
-        </Alert>
-      )}
+      <UploadError className="mt-2" error={add.error} />
 
       {isPending ? (
         <Box className="flex justify-center py-4">
@@ -204,22 +154,15 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 
       {selected === undefined ? null : (
         <Box className="border-line-soft mt-3 flex flex-col gap-2 border-t pt-3">
-          <TextInput
+          <AssetNameInput
             aria-label="Image name"
-            onChange={(event) =>
-              rename.mutate({
-                id: selected.id,
-                name: event.currentTarget.value,
-              })
-            }
-            size="xs"
+            onCommit={(name) => rename.mutate({ id: selected.id, name })}
             value={selected.name}
           />
 
           <Box className="flex flex-wrap items-center gap-2">
             <Button
               onClick={() => apply(setAvatarImage(selected.id))}
-              size="xs"
               variant="default"
             >
               Use as photo
@@ -228,7 +171,6 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
             {document.content.header.avatarImageId === selected.id ? (
               <Button
                 onClick={() => apply(setAvatarImage(undefined))}
-                size="xs"
                 variant="subtle"
               >
                 Remove as photo
@@ -245,13 +187,11 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
               data={sections}
               onChange={setSectionId}
               placeholder="Insert into section…"
-              size="xs"
               value={sectionId}
             />
             <Button
               disabled={sectionId === null}
               onClick={() => sectionId !== null && insertInto(sectionId)}
-              size="xs"
               variant="default"
             >
               Insert
@@ -265,7 +205,6 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
             <Button
               color="red"
               onClick={() => setConfirming(selected)}
-              size="xs"
               variant="subtle"
             >
               Delete
@@ -274,9 +213,8 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
         </Box>
       )}
 
-      <ConfirmDialog
-        confirmLabel="Delete image"
-        danger
+      <DeleteImageDialog
+        image={confirming}
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
@@ -285,15 +223,8 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 
           setConfirming(null)
         }}
-        opened={confirming !== null}
-        title={`Delete ${confirming?.name ?? 'image'}?`}
-      >
-        <Text className="text-[13px]">
-          {confirming !== null && !unusedIds.has(confirming.id)
-            ? 'A resume still refers to this image. Deleting it leaves that resume showing a missing-image box.'
-            : 'This image is not used by any resume. Deleting it frees the space it takes on this device.'}
-        </Text>
-      </ConfirmDialog>
+        unused={confirming !== null && unusedIds.has(confirming.id)}
+      />
     </ControlGroup>
   )
 }
@@ -321,38 +252,19 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
   return (
     <ControlGroup title="Fonts">
       <Box className="flex items-center gap-2">
-        <FileButton
+        <AssetUpload
           accept={FONT_ACCEPT}
-          onChange={(file) => file && add.mutate(file)}
-        >
-          {(props) => (
-            <Button
-              {...props}
-              leftSection={<Icon name="upload-simple" size={13} />}
-              loading={add.isPending}
-              size="xs"
-              variant="default"
-            >
-              Add font
-            </Button>
-          )}
-        </FileButton>
+          label="Add font"
+          loading={add.isPending}
+          onFile={(file) => add.mutate(file)}
+        />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
           {(fonts ?? []).length} stored
         </Text>
       </Box>
 
-      {add.error === null ? null : (
-        <Alert
-          className="mt-2"
-          color="red"
-          icon={<Icon name="warning" size={14} />}
-          variant="light"
-        >
-          <Text className="text-[12px]">{errorMessage(add.error)}</Text>
-        </Alert>
-      )}
+      <UploadError className="mt-2" error={add.error} />
 
       {isPending ? (
         <Box className="flex justify-center py-4">
@@ -367,75 +279,40 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
       ) : (
         <Box className="mt-2 flex flex-col gap-2">
           {(fonts ?? []).map((font) => (
-            <Box
-              className="border-line-soft rounded-control flex flex-col gap-1 border p-2"
+            <FontCard
+              actions={
+                <>
+                  <Button
+                    disabled={bodyFont.fontId === font.id}
+                    onClick={() => use(font, 'bodyFont')}
+                    size="compact-xs"
+                    variant={bodyFont.fontId === font.id ? 'light' : 'subtle'}
+                  >
+                    Body
+                  </Button>
+                  <Button
+                    disabled={headingFont?.fontId === font.id}
+                    onClick={() => use(font, 'headingFont')}
+                    size="compact-xs"
+                    variant={
+                      headingFont?.fontId === font.id ? 'light' : 'subtle'
+                    }
+                  >
+                    Headings
+                  </Button>
+                </>
+              }
+              font={font}
               key={font.id}
-            >
-              <Box className="flex items-baseline justify-between gap-2">
-                {/* Set in its own face, which is the only preview that tells you
-                    anything — and proof the file loaded at all. */}
-                <Text
-                  className="truncate text-[13px]"
-                  style={{
-                    fontFamily: `'${font.family}', var(--font-serif)`,
-                    fontWeight: font.weight,
-                    fontStyle: font.style,
-                  }}
-                >
-                  {font.family}
-                </Text>
-                <Text
-                  className="text-subtle flex-none font-mono text-[10px] tabular-nums"
-                  span
-                >
-                  {font.weight} {font.style === 'italic' ? 'italic' : ''}{' '}
-                  {font.format} {formatBytes(font.size)}
-                </Text>
-              </Box>
-
-              <Box className="flex items-center gap-1">
-                <Button
-                  disabled={bodyFont.fontId === font.id}
-                  onClick={() => use(font, 'bodyFont')}
-                  size="compact-xs"
-                  variant={bodyFont.fontId === font.id ? 'light' : 'subtle'}
-                >
-                  Body
-                </Button>
-                <Button
-                  disabled={headingFont?.fontId === font.id}
-                  onClick={() => use(font, 'headingFont')}
-                  size="compact-xs"
-                  variant={headingFont?.fontId === font.id ? 'light' : 'subtle'}
-                >
-                  Headings
-                </Button>
-
-                <Box className="flex-1" />
-
-                {unusedIds.has(font.id) ? (
-                  <Text className="text-subtle font-mono text-[10px]" span>
-                    unused
-                  </Text>
-                ) : null}
-
-                <Button
-                  color="red"
-                  onClick={() => setConfirming(font)}
-                  size="compact-xs"
-                  variant="subtle"
-                >
-                  Delete
-                </Button>
-              </Box>
-            </Box>
+              onDelete={() => setConfirming(font)}
+              unused={unusedIds.has(font.id)}
+            />
           ))}
         </Box>
       )}
 
-      <ConfirmDialog
-        confirmLabel="Delete font"
-        danger
+      <DeleteFontDialog
+        font={confirming}
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
@@ -444,15 +321,8 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 
           setConfirming(null)
         }}
-        opened={confirming !== null}
-        title={`Delete ${confirming?.family ?? 'font'}?`}
-      >
-        <Text className="text-[13px]">
-          {confirming !== null && !unusedIds.has(confirming.id)
-            ? 'A resume is set in this font. Deleting it makes that resume print in a fallback face instead, which changes where its pages break.'
-            : 'No resume is set in this font. Deleting it frees the space it takes on this device.'}
-        </Text>
-      </ConfirmDialog>
+        unused={confirming !== null && unusedIds.has(confirming.id)}
+      />
     </ControlGroup>
   )
 }

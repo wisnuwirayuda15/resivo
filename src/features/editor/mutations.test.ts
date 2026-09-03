@@ -136,37 +136,6 @@ describe('section edits', () => {
 
     expect(titles(next)).toEqual(titles(document))
   })
-
-  it('reorders by id', () => {
-    const document = createEmptyDocument()
-    const ids = document.content.sections.map((section) => section.id)
-
-    const next = apply(
-      document,
-      edit.reorderSections([ids[3], ids[0], ids[1], ids[2]] as Array<string>),
-    )
-
-    expect(titles(next)).toEqual([
-      'Skills',
-      'Summary',
-      'Experience',
-      'Education',
-    ])
-  })
-
-  it('keeps sections a stale id list omits', () => {
-    const document = createEmptyDocument()
-    const ids = document.content.sections.map((section) => section.id)
-
-    // Only two of four ids: the rest must survive, not vanish.
-    const next = apply(
-      document,
-      edit.reorderSections([ids[2], ids[0]] as Array<string>),
-    )
-
-    expect(next.content.sections).toHaveLength(4)
-    expect(titles(next).slice(0, 2)).toEqual(['Education', 'Summary'])
-  })
 })
 
 describe('block edits', () => {

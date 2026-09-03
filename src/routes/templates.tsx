@@ -25,12 +25,9 @@ const TemplatesRoute: React.FC = () => (
       <Box className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
         {templateList.map((template) => (
           <Box key={template.id} className="flex flex-col gap-2">
-            {/* Not selectable here — this view describes, it does not apply. */}
-            <TemplateTile
-              template={template}
-              selected={false}
-              onSelect={() => {}}
-            />
+            {/* No `onSelect`, so the tile renders inert — this view describes,
+                it does not apply. */}
+            <TemplateTile template={template} />
             <Text className="text-subtle px-1 text-[11px] leading-snug">
               {template.atsNotes}
             </Text>

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 import {
+  PNG_2X2,
   createResume,
   expectPaperReady,
   openEmptyApp,
@@ -8,17 +9,6 @@ import {
   paperText,
   typeMarkdown,
 } from './app'
-
-/**
- * A 2x2 PNG, correct down to its CRCs.
- *
- * Written out rather than read from a fixture file so the test has no
- * dependency on the working directory. It has to be a real image: upload
- * validates by handing the bytes to `createImageBitmap`, which is the browser's
- * own decoder and rejects a malformed chunk that a structural check would pass.
- */
-const PNG_2X2 =
-  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEklEQVR4nGM4IScnF3CCAUIBAB6kBHUNzDQ/AAAAAElFTkSuQmCC'
 
 /**
  * The workflow the PRD names, start to finish, as one test.

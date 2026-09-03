@@ -1,16 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 import { Shell } from '@/components/shell/Shell'
-import { EmptyState } from '@/components/EmptyState'
+import { ClientOnly } from '@/components/client-only'
+import { FontManagerView } from '@/features/assets/FontManagerView'
 
-/** Font manager. Upload, validation and embedding land in phase 10. */
+/** Font manager. Client-only, because it reads IndexedDB. */
 const FontsRoute: React.FC = () => (
   <Shell title="Fonts">
-    <EmptyState
-      icon="text-aa"
-      title="No custom fonts"
-      body="Resivo ships with Instrument Sans, JetBrains Mono and Source Serif 4. Upload a WOFF2, WOFF or TTF file to use your own."
-    />
+    <ClientOnly>
+      <FontManagerView />
+    </ClientOnly>
   </Shell>
 )
 

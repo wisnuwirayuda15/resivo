@@ -19,6 +19,17 @@ import type { Page } from '@playwright/test'
 const DB_NAME = 'resivo'
 
 /**
+ * A 2x2 PNG, correct down to its CRCs.
+ *
+ * Written out rather than read from a fixture file so a spec has no dependency
+ * on the working directory. It has to be a real image: upload validates by
+ * handing the bytes to `createImageBitmap`, which is the browser's own decoder
+ * and rejects a malformed chunk that a structural check would pass.
+ */
+export const PNG_2X2 =
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEklEQVR4nGM4IScnF3CCAUIBAB6kBHUNzDQ/AAAAAElFTkSuQmCC'
+
+/**
  * Opens the app with an empty database.
  *
  * Deleting before the app loads matters: Dexie opens its connection on the first
