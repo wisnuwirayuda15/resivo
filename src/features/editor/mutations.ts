@@ -51,6 +51,28 @@ const moveWithin = <T>(items: Array<T>, from: number, to: number): void => {
 }
 
 // ---------------------------------------------------------------------------
+// Meta
+// ---------------------------------------------------------------------------
+
+/**
+ * The document's language tag.
+ *
+ * Affects date formatting and the exported `<html lang>`, not the text of the
+ * resume — the model has always carried it and nothing could change it, so every
+ * document was permanently `en` and every date range could only ever render in
+ * English.
+ */
+export const setLocale =
+  (locale: string): Recipe =>
+  (draft) => {
+    const trimmed = locale.trim()
+
+    if (trimmed.length >= 2) {
+      draft.meta.locale = trimmed
+    }
+  }
+
+// ---------------------------------------------------------------------------
 // Header
 // ---------------------------------------------------------------------------
 
@@ -91,6 +113,52 @@ export const updateContactLabel =
 
     if (contact !== undefined) {
       contact.label = label
+    }
+  }
+
+/**
+ * The icon beside a contact.
+ *
+ * The renderer has drawn `contact.icon` since it was written, and no recipe set
+ * it — so the field could only arrive through a Markdown directive.
+ */
+export const setContactIcon =
+  (contactId: string, icon: IconRef | undefined): Recipe =>
+  (draft) => {
+    const contact = draft.content.header.contacts.find(
+      (item) => item.id === contactId,
+    )
+
+    if (contact === undefined) {
+      return
+    }
+
+    if (icon === undefined) {
+      delete contact.icon
+    } else {
+      contact.icon = icon
+    }
+  }
+
+/** Makes a contact a link, or stops it being one. An empty string clears it,
+ * since that is what an emptied input produces. */
+export const setContactHref =
+  (contactId: string, href: string): Recipe =>
+  (draft) => {
+    const contact = draft.content.header.contacts.find(
+      (item) => item.id === contactId,
+    )
+
+    if (contact === undefined) {
+      return
+    }
+
+    const trimmed = href.trim()
+
+    if (trimmed === '') {
+      delete contact.href
+    } else {
+      contact.href = trimmed
     }
   }
 
@@ -268,6 +336,39 @@ export const moveBlockToSection =
         moved,
       )
     }
+  }
+
+/**
+ * How wide an image block draws, as a percentage of the content column.
+ *
+ * `undefined` means full width, which is what the figure gets with no inline
+ * width at all — so clearing it removes the property rather than writing 100.
+ * The model, the Markdown codec and the renderer have all supported this from
+ * the start; nothing set it, so every image inserted from the panel was full
+ * width for ever.
+ */
+export const setImageWidth =
+  (
+    sectionId: string,
+    blockId: string,
+    widthPercent: number | undefined,
+  ): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId)
+    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+
+    if (block === undefined || block.kind !== 'image') {
+      return
+    }
+
+    if (widthPercent === undefined) {
+      delete block.widthPercent
+      return
+    }
+
+    // Clamped to the schema's own bounds, so a control that offers a bad number
+    // cannot write a document that fails validation on the way to disk.
+    block.widthPercent = Math.max(1, Math.min(100, Math.round(widthPercent)))
   }
 
 /**

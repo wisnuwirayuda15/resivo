@@ -46,12 +46,58 @@ describe('header edits', () => {
     expect(removed.content.header.contacts).toEqual([])
   })
 
+  it('sets and clears a contact icon and link', () => {
+    const added = apply(createEmptyDocument(), edit.addContact('ada@x.com'))
+    const id = added.content.header.contacts[0]?.id ?? ''
+
+    const decorated = apply(
+      added,
+      edit.setContactIcon(id, { library: 'phosphor', name: 'envelope' }),
+      edit.setContactHref(id, ' https://example.com '),
+    )
+
+    expect(decorated.content.header.contacts[0]?.icon?.name).toBe('envelope')
+    expect(decorated.content.header.contacts[0]?.href).toBe(
+      'https://example.com',
+    )
+
+    // Both clear by deleting the key, so the document never carries a field
+    // holding `undefined` — which the schema would reject on the way to disk.
+    const cleared = apply(
+      decorated,
+      edit.setContactIcon(id, undefined),
+      edit.setContactHref(id, '   '),
+    )
+    const contact = cleared.content.header.contacts[0]
+
+    expect(contact === undefined ? true : 'icon' in contact).toBe(false)
+    expect(contact === undefined ? true : 'href' in contact).toBe(false)
+    expect(documentSchema.safeParse(cleared).success).toBe(true)
+  })
+
   it('clears the avatar by removing the key rather than storing undefined', () => {
     const set = apply(createEmptyDocument(), edit.setAvatarImage('image-1'))
     const cleared = apply(set, edit.setAvatarImage(undefined))
 
     expect('avatarImageId' in cleared.content.header).toBe(false)
     expect(documentSchema.safeParse(cleared).success).toBe(true)
+  })
+})
+
+describe('meta edits', () => {
+  it('sets the document locale', () => {
+    const next = apply(createEmptyDocument(), edit.setLocale('id'))
+
+    expect(next.meta.locale).toBe('id')
+    expect(documentSchema.safeParse(next).success).toBe(true)
+  })
+
+  it('refuses a tag too short to be one', () => {
+    // The schema's floor is two characters. A recipe that wrote 'e' would
+    // produce a document that fails validation on save, long after the edit.
+    const next = apply(createEmptyDocument(), edit.setLocale('e'))
+
+    expect(next.meta.locale).toBe('en')
   })
 })
 
@@ -155,6 +201,59 @@ describe('block edits', () => {
       ),
     }
   }
+
+  it('sets, clamps and clears an image width', () => {
+    const document = createEmptyDocument()
+    const sectionId = document.content.sections[0]?.id ?? ''
+    const withImage = apply(
+      document,
+      edit.addBlock(sectionId, {
+        id: 'image-1',
+        kind: 'image',
+        imageId: 'row-1',
+        alt: '',
+      }),
+    )
+
+    const imageIn = (next: ResumeDocument) => {
+      const block = next.content.sections
+        .find((section) => section.id === sectionId)
+        ?.blocks.find((candidate) => candidate.id === 'image-1')
+
+      return block?.kind === 'image' ? block : undefined
+    }
+
+    expect(imageIn(withImage)?.widthPercent).toBeUndefined()
+
+    const half = apply(withImage, edit.setImageWidth(sectionId, 'image-1', 50))
+    expect(imageIn(half)?.widthPercent).toBe(50)
+
+    // Clamped to the schema's own bounds, so no control can write a document
+    // that fails validation on the way to disk.
+    const clamped = apply(
+      withImage,
+      edit.setImageWidth(sectionId, 'image-1', 400),
+    )
+    expect(imageIn(clamped)?.widthPercent).toBe(100)
+    expect(documentSchema.safeParse(clamped).success).toBe(true)
+
+    // Cleared by removing the key: a figure with no inline width is already
+    // full width, so the default is absence rather than 100.
+    const cleared = apply(
+      half,
+      edit.setImageWidth(sectionId, 'image-1', undefined),
+    )
+    const block = imageIn(cleared)
+
+    expect(block === undefined ? true : 'widthPercent' in block).toBe(false)
+  })
+
+  it('leaves a block that is not an image alone', () => {
+    const { document, sectionId } = withParagraph()
+    const next = apply(document, edit.setImageWidth(sectionId, 'block-1', 50))
+
+    expect(next).toBe(document)
+  })
 
   it('adds a block to a section', () => {
     const { document, sectionId } = withParagraph()

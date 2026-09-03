@@ -26,6 +26,16 @@ interface ItemChromeProps {
   onMoveUp?: (() => void) | null
   onMoveDown?: (() => void) | null
   onRemove?: () => void
+  /**
+   * Controls for what this particular item is — an image's width, so far.
+   *
+   * Rendered on a second row of the chrome rather than beside the buttons: the
+   * chrome sits in the page's margin, and growing it sideways would eventually
+   * run off the paper, whereas growing it downwards costs nothing. It is inside
+   * the chrome for the reason the chrome exists — the measuring pass does not
+   * render any of this, so no control here can move a page break.
+   */
+  extra?: React.ReactNode
   children: React.ReactNode
   className: string
 }
@@ -36,6 +46,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   onMoveUp,
   onMoveDown,
   onRemove,
+  extra,
   children,
   className,
 }) => {
@@ -66,49 +77,55 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
     >
       {movable ? (
         <div className="rp-chrome" contentEditable={false}>
-          <button
-            aria-label="Drag to move"
-            className="rp-chrome-grip"
-            ref={setActivatorNodeRef}
-            type="button"
-            {...attributes}
-            {...listeners}
-          >
-            {/* Six dots, drawn inline: the iframe has no icon font and no
+          <div className="rp-chrome-row">
+            <button
+              aria-label="Drag to move"
+              className="rp-chrome-grip"
+              ref={setActivatorNodeRef}
+              type="button"
+              {...attributes}
+              {...listeners}
+            >
+              {/* Six dots, drawn inline: the iframe has no icon font and no
                 Mantine, and an SVG here would be the seventh copy of a glyph the
                 app already ships. */}
-            <span aria-hidden>⠿</span>
-          </button>
+              <span aria-hidden>⠿</span>
+            </button>
 
-          <button
-            aria-label="Move up"
-            className="rp-chrome-button"
-            disabled={onMoveUp === null || onMoveUp === undefined}
-            onClick={() => onMoveUp?.()}
-            type="button"
-          >
-            <span aria-hidden>↑</span>
-          </button>
-
-          <button
-            aria-label="Move down"
-            className="rp-chrome-button"
-            disabled={onMoveDown === null || onMoveDown === undefined}
-            onClick={() => onMoveDown?.()}
-            type="button"
-          >
-            <span aria-hidden>↓</span>
-          </button>
-
-          {onRemove === undefined ? null : (
             <button
-              aria-label="Delete"
-              className="rp-chrome-button rp-chrome-danger"
-              onClick={onRemove}
+              aria-label="Move up"
+              className="rp-chrome-button"
+              disabled={onMoveUp === null || onMoveUp === undefined}
+              onClick={() => onMoveUp?.()}
               type="button"
             >
-              <span aria-hidden>×</span>
+              <span aria-hidden>↑</span>
             </button>
+
+            <button
+              aria-label="Move down"
+              className="rp-chrome-button"
+              disabled={onMoveDown === null || onMoveDown === undefined}
+              onClick={() => onMoveDown?.()}
+              type="button"
+            >
+              <span aria-hidden>↓</span>
+            </button>
+
+            {onRemove === undefined ? null : (
+              <button
+                aria-label="Delete"
+                className="rp-chrome-button rp-chrome-danger"
+                onClick={onRemove}
+                type="button"
+              >
+                <span aria-hidden>×</span>
+              </button>
+            )}
+          </div>
+
+          {extra === undefined ? null : (
+            <div className="rp-chrome-row">{extra}</div>
           )}
         </div>
       ) : null}

@@ -1,8 +1,9 @@
 import { Box } from '@mantine/core'
 
 import { BUILTIN_FONTS } from '@/features/templates/defaults'
+import { DOCUMENT_LOCALES } from '@/features/templates/renderer/locales'
 import { useFonts } from '@/features/assets/queries'
-import { patchDesign } from '@/features/editor/mutations'
+import { patchDesign, setLocale } from '@/features/editor/mutations'
 
 import {
   ColorField,
@@ -41,8 +42,30 @@ type FontKey = 'serif' | 'sans' | 'mono' | `custom:${string}`
 
 interface StylePanelProps {
   design: DesignConfig
+  /** The document's BCP 47 tag. Not part of `DesignConfig` — it changes what the
+   * dates say, not how they look — but this panel is where a document-wide
+   * setting belongs. */
+  locale: string
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void
 }
+
+/**
+ * Locale options, with the document's own tag included even when the list does
+ * not name it.
+ *
+ * A Markdown import or a restored backup can carry any BCP 47 tag. Offering only
+ * the curated list would leave the control blank for such a document and, worse,
+ * silently overwrite the tag with whatever the user picked next.
+ */
+const localeOptions = (
+  locale: string,
+): Array<{ value: string; label: string }> =>
+  DOCUMENT_LOCALES.some((entry) => entry.value === locale)
+    ? DOCUMENT_LOCALES.map(({ value, label }) => ({ value, label }))
+    : [
+        ...DOCUMENT_LOCALES.map(({ value, label }) => ({ value, label })),
+        { value: locale, label: locale },
+      ]
 
 const BUILTIN_OPTIONS: Array<{ value: FontKey; label: string }> = [
   { value: 'serif', label: 'Source Serif 4' },
@@ -125,7 +148,11 @@ const MARGIN_EDGES = [
   ['left', 'Left margin'],
 ] as const
 
-export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
+export const StylePanel: React.FC<StylePanelProps> = ({
+  design,
+  locale,
+  apply,
+}) => {
   /**
    * Uploaded fonts join the same two selects rather than getting a list of their
    * own: from the user's side there is one decision — what this resume is set in
@@ -397,7 +424,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
         />
         <NumberField
           decimalScale={0}
-          hint="Applies once a photo is attached — the image library arrives in a later phase."
+          hint="Applies once a photo is attached, from the Assets tab or the Images page."
           label="Size"
           max={300}
           min={24}
@@ -407,6 +434,16 @@ export const StylePanel: React.FC<StylePanelProps> = ({ design, apply }) => {
           step={2}
           suffix="px"
           value={image.avatarSize}
+        />
+      </ControlGroup>
+
+      <ControlGroup title="Language">
+        <SelectField
+          data={localeOptions(locale)}
+          hint="Formats month names and the end of an ongoing role, and sets the exported document's language. It does not translate what you wrote."
+          label="Document"
+          onChange={(next) => apply(setLocale(next))}
+          value={locale}
         />
       </ControlGroup>
     </Box>

@@ -29,11 +29,21 @@
   /* Outside the page's content box, in the margin. Nothing in the flow moves to
      make room for it. */
   right: 100%;
+  /* A column, so a per-item control lands under the buttons rather than beside
+     them: the margin is finite sideways and unbounded downwards, and this is
+     absolutely positioned either way. */
   display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 2px;
   padding-right: 6px;
   opacity: 0;
   transition: opacity 120ms ease-out;
+}
+
+.rp-chrome-row {
+  display: flex;
+  gap: 2px;
 }
 
 .rp-item:hover .rp-chrome,
@@ -79,9 +89,26 @@
 }
 
 .rp-chrome-grip:focus-visible,
-.rp-chrome-button:focus-visible {
+.rp-chrome-button:focus-visible,
+.rp-chrome-select:focus-visible {
   outline: 2px solid rgb(14, 124, 118);
   outline-offset: 1px;
+}
+
+/* A native select, deliberately. The iframe has no component library, and the
+   platform control already has a keyboard model, a popup that escapes the
+   paper's overflow, and a readable rendering at this size. */
+.rp-chrome-select {
+  height: 18px;
+  padding: 0 2px;
+  border: 1px solid rgba(18, 18, 16, 0.12);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.94);
+  color: rgba(18, 18, 16, 0.7);
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
 }
 
 /* The item being dragged. Dimmed rather than hidden, so the page it came from

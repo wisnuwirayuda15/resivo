@@ -72,7 +72,11 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
             />
           </ControlGroup>
 
-          <StylePanel apply={apply} design={document.design} />
+          <StylePanel
+            apply={apply}
+            design={document.design}
+            locale={document.meta.locale}
+          />
         </ScrollArea>
       </Tabs.Panel>
 

@@ -23,6 +23,9 @@ import {
   setSectionTitle,
 } from '@/features/editor/mutations'
 
+import { HeaderPanel } from './HeaderPanel'
+import { isPlainInline } from './plainInline'
+
 import type { Recipe } from '@/features/editor/mutations'
 import type {
   ResumeContent,
@@ -31,7 +34,7 @@ import type {
 } from '@/features/resume/model/document'
 
 /**
- * The Sections tab — the document's outline, as an ordered list.
+ * The Sections tab — the document's outline, with the header above it.
  *
  * Reordering here is by explicit move, not by drag: dnd-kit and the in-preview
  * drag handles arrive with the visual editor, and this list has to be usable from
@@ -60,20 +63,6 @@ const KIND_LABELS: Record<SectionKind, string> = {
   custom: 'Custom section',
 }
 
-/**
- * Whether the title is plain enough to edit as a string.
- *
- * A title carrying bold or a link cannot round-trip through a text input without
- * losing its formatting, so this panel shows it read-only and points the user at
- * an editor where the formatting is visible. Silently flattening it would be a
- * data loss the user never asked for.
- */
-const isPlainTitle = (title: Section['title']): boolean =>
-  title.length === 0 ||
-  (title.length === 1 &&
-    title[0]?.type === 'text' &&
-    (title[0].marks ?? []).length === 0)
-
 const SectionRow: React.FC<{
   section: Section
   index: number
@@ -82,7 +71,7 @@ const SectionRow: React.FC<{
   onRequestRemove: () => void
 }> = ({ section, index, count, apply, onRequestRemove }) => {
   const label = plainText(section.title)
-  const editable = isPlainTitle(section.title)
+  const editable = isPlainInline(section.title)
   const blocks = section.blocks.length
   const [picking, setPicking] = useState(false)
 
@@ -235,6 +224,10 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
 
   return (
     <Box>
+      {/* The header first, because it is first on the paper. Its contacts are
+          edited here for a structural reason — see `HeaderPanel`. */}
+      <HeaderPanel apply={apply} header={content.header} />
+
       <ul className="list-none">
         {sections.map((section, index) => (
           <SectionRow

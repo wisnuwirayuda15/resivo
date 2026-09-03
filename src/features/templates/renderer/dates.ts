@@ -1,3 +1,5 @@
+import { presentLabel } from './locales'
+
 import type { DateRange } from '@/features/resume/model/document'
 
 /**
@@ -12,10 +14,6 @@ import type { DateRange } from '@/features/resume/model/document'
 
 /** An en dash, the typographic separator for a span. */
 export const RANGE_DASH = '–'
-
-/** Not localized yet: the document carries a locale for date formatting, not a
- * UI language. Revisit when the app itself is translated. */
-const PRESENT = 'Present'
 
 const YEAR_ONLY = /^\d{4}$/
 const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/
@@ -78,8 +76,12 @@ export const formatDateRange = (
   const start = formatPoint(range.start ?? '', locale)
   // `current` wins over `end` — the model's rule, so that ticking "current"
   // never requires clearing a stale end date first.
+  // The one word on the paper this app supplies rather than the user, so it
+  // follows the document's language along with the month names beside it.
   const end =
-    range.current === true ? PRESENT : formatPoint(range.end ?? '', locale)
+    range.current === true
+      ? presentLabel(locale)
+      : formatPoint(range.end ?? '', locale)
 
   if (start !== '' && end !== '') {
     return `${start} ${RANGE_DASH} ${end}`

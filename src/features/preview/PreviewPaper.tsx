@@ -18,7 +18,7 @@ import {
 import { SortableContext } from '@dnd-kit/sortable'
 
 import { loadedGlyphCount, onIconCatalogLoaded } from '@/features/icons/catalog'
-import { removeBlock } from '@/features/editor/mutations'
+import { removeBlock, setImageWidth } from '@/features/editor/mutations'
 
 import { resolveTemplate } from '@/features/templates/registry'
 
@@ -406,6 +406,57 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   }
 
   /**
+   * The width control for an image block, or nothing for any other item.
+   *
+   * `widthPercent` was in the model, the Markdown codec and the renderer from
+   * the start with no control anywhere, so an image inserted from the Assets
+   * panel was full width for ever and the only way to change it was to type the
+   * directive's `width` attribute by hand.
+   *
+   * 100 writes `undefined` rather than the number: a figure with no inline width
+   * is already full width, and storing the default would put a redundant
+   * attribute into every exported Markdown file.
+   */
+  const widthControl = (item: FlowItem): React.ReactNode => {
+    if (item.type !== 'block' || apply === undefined) {
+      return undefined
+    }
+
+    const block = document.content.sections
+      .find((section) => section.id === item.sectionId)
+      ?.blocks.find((candidate) => candidate.id === item.blockId)
+
+    if (block?.kind !== 'image') {
+      return undefined
+    }
+
+    return (
+      <select
+        aria-label="Image width"
+        className="rp-chrome-select"
+        onChange={(event) => {
+          const next = Number(event.currentTarget.value)
+
+          apply(
+            setImageWidth(
+              item.sectionId ?? '',
+              item.blockId ?? '',
+              next === 100 ? undefined : next,
+            ),
+          )
+        }}
+        value={block.widthPercent ?? 100}
+      >
+        <option value={25}>25%</option>
+        <option value={33}>33%</option>
+        <option value={50}>50%</option>
+        <option value={75}>75%</option>
+        <option value={100}>100%</option>
+      </select>
+    )
+  }
+
+  /**
    * The pages, and — while editing — the drag context around them.
    *
    * The context wraps only the paged pass. The measuring pass has no draggables
@@ -443,6 +494,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
               return (
                 <ItemChrome
                   className={flowItemClass(item.type)}
+                  extra={widthControl(item)}
                   id={id}
                   key={id}
                   movable={isMovable(item)}

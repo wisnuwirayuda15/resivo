@@ -71,7 +71,7 @@ const round = (value: number): number => Math.round(value * 100) / 100
 /**
  * The three bundled families are emitted as the `--font-*` variables that the
  * iframe's font stylesheet defines, so each keeps its full fallback chain.
- * Anything else is a user-uploaded family (phase 10): quoted, with a serif
+ * Anything else is a user-uploaded family: quoted, with a serif
  * fallback, and stripped of the characters that could close the declaration.
  */
 const BUILTIN_STACKS: Record<string, string> = {
