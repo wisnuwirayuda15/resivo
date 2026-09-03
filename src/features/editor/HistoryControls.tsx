@@ -2,8 +2,11 @@ import { Tooltip, UnstyledButton } from '@mantine/core'
 import { useOs } from '@mantine/hooks'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { cn } from '@/lib/utils'
 
 import { useEditorStore } from './store'
+
+import type { ComponentProps } from 'react'
 
 /**
  * Undo and redo for the document.
@@ -20,30 +23,37 @@ import { useEditorStore } from './store'
  * always act on the document, whatever has focus.
  */
 
-interface HistoryButtonProps {
+interface HistoryButtonProps extends ComponentProps<'button'> {
   icon: string
   label: string
-  disabled: boolean
-  onClick: () => void
 }
 
-const HistoryButton: React.FC<HistoryButtonProps> = ({
+/**
+ * Same contract as the app bar's `BarButton`, and for the same reason: Tooltip
+ * clones its child and injects the props that make it open, so a button that
+ * declares only its own four props drops them and never shows a tooltip. The
+ * injected `className` is empty here — the classes live inside the component —
+ * so it is merged rather than spread over.
+ */
+const HistoryButton = ({
   icon,
   label,
-  disabled,
-  onClick,
-}) => (
-  <Tooltip label={label}>
-    <UnstyledButton
-      aria-label={label}
-      className="text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40"
-      component="button"
-      disabled={disabled}
-      onClick={onClick}
-    >
-      <Icon name={icon} size={16} />
-    </UnstyledButton>
-  </Tooltip>
+  className,
+  ref,
+  ...rest
+}: HistoryButtonProps) => (
+  <UnstyledButton
+    ref={ref}
+    aria-label={label}
+    component="button"
+    {...rest}
+    className={cn(
+      'text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40',
+      className,
+    )}
+  >
+    <Icon name={icon} size={16} />
+  </UnstyledButton>
 )
 
 export const HistoryControls: React.FC = () => {
@@ -60,18 +70,22 @@ export const HistoryControls: React.FC = () => {
 
   return (
     <>
-      <HistoryButton
-        disabled={!canUndo}
-        icon="arrow-u-up-left"
-        label={`Undo (${modifier}Z)`}
-        onClick={undo}
-      />
-      <HistoryButton
-        disabled={!canRedo}
-        icon="arrow-u-up-right"
-        label={`Redo (${modifier}⇧Z)`}
-        onClick={redo}
-      />
+      <Tooltip label={`Undo (${modifier}Z)`}>
+        <HistoryButton
+          disabled={!canUndo}
+          icon="arrow-u-up-left"
+          label={`Undo (${modifier}Z)`}
+          onClick={undo}
+        />
+      </Tooltip>
+      <Tooltip label={`Redo (${modifier}⇧Z)`}>
+        <HistoryButton
+          disabled={!canRedo}
+          icon="arrow-u-up-right"
+          label={`Redo (${modifier}⇧Z)`}
+          onClick={redo}
+        />
+      </Tooltip>
     </>
   )
 }

@@ -123,7 +123,7 @@ const ResumeScreen: React.FC = () => {
     >
       {/* The editor fills the viewport rather than scrolling the page: the pane
           inside it owns its own scrolling, so the chrome never moves. */}
-      <Box className="h-[calc(100dvh-44px)]">
+      <Box className="h-[calc(100dvh-var(--spacing-toolbar))]">
         <ClientOnly
           fallback={
             <Box className="flex justify-center py-20">

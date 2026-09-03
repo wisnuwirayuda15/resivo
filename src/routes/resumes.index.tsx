@@ -57,7 +57,6 @@ const LibraryRoute: React.FC = () => {
       actions={
         <>
           <TextInput
-            size="sm"
             w={200}
             placeholder="Search resumes"
             aria-label="Search resumes"
@@ -73,7 +72,6 @@ const LibraryRoute: React.FC = () => {
             }
           />
           <Select
-            size="sm"
             w={132}
             aria-label="Sort resumes"
             data={[

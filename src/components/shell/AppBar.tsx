@@ -9,6 +9,7 @@ import {
 } from '@mantine/core'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { cn } from '@/lib/utils'
 
 import type { ComponentProps, ReactNode } from 'react'
 
@@ -32,14 +33,30 @@ interface BarButtonProps extends ComponentProps<'button'> {
  * button, because `Menu.Target` and `Tooltip` work by cloning their child and
  * injecting `onClick`, `ref` and the ARIA attributes. A component that swallows
  * those renders fine but never opens anything.
+ *
+ * `className` has to be pulled out of that spread and merged, not spread over.
+ * Tooltip clones its child with `className: cx(ownClassName, childProps.className)`
+ * — and this button's classes are inside the component, not on the element
+ * Tooltip can see, so what it injects is empty. Spreading it last therefore
+ * erased every class here: both header buttons rendered as bare 16px glyphs with
+ * no hit area and no hover, which is what made the row look like floating icons.
  */
-const BarButton = ({ icon, label, ref, ...rest }: BarButtonProps) => (
+const BarButton = ({
+  icon,
+  label,
+  className,
+  ref,
+  ...rest
+}: BarButtonProps) => (
   <UnstyledButton
     ref={ref}
     component="button"
     aria-label={label}
-    className="text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors"
     {...rest}
+    className={cn(
+      'text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors',
+      className,
+    )}
   >
     <Icon name={icon} size={16} />
   </UnstyledButton>
@@ -49,8 +66,8 @@ const BarButton = ({ icon, label, ref, ...rest }: BarButtonProps) => (
  * Contents of the application bar.
  *
  * Fills `AppShell.Header` rather than positioning itself — the shell owns the
- * 44px height, the fixed placement and the bottom border. This is only the row
- * of controls inside it.
+ * height (`--spacing-toolbar`), the fixed placement and the bottom border. This
+ * is only the row of controls inside it.
  */
 export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
   const { setColorScheme } = useMantineColorScheme()
@@ -71,29 +88,39 @@ export const AppBar: React.FC<AppBarProps> = ({ title, actions, burger }) => {
 
       {actions}
 
-      <Box className="bg-line mx-1 h-4 w-px" />
+      {/* The divider separates the route's own controls from the shared ones,
+          and reads as a divider only if it is a clear majority of a control's
+          height — 18px against the 30px the design system uses. */}
+      <Box className="bg-line mx-1 h-[18px] w-px" />
 
-      <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
-        <BarButton
-          icon={isDark ? 'sun' : 'moon'}
-          label="Toggle theme"
-          onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
-        />
-      </Tooltip>
+      {/* The two icon buttons are the same kind of control, so they sit tighter
+          to each other than to anything else in the row. */}
+      <Box className="flex items-center gap-0.5">
+        <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
+          <BarButton
+            icon={isDark ? 'sun' : 'moon'}
+            label="Toggle theme"
+            onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+          />
+        </Tooltip>
 
-      <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
-        <Menu.Target>
-          <BarButton icon="dots-three" label="Application menu" />
-        </Menu.Target>
-        <Menu.Dropdown>
-          <Menu.Item leftSection={<Icon name="keyboard" size={15} />} disabled>
-            Keyboard shortcuts
-          </Menu.Item>
-          <Menu.Item leftSection={<Icon name="info" size={15} />} disabled>
-            About Resivo
-          </Menu.Item>
-        </Menu.Dropdown>
-      </Menu>
+        <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
+          <Menu.Target>
+            <BarButton icon="dots-three" label="Application menu" />
+          </Menu.Target>
+          <Menu.Dropdown>
+            <Menu.Item
+              leftSection={<Icon name="keyboard" size={15} />}
+              disabled
+            >
+              Keyboard shortcuts
+            </Menu.Item>
+            <Menu.Item leftSection={<Icon name="info" size={15} />} disabled>
+              About Resivo
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
     </Box>
   )
 }

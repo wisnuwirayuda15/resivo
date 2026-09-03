@@ -52,9 +52,12 @@ export const Shell: React.FC<ShellProps> = ({
   return (
     <AppShell
       layout="alt"
-      header={{ height: 44 }}
+      // The height and width come from the tokens rather than from literals,
+      // so `h-toolbar` and `w-sidebar` elsewhere cannot drift out of step with
+      // the shell they are lining up against.
+      header={{ height: 'var(--spacing-toolbar)' }}
       navbar={{
-        width: 232,
+        width: 'var(--spacing-sidebar)',
         breakpoint: 'sm',
         // Below the breakpoint the sidebar becomes an overlay, opened by the
         // burger in the header. Desktop keeps it permanently visible.

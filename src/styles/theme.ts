@@ -195,19 +195,30 @@ export const theme = createTheme({
   // The ONE place components receive default props. Call sites should not
   // repeat these styling props.
   components: {
-    // Control heights are 22 / 26 / 30 / 36 with 30 as the default, so every
-    // interactive component defaults to `sm` on Mantine's scale (which this
-    // theme's compact font sizes render at ~30px).
+    /**
+     * Sizes are `xs`, and that is not a typo.
+     *
+     * Mantine's control heights are fixed pixels, not derived from font size:
+     * `--input-height-xs` is 1.875rem and `--input-height-sm` is 2.25rem, with
+     * `--mantine-scale: 1`, so they are 30px and 36px. The design system's
+     * default control is 30px — `--ctl-h-md` in tokens.css — which is Mantine's
+     * `xs`. Asking for `sm` in the belief that compact font sizes shrink it to
+     * 30px produced a 36px control in a 44px header, which is where this came
+     * from.
+     *
+     * ActionIcon is the exception: its own scale steps 28 -> 34 and skips 30, so
+     * it takes the input-matched size to line up with everything else.
+     */
     Button: Button.extend({
-      defaultProps: { radius: 'control', size: 'sm', fw: 500 },
+      defaultProps: { radius: 'control', size: 'xs', fw: 500 },
     }),
     ActionIcon: ActionIcon.extend({
-      defaultProps: { radius: 'control', size: 'md', variant: 'subtle' },
+      defaultProps: { radius: 'control', size: 'input-xs', variant: 'subtle' },
     }),
-    Input: Input.extend({ defaultProps: { radius: 'control', size: 'sm' } }),
-    Select: Select.extend({ defaultProps: { radius: 'control', size: 'sm' } }),
+    Input: Input.extend({ defaultProps: { radius: 'control', size: 'xs' } }),
+    Select: Select.extend({ defaultProps: { radius: 'control', size: 'xs' } }),
     NativeSelect: NativeSelect.extend({
-      defaultProps: { radius: 'control', size: 'sm' },
+      defaultProps: { radius: 'control', size: 'xs' },
     }),
     Paper: Paper.extend({
       defaultProps: { radius: 'card', withBorder: true, shadow: 'xs' },

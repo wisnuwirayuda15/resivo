@@ -62,7 +62,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      <AppShell.Section className="border-line flex h-[44px] items-center gap-2 border-b px-3">
+      <AppShell.Section className="border-line flex h-toolbar items-center gap-2 border-b px-3">
         <Wordmark />
         {/* Privacy stated as fact, not as a boast. */}
         <Badge variant="default" size="xs" radius="pill">
