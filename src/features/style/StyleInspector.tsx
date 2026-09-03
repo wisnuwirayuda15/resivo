@@ -47,7 +47,10 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
       keepMounted={false}
       variant="default"
     >
-      <Tabs.List className="h-titlebar border-line-soft flex-none border-b px-1">
+      <Tabs.List
+        aria-label="Inspector"
+        className="h-titlebar border-line-soft flex-none border-b px-1"
+      >
         <Tabs.Tab leftSection={<Icon name="palette" size={13} />} value="style">
           Style
         </Tabs.Tab>

@@ -71,7 +71,10 @@ export const CodePane: React.FC<CodePaneProps> = ({
         onChange={setTab}
         value={tab}
       >
-        <Tabs.List className="h-titlebar border-line-soft bg-surface flex-none border-b px-1">
+        <Tabs.List
+          aria-label="Source files"
+          className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
+        >
           <Tabs.Tab
             leftSection={<Icon name="markdown-logo" size={13} />}
             value="markdown"

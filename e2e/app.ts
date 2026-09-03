@@ -148,14 +148,30 @@ export const markdownPaneText = async (page: Page): Promise<string> => {
 /**
  * Opens a named tab in the inspector on the right.
  *
- * `exact` matters: the code pane's tabs are named after files, so a substring
- * match for "Style" also finds `style.css` on the far side of the editor.
+ * Scoped to that tab strip by name, because up to three are on screen at once:
+ * the editor's panes below the breakpoint, the code pane's files, and this one.
+ * Two of them have a tab called "Style", and the code pane's is named after a
+ * file, so `exact` alone was never going to be enough.
  */
 export const openInspectorTab = async (
   page: Page,
   name: string,
 ): Promise<void> => {
-  await page.getByRole('tab', { name, exact: true }).click()
+  await page
+    .getByRole('tablist', { name: 'Inspector' })
+    .getByRole('tab', { name, exact: true })
+    .click()
+}
+
+/** A tab in the editor's own strip, which only exists below the breakpoint. */
+export const openEditorPane = async (
+  page: Page,
+  name: string,
+): Promise<void> => {
+  await page
+    .getByRole('tablist', { name: 'Editor panes' })
+    .getByRole('tab', { name, exact: true })
+    .click()
 }
 
 /**
