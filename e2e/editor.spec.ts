@@ -231,3 +231,44 @@ test('the guide explains the format, and hands it over', async ({ page }) => {
   await page.keyboard.press('Escape')
   await expect(guide).toBeHidden()
 })
+
+/**
+ * Leaving the editor and walking back in.
+ *
+ * A regression test with a specific shape in mind. Autosave wrote to IndexedDB
+ * and nothing wrote the saved row back into the query cache, on the reasoning
+ * that the editor store held the newer document — true only while the editor is
+ * open. Once it closed, the detail key still held the document as it was on
+ * entry, and it is `staleTime: Infinity`, so walking back in served that. The
+ * edits were on disk and invisible, and the next keystroke would have saved the
+ * stale document over them.
+ *
+ * The navigation has to be client-side for this to mean anything: a reload
+ * empties the cache, which is exactly what used to hide the bug.
+ */
+test('an edit survives leaving the editor and coming back', async ({
+  page,
+}) => {
+  test.slow()
+
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+
+  await typeMarkdown(page, '# Ada Lovelace\n\nAnalytical engines\n')
+  await expect.poll(() => paperText(page)).toContain('Analytical engines')
+
+  // Saved, and the header says so rather than leaving it to be guessed.
+  await expect(page.getByRole('status')).toContainText('Saved')
+
+  await page.getByRole('link', { name: 'All resumes' }).click()
+  await expect(page.getByRole('link', { name: /Ada Lovelace/ })).toBeVisible()
+
+  await page.getByRole('link', { name: /Ada Lovelace/ }).click()
+  await expect(page).toHaveURL(/\/resumes\/[0-9a-f-]{36}$/)
+  await expectPaperReady(page)
+
+  await expect.poll(() => paperText(page)).toContain('Analytical engines')
+  await expect
+    .poll(() => markdownPaneText(page))
+    .toContain('Analytical engines')
+})

@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { groupRepo, resumeRepo } from '@/database/index'
 
 import type { QueryClient } from '@tanstack/react-query'
-import type { ResumeSummary } from '@/database/index'
+import type { ResumeRecord, ResumeSummary } from '@/database/index'
 import type { TemplateId } from './model/document'
 
 /**
@@ -127,31 +127,41 @@ export const useCreateResume = () => {
 }
 
 /**
- * Records a save against the cached library list.
+ * Records a save against both cached views of the resume.
  *
- * Patches the one affected row's `updatedAt` in place rather than invalidating:
- * autosave fires every time the user pauses typing, and refetching every summary
- * on each of those would be wasteful when the only thing that changed is this
- * row's edit time. Re-sorts so the "recently edited" ordering stays correct
- * without a round trip.
+ * The **list** row is patched in place rather than invalidated: autosave fires
+ * every time the user pauses typing, and refetching every summary on each of
+ * those would be wasteful when the only thing that changed is this row's edit
+ * time. Re-sorted, so the "recently edited" ordering stays correct without a
+ * round trip.
  *
- * The detail key is deliberately left alone — the editor store already holds the
- * newer document, so writing it back into the cache would be pointless work.
+ * The **detail** row has to be written too, and used not to be. The reasoning
+ * for leaving it alone was that the editor store already holds the newer
+ * document — true, and only true while the editor is open. On leaving, the store
+ * is emptied and this key still held the document as it was when the editor
+ * opened; since it is `staleTime: Infinity`, walking back in served that. The
+ * edits were in IndexedDB and invisible, which reads as "it did not save" — and
+ * the next keystroke would autosave the stale document over the real one. So
+ * this is data loss, not a display bug, and the whole record is written here.
  *
- * Shared with `features/editor/useAutosave`, which is the other caller that
- * persists a document.
+ * The record comes from the repository rather than being reconstructed: it
+ * decides `updatedAt` and rewrites part of the document through `syncMeta`, so
+ * anything assembled by the caller would differ from what is on disk.
  */
-export const patchSavedSummary = (
+export const patchSavedResume = (
   client: QueryClient,
-  id: string,
-  savedAt: number = Date.now(),
+  record: ResumeRecord,
 ): void => {
+  client.setQueryData<ResumeRecord | null>(resumeKeys.detail(record.id), record)
+
   client.setQueryData<Array<ResumeSummary>>(resumeKeys.list(), (summaries) =>
     summaries === undefined
       ? summaries
       : summaries
           .map((summary) =>
-            summary.id === id ? { ...summary, updatedAt: savedAt } : summary,
+            summary.id === record.id
+              ? { ...summary, updatedAt: record.updatedAt }
+              : summary,
           )
           .sort((a, b) => b.updatedAt - a.updatedAt),
   )
@@ -170,7 +180,7 @@ export const useSaveResumeDocument = () => {
       id: string
       document: Parameters<typeof resumeRepo.saveResumeDocument>[1]
     }) => resumeRepo.saveResumeDocument(id, document),
-    onSuccess: (_result, { id }) => patchSavedSummary(client, id),
+    onSuccess: (record) => patchSavedResume(client, record),
   })
 }
 

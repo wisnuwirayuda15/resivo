@@ -146,25 +146,35 @@ export const createResume = async (
 /**
  * Persists an edited document. This is the autosave write path, so it does the
  * minimum: refresh the denormalized metadata, stamp `updatedAt`, one `put`.
+ *
+ * Returns the row it wrote, rather than nothing. The caller needs to know what
+ * landed, not what it asked for: `syncMeta` rewrites part of the document and
+ * `updatedAt` is decided here, so a caller reconstructing the saved row would be
+ * guessing at both. The query cache is updated from this — see
+ * `patchSavedResume`.
  */
 export const saveResumeDocument = async (
   id: string,
   document: ResumeDocument,
-): Promise<void> => {
+): Promise<ResumeRecord> => {
   const db = getDb()
 
-  await db.transaction('rw', db.resumes, async () => {
+  return db.transaction('rw', db.resumes, async () => {
     const existing = await db.resumes.get(id)
 
     if (existing === undefined) {
       throw new Error(`Resume ${id} no longer exists.`)
     }
 
-    await db.resumes.put({
+    const saved: ResumeRecord = {
       ...existing,
       document: syncMeta(document),
       updatedAt: Date.now(),
-    })
+    }
+
+    await db.resumes.put(saved)
+
+    return saved
   })
 }
 

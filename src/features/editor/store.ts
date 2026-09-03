@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import type { StoreApi, UseBoundStore } from 'zustand'
 import type { ResumeDocument } from '@/features/resume/model/document'
 import type { Recipe } from './mutations'
+import type { SaveStatus } from './autosave'
 
 /**
  * The working copy of the resume being edited.
@@ -52,6 +53,12 @@ export interface EditorState {
   future: Array<ResumeDocument>
   coalesceKey: string | null
   coalesceAt: number
+  /**
+   * What autosave is doing, for the header's indicator. Kept here rather than
+   * in the route so that reporting it re-renders one small component, not the
+   * editor and everything under it.
+   */
+  saveStatus: SaveStatus
 
   load: (resumeId: string, document: ResumeDocument) => void
   close: () => void
@@ -63,6 +70,7 @@ export interface EditorState {
   redo: () => void
   /** Marks the current document as persisted. Called by autosave on success. */
   markSaved: (document: ResumeDocument) => void
+  setSaveStatus: (status: SaveStatus) => void
 
   isDirty: () => boolean
   canUndo: () => boolean
@@ -77,6 +85,9 @@ const initial = {
   future: [],
   coalesceKey: null,
   coalesceAt: 0,
+  // A document that has just been loaded came out of the database, so it is
+  // saved. Anything else would report unsaved work before any was done.
+  saveStatus: 'saved',
 } satisfies Partial<EditorState>
 
 /**
@@ -169,6 +180,8 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
     },
 
     markSaved: (document) => set({ baseline: document }),
+
+    setSaveStatus: (saveStatus) => set({ saveStatus }),
 
     isDirty: () => {
       const { document, baseline } = get()

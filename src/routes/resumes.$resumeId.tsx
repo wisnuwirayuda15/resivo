@@ -7,6 +7,7 @@ import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
 import { EditorLayout } from '@/features/editor/EditorLayout'
 import { HistoryControls } from '@/features/editor/HistoryControls'
+import { SaveIndicator } from '@/features/editor/SaveIndicator'
 import { useAutosave } from '@/features/editor/useAutosave'
 import { useDocumentHistoryShortcuts } from '@/features/editor/useDocumentHistoryShortcuts'
 import { useEditorStore } from '@/features/editor/store'
@@ -116,7 +117,12 @@ const ResumeScreen: React.FC = () => {
       // exists once a document has been loaded from IndexedDB.
       actions={
         <ClientOnly>
-          <HistoryControls />
+          {/* The save state before the undo pair: it is a readout, and the
+              controls beside it are actions. */}
+          <Box className="flex items-center gap-2">
+            <SaveIndicator />
+            <HistoryControls />
+          </Box>
         </ClientOnly>
       }
       title={resume.data?.title ?? 'Resume'}

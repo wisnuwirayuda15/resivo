@@ -20,6 +20,18 @@ export const AUTOSAVE_DELAY_MS = 600
 
 export type SaveFn = (document: ResumeDocument) => Promise<void>
 
+/**
+ * What the indicator in the header reports.
+ *
+ * Three states, not four. 'saved' is the resting state and the one a freshly
+ * loaded document is in — it came from the database, so it is saved. 'saving'
+ * covers both the debounce window and the write itself: they are 600ms and a
+ * few milliseconds apart, and splitting them would put a distinction on screen
+ * that nobody can act on. 'error' persists until a later write succeeds,
+ * because a failed save is not something to flash and forget.
+ */
+export type SaveStatus = 'saved' | 'saving' | 'error'
+
 export interface Autosave {
   /** Queues a save, restarting the debounce window. */
   schedule: (document: ResumeDocument) => void
@@ -30,6 +42,8 @@ export interface Autosave {
    * discard — not for normal unmount, which should flush. */
   cancel: () => void
   hasPending: () => boolean
+  /** The current state, for a caller that missed the transitions. */
+  status: () => SaveStatus
 }
 
 export interface AutosaveOptions {
@@ -37,6 +51,8 @@ export interface AutosaveOptions {
   delay?: number
   onSaved?: (document: ResumeDocument) => void
   onError?: (error: unknown, document: ResumeDocument) => void
+  /** Called on every transition, and never with the state it is already in. */
+  onStatusChange?: (status: SaveStatus) => void
 }
 
 export const createAutosave = ({
@@ -44,6 +60,7 @@ export const createAutosave = ({
   delay = AUTOSAVE_DELAY_MS,
   onSaved,
   onError,
+  onStatusChange,
 }: AutosaveOptions): Autosave => {
   let timer: ReturnType<typeof setTimeout> | undefined
   let pending: ResumeDocument | undefined
@@ -58,11 +75,33 @@ export const createAutosave = ({
     }
   }
 
+  let status: SaveStatus = 'saved'
+
+  const setStatus = (next: SaveStatus) => {
+    if (next !== status) {
+      status = next
+      onStatusChange?.(next)
+    }
+  }
+
   const write = async (document: ResumeDocument): Promise<void> => {
     try {
       await save(document)
       onSaved?.(document)
+
+      /**
+       * Only back to rest if nothing arrived while this was in flight.
+       *
+       * A save that lands mid-burst is not the end of the burst: the next
+       * document is already pending or its timer is already running, so
+       * reporting "saved" here would show a green light with unwritten edits
+       * behind it.
+       */
+      if (pending === undefined && timer === undefined) {
+        setStatus('saved')
+      }
     } catch (error) {
+      setStatus('error')
       onError?.(error, document)
     }
   }
@@ -94,6 +133,7 @@ export const createAutosave = ({
       pending = document
       clearTimer()
       timer = setTimeout(run, delay)
+      setStatus('saving')
     },
 
     flush: async () => {
@@ -108,5 +148,6 @@ export const createAutosave = ({
     },
 
     hasPending: () => pending !== undefined,
+    status: () => status,
   }
 }

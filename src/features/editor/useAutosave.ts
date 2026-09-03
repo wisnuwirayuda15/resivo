@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 import { resumeRepo } from '@/database/index'
-import { patchSavedSummary } from '@/features/resume/queries'
+import { patchSavedResume } from '@/features/resume/queries'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { createAutosave } from './autosave'
@@ -30,11 +30,22 @@ export const useAutosave = (
     }
 
     const autosave = createAutosave({
-      save: (document) => resumeRepo.saveResumeDocument(resumeId, document),
-      onSaved: (document) => {
-        useEditorStore.getState().markSaved(document)
-        patchSavedSummary(client, resumeId)
+      /**
+       * The cache is updated from the row the repository wrote, inside `save`,
+       * rather than from the document that was handed in. `saveResumeDocument`
+       * decides `updatedAt` and rewrites part of the document, so the caller's
+       * copy is not what is on disk — and it is the copy on disk that the editor
+       * reads when someone walks back in.
+       */
+      save: async (document) => {
+        patchSavedResume(
+          client,
+          await resumeRepo.saveResumeDocument(resumeId, document),
+        )
       },
+      onSaved: (document) => useEditorStore.getState().markSaved(document),
+      onStatusChange: (status) =>
+        useEditorStore.getState().setSaveStatus(status),
     })
 
     autosaveRef.current = autosave

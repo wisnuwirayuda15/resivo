@@ -186,4 +186,71 @@ describe('createAutosave', () => {
 
     expect(save).toHaveBeenCalledTimes(1)
   })
+
+  describe('the status it reports', () => {
+    /**
+     * The status is what the header shows, so these assert the transitions a
+     * user would see rather than the internal field: rest, work, rest.
+     */
+    it('starts at rest, because a loaded document is already saved', () => {
+      const autosave = createAutosave({ save: async () => {} })
+
+      expect(autosave.status()).toBe('saved')
+    })
+
+    it('goes to work on the first edit and back to rest once written', async () => {
+      const seen: Array<string> = []
+      const autosave = createAutosave({
+        save: async () => {},
+        onStatusChange: (status) => seen.push(status),
+      })
+
+      autosave.schedule(createEmptyDocument())
+      expect(autosave.status()).toBe('saving')
+
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS)
+      expect(autosave.status()).toBe('saved')
+      expect(seen).toEqual(['saving', 'saved'])
+    })
+
+    it('stays at work while a burst is still arriving', async () => {
+      const seen: Array<string> = []
+      const autosave = createAutosave({
+        save: async () => {},
+        onStatusChange: (status) => seen.push(status),
+      })
+
+      autosave.schedule(createEmptyDocument())
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS / 2)
+      autosave.schedule(createEmptyDocument())
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS / 2)
+
+      // One transition so far: the window restarted rather than closing.
+      expect(seen).toEqual(['saving'])
+
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS)
+      expect(seen).toEqual(['saving', 'saved'])
+    })
+
+    it('reports a failed write, and clears it once one succeeds', async () => {
+      let fail = true
+      const autosave = createAutosave({
+        save: async () => {
+          if (fail) {
+            throw new Error('disk full')
+          }
+        },
+        onError: () => {},
+      })
+
+      autosave.schedule(createEmptyDocument())
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS)
+      expect(autosave.status()).toBe('error')
+
+      fail = false
+      autosave.schedule(createEmptyDocument())
+      await vi.advanceTimersByTimeAsync(AUTOSAVE_DELAY_MS)
+      expect(autosave.status()).toBe('saved')
+    })
+  })
 })
