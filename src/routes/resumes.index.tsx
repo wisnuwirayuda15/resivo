@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Button, Select, TextInput } from '@mantine/core'
+import { Box, Button, Select, TextInput } from '@mantine/core'
 import { z } from 'zod'
 
 import { Shell } from '@/components/shell/Shell'
@@ -58,8 +58,11 @@ const LibraryRoute: React.FC = () => {
       allActive={group === undefined}
       actions={
         <>
+          {/* Flexible below `sm`, where 200px of search would leave the title
+              nothing. It shrinks rather than disappearing: finding a resume is
+              the reason this row exists. */}
           <TextInput
-            w={200}
+            className="w-[126px] sm:w-[200px]"
             placeholder="Search resumes"
             aria-label="Search resumes"
             leftSection={<Icon name="magnifying-glass" size={15} />}
@@ -73,7 +76,11 @@ const LibraryRoute: React.FC = () => {
               })
             }
           />
+          {/* Sorting is a preference with a sensible default, and the default —
+              last edited — is the one a phone wants. It stays in the URL, so a
+              choice made on a wider screen survives. */}
           <Select
+            visibleFrom="sm"
             w={132}
             aria-label="Sort resumes"
             data={[
@@ -88,11 +95,17 @@ const LibraryRoute: React.FC = () => {
           {/* The header's button, not the sidebar's or the empty state's: it
               is the one that is on screen whatever the library holds. */}
           <OnboardingTour.Target id={TOUR_TARGET_IDS.newResume}>
+            {/* The glyph alone on a phone. The label is what the row cannot
+                afford, and `aria-label` is what keeps the button named either
+                way. */}
             <Button
+              aria-label="New resume"
               leftSection={<Icon name="plus" size={15} />}
               onClick={() => setNewResumeOpen(true)}
             >
-              New resume
+              <Box component="span" visibleFrom="sm">
+                New resume
+              </Box>
             </Button>
           </OnboardingTour.Target>
         </>

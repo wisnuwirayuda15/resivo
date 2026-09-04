@@ -95,7 +95,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   const isDark = scheme === 'dark'
 
   return (
-    <Box className="flex h-full items-center gap-2 px-4">
+    <Box className="flex h-full items-center gap-2 px-3 sm:px-4">
       {burger}
 
       {/* The same slot as the burger, and the two never both appear: below the
@@ -128,8 +128,10 @@ export const AppBar: React.FC<AppBarProps> = ({
 
       {/* The divider separates the route's own controls from the shared ones,
           and reads as a divider only if it is a clear majority of a control's
-          height — 18px against the 30px the design system uses. */}
-      <Box className="bg-line mx-1 h-[18px] w-px" />
+          height — 18px against the 30px the design system uses. Gone on a phone,
+          where the theme toggle has stepped out and it would be separating the
+          menu from nothing. */}
+      <Box className="bg-line mx-1 hidden h-[18px] w-px sm:block" />
 
       {/* The two icon buttons are the same kind of control, so they sit tighter
           to each other than to anything else in the row. The tour points at the
@@ -137,13 +139,18 @@ export const AppBar: React.FC<AppBarProps> = ({
           the other a `Tooltip` child, and both work by cloning what they wrap. */}
       <OnboardingTour.Target id={TOUR_TARGET_IDS.appMenu}>
         <Box className="flex items-center gap-0.5">
-          <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
-            <BarButton
-              icon={isDark ? 'sun' : 'moon'}
-              label="Toggle theme"
-              onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
-            />
-          </Tooltip>
+          {/* Out of the row on a phone, where every pixel is contested. The
+              scheme still follows the system by default, and the palette can
+              still switch it. */}
+          <Box visibleFrom="sm">
+            <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
+              <BarButton
+                icon={isDark ? 'sun' : 'moon'}
+                label="Toggle theme"
+                onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+              />
+            </Tooltip>
+          </Box>
 
           <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
             <Menu.Target>

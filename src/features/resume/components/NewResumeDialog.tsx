@@ -203,7 +203,10 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
           >
             Template
           </Text>
-          <Box className="grid grid-cols-4 gap-2">
+          {/* Two across on a phone. Four tiles in 340px gives each about 80,
+              which breaks the description to one word a line and still spills
+              the long ones. */}
+          <Box className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {templateList.map((template) => (
               <TemplateTile
                 key={template.id}
@@ -284,7 +287,10 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             )}
           </FileButton>
 
-          <Box className="flex-1" />
+          {/* The spacer only where the row fits on one line. On a phone it
+              would take the whole first row and push the two buttons that
+              matter onto a second. */}
+          <Box className="hidden flex-1 sm:block" />
 
           <Button variant="default" onClick={close}>
             Cancel

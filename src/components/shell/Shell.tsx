@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { AppShell, Burger } from '@mantine/core'
+import { AppShell, Burger, Overlay } from '@mantine/core'
 import { useDisclosure, useHotkeys } from '@mantine/hooks'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -116,7 +116,37 @@ export const Shell: React.FC<ShellProps> = ({
         transitionDuration={200}
         transitionTimingFunction="cubic-bezier(0.2, 0.7, 0.3, 1)"
       >
-        <AppShell.Navbar className="bg-surface">
+        {/* Tapping the page closes the navbar.
+
+            Below the breakpoint the navbar is a full-width sheet over the
+            content, and Mantine draws nothing behind it — so a tap outside it
+            was swallowed by the sheet and the only way back was the burger. A
+            scrim is both halves of the fix: it takes the tap, and it says the
+            thing behind it is not available. Under the navbar and header in the
+            stack, so the burger that opened it still closes it. */}
+        {navOpened ? (
+          <Overlay
+            // The same ink and blur the design system gives a modal overlay,
+            // because this is one: while it is up, the page behind is not
+            // available.
+            backgroundOpacity={0.42}
+            blur={2}
+            hiddenFrom="sm"
+            onClick={closeNav}
+            // Under the navbar (101) and the header (100), so the sheet stays
+            // lit and the burger that opened it still closes it.
+            zIndex={99}
+          />
+        ) : null}
+
+        {/* A drawer, not the whole screen.
+
+            Mantine forces the navbar to 100% width below its breakpoint, which
+            left nothing beside it to tap and put it over the header — so the
+            burger that opened it was underneath it, and the only way out was to
+            navigate somewhere. A Tailwind utility wins over that rule because
+            the utilities layer comes after Mantine's, with no `!important`. */}
+        <AppShell.Navbar className="bg-surface max-sm:w-[min(300px,84vw)]">
           <ClientOnly>
             <Sidebar
               onNewResume={() => {

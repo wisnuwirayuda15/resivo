@@ -80,7 +80,19 @@ export const createResume = async (
   title: string,
   options: { template?: string } = {},
 ): Promise<void> => {
-  await page.getByRole('button', { name: 'New resume' }).first().click()
+  /**
+   * The app bar's, not the sidebar's and not the empty state's.
+   *
+   * Three buttons carry this name. The sidebar's is translated off screen below
+   * the navbar's breakpoint — visible to a locator, unclickable to a pointer —
+   * and the empty state's is gone the moment the library has anything in it.
+   * The one in the bar is on screen at every width and whatever the library
+   * holds.
+   */
+  await page
+    .getByRole('banner')
+    .getByRole('button', { name: 'New resume' })
+    .click()
 
   const dialog = page.getByRole('dialog', { name: 'New resume' })
   await expect(dialog).toBeVisible()

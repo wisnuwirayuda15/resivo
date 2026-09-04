@@ -163,9 +163,15 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
     <section className={cn('flex min-h-0 flex-col', className)}>
       <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTitlebar}>
         <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
-          <Text span className="text-subtle font-mono text-[11px]">
-            {pageCount} {pageCount === 1 ? 'page' : 'pages'} ·{' '}
-            {dimensions.width} × {dimensions.height}
+          {/* The count stays at every width; the sheet's measurements go, since
+              they are a reminder rather than something to act on and they are
+              the widest thing in the row. */}
+          <Text span className="text-subtle flex-none font-mono text-[11px]">
+            {pageCount} {pageCount === 1 ? 'page' : 'pages'}
+            <Text component="span" visibleFrom="sm">
+              {' · '}
+              {dimensions.width} × {dimensions.height}
+            </Text>
           </Text>
 
           <Box className="ml-auto flex items-center gap-1">
@@ -186,6 +192,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
             {onPaperSizeChange === undefined ? null : (
               <SegmentedControl
+                visibleFrom="sm"
                 aria-label="Paper size"
                 // `satisfies` rather than a cast: the literals are checked against
                 // the model's sizes, and `onChange` still narrows to them.
@@ -196,50 +203,58 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
               />
             )}
 
-            <Tooltip label="Zoom out">
-              <UnstyledButton
-                aria-label="Zoom out"
-                className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-                onClick={() => step(-1)}
-              >
-                <Icon name="minus" size={14} />
-              </UnstyledButton>
-            </Tooltip>
+            {/* Zoom, only where there is room for it.
 
-            {/* Monospace, because it is a number that changes in place — the design
-              system's rule for every numeric readout. */}
-            <Text
-              span
-              className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
-            >
-              {Math.round(zoom * 100)}%
-            </Text>
+                Below `sm` the fit-to-width default is the only magnification
+                that makes sense on a screen narrower than the page, and four
+                more controls in a 38px row is what pushed this header — and
+                with it the whole editor — 58px wider than the viewport. */}
+            <Box className="flex items-center gap-1" visibleFrom="sm">
+              <Tooltip label="Zoom out">
+                <UnstyledButton
+                  aria-label="Zoom out"
+                  className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+                  onClick={() => step(-1)}
+                >
+                  <Icon name="minus" size={14} />
+                </UnstyledButton>
+              </Tooltip>
 
-            <Tooltip label="Zoom in">
-              <UnstyledButton
-                aria-label="Zoom in"
-                className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-                onClick={() => step(1)}
+              {/* Monospace, because it is a number that changes in place — the design
+                system's rule for every numeric readout. */}
+              <Text
+                span
+                className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
               >
-                <Icon name="plus" size={14} />
-              </UnstyledButton>
-            </Tooltip>
+                {Math.round(zoom * 100)}%
+              </Text>
 
-            <Tooltip label="Fit width">
-              <UnstyledButton
-                aria-label="Fit width"
-                aria-pressed={pinnedZoom === null}
-                className={cn(
-                  'rounded-control flex size-[22px] items-center justify-center',
-                  pinnedZoom === null
-                    ? 'text-accent bg-selected'
-                    : 'text-muted hover:text-body hover:bg-hover',
-                )}
-                onClick={() => setPinnedZoom(null)}
-              >
-                <Icon name="arrows-horizontal" size={14} />
-              </UnstyledButton>
-            </Tooltip>
+              <Tooltip label="Zoom in">
+                <UnstyledButton
+                  aria-label="Zoom in"
+                  className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+                  onClick={() => step(1)}
+                >
+                  <Icon name="plus" size={14} />
+                </UnstyledButton>
+              </Tooltip>
+
+              <Tooltip label="Fit width">
+                <UnstyledButton
+                  aria-label="Fit width"
+                  aria-pressed={pinnedZoom === null}
+                  className={cn(
+                    'rounded-control flex size-[22px] items-center justify-center',
+                    pinnedZoom === null
+                      ? 'text-accent bg-selected'
+                      : 'text-muted hover:text-body hover:bg-hover',
+                  )}
+                  onClick={() => setPinnedZoom(null)}
+                >
+                  <Icon name="arrows-horizontal" size={14} />
+                </UnstyledButton>
+              </Tooltip>
+            </Box>
           </Box>
         </header>
       </OnboardingTour.Target>

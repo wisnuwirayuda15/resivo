@@ -102,11 +102,83 @@ test('ignores a collapsed sidebar where the sidebar is an overlay', async ({
   ).toBeHidden()
   await page.getByRole('button', { name: 'Toggle navigation' }).click()
 
-  // The whole viewport wide, which is `AppShell`'s own doing, and with its
-  // labels back — not the rail the stored preference still asks for.
+  // A drawer, with its labels back — not the rail the stored preference still
+  // asks for, and not the whole viewport either: a drawer with no page beside
+  // it leaves nothing to tap to dismiss it.
   const width = await page
     .getByRole('navigation')
     .evaluate((node) => Math.round(node.getBoundingClientRect().width))
-  expect(width).toBe(600)
+  expect(width).toBeLessThan(600)
   await expect(page.getByText('No account. No cloud.')).toBeVisible()
+})
+
+/** A phone, not a narrow desktop window. */
+const PHONE = { width: 375, height: 812 }
+
+/**
+ * The editor at phone width.
+ *
+ * The 900px case above only exercises the pane fallback. At 375 the row of
+ * controls over the paper is the thing that did not fit: the page dimensions,
+ * both segmented controls and four zoom buttons in one 38px strip made that
+ * header 433px wide, and since nothing there scrolls it took the whole editor —
+ * and the document — with it.
+ */
+test('fits a phone, with nothing pushed off the side', async ({ page }) => {
+  test.slow()
+
+  await page.setViewportSize(PHONE)
+
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+  await expectPaperReady(page)
+
+  const overflow = () =>
+    page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    )
+
+  expect(await overflow()).toBe(0)
+
+  // Every pane, since each one is a different row of controls.
+  for (const pane of ['Code', 'Style', 'Paper'] as const) {
+    await openEditorPane(page, pane)
+    expect(await overflow()).toBe(0)
+  }
+
+  // What the strip keeps at this width, and what it drops.
+  await expect(page.getByText('1 page')).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Export' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Zoom in' })).toBeHidden()
+})
+
+/**
+ * The navbar on a phone is a drawer.
+ *
+ * Mantine gives it the full viewport width below the breakpoint, which put it
+ * over the header — so the burger that opened it was underneath it, and with no
+ * scrim and nothing beside it to tap, the only way out was to navigate
+ * somewhere. Opening the menu to look at it was a one-way trip.
+ */
+test('the navbar drawer closes when the page beside it is tapped', async ({
+  page,
+}) => {
+  await page.setViewportSize(PHONE)
+  await openEmptyApp(page)
+
+  const drawer = page.locator('nav.mantine-AppShell-navbar')
+  const settings = page.getByRole('link', { name: 'Settings' })
+
+  await page.getByRole('button', { name: 'Toggle navigation' }).click()
+  await expect(settings).toBeInViewport()
+
+  // There is a page beside it to tap at all, which is the half of the fix that
+  // is easy to lose: a full-width drawer has no outside.
+  const box = await drawer.boundingBox()
+  expect(box?.width ?? PHONE.width).toBeLessThan(PHONE.width)
+
+  await page.mouse.click(PHONE.width - 20, 500)
+  await expect(settings).not.toBeInViewport()
 })
