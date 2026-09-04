@@ -1,13 +1,6 @@
-import {
-  AppShell,
-  Badge,
-  Box,
-  ScrollArea,
-  Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
+import { ActionIcon, AppShell, Box, ScrollArea, Tooltip } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 import { UNGROUPED } from "@/database/index";
 import { Icon } from "@/features/icons/IconRenderer";
@@ -84,6 +77,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const groups = useGroups();
   const counts = useGroupCounts();
+  const { pathname } = useLocation();
 
   /**
    * Read during the first render, not in an effect. This only ever mounts inside
@@ -111,25 +105,23 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
       >
         {rail ? (
-          <LogoMark />
+          <Link to="/">
+            <LogoMark />
+          </Link>
         ) : (
           <>
             <Link to="/">
               <Logo />
             </Link>
-            {/* Privacy stated as fact, not as a boast. */}
-            <Badge variant="default" size="xs" radius="pill">
-              local
-            </Badge>
             <Box className="flex-1" />
             <Tooltip label="New resume">
-              <UnstyledButton
+              <ActionIcon
                 onClick={onNewResume}
                 aria-label="New resume"
-                className="text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[26px] w-[26px] items-center justify-center transition-colors"
+                className="hover:bg-hover hover:text-body my-1"
               >
                 <Icon name="plus" size={16} />
-              </UnstyledButton>
+              </ActionIcon>
             </Tooltip>
           </>
         )}
@@ -159,6 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon="archive"
             label="Archived"
             to="/archive"
+            active={pathname === "/archive"}
             onNavigate={onNavigate}
           />
         </NavGroup>
@@ -203,6 +196,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon="sparkle"
             label="Templates"
             to="/templates"
+            active={pathname === "/templates"}
             onNavigate={onNavigate}
           />
           <NavLink
@@ -210,6 +204,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon="image"
             label="Images"
             to="/images"
+            active={pathname === "/images"}
             onNavigate={onNavigate}
             tourId={TOUR_TARGET_IDS.assets}
           />
@@ -218,6 +213,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             icon="text-aa"
             label="Fonts"
             to="/fonts"
+            active={pathname === "/fonts"}
             onNavigate={onNavigate}
           />
         </NavGroup>
