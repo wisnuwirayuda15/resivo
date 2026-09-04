@@ -11,25 +11,25 @@
  * validate after the fact.
  */
 
-import type { SplitterPaneSize } from '@mantine/hooks'
+import type { SplitterPaneSize } from "@mantine/hooks";
 
 /**
  * Mantine's own pane size: a number or percentage string for a flexible pane, a
  * `px`/`rem` string for a fixed one. Aliased rather than re-described so a
  * restored layout is exactly what the splitter accepts.
  */
-export type PaneSize = SplitterPaneSize
+export type PaneSize = SplitterPaneSize;
 
-const STORAGE_PREFIX = 'resivo.editor.panels'
+const STORAGE_PREFIX = "resivo.editor.panels";
 
 const storageKey = (paneCount: number): string =>
-  `${STORAGE_PREFIX}.${paneCount}`
+  `${STORAGE_PREFIX}.${paneCount}`;
 
-const SIZE_PATTERN = /^\d+(?:\.\d+)?(?:px|rem|%)$/
+const SIZE_PATTERN = /^\d+(?:\.\d+)?(?:px|rem|%)$/;
 
 const isPaneSize = (value: unknown): value is PaneSize =>
-  (typeof value === 'number' && Number.isFinite(value) && value >= 0) ||
-  (typeof value === 'string' && SIZE_PATTERN.test(value))
+  (typeof value === "number" && Number.isFinite(value) && value >= 0) ||
+  (typeof value === "string" && SIZE_PATTERN.test(value));
 
 /**
  * Reads a stored layout, or `null` if there is nothing usable.
@@ -40,46 +40,46 @@ const isPaneSize = (value: unknown): value is PaneSize =>
  * answer, so nothing here throws.
  */
 export const readPaneSizes = (paneCount: number): Array<PaneSize> | null => {
-  if (typeof localStorage === 'undefined') {
-    return null
+  if (typeof localStorage === "undefined") {
+    return null;
   }
 
-  const raw = localStorage.getItem(storageKey(paneCount))
+  const raw = localStorage.getItem(storageKey(paneCount));
 
   if (raw === null) {
-    return null
+    return null;
   }
 
   try {
-    const parsed: unknown = JSON.parse(raw)
+    const parsed: unknown = JSON.parse(raw);
 
     if (
       Array.isArray(parsed) &&
       parsed.length === paneCount &&
       parsed.every(isPaneSize)
     ) {
-      return parsed
+      return parsed;
     }
   } catch {
     // Unparseable means a corrupt entry, which is exactly the case the defaults
     // exist for.
   }
 
-  return null
-}
+  return null;
+};
 
 export const writePaneSizes = (
   paneCount: number,
   sizes: ReadonlyArray<PaneSize>,
 ): void => {
-  if (typeof localStorage === 'undefined' || sizes.length !== paneCount) {
-    return
+  if (typeof localStorage === "undefined" || sizes.length !== paneCount) {
+    return;
   }
 
   try {
-    localStorage.setItem(storageKey(paneCount), JSON.stringify(sizes))
+    localStorage.setItem(storageKey(paneCount), JSON.stringify(sizes));
   } catch {
     // Storage can be full or blocked outright by the browser's privacy settings.
     // Losing a remembered pane width is not worth failing an edit session over.
   }
-}
+};

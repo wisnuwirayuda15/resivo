@@ -1,8 +1,8 @@
-import { useEffect, useSyncExternalStore } from 'react'
+import { useEffect, useSyncExternalStore } from "react";
 
-import { loadGlyphs, loadedGlyphs, onIconCatalogLoaded } from './catalog'
+import { loadGlyphs, loadedGlyphs, onIconCatalogLoaded } from "./catalog";
 
-import type { IconWeight } from '@/features/resume/model/document'
+import type { IconWeight } from "@/features/resume/model/document";
 
 /**
  * The glyph for an icon that is not one of the curated components, in the weight
@@ -23,9 +23,9 @@ export const useCatalogGlyph = (
 ): string | undefined => {
   useEffect(() => {
     if (name !== undefined) {
-      void loadGlyphs(weight)
+      void loadGlyphs(weight);
     }
-  }, [name, weight])
+  }, [name, weight]);
 
   return useSyncExternalStore(
     onIconCatalogLoaded,
@@ -33,5 +33,5 @@ export const useCatalogGlyph = (
     // On the server no glyphs are ever loaded, so the markup rendered there is
     // the reserved box, which is what hydration then matches.
     () => undefined,
-  )
-}
+  );
+};

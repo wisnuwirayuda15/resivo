@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -9,22 +9,22 @@ import {
   Text,
   TextInput,
   UnstyledButton,
-} from '@mantine/core'
-import { Link } from '@tanstack/react-router'
+} from "@mantine/core";
+import { Link } from "@tanstack/react-router";
 
-import { ConfirmDialog } from '@/components/ConfirmDialog'
-import { Icon } from '@/features/icons/IconRenderer'
-import { NavItemContent, navItemClassName } from '@/components/shell/NavItem'
+import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { Icon } from "@/features/icons/IconRenderer";
+import { NavItemContent, navItemClassName } from "@/components/shell/NavItem";
 
-import { useDeleteGroup, useRenameGroup } from '../queries'
+import { useDeleteGroup, useRenameGroup } from "../queries";
 
-import type { GroupRecord } from '@/database/index'
+import type { GroupRecord } from "@/database/index";
 
 interface GroupRowProps {
-  group: GroupRecord
-  count?: number
-  active: boolean
-  onNavigate: () => void
+  group: GroupRecord;
+  count?: number;
+  active: boolean;
+  onNavigate: () => void;
 }
 
 /**
@@ -45,27 +45,27 @@ export const GroupRow: React.FC<GroupRowProps> = ({
   active,
   onNavigate,
 }) => {
-  const [renaming, setRenaming] = useState(false)
-  const [name, setName] = useState(group.name)
-  const [confirming, setConfirming] = useState(false)
+  const [renaming, setRenaming] = useState(false);
+  const [name, setName] = useState(group.name);
+  const [confirming, setConfirming] = useState(false);
 
-  const rename = useRenameGroup()
-  const remove = useDeleteGroup()
+  const rename = useRenameGroup();
+  const remove = useDeleteGroup();
 
   const submit = async () => {
-    const trimmed = name.trim()
+    const trimmed = name.trim();
 
-    if (trimmed !== '' && trimmed !== group.name) {
-      await rename.mutateAsync({ id: group.id, name: trimmed })
+    if (trimmed !== "" && trimmed !== group.name) {
+      await rename.mutateAsync({ id: group.id, name: trimmed });
     }
 
-    setRenaming(false)
-  }
+    setRenaming(false);
+  };
 
   return (
     <Box className="group/row relative">
       <Link
-        aria-current={active ? 'page' : undefined}
+        aria-current={active ? "page" : undefined}
         className={navItemClassName(active)}
         onClick={onNavigate}
         search={{ group: group.id }}
@@ -90,8 +90,8 @@ export const GroupRow: React.FC<GroupRowProps> = ({
             <Menu.Item
               leftSection={<Icon name="cursor-text" size={15} />}
               onClick={() => {
-                setName(group.name)
-                setRenaming(true)
+                setName(group.name);
+                setRenaming(true);
               }}
             >
               Rename
@@ -119,8 +119,8 @@ export const GroupRow: React.FC<GroupRowProps> = ({
             label="Name"
             onChange={(event) => setName(event.currentTarget.value)}
             onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                void submit()
+              if (event.key === "Enter") {
+                void submit();
               }
             }}
             value={name}
@@ -141,20 +141,20 @@ export const GroupRow: React.FC<GroupRowProps> = ({
         danger
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
-          remove.mutate(group.id)
-          setConfirming(false)
+          remove.mutate(group.id);
+          setConfirming(false);
         }}
         opened={confirming}
         title={`Delete ${group.name}?`}
       >
         <Text className="text-[13px]">
           {count === undefined || count === 0
-            ? 'The group is empty, so nothing else changes.'
-            : `The ${count === 1 ? 'resume' : `${count} resumes`} in it ${
-                count === 1 ? 'becomes' : 'become'
+            ? "The group is empty, so nothing else changes."
+            : `The ${count === 1 ? "resume" : `${count} resumes`} in it ${
+                count === 1 ? "becomes" : "become"
               } ungrouped. Nothing is deleted but the group itself.`}
         </Text>
       </ConfirmDialog>
     </Box>
-  )
-}
+  );
+};

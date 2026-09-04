@@ -48,7 +48,7 @@
 }
 
 /* A4 swaps only the page box; every other token is template-owned. */
-.resivo-paper[data-size='A4'] {
+.resivo-paper[data-size="A4"] {
   --paper-w: 210mm;
   --paper-h: 297mm;
 }
@@ -58,14 +58,14 @@
 /* classic: traditional single-column serif. Uses the baseline above. */
 
 /* modern: clean contemporary sans, ink accent rather than colour. */
-.resivo-paper[data-template='modern'] {
+.resivo-paper[data-template="modern"] {
   --paper-font-body: var(--font-sans);
   --paper-font-head: var(--font-sans);
   --paper-accent: #1d1d1a;
 }
 
 /* technical: sans body with monospace headings, tighter body size. */
-.resivo-paper[data-template='technical'] {
+.resivo-paper[data-template="technical"] {
   --paper-font-body: var(--font-sans);
   --paper-font-head: var(--font-mono);
   --paper-accent: #2563a8;
@@ -73,7 +73,7 @@
 }
 
 /* editorial: serif throughout with a larger name and a red accent. */
-.resivo-paper[data-template='editorial'] {
+.resivo-paper[data-template="editorial"] {
   --paper-font-body: var(--font-serif);
   --paper-font-head: var(--font-serif);
   --paper-accent: #94271d;

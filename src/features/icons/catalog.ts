@@ -19,49 +19,49 @@
  * on what happens to be installed.
  */
 
-import { ICON_WEIGHTS } from '@/features/resume/model/document'
+import { ICON_WEIGHTS } from "@/features/resume/model/document";
 
-import type { IconWeight } from '@/features/resume/model/document'
+import type { IconWeight } from "@/features/resume/model/document";
 
 export interface IconEntry {
   /** Kebab-case, as the document model stores it. */
-  name: string
+  name: string;
   /** Tags and categories, lowercased and space-joined. */
-  terms: string
+  terms: string;
 }
 
 export interface IconCatalog {
-  entries: Array<IconEntry>
-  byName: Map<string, IconEntry>
+  entries: Array<IconEntry>;
+  byName: Map<string, IconEntry>;
 }
 
 /** Name to SVG children, for one weight. */
-export type GlyphSet = Map<string, string>
+export type GlyphSet = Map<string, string>;
 
 export const parseCatalog = (source: string): IconCatalog => {
   const entries = source
-    .split('\n')
-    .filter((line) => line !== '')
+    .split("\n")
+    .filter((line) => line !== "")
     .map((line) => {
-      const [name = '', terms = ''] = line.split('\t')
+      const [name = "", terms = ""] = line.split("\t");
 
-      return { name, terms }
-    })
+      return { name, terms };
+    });
 
-  return { entries, byName: new Map(entries.map((e) => [e.name, e])) }
-}
+  return { entries, byName: new Map(entries.map((e) => [e.name, e])) };
+};
 
 export const parseGlyphs = (source: string): GlyphSet =>
   new Map(
     source
-      .split('\n')
-      .filter((line) => line !== '')
+      .split("\n")
+      .filter((line) => line !== "")
       .map((line) => {
-        const [name = '', body = ''] = line.split('\t')
+        const [name = "", body = ""] = line.split("\t");
 
-        return [name, body] as const
+        return [name, body] as const;
       }),
-  )
+  );
 
 // ---------------------------------------------------------------------------
 // Loading
@@ -78,98 +78,98 @@ const GLYPH_IMPORTS: Record<
   IconWeight,
   () => Promise<{ GLYPH_SOURCE: string }>
 > = {
-  thin: () => import('./glyphs.thin.gen'),
-  light: () => import('./glyphs.light.gen'),
-  regular: () => import('./glyphs.regular.gen'),
-  bold: () => import('./glyphs.bold.gen'),
-  fill: () => import('./glyphs.fill.gen'),
-  duotone: () => import('./glyphs.duotone.gen'),
-}
+  thin: () => import("./glyphs.thin.gen"),
+  light: () => import("./glyphs.light.gen"),
+  regular: () => import("./glyphs.regular.gen"),
+  bold: () => import("./glyphs.bold.gen"),
+  fill: () => import("./glyphs.fill.gen"),
+  duotone: () => import("./glyphs.duotone.gen"),
+};
 
 /** Notified when the index or any weight arrives, so anything already rendered (
  * the paper, above all) can draw the glyphs it had to leave as reserved
  * space. */
-const listeners = new Set<() => void>()
+const listeners = new Set<() => void>();
 
 const announce = () => {
   for (const listener of listeners) {
-    listener()
+    listener();
   }
-}
+};
 
 export const onIconCatalogLoaded = (listener: () => void): (() => void) => {
-  listeners.add(listener)
+  listeners.add(listener);
 
-  return () => listeners.delete(listener)
-}
+  return () => listeners.delete(listener);
+};
 
-let catalog: IconCatalog | null = null
-let catalogPending: Promise<IconCatalog> | null = null
+let catalog: IconCatalog | null = null;
+let catalogPending: Promise<IconCatalog> | null = null;
 
 export const loadIconCatalog = (): Promise<IconCatalog> => {
   if (catalog !== null) {
-    return Promise.resolve(catalog)
+    return Promise.resolve(catalog);
   }
 
   // One request no matter how many components ask at once: the picker and the
   // preview both want it, and they mount together.
-  catalogPending ??= import('./catalog.gen').then((module) => {
-    catalog = parseCatalog(module.ICON_INDEX_SOURCE)
-    catalogPending = null
-    announce()
+  catalogPending ??= import("./catalog.gen").then((module) => {
+    catalog = parseCatalog(module.ICON_INDEX_SOURCE);
+    catalogPending = null;
+    announce();
 
-    return catalog
-  })
+    return catalog;
+  });
 
-  return catalogPending
-}
+  return catalogPending;
+};
 
-const glyphs = new Map<IconWeight, GlyphSet>()
-const glyphsPending = new Map<IconWeight, Promise<GlyphSet>>()
+const glyphs = new Map<IconWeight, GlyphSet>();
+const glyphsPending = new Map<IconWeight, Promise<GlyphSet>>();
 
 export const loadGlyphs = (weight: IconWeight): Promise<GlyphSet> => {
-  const loaded = glyphs.get(weight)
+  const loaded = glyphs.get(weight);
 
   if (loaded !== undefined) {
-    return Promise.resolve(loaded)
+    return Promise.resolve(loaded);
   }
 
-  const inFlight = glyphsPending.get(weight)
+  const inFlight = glyphsPending.get(weight);
 
   if (inFlight !== undefined) {
-    return inFlight
+    return inFlight;
   }
 
   const request = GLYPH_IMPORTS[weight]().then((module) => {
-    const parsed = parseGlyphs(module.GLYPH_SOURCE)
+    const parsed = parseGlyphs(module.GLYPH_SOURCE);
 
-    glyphs.set(weight, parsed)
-    glyphsPending.delete(weight)
-    announce()
+    glyphs.set(weight, parsed);
+    glyphsPending.delete(weight);
+    announce();
 
-    return parsed
-  })
+    return parsed;
+  });
 
-  glyphsPending.set(weight, request)
+  glyphsPending.set(weight, request);
 
-  return request
-}
+  return request;
+};
 
 /** One weight's glyphs if they are already here, `null` otherwise. */
 export const loadedGlyphs = (weight: IconWeight): GlyphSet | null =>
-  glyphs.get(weight) ?? null
+  glyphs.get(weight) ?? null;
 
 /**
  * How many weights have arrived. The paper watches this rather than a boolean,
  * because a second weight landing changes what is drawn just as much as the
  * first did.
  */
-export const loadedGlyphCount = (): number => glyphs.size
+export const loadedGlyphCount = (): number => glyphs.size;
 
 /** Whether a string is one of the weights this build carries. Used where a
  * weight comes from a saved document rather than from the app. */
 export const isIconWeight = (value: string): value is IconWeight =>
-  (ICON_WEIGHTS as ReadonlyArray<string>).includes(value)
+  (ICON_WEIGHTS as ReadonlyArray<string>).includes(value);
 
 // ---------------------------------------------------------------------------
 // Search
@@ -186,26 +186,26 @@ export const isIconWeight = (value: string): value is IconWeight =>
  * the obvious answer must be first.
  */
 export const scoreIcon = (entry: IconEntry, query: string): number => {
-  const needle = query.trim().toLowerCase()
+  const needle = query.trim().toLowerCase();
 
-  if (needle === '') {
-    return 1
+  if (needle === "") {
+    return 1;
   }
 
-  const { name, terms } = entry
+  const { name, terms } = entry;
 
   if (name === needle) {
-    return 1000
+    return 1000;
   }
 
   if (name.startsWith(needle)) {
     // Shorter names win the tie-break below, so "star" outranks "star-four".
-    return 800
+    return 800;
   }
 
   // A word boundary inside the name: "envelope-simple" for "simple".
   if (name.includes(`-${needle}`)) {
-    return 600
+    return 600;
   }
 
   /**
@@ -214,20 +214,20 @@ export const scoreIcon = (entry: IconEntry, query: string): number => {
    * `envelope` (tagged "mail") is what someone wants, and `voicemail` is not,
    * even though the latter matches its own name.
    */
-  if (terms.split(' ').some((term) => term === needle)) {
-    return 500
+  if (terms.split(" ").some((term) => term === needle)) {
+    return 500;
   }
 
   if (name.includes(needle)) {
-    return 400
+    return 400;
   }
 
   if (terms.includes(needle)) {
-    return 200
+    return 200;
   }
 
-  return isSubsequence(needle, name) ? 100 : 0
-}
+  return isSubsequence(needle, name) ? 100 : 0;
+};
 
 /**
  * Whether every character of `needle` appears in `haystack` in order.
@@ -237,20 +237,20 @@ export const scoreIcon = (entry: IconEntry, query: string): number => {
  * matches against each other produces confident nonsense.
  */
 const isSubsequence = (needle: string, haystack: string): boolean => {
-  let at = 0
+  let at = 0;
 
   for (const character of haystack) {
     if (character === needle[at]) {
-      at += 1
+      at += 1;
 
       if (at === needle.length) {
-        return true
+        return true;
       }
     }
   }
 
-  return needle.length === 0
-}
+  return needle.length === 0;
+};
 
 /**
  * The matching icons, best first.
@@ -267,10 +267,10 @@ export const searchIcons = (
   entries: ReadonlyArray<IconEntry>,
   query: string,
 ): Array<IconEntry> => {
-  const needle = query.trim().toLowerCase()
+  const needle = query.trim().toLowerCase();
 
-  if (needle === '') {
-    return [...entries]
+  if (needle === "") {
+    return [...entries];
   }
 
   return entries
@@ -278,14 +278,14 @@ export const searchIcons = (
     .filter(({ score }) => score > 0)
     .sort((a, b) => {
       if (a.score !== b.score) {
-        return b.score - a.score
+        return b.score - a.score;
       }
 
       if (a.entry.name.length !== b.entry.name.length) {
-        return a.entry.name.length - b.entry.name.length
+        return a.entry.name.length - b.entry.name.length;
       }
 
-      return a.entry.name.localeCompare(b.entry.name)
+      return a.entry.name.localeCompare(b.entry.name);
     })
-    .map(({ entry }) => entry)
-}
+    .map(({ entry }) => entry);
+};

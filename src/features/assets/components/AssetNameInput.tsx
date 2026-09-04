@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react'
-import { TextInput } from '@mantine/core'
+import { useEffect, useState } from "react";
+import { TextInput } from "@mantine/core";
 
 interface AssetNameInputProps {
-  value: string
-  onCommit: (name: string) => void
-  'aria-label': string
+  value: string;
+  onCommit: (name: string) => void;
+  "aria-label": string;
 }
 
 /**
@@ -19,24 +19,24 @@ interface AssetNameInputProps {
 export const AssetNameInput: React.FC<AssetNameInputProps> = ({
   value,
   onCommit,
-  'aria-label': label,
+  "aria-label": label,
 }) => {
-  const [draft, setDraft] = useState(value)
+  const [draft, setDraft] = useState(value);
 
   // A rename from elsewhere, or a different asset arriving in the same slot,
   // replaces the draft. Keyed on `value` so typing is never interrupted.
-  useEffect(() => setDraft(value), [value])
+  useEffect(() => setDraft(value), [value]);
 
   const commit = () => {
-    const trimmed = draft.trim()
+    const trimmed = draft.trim();
 
-    if (trimmed === '' || trimmed === value) {
-      setDraft(value)
-      return
+    if (trimmed === "" || trimmed === value) {
+      setDraft(value);
+      return;
     }
 
-    onCommit(trimmed)
-  }
+    onCommit(trimmed);
+  };
 
   return (
     <TextInput
@@ -44,16 +44,16 @@ export const AssetNameInput: React.FC<AssetNameInputProps> = ({
       onBlur={commit}
       onChange={(event) => setDraft(event.currentTarget.value)}
       onKeyDown={(event) => {
-        if (event.key === 'Enter') {
-          event.currentTarget.blur()
+        if (event.key === "Enter") {
+          event.currentTarget.blur();
         }
 
-        if (event.key === 'Escape') {
-          setDraft(value)
-          event.currentTarget.blur()
+        if (event.key === "Escape") {
+          setDraft(value);
+          event.currentTarget.blur();
         }
       }}
       value={draft}
     />
-  )
-}
+  );
+};

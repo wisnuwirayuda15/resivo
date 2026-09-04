@@ -20,7 +20,7 @@
 
 /* Light, also the default before the scheme attribute is applied */
 :root,
-[data-mantine-color-scheme='light'] {
+[data-mantine-color-scheme="light"] {
   /* Max two background values per view: --bg-app plus --bg-surface */
   --bg-app: var(--n-50);
   --bg-surface: var(--n-0);
@@ -83,7 +83,7 @@
 }
 
 /* Dark */
-[data-mantine-color-scheme='dark'] {
+[data-mantine-color-scheme="dark"] {
   --bg-app: #101113;
   --bg-surface: #17191c;
   --bg-raised: #1e2125;

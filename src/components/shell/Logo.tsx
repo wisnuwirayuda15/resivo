@@ -1,7 +1,7 @@
-import LogoFull from '@/assets/logo.svg?react'
-import LogoAbbreviated from '@/assets/logo-mark.svg?react'
+import LogoFull from "@/assets/logo.svg?react";
+import LogoAbbreviated from "@/assets/logo-mark.svg?react";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
 /**
  * The Resivo logo, in its two widths.
@@ -31,7 +31,7 @@ import { cn } from '@/lib/utils'
 
 interface LogoProps {
   /** Height and colour, if the default is wrong for the place it sits in. */
-  className?: string
+  className?: string;
 }
 
 /**
@@ -42,12 +42,12 @@ interface LogoProps {
  * rendering. Matching the letters rather than the box is what keeps the sidebar
  * header looking untouched.
  */
-const HEIGHT = 'h-[14px] w-auto'
+const HEIGHT = "h-[14px] w-auto";
 
 export const Logo: React.FC<LogoProps> = ({ className }) => (
-  <LogoFull className={cn('text-title', HEIGHT, className)} />
-)
+  <LogoFull className={cn("text-title", HEIGHT, className)} />
+);
 
 export const LogoMark: React.FC<LogoProps> = ({ className }) => (
-  <LogoAbbreviated className={cn('text-title', HEIGHT, className)} />
-)
+  <LogoAbbreviated className={cn("text-title", HEIGHT, className)} />
+);

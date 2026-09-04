@@ -6,35 +6,35 @@ import {
   UnstyledButton,
   useComputedColorScheme,
   useMantineColorScheme,
-} from '@mantine/core'
+} from "@mantine/core";
 
-import { Link } from '@tanstack/react-router'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { Link } from "@tanstack/react-router";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { cn } from '@/lib/utils'
+import { Icon } from "@/features/icons/IconRenderer";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { cn } from "@/lib/utils";
 
-import type { ComponentProps, ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from "react";
 
 interface AppBarProps {
-  title: string
+  title: string;
   /** View-specific controls, right-aligned before the shared ones. */
-  actions?: ReactNode
+  actions?: ReactNode;
   /** Navbar toggle, shown only below the navbar breakpoint. */
-  burger?: ReactNode
+  burger?: ReactNode;
   /** Opens the shortcuts sheet, which the shell owns so the palette can open
    * the same one. */
-  onShowShortcuts: () => void
+  onShowShortcuts: () => void;
   /** Starts the onboarding tour again. */
-  onStartTour: () => void
+  onStartTour: () => void;
   /** Collapses the sidebar to its rail, or brings it back. */
-  onToggleSidebar: () => void
+  onToggleSidebar: () => void;
 }
 
-interface BarButtonProps extends ComponentProps<'button'> {
-  icon: string
-  label: string
+interface BarButtonProps extends ComponentProps<"button"> {
+  icon: string;
+  label: string;
 }
 
 /**
@@ -65,13 +65,13 @@ const BarButton = ({
     aria-label={label}
     {...rest}
     className={cn(
-      'text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors',
+      "text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors",
       className,
     )}
   >
     <Icon name={icon} size={16} />
   </UnstyledButton>
-)
+);
 
 /**
  * Contents of the application bar.
@@ -88,11 +88,11 @@ export const AppBar: React.FC<AppBarProps> = ({
   onStartTour,
   onToggleSidebar,
 }) => {
-  const { setColorScheme } = useMantineColorScheme()
-  const scheme = useComputedColorScheme('light', {
+  const { setColorScheme } = useMantineColorScheme();
+  const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
-  })
-  const isDark = scheme === 'dark'
+  });
+  const isDark = scheme === "dark";
 
   return (
     <Box className="flex h-full items-center gap-2 px-3 sm:px-4">
@@ -145,11 +145,11 @@ export const AppBar: React.FC<AppBarProps> = ({
           {/* Out of the row on a phone, where every pixel is contested, and
               into the menu below, so the control still exists at every width. */}
           <Box visibleFrom="sm">
-            <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
+            <Tooltip label={isDark ? "Light theme" : "Dark theme"}>
               <BarButton
-                icon={isDark ? 'sun' : 'moon'}
+                icon={isDark ? "sun" : "moon"}
                 label="Toggle theme"
-                onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+                onClick={() => setColorScheme(isDark ? "light" : "dark")}
               />
             </Tooltip>
           </Box>
@@ -163,10 +163,10 @@ export const AppBar: React.FC<AppBarProps> = ({
                   below the breakpoint, so it is never offered twice. */}
               <Menu.Item
                 hiddenFrom="sm"
-                leftSection={<Icon name={isDark ? 'sun' : 'moon'} size={15} />}
-                onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+                leftSection={<Icon name={isDark ? "sun" : "moon"} size={15} />}
+                onClick={() => setColorScheme(isDark ? "light" : "dark")}
               >
-                {isDark ? 'Light theme' : 'Dark theme'}
+                {isDark ? "Light theme" : "Dark theme"}
               </Menu.Item>
               <Menu.Item
                 leftSection={<Icon name="keyboard" size={15} />}
@@ -193,5 +193,5 @@ export const AppBar: React.FC<AppBarProps> = ({
         </Box>
       </OnboardingTour.Target>
     </Box>
-  )
-}
+  );
+};

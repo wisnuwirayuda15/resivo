@@ -1,20 +1,23 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { createPortal } from 'react-dom'
+import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
-import { fontFaceCss } from '@/features/assets/fontFaces'
-import { documentFontIds, documentImageIds } from '@/features/assets/references'
-import { useFontUrls, useImageUrls } from '@/features/assets/useAssetUrls'
-import { useFonts } from '@/features/assets/queries'
+import { fontFaceCss } from "@/features/assets/fontFaces";
+import {
+  documentFontIds,
+  documentImageIds,
+} from "@/features/assets/references";
+import { useFontUrls, useImageUrls } from "@/features/assets/useAssetUrls";
+import { useFonts } from "@/features/assets/queries";
 
-import { PreviewPaper } from './PreviewPaper'
-import { sanitizeCss } from '@/features/css/sanitize'
-import { previewStylesheet } from './css'
+import { PreviewPaper } from "./PreviewPaper";
+import { sanitizeCss } from "@/features/css/sanitize";
+import { previewStylesheet } from "./css";
 
-import paperFontsHref from './paper-fonts.css?url'
+import paperFontsHref from "./paper-fonts.css?url";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { RenderMode } from '@/features/templates/renderer/types'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { Recipe } from "@/features/editor/mutations";
+import type { RenderMode } from "@/features/templates/renderer/types";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The preview host.
@@ -39,22 +42,22 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * changing `srcDoc` would reload the frame and throw away the portal on every
  * edit.
  */
-const SKELETON = '<!doctype html><html><head></head><body></body></html>'
+const SKELETON = "<!doctype html><html><head></head><body></body></html>";
 
 interface PreviewFrameProps {
-  document: ResumeDocument
+  document: ResumeDocument;
   /** `view` by default: a preview is a preview until something asks for the
    * editing surface. */
-  mode?: RenderMode
-  apply?: (recipe: Recipe) => void
+  mode?: RenderMode;
+  apply?: (recipe: Recipe) => void;
   /** 1 = 100%. */
-  zoom?: number
-  className?: string
-  title?: string
+  zoom?: number;
+  className?: string;
+  title?: string;
   /** Called whenever pagination settles on a different number of pages. */
-  onPageCountChange?: (count: number) => void
+  onPageCountChange?: (count: number) => void;
   /** Called with the flow-item ids on each page whenever pagination settles. */
-  onPaginated?: (pages: Array<Array<string>>) => void
+  onPaginated?: (pages: Array<Array<string>>) => void;
   /**
    * Handed a function that prints the iframe.
    *
@@ -67,17 +70,17 @@ interface PreviewFrameProps {
 
 export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   document: resume,
-  mode = 'view',
+  mode = "view",
   apply,
   zoom = 1,
   className,
-  title = 'Resume preview',
+  title = "Resume preview",
   onPageCountChange,
   onPaginated,
 }) => {
-  const frameRef = useRef<HTMLIFrameElement | null>(null)
-  const styleRef = useRef<HTMLStyleElement | null>(null)
-  const [frameDocument, setFrameDocument] = useState<Document | null>(null)
+  const frameRef = useRef<HTMLIFrameElement | null>(null);
+  const styleRef = useRef<HTMLStyleElement | null>(null);
+  const [frameDocument, setFrameDocument] = useState<Document | null>(null);
 
   /**
    * Incremented every time the iframe finishes loading a batch of faces.
@@ -87,19 +90,19 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
    * fallback metrics and, since the promise only settles once, never measured
    * again. A counter makes every arrival re-paginate.
    */
-  const [fontEpoch, setFontEpoch] = useState(0)
+  const [fontEpoch, setFontEpoch] = useState(0);
 
   /**
    * Only the assets this document names. Holding every uploaded image would mean
    * a gallery's worth of blobs alive for as long as the editor is open, and
    * every declared face delaying the first paint, see `font-display: block`.
    */
-  const imageIds = useMemo(() => documentImageIds(resume), [resume])
-  const fontIds = useMemo(() => documentFontIds(resume), [resume])
+  const imageIds = useMemo(() => documentImageIds(resume), [resume]);
+  const fontIds = useMemo(() => documentFontIds(resume), [resume]);
 
-  const images = useImageUrls(imageIds)
-  const fontUrls = useFontUrls(fontIds)
-  const { data: fonts } = useFonts()
+  const images = useImageUrls(imageIds);
+  const fontUrls = useFontUrls(fontIds);
+  const { data: fonts } = useFonts();
 
   /**
    * A face needs both halves: the row, for its family and weight, and the blob
@@ -111,13 +114,13 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
     () =>
       fontFaceCss(
         (fonts ?? []).flatMap((font) => {
-          const url = fontUrls.get(font.id)
+          const url = fontUrls.get(font.id);
 
-          return url === undefined ? [] : [{ font, url }]
+          return url === undefined ? [] : [{ font, url }];
         }),
       ),
     [fonts, fontUrls],
-  )
+  );
 
   /**
    * The user's CSS is sanitized here rather than stored sanitized, so tightening
@@ -131,33 +134,33 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
         design: resume.design,
         customCss: sanitizeCss(resume.customCss).css,
         fontFaces,
-        editing: mode === 'edit',
+        editing: mode === "edit",
       }),
     [resume.templateId, resume.design, resume.customCss, fontFaces, mode],
-  )
+  );
 
   // Create the head elements once per document, and tear them down with it.
   useEffect(() => {
     if (frameDocument === null) {
-      return
+      return;
     }
 
-    const link = frameDocument.createElement('link')
+    const link = frameDocument.createElement("link");
 
-    link.rel = 'stylesheet'
-    link.href = paperFontsHref
+    link.rel = "stylesheet";
+    link.href = paperFontsHref;
 
-    const style = frameDocument.createElement('style')
+    const style = frameDocument.createElement("style");
 
-    frameDocument.head.append(link, style)
-    styleRef.current = style
+    frameDocument.head.append(link, style);
+    styleRef.current = style;
 
     return () => {
-      link.remove()
-      style.remove()
-      styleRef.current = null
-    }
-  }, [frameDocument])
+      link.remove();
+      style.remove();
+      styleRef.current = null;
+    };
+  }, [frameDocument]);
 
   /**
    * Update the one style element in place rather than replacing it. Swapping the
@@ -165,25 +168,25 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
    * flash on every keystroke that touches the design.
    */
   useEffect(() => {
-    const style = styleRef.current
+    const style = styleRef.current;
 
     if (style !== null) {
-      style.textContent = css
+      style.textContent = css;
     }
-  }, [frameDocument, css])
+  }, [frameDocument, css]);
 
   useEffect(() => {
     if (frameDocument === null) {
-      return
+      return;
     }
 
-    const faces = frameDocument.fonts
-    const bump = () => setFontEpoch((epoch) => epoch + 1)
+    const faces = frameDocument.fonts;
+    const bump = () => setFontEpoch((epoch) => epoch + 1);
 
-    faces.addEventListener('loadingdone', bump)
+    faces.addEventListener("loadingdone", bump);
 
-    return () => faces.removeEventListener('loadingdone', bump)
-  }, [frameDocument])
+    return () => faces.removeEventListener("loadingdone", bump);
+  }, [frameDocument]);
 
   return (
     <>
@@ -220,5 +223,5 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
             frameDocument.body,
           )}
     </>
-  )
-}
+  );
+};

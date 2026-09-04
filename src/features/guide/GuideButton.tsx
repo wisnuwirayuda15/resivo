@@ -1,10 +1,10 @@
-import { Suspense, lazy, useState } from 'react'
-import { Button } from '@mantine/core'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
-import { useDisclosure } from '@mantine/hooks'
+import { Suspense, lazy, useState } from "react";
+import { Button } from "@mantine/core";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
+import { useDisclosure } from "@mantine/hooks";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
+import { Icon } from "@/features/icons/IconRenderer";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 
 /**
  * The way into the guide, and the drawer it opens.
@@ -24,12 +24,12 @@ import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
  * than only while open, so the second visit opens instantly and animates.
  */
 const GuideDrawer = lazy(() =>
-  import('./GuideDrawer').then((module) => ({ default: module.GuideDrawer })),
-)
+  import("./GuideDrawer").then((module) => ({ default: module.GuideDrawer })),
+);
 
 export const GuideButton: React.FC = () => {
-  const [opened, { open, close }] = useDisclosure(false)
-  const [everOpened, setEverOpened] = useState(false)
+  const [opened, { open, close }] = useDisclosure(false);
+  const [everOpened, setEverOpened] = useState(false);
 
   return (
     <>
@@ -40,8 +40,8 @@ export const GuideButton: React.FC = () => {
         <Button
           leftSection={<Icon name="book-open" size={13} />}
           onClick={() => {
-            setEverOpened(true)
-            open()
+            setEverOpened(true);
+            open();
           }}
           size="compact-xs"
           variant="default"
@@ -58,5 +58,5 @@ export const GuideButton: React.FC = () => {
         </Suspense>
       ) : null}
     </>
-  )
-}
+  );
+};

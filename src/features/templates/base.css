@@ -240,12 +240,12 @@
   color: var(--paper-ink-head);
 }
 
-.rp-heading[data-level='4'] {
+.rp-heading[data-level="4"] {
   font-size: calc(var(--paper-fs-section) * 0.82);
 }
 
-.rp-heading[data-level='5'],
-.rp-heading[data-level='6'] {
+.rp-heading[data-level="5"],
+.rp-heading[data-level="6"] {
   font-size: 1em;
   font-style: italic;
 }
@@ -312,7 +312,7 @@
 }
 
 .rp-tag + .rp-tag::before {
-  content: '·';
+  content: "·";
   margin-right: 0.7em;
   color: var(--paper-rule-color);
 }

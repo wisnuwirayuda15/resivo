@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react'
-import { Button } from '@mantine/core'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
-import { useMediaQuery } from '@mantine/hooks'
-import { useRouterState } from '@tanstack/react-router'
+import { useEffect, useState } from "react";
+import { Button } from "@mantine/core";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
+import { useMediaQuery } from "@mantine/hooks";
+import { useRouterState } from "@tanstack/react-router";
 
-import { hasSeenTour, markTourSeen } from './seen'
-import { useTourPane } from '@/features/editor/tourPane'
+import { hasSeenTour, markTourSeen } from "./seen";
+import { useTourPane } from "@/features/editor/tourPane";
 import {
   EDITOR_STEP_PANES,
   SIDEBAR_STEP_IDS,
   TOUR_TARGET_IDS,
   tourSteps,
-} from './steps'
+} from "./steps";
 
-import type { ReactNode } from 'react'
-import type { TourName } from './seen'
+import type { ReactNode } from "react";
+import type { TourName } from "./seen";
 
 /**
  * The onboarding tour, wrapped around the whole shell.
@@ -37,20 +37,20 @@ import type { TourName } from './seen'
  */
 
 interface AppTourProps {
-  children: ReactNode
+  children: ReactNode;
   /**
    * Bumped to start the tour again from the app menu or the palette. The
    * package starts on `started` going true, so a restart needs an edge rather
    * than a boolean that is already set.
    */
-  restartSignal: number
+  restartSignal: number;
   /**
    * Opens or closes the navbar for a step anchored inside it.
    *
    * Only ever called with `true` where the navbar is an overlay: on a wide
    * screen the sidebar is already there and nothing needs to move.
    */
-  onRevealSidebar?: (reveal: boolean) => void
+  onRevealSidebar?: (reveal: boolean) => void;
 }
 
 /**
@@ -68,23 +68,23 @@ interface AppTourProps {
  */
 const popoverPosition = (
   stepId: string | undefined,
-): 'bottom' | 'left' | 'right' => {
+): "bottom" | "left" | "right" => {
   if (stepId === TOUR_TARGET_IDS.code || stepId === TOUR_TARGET_IDS.paper) {
-    return 'right'
+    return "right";
   }
 
-  return stepId === TOUR_TARGET_IDS.inspector ? 'left' : 'bottom'
-}
+  return stepId === TOUR_TARGET_IDS.inspector ? "left" : "bottom";
+};
 
 /** Which tour belongs to this route, or none. */
 const tourForPath = (pathname: string): TourName | null => {
   if (/^\/resumes\/[^/]+$/.test(pathname)) {
-    return 'editor'
+    return "editor";
   }
 
   // Not '/', which is the landing page and has no shell to point at.
-  return pathname === '/resumes' ? 'library' : null
-}
+  return pathname === "/resumes" ? "library" : null;
+};
 
 export const AppTour: React.FC<AppTourProps> = ({
   children,
@@ -93,34 +93,34 @@ export const AppTour: React.FC<AppTourProps> = ({
 }) => {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
-  })
-  const name = tourForPath(pathname)
+  });
+  const name = tourForPath(pathname);
 
   /**
    * Whether the editor is showing all three panes at once. The same breakpoint
    * `EditorLayout` splits on, and what decides where the editor tour points:
    * at the panes where they exist, at the tabs that open them where they do not.
    */
-  const wideEditor = useMediaQuery('(min-width: 1200px)', true, {
+  const wideEditor = useMediaQuery("(min-width: 1200px)", true, {
     getInitialValueInEffect: false,
-  })
+  });
 
   /**
    * Whether the sidebar is a sidebar rather than a drawer. Mantine's `sm`, the
    * same breakpoint `AppShell` collapses the navbar at.
    */
-  const sidebarPermanent = useMediaQuery('(min-width: 48em)', true, {
+  const sidebarPermanent = useMediaQuery("(min-width: 48em)", true, {
     getInitialValueInEffect: false,
-  })
+  });
 
   /**
    * How a step asks for the editor pane it lives in. Read as a stable action
    * rather than through the hook's selector, so a pane change does not
    * re-render the whole shell.
    */
-  const requestPane = useTourPane((state) => state.request)
+  const requestPane = useTourPane((state) => state.request);
 
-  const [started, setStarted] = useState(false)
+  const [started, setStarted] = useState(false);
 
   /**
    * Started in an effect, never during render.
@@ -133,15 +133,15 @@ export const AppTour: React.FC<AppTourProps> = ({
     // `eligible` already establishes that `name` is not null, and TypeScript
     // narrows through the alias.
     if (name !== null && !hasSeenTour(name)) {
-      setStarted(true)
+      setStarted(true);
     }
-  }, [name])
+  }, [name]);
 
   useEffect(() => {
     if (restartSignal > 0 && name !== null) {
-      setStarted(true)
+      setStarted(true);
     }
-  }, [restartSignal, name])
+  }, [restartSignal, name]);
 
   /**
    * A request dropped wherever it no longer applies.
@@ -153,25 +153,25 @@ export const AppTour: React.FC<AppTourProps> = ({
    * tab strip for a request to mean anything to.
    */
   useEffect(() => {
-    if (name !== 'editor' || wideEditor) {
-      requestPane(null)
+    if (name !== "editor" || wideEditor) {
+      requestPane(null);
     }
-  }, [name, wideEditor, requestPane])
+  }, [name, wideEditor, requestPane]);
 
   const finish = () => {
-    setStarted(false)
-    onRevealSidebar?.(false)
+    setStarted(false);
+    onRevealSidebar?.(false);
     // Stops asking for a pane, which hands the tab strip back to whatever the
     // user had chosen before the tour started.
-    requestPane(null)
+    requestPane(null);
 
     if (name !== null) {
-      markTourSeen(name)
+      markTourSeen(name);
     }
-  }
+  };
 
   if (name === null) {
-    return children
+    return children;
   }
 
   return (
@@ -208,7 +208,7 @@ export const AppTour: React.FC<AppTourProps> = ({
        * after each step, which comfortably outlasts the drawer's 200ms.
        */
       onOnboardingTourChange={(step) => {
-        onRevealSidebar?.(!sidebarPermanent && SIDEBAR_STEP_IDS.has(step.id))
+        onRevealSidebar?.(!sidebarPermanent && SIDEBAR_STEP_IDS.has(step.id));
         /**
          * And the editor's tab strip, the same way.
          *
@@ -225,10 +225,10 @@ export const AppTour: React.FC<AppTourProps> = ({
          * mid-tour would swap the pane behind the card for no reason the reader
          * can see; the release belongs at the end, and `finish` does it.
          */
-        const pane = wideEditor ? undefined : EDITOR_STEP_PANES[step.id]
+        const pane = wideEditor ? undefined : EDITOR_STEP_PANES[step.id];
 
         if (pane !== undefined) {
-          requestPane(pane)
+          requestPane(pane);
         }
       }}
       /**
@@ -256,5 +256,5 @@ export const AppTour: React.FC<AppTourProps> = ({
     >
       {children}
     </OnboardingTour>
-  )
-}
+  );
+};

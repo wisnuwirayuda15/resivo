@@ -1,7 +1,7 @@
-import { createId } from '@/lib/id'
-import { templateDefaults } from '@/features/templates/defaults'
+import { createId } from "@/lib/id";
+import { templateDefaults } from "@/features/templates/defaults";
 
-import { DOCUMENT_VERSION } from './document'
+import { DOCUMENT_VERSION } from "./document";
 
 import type {
   ContactItem,
@@ -11,7 +11,7 @@ import type {
   Section,
   SectionKind,
   TemplateId,
-} from './document'
+} from "./document";
 
 /**
  * Constructors for document nodes.
@@ -22,7 +22,7 @@ import type {
 
 /** Plain unformatted text. The common case by far. */
 export const text = (value: string): InlineText =>
-  value === '' ? [] : [{ type: 'text', text: value }]
+  value === "" ? [] : [{ type: "text", text: value }];
 
 /** Reads the plain string back out, dropping formatting. Used for search,
  * denormalized metadata and Markdown serialization of simple runs. */
@@ -30,17 +30,17 @@ export const plainText = (inline: InlineText): string =>
   inline
     .map((node) => {
       switch (node.type) {
-        case 'text':
-          return node.text
-        case 'link':
-          return plainText(node.children)
-        case 'icon':
-          return ''
+        case "text":
+          return node.text;
+        case "link":
+          return plainText(node.children);
+        case "icon":
+          return "";
       }
     })
-    .join('')
+    .join("");
 
-const icon = (name: string): IconRef => ({ library: 'phosphor', name })
+const icon = (name: string): IconRef => ({ library: "phosphor", name });
 
 export const createContact = (
   label: string,
@@ -50,18 +50,18 @@ export const createContact = (
   label: text(label),
   ...(options.icon === undefined ? {} : { icon: icon(options.icon) }),
   ...(options.href === undefined ? {} : { href: options.href }),
-})
+});
 
 export const createSection = (
   kind: SectionKind,
   title: string,
-  blocks: Section['blocks'] = [],
+  blocks: Section["blocks"] = [],
 ): Section => ({
   id: createId(),
   kind,
   title: text(title),
   blocks,
-})
+});
 
 /**
  * A new, empty resume.
@@ -73,26 +73,26 @@ export const createSection = (
  * they did not write.
  */
 export const createEmptyDocument = (
-  templateId: TemplateId = 'classic',
+  templateId: TemplateId = "classic",
 ): ResumeDocument => ({
   schemaVersion: DOCUMENT_VERSION,
   templateId,
-  meta: { fullName: '', locale: 'en' },
+  meta: { fullName: "", locale: "en" },
   content: {
     header: {
       name: [],
       contacts: [],
     },
     sections: [
-      createSection('summary', 'Summary'),
-      createSection('experience', 'Experience'),
-      createSection('education', 'Education'),
-      createSection('skills', 'Skills'),
+      createSection("summary", "Summary"),
+      createSection("experience", "Experience"),
+      createSection("education", "Education"),
+      createSection("skills", "Skills"),
     ],
   },
   design: templateDefaults(templateId),
-  customCss: '',
-})
+  customCss: "",
+});
 
 /**
  * Recomputes the denormalized `meta` fields from `content.header`.
@@ -102,18 +102,18 @@ export const createEmptyDocument = (
  * Call this on save rather than on every keystroke.
  */
 export const syncMeta = (document: ResumeDocument): ResumeDocument => {
-  const fullName = plainText(document.content.header.name)
+  const fullName = plainText(document.content.header.name);
   const headline =
     document.content.header.headline === undefined
       ? undefined
-      : plainText(document.content.header.headline)
+      : plainText(document.content.header.headline);
 
   return {
     ...document,
     meta: {
       ...document.meta,
       fullName,
-      ...(headline === undefined || headline === '' ? {} : { headline }),
+      ...(headline === undefined || headline === "" ? {} : { headline }),
     },
-  }
-}
+  };
+};

@@ -1,4 +1,4 @@
-import { DocumentIcon } from '@/features/icons/IconRenderer'
+import { DocumentIcon } from "@/features/icons/IconRenderer";
 import {
   setBlockText,
   setBulletItem,
@@ -11,20 +11,20 @@ import {
   setTableCell,
   setTag,
   updateContactLabel,
-} from '@/features/editor/mutations'
-import { plainText } from '@/features/resume/model/index'
+} from "@/features/editor/mutations";
+import { plainText } from "@/features/resume/model/index";
 
-import { EditableText } from './EditableText'
-import { formatDateRange } from './dates'
+import { EditableText } from "./EditableText";
+import { formatDateRange } from "./dates";
 
-import type { Recipe } from '@/features/editor/mutations'
+import type { Recipe } from "@/features/editor/mutations";
 import type {
   BlockProps,
   HeaderProps,
   RenderContext,
   SectionHeadingProps,
   TemplateComponents,
-} from './types'
+} from "./types";
 import type {
   BulletListBlock,
   CodeBlock,
@@ -40,7 +40,7 @@ import type {
   Section,
   TableBlock,
   TagListBlock,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * The default renderers, the resume every template starts from.
@@ -70,16 +70,16 @@ const commitWith = (
   context: RenderContext,
   build: (value: InlineText) => Recipe,
 ): ((value: InlineText) => void) | undefined => {
-  const { apply } = context
+  const { apply } = context;
 
-  return apply === undefined ? undefined : (value) => apply(build(value))
-}
+  return apply === undefined ? undefined : (value) => apply(build(value));
+};
 
 const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
   const avatar =
     header.avatarImageId === undefined
       ? undefined
-      : context.images.get(header.avatarImageId)
+      : context.images.get(header.avatarImageId);
 
   return (
     <header className="rp-header">
@@ -134,7 +134,7 @@ const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
                     />
                   </span>
                 </>
-              )
+              );
 
               return (
                 <span className="rp-contact" key={contact.id}>
@@ -151,14 +151,14 @@ const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
                     </a>
                   )}
                 </span>
-              )
+              );
             })}
           </div>
         )}
       </div>
     </header>
-  )
-}
+  );
+};
 
 /**
  * A section's heading, and the rule under it.
@@ -179,7 +179,7 @@ const DefaultSectionHeading: React.FC<SectionHeadingProps> = ({
    * nothing over it. Titling it is done in the Markdown pane, by writing the
    * heading the paste did not have.
    */
-  plainText(section.title) === '' ? null : (
+  plainText(section.title) === "" ? null : (
     <div className="rp-section">
       <div className="rp-section-title-row">
         {section.icon === undefined ? null : (
@@ -201,12 +201,12 @@ const DefaultSectionHeading: React.FC<SectionHeadingProps> = ({
         <div className="rp-section-rule" />
       ) : null}
     </div>
-  )
+  );
 
 interface BlockViewProps<T> {
-  block: T
-  section: Section
-  context: RenderContext
+  block: T;
+  section: Section;
+  context: RenderContext;
 }
 
 const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
@@ -224,7 +224,7 @@ const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
       value={block.text}
     />
   </p>
-)
+);
 
 /**
  * A list, at any depth.
@@ -238,30 +238,30 @@ const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
  * reliably drawn.
  */
 const ListItems: React.FC<{
-  list: NestedList
-  path: ReadonlyArray<number>
-  block: BulletListBlock
-  section: Section
-  context: RenderContext
+  list: NestedList;
+  path: ReadonlyArray<number>;
+  block: BulletListBlock;
+  section: Section;
+  context: RenderContext;
 }> = ({ list, path, block, section, context }) => {
-  const Tag = list.ordered === true ? 'ol' : 'ul'
+  const Tag = list.ordered === true ? "ol" : "ul";
 
   return (
     <Tag
-      className={list.ordered === true ? 'rp-list rp-list-ordered' : 'rp-list'}
+      className={list.ordered === true ? "rp-list rp-list-ordered" : "rp-list"}
       start={list.ordered === true ? list.start : undefined}
     >
       {list.items.map((item, index) => {
-        const here = [...path, index]
+        const here = [...path, index];
 
         return (
           <li
-            className={item.checked === undefined ? undefined : 'rp-task'}
-            key={here.join('.')}
+            className={item.checked === undefined ? undefined : "rp-task"}
+            key={here.join(".")}
           >
             {item.checked === undefined ? null : (
               <span aria-hidden="true" className="rp-checkbox">
-                {item.checked ? '☑' : '☐'}
+                {item.checked ? "☑" : "☐"}
               </span>
             )}
             <EditableText
@@ -282,11 +282,11 @@ const ListItems: React.FC<{
               />
             )}
           </li>
-        )
+        );
       })}
     </Tag>
-  )
-}
+  );
+};
 
 const BulletList: React.FC<BlockViewProps<BulletListBlock>> = ({
   block,
@@ -300,11 +300,11 @@ const BulletList: React.FC<BlockViewProps<BulletListBlock>> = ({
     path={[]}
     section={section}
   />
-)
+);
 
 /** Written out rather than built from the level, so the tag is a known element
  * name to the type system and to JSX rather than an interpolated string. */
-const HEADING_TAGS = { 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6' } as const
+const HEADING_TAGS = { 3: "h3", 4: "h4", 5: "h5", 6: "h6" } as const;
 
 /**
  * A subheading inside a section.
@@ -318,7 +318,7 @@ const Heading: React.FC<BlockViewProps<HeadingBlock>> = ({
   section,
   context,
 }) => {
-  const Tag = HEADING_TAGS[block.level]
+  const Tag = HEADING_TAGS[block.level];
 
   return (
     <Tag className="rp-heading" data-level={block.level}>
@@ -331,8 +331,8 @@ const Heading: React.FC<BlockViewProps<HeadingBlock>> = ({
         value={block.text}
       />
     </Tag>
-  )
-}
+  );
+};
 
 const Quote: React.FC<BlockViewProps<QuoteBlock>> = ({
   block,
@@ -353,7 +353,7 @@ const Quote: React.FC<BlockViewProps<QuoteBlock>> = ({
       </p>
     ))}
   </blockquote>
-)
+);
 
 /**
  * A fenced code block.
@@ -367,7 +367,7 @@ const Code: React.FC<BlockViewProps<CodeBlock>> = ({ block }) => (
   <pre className="rp-code-block" data-language={block.language}>
     <code>{block.code}</code>
   </pre>
-)
+);
 
 const Table: React.FC<BlockViewProps<TableBlock>> = ({
   block,
@@ -383,9 +383,9 @@ const Table: React.FC<BlockViewProps<TableBlock>> = ({
       )}
       value={value}
     />
-  )
+  );
 
-  const align = (column: number) => block.align[column] ?? undefined
+  const align = (column: number) => block.align[column] ?? undefined;
 
   return (
     <table className="rp-table">
@@ -410,20 +410,20 @@ const Table: React.FC<BlockViewProps<TableBlock>> = ({
         ))}
       </tbody>
     </table>
-  )
-}
+  );
+};
 
 const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
   block,
   section,
   context,
 }) => {
-  const dates = formatDateRange(block.dateRange, context.locale)
+  const dates = formatDateRange(block.dateRange, context.locale);
 
-  const field = (name: 'title' | 'subtitle' | 'location' | 'summary') =>
+  const field = (name: "title" | "subtitle" | "location" | "summary") =>
     commitWith(context, (value) =>
       setEntryField(section.id, block.id, name, value),
-    )
+    );
 
   return (
     <div className="rp-entry">
@@ -433,7 +433,7 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
             <EditableText
               context={context}
               label="entry title"
-              onCommit={field('title')}
+              onCommit={field("title")}
               value={block.title}
             />
           </span>
@@ -442,11 +442,11 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
               {/* A comma rather than a separate line: role and employer read as
                   one fact, and one line per entry saves a page over a resume. */}
               <span className="rp-entry-subtitle">
-                {', '}
+                {", "}
                 <EditableText
                   context={context}
                   label="entry subtitle"
-                  onCommit={field('subtitle')}
+                  onCommit={field("subtitle")}
                   value={block.subtitle}
                 />
               </span>
@@ -454,7 +454,7 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
           )}
         </div>
 
-        {dates === '' && block.location === undefined ? null : (
+        {dates === "" && block.location === undefined ? null : (
           <div className="rp-entry-meta">
             {/**
              * The dates are the one run of text on the paper that is *derived*,
@@ -464,13 +464,13 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
              * than one whose dates are edited in the Markdown pane. So this stays
              * read-only here, deliberately.
              */}
-            {dates === '' ? null : <div>{dates}</div>}
+            {dates === "" ? null : <div>{dates}</div>}
             {block.location === undefined ? null : (
               <div>
                 <EditableText
                   context={context}
                   label="entry location"
-                  onCommit={field('location')}
+                  onCommit={field("location")}
                   value={block.location}
                 />
               </div>
@@ -484,7 +484,7 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
           <EditableText
             context={context}
             label="entry summary"
-            onCommit={field('summary')}
+            onCommit={field("summary")}
             value={block.summary}
           />
         </p>
@@ -507,8 +507,8 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
         </ul>
       )}
     </div>
-  )
-}
+  );
+};
 
 const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
   block,
@@ -526,14 +526,14 @@ const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
           onCommit={commitWith(context, (value) =>
             setTag(section.id, block.id, index, plainText(value)),
           )}
-          value={[{ type: 'text', text: tag }]}
+          value={[{ type: "text", text: tag }]}
         />
       </span>
     ))}
   </div>
-)
+);
 
-const Divider: React.FC = () => <div className="rp-divider" />
+const Divider: React.FC = () => <div className="rp-divider" />;
 
 /**
  * A forced page break, drawn as a marker of no height.
@@ -550,7 +550,7 @@ const Divider: React.FC = () => <div className="rp-divider" />
  */
 const PageBreak: React.FC = () => (
   <div aria-hidden className="rp-page-break" data-label="Page break" />
-)
+);
 
 const IconLabel: React.FC<BlockViewProps<IconLabelBlock>> = ({
   block,
@@ -570,7 +570,7 @@ const IconLabel: React.FC<BlockViewProps<IconLabelBlock>> = ({
       />
     </span>
   </div>
-)
+);
 
 /**
  * A referenced image.
@@ -586,7 +586,7 @@ const Image: React.FC<{ block: ImageBlock; context: RenderContext }> = ({
   block,
   context,
 }) => {
-  const resolved = context.images.get(block.imageId)
+  const resolved = context.images.get(block.imageId);
 
   return (
     <figure
@@ -600,9 +600,9 @@ const Image: React.FC<{ block: ImageBlock; context: RenderContext }> = ({
       {resolved === undefined || resolved === null ? (
         <div className="rp-image-missing" data-image-id={block.imageId}>
           {resolved === null
-            ? `Missing image${block.alt === '' ? '' : `: ${block.alt}`}`
-            : block.alt === ''
-              ? 'Image'
+            ? `Missing image${block.alt === "" ? "" : `: ${block.alt}`}`
+            : block.alt === ""
+              ? "Image"
               : block.alt}
         </div>
       ) : (
@@ -614,46 +614,46 @@ const Image: React.FC<{ block: ImageBlock; context: RenderContext }> = ({
         />
       )}
     </figure>
-  )
-}
+  );
+};
 
 const Raw: React.FC<{ block: RawBlock }> = ({ block }) => (
   <pre className="rp-raw">{block.markdown}</pre>
-)
+);
 
 const DefaultBlock: React.FC<BlockProps> = ({ block, section, context }) => {
   switch (block.kind) {
-    case 'paragraph':
-      return <Paragraph block={block} context={context} section={section} />
-    case 'heading':
-      return <Heading block={block} context={context} section={section} />
-    case 'bulletList':
-      return <BulletList block={block} context={context} section={section} />
-    case 'quote':
-      return <Quote block={block} context={context} section={section} />
-    case 'code':
-      return <Code block={block} context={context} section={section} />
-    case 'table':
-      return <Table block={block} context={context} section={section} />
-    case 'entry':
-      return <Entry block={block} context={context} section={section} />
-    case 'tagList':
-      return <TagList block={block} context={context} section={section} />
-    case 'image':
-      return <Image block={block} context={context} />
-    case 'divider':
-      return <Divider />
-    case 'pageBreak':
-      return <PageBreak />
-    case 'iconLabel':
-      return <IconLabel block={block} context={context} section={section} />
-    case 'raw':
-      return <Raw block={block} />
+    case "paragraph":
+      return <Paragraph block={block} context={context} section={section} />;
+    case "heading":
+      return <Heading block={block} context={context} section={section} />;
+    case "bulletList":
+      return <BulletList block={block} context={context} section={section} />;
+    case "quote":
+      return <Quote block={block} context={context} section={section} />;
+    case "code":
+      return <Code block={block} context={context} section={section} />;
+    case "table":
+      return <Table block={block} context={context} section={section} />;
+    case "entry":
+      return <Entry block={block} context={context} section={section} />;
+    case "tagList":
+      return <TagList block={block} context={context} section={section} />;
+    case "image":
+      return <Image block={block} context={context} />;
+    case "divider":
+      return <Divider />;
+    case "pageBreak":
+      return <PageBreak />;
+    case "iconLabel":
+      return <IconLabel block={block} context={context} section={section} />;
+    case "raw":
+      return <Raw block={block} />;
   }
-}
+};
 
 export const defaultComponents: TemplateComponents = {
   Header: DefaultHeader,
   SectionHeading: DefaultSectionHeading,
   Block: DefaultBlock,
-}
+};

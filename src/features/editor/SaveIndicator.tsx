@@ -1,11 +1,11 @@
-import { Box, Text, Tooltip } from '@mantine/core'
+import { Box, Text, Tooltip } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { cn } from '@/lib/utils'
+import { Icon } from "@/features/icons/IconRenderer";
+import { cn } from "@/lib/utils";
 
-import { useEditorStore } from './store'
+import { useEditorStore } from "./store";
 
-import type { SaveStatus } from './autosave'
+import type { SaveStatus } from "./autosave";
 
 /**
  * Whether the open resume is written down yet.
@@ -23,38 +23,38 @@ import type { SaveStatus } from './autosave'
  */
 
 interface Report {
-  icon: string
-  label: string
+  icon: string;
+  label: string;
   /** Says where, because "saved" in an app with no account invites the question. */
-  detail: string
-  className: string
+  detail: string;
+  className: string;
 }
 
 const REPORTS: Record<SaveStatus, Report> = {
   saved: {
-    icon: 'check-circle',
-    label: 'Saved',
-    detail: 'Written to this device. There is no copy anywhere else.',
-    className: 'text-subtle',
+    icon: "check-circle",
+    label: "Saved",
+    detail: "Written to this device. There is no copy anywhere else.",
+    className: "text-subtle",
   },
   saving: {
-    icon: 'circle-dashed',
-    label: 'Saving',
-    detail: 'Writing to this device.',
-    className: 'text-muted',
+    icon: "circle-dashed",
+    label: "Saving",
+    detail: "Writing to this device.",
+    className: "text-muted",
   },
   error: {
-    icon: 'warning-circle',
-    label: 'Not saved',
+    icon: "warning-circle",
+    label: "Not saved",
     detail:
-      'The last write failed, and this resume is not on disk. Your edits are still on screen, export a copy before closing the tab.',
-    className: 'text-[var(--danger-text)]',
+      "The last write failed, and this resume is not on disk. Your edits are still on screen, export a copy before closing the tab.",
+    className: "text-[var(--danger-text)]",
   },
-}
+};
 
 export const SaveIndicator: React.FC = () => {
-  const status = useEditorStore((state) => state.saveStatus)
-  const report = REPORTS[status]
+  const status = useEditorStore((state) => state.saveStatus);
+  const report = REPORTS[status];
 
   return (
     <Tooltip label={report.detail} multiline w={260}>
@@ -64,7 +64,7 @@ export const SaveIndicator: React.FC = () => {
       <Box
         aria-live="polite"
         className={cn(
-          'flex w-[72px] flex-none items-center gap-1.5 text-[11px]',
+          "flex w-[72px] flex-none items-center gap-1.5 text-[11px]",
           report.className,
         )}
         role="status"
@@ -75,5 +75,5 @@ export const SaveIndicator: React.FC = () => {
         </Text>
       </Box>
     </Tooltip>
-  )
-}
+  );
+};

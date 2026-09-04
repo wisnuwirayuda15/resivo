@@ -1,12 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface ClientOnlyProps {
-  children: ReactNode
+  children: ReactNode;
   /** Rendered on the server and during the first client paint. Give it the same
    * footprint as the real content so hydration does not shift the layout. */
-  fallback?: ReactNode
+  fallback?: ReactNode;
 }
 
 /**
@@ -25,11 +25,11 @@ export const ClientOnly: React.FC<ClientOnlyProps> = ({
   children,
   fallback = null,
 }) => {
-  const [hydrated, setHydrated] = useState(false)
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    setHydrated(true)
-  }, [])
+    setHydrated(true);
+  }, []);
 
-  return <>{hydrated ? children : fallback}</>
-}
+  return <>{hydrated ? children : fallback}</>;
+};

@@ -1,4 +1,4 @@
-import { Link } from '@tanstack/react-router'
+import { Link } from "@tanstack/react-router";
 import {
   Box,
   Button,
@@ -6,10 +6,10 @@ import {
   UnstyledButton,
   useComputedColorScheme,
   useMantineColorScheme,
-} from '@mantine/core'
+} from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { Logo } from '@/components/shell/Logo'
+import { Icon } from "@/features/icons/IconRenderer";
+import { Logo } from "@/components/shell/Logo";
 
 /**
  * The landing page's own bar.
@@ -24,16 +24,16 @@ import { Logo } from '@/components/shell/Logo'
  */
 
 const LINKS = [
-  { label: 'Templates', to: '/templates' },
-  { label: 'About', to: '/about' },
-] as const
+  { label: "Templates", to: "/templates" },
+  { label: "About", to: "/about" },
+] as const;
 
 export const LandingNav: React.FC = () => {
-  const { setColorScheme } = useMantineColorScheme()
-  const scheme = useComputedColorScheme('light', {
+  const { setColorScheme } = useMantineColorScheme();
+  const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
-  })
-  const isDark = scheme === 'dark'
+  });
+  const isDark = scheme === "dark";
 
   return (
     <Box
@@ -61,11 +61,11 @@ export const LandingNav: React.FC = () => {
           ))}
 
           <UnstyledButton
-            aria-label={isDark ? 'Light theme' : 'Dark theme'}
+            aria-label={isDark ? "Light theme" : "Dark theme"}
             className="text-muted hover:text-body hover:bg-hover rounded-control duration-fast ease-standard flex size-[30px] items-center justify-center transition-colors active:scale-[0.96]"
-            onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+            onClick={() => setColorScheme(isDark ? "light" : "dark")}
           >
-            <Icon name={isDark ? 'sun' : 'moon'} size={15} />
+            <Icon name={isDark ? "sun" : "moon"} size={15} />
           </UnstyledButton>
 
           <Button
@@ -78,5 +78,5 @@ export const LandingNav: React.FC = () => {
         </Box>
       </Box>
     </Box>
-  )
-}
+  );
+};

@@ -1,15 +1,15 @@
-import { Suspense, lazy, useCallback, useState } from 'react'
-import { Box, Loader, Tabs, Text } from '@mantine/core'
+import { Suspense, lazy, useCallback, useState } from "react";
+import { Box, Loader, Tabs, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { Icon } from "@/features/icons/IconRenderer";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { GuideButton } from '@/features/guide/GuideButton'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { cn } from '@/lib/utils'
+import { GuideButton } from "@/features/guide/GuideButton";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { cn } from "@/lib/utils";
 
-import type { ParseWarning } from '@/features/markdown/index'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ParseWarning } from "@/features/markdown/index";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * Panel 1, the code pane.
@@ -21,28 +21,28 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * both are the same editor with a different language.
  */
 const MarkdownEditor = lazy(() =>
-  import('./MarkdownEditor').then((module) => ({
+  import("./MarkdownEditor").then((module) => ({
     default: module.MarkdownEditor,
   })),
-)
+);
 
 const CssEditor = lazy(() =>
-  import('./CssEditor').then((module) => ({ default: module.CssEditor })),
-)
+  import("./CssEditor").then((module) => ({ default: module.CssEditor })),
+);
 
 interface CodePaneProps {
-  document: ResumeDocument
-  warnings: Array<ParseWarning>
-  onSourceChange: (source: string) => void
-  onCustomCssChange: (css: string) => void
-  className?: string
+  document: ResumeDocument;
+  warnings: Array<ParseWarning>;
+  onSourceChange: (source: string) => void;
+  onCustomCssChange: (css: string) => void;
+  className?: string;
 }
 
 const EditorFallback: React.FC = () => (
   <Box className="flex h-full items-center justify-center">
     <Loader size="sm" />
   </Box>
-)
+);
 
 export const CodePane: React.FC<CodePaneProps> = ({
   document: resume,
@@ -51,11 +51,11 @@ export const CodePane: React.FC<CodePaneProps> = ({
   onCustomCssChange,
   className,
 }) => {
-  const [tab, setTab] = useState<string | null>('markdown')
-  const [refusals, setRefusals] = useState(0)
+  const [tab, setTab] = useState<string | null>("markdown");
+  const [refusals, setRefusals] = useState(0);
 
   /** Stable, so reporting a count does not re-run the editor's marker effect. */
-  const handleRefusals = useCallback((count: number) => setRefusals(count), [])
+  const handleRefusals = useCallback((count: number) => setRefusals(count), []);
 
   /**
    * One count for whichever tab is not showing.
@@ -65,11 +65,11 @@ export const CodePane: React.FC<CodePaneProps> = ({
    * except that tracking which is which costs more than it tells the reader. The
    * count is therefore the total, and the tab it belongs to is one click away.
    */
-  const notices = warnings.length + refusals
+  const notices = warnings.length + refusals;
 
   return (
     <OnboardingTour.Target id={TOUR_TARGET_IDS.code}>
-      <Box className={cn('bg-code flex min-h-0 flex-col', className)}>
+      <Box className={cn("bg-code flex min-h-0 flex-col", className)}>
         <Tabs
           className="flex min-h-0 flex-1 flex-col"
           keepMounted={false}
@@ -101,7 +101,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
                   className="text-warning-text font-mono text-[11px] tabular-nums"
                   span
                 >
-                  {notices} {notices === 1 ? 'notice' : 'notices'}
+                  {notices} {notices === 1 ? "notice" : "notices"}
                 </Text>
               )}
               <GuideButton />
@@ -130,5 +130,5 @@ export const CodePane: React.FC<CodePaneProps> = ({
         </Tabs>
       </Box>
     </OnboardingTour.Target>
-  )
-}
+  );
+};

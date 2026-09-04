@@ -13,9 +13,9 @@ export const formatBytes = (bytes: number): string =>
       `${bytes} B`
     : bytes < 1024 * 1024
       ? `${Math.round(bytes / 1024)} KB`
-      : `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`
+      : `${Math.round((bytes / (1024 * 1024)) * 10) / 10} MB`;
 
 /** The message from a rejected upload, which is written for the user. Anything
  * else is unexpected, so it is shown verbatim rather than paraphrased. */
 export const errorMessage = (error: unknown): string =>
-  error instanceof Error ? error.message : String(error)
+  error instanceof Error ? error.message : String(error);

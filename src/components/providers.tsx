@@ -1,20 +1,20 @@
-import { QueryClientProvider } from '@tanstack/react-query'
-import { MantineProvider } from '@mantine/core'
-import { DatesProvider } from '@mantine/dates'
-import { Notifications } from '@mantine/notifications'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
-import { FormDevtoolsPanel } from '@tanstack/react-form-devtools'
+import { QueryClientProvider } from "@tanstack/react-query";
+import { MantineProvider } from "@mantine/core";
+import { DatesProvider } from "@mantine/dates";
+import { Notifications } from "@mantine/notifications";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
+import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 
-import { theme } from '@/styles/theme'
+import { theme } from "@/styles/theme";
 
-import type { ReactNode } from 'react'
-import type { QueryClient } from '@tanstack/react-query'
+import type { ReactNode } from "react";
+import type { QueryClient } from "@tanstack/react-query";
 
 interface ProvidersProps {
-  queryClient: QueryClient
-  children: ReactNode
+  queryClient: QueryClient;
+  children: ReactNode;
 }
 
 /**
@@ -39,18 +39,18 @@ export const Providers: React.FC<ProvidersProps> = ({
           {children}
           <Notifications />
           <TanStackDevtools
-            config={{ position: 'bottom-right' }}
+            config={{ position: "bottom-right" }}
             plugins={[
               {
-                name: 'TanStack Router',
+                name: "TanStack Router",
                 render: <TanStackRouterDevtoolsPanel />,
               },
               {
-                name: 'TanStack Query',
+                name: "TanStack Query",
                 render: <ReactQueryDevtoolsPanel />,
               },
               {
-                name: 'TanStack Form',
+                name: "TanStack Form",
                 render: <FormDevtoolsPanel />,
               },
             ]}
@@ -58,5 +58,5 @@ export const Providers: React.FC<ProvidersProps> = ({
         </DatesProvider>
       </MantineProvider>
     </QueryClientProvider>
-  )
-}
+  );
+};

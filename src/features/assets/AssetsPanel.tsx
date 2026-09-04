@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -7,25 +7,28 @@ import {
   Text,
   Tooltip,
   UnstyledButton,
-} from '@mantine/core'
+} from "@mantine/core";
 
-import { ControlGroup } from '@/features/style/controls'
+import { ControlGroup } from "@/features/style/controls";
 import {
   addBlock,
   patchDesign,
   setAvatarImage,
-} from '@/features/editor/mutations'
-import { plainText } from '@/features/resume/model/index'
-import { createId } from '@/lib/id'
+} from "@/features/editor/mutations";
+import { plainText } from "@/features/resume/model/index";
+import { createId } from "@/lib/id";
 
-import { AssetNameInput } from './components/AssetNameInput'
-import { AssetUpload, UploadError } from './components/AssetUpload'
-import { DeleteFontDialog, DeleteImageDialog } from './components/deleteDialogs'
-import { FontCard } from './components/FontCard'
-import { Thumb } from './components/Thumb'
-import { IMAGE_ACCEPT } from './readImage'
-import { FONT_ACCEPT } from './readFont'
-import { formatBytes } from './format'
+import { AssetNameInput } from "./components/AssetNameInput";
+import { AssetUpload, UploadError } from "./components/AssetUpload";
+import {
+  DeleteFontDialog,
+  DeleteImageDialog,
+} from "./components/deleteDialogs";
+import { FontCard } from "./components/FontCard";
+import { Thumb } from "./components/Thumb";
+import { IMAGE_ACCEPT } from "./readImage";
+import { FONT_ACCEPT } from "./readFont";
+import { formatBytes } from "./format";
 import {
   useAddFont,
   useAddImage,
@@ -36,11 +39,11 @@ import {
   useRenameImage,
   useUnusedFonts,
   useUnusedImages,
-} from './queries'
+} from "./queries";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { FontSummary, ImageSummary } from '@/database/index'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { Recipe } from "@/features/editor/mutations";
+import type { FontSummary, ImageSummary } from "@/database/index";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The Assets tab, the images and fonts stored on this device.
@@ -61,45 +64,45 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  */
 
 interface AssetsPanelProps {
-  document: ResumeDocument
-  apply: (recipe: Recipe, options?: { coalesce?: string }) => void
+  document: ResumeDocument;
+  apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
 }
 
 const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
-  const { data: images, isPending } = useImages()
-  const { data: unused } = useUnusedImages()
-  const add = useAddImage()
-  const rename = useRenameImage()
-  const remove = useDeleteImage()
+  const { data: images, isPending } = useImages();
+  const { data: unused } = useUnusedImages();
+  const add = useAddImage();
+  const rename = useRenameImage();
+  const remove = useDeleteImage();
 
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [confirming, setConfirming] = useState<ImageSummary | null>(null)
-  const [sectionId, setSectionId] = useState<string | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [confirming, setConfirming] = useState<ImageSummary | null>(null);
+  const [sectionId, setSectionId] = useState<string | null>(null);
 
-  const selected = (images ?? []).find((image) => image.id === selectedId)
-  const unusedIds = new Set((unused ?? []).map((image) => image.id))
+  const selected = (images ?? []).find((image) => image.id === selectedId);
+  const unusedIds = new Set((unused ?? []).map((image) => image.id));
 
   const sections = document.content.sections.map((section) => ({
     value: section.id,
-    label: plainText(section.title).trim() || 'Untitled section',
-  }))
+    label: plainText(section.title).trim() || "Untitled section",
+  }));
 
   const insertInto = (target: string) => {
     if (selected === undefined) {
-      return
+      return;
     }
 
     apply(
       addBlock(target, {
         id: createId(),
-        kind: 'image',
+        kind: "image",
         imageId: selected.id,
         // Empty rather than the file name: alt text describes the picture to
         // someone who cannot see it, and "photo-2024-final" describes nothing.
-        alt: '',
+        alt: "",
       }),
-    )
-  }
+    );
+  };
 
   return (
     <ControlGroup title="Images">
@@ -133,7 +136,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
             <Tooltip
               key={image.id}
               label={`${image.name}, ${image.width}×${image.height}, ${formatBytes(image.size)}${
-                unusedIds.has(image.id) ? ', unused' : ''
+                unusedIds.has(image.id) ? ", unused" : ""
               }`}
             >
               <UnstyledButton
@@ -200,7 +203,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 
           <Box className="flex items-center justify-between">
             <Text className="text-subtle font-mono text-[11px]" span>
-              {unusedIds.has(selected.id) ? 'Used by no resume' : 'In use'}
+              {unusedIds.has(selected.id) ? "Used by no resume" : "In use"}
             </Text>
             <Button
               color="red"
@@ -218,36 +221,36 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
-            remove.mutate(confirming.id)
+            remove.mutate(confirming.id);
           }
 
-          setConfirming(null)
+          setConfirming(null);
         }}
         unused={confirming !== null && unusedIds.has(confirming.id)}
       />
     </ControlGroup>
-  )
-}
+  );
+};
 
 const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
-  const { data: fonts, isPending } = useFonts()
-  const { data: unused } = useUnusedFonts()
-  const add = useAddFont()
-  const remove = useDeleteFont()
+  const { data: fonts, isPending } = useFonts();
+  const { data: unused } = useUnusedFonts();
+  const add = useAddFont();
+  const remove = useDeleteFont();
 
-  const [confirming, setConfirming] = useState<FontSummary | null>(null)
+  const [confirming, setConfirming] = useState<FontSummary | null>(null);
 
-  const unusedIds = new Set((unused ?? []).map((font) => font.id))
-  const { bodyFont, headingFont } = document.design.typography
+  const unusedIds = new Set((unused ?? []).map((font) => font.id));
+  const { bodyFont, headingFont } = document.design.typography;
 
-  const use = (font: FontSummary, role: 'bodyFont' | 'headingFont') =>
+  const use = (font: FontSummary, role: "bodyFont" | "headingFont") =>
     apply(
       patchDesign({
         typography: {
-          [role]: { family: font.family, source: 'custom', fontId: font.id },
+          [role]: { family: font.family, source: "custom", fontId: font.id },
         },
       }),
-    )
+    );
 
   return (
     <ControlGroup title="Fonts">
@@ -284,18 +287,18 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
                 <>
                   <Button
                     disabled={bodyFont.fontId === font.id}
-                    onClick={() => use(font, 'bodyFont')}
+                    onClick={() => use(font, "bodyFont")}
                     size="compact-xs"
-                    variant={bodyFont.fontId === font.id ? 'light' : 'subtle'}
+                    variant={bodyFont.fontId === font.id ? "light" : "subtle"}
                   >
                     Body
                   </Button>
                   <Button
                     disabled={headingFont?.fontId === font.id}
-                    onClick={() => use(font, 'headingFont')}
+                    onClick={() => use(font, "headingFont")}
                     size="compact-xs"
                     variant={
-                      headingFont?.fontId === font.id ? 'light' : 'subtle'
+                      headingFont?.fontId === font.id ? "light" : "subtle"
                     }
                   >
                     Headings
@@ -316,16 +319,16 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
-            remove.mutate(confirming.id)
+            remove.mutate(confirming.id);
           }
 
-          setConfirming(null)
+          setConfirming(null);
         }}
         unused={confirming !== null && unusedIds.has(confirming.id)}
       />
     </ControlGroup>
-  )
-}
+  );
+};
 
 export const AssetsPanel: React.FC<AssetsPanelProps> = ({
   document,
@@ -335,4 +338,4 @@ export const AssetsPanel: React.FC<AssetsPanelProps> = ({
     <ImageGallery apply={apply} document={document} />
     <FontList apply={apply} document={document} />
   </Box>
-)
+);

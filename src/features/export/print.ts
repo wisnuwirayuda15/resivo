@@ -25,7 +25,7 @@
  */
 
 /** One frame, reused by id, so a second attempt cannot leave two behind. */
-const FRAME_ID = 'resivo-print-document'
+const FRAME_ID = "resivo-print-document";
 
 /**
  * How long to keep the frame after `print()` returns, when `afterprint` never
@@ -33,11 +33,11 @@ const FRAME_ID = 'resivo-print-document'
  * document for ever is a leak; ten seconds is long after a print job has been
  * handed over and short enough not to matter.
  */
-const CLEANUP_FALLBACK_MS = 10_000
+const CLEANUP_FALLBACK_MS = 10_000;
 
 const removeFrame = (): void => {
-  document.getElementById(FRAME_ID)?.remove()
-}
+  document.getElementById(FRAME_ID)?.remove();
+};
 
 /**
  * Prints one self-contained HTML document.
@@ -47,13 +47,13 @@ const removeFrame = (): void => {
  * cancels is not a failure, and there is no way to tell the two apart from here.
  */
 export const printExportHtml = async (html: string): Promise<void> => {
-  removeFrame()
+  removeFrame();
 
-  const frame = document.createElement('iframe')
+  const frame = document.createElement("iframe");
 
-  frame.id = FRAME_ID
-  frame.title = 'Print document'
-  frame.setAttribute('aria-hidden', 'true')
+  frame.id = FRAME_ID;
+  frame.title = "Print document";
+  frame.setAttribute("aria-hidden", "true");
 
   /**
    * Positioned off screen rather than `display: none`.
@@ -63,32 +63,32 @@ export const printExportHtml = async (html: string): Promise<void> => {
    * Tailwind's reach, everything the app renders uses classes.
    */
   frame.style.cssText =
-    'position:fixed;left:-10000px;top:0;width:1024px;height:1400px;border:0'
+    "position:fixed;left:-10000px;top:0;width:1024px;height:1400px;border:0";
 
   /**
    * Not sandboxed, deliberately. The document is one this app just wrote and
    * contains no script, and a sandbox without `allow-modals` is refused
    * `print()`, which is the only thing the frame exists for.
    */
-  frame.srcdoc = html
+  frame.srcdoc = html;
 
-  document.body.append(frame)
+  document.body.append(frame);
 
   try {
     await new Promise<void>((resolve, reject) => {
-      frame.addEventListener('load', () => resolve(), { once: true })
+      frame.addEventListener("load", () => resolve(), { once: true });
       frame.addEventListener(
-        'error',
-        () => reject(new Error('The print document could not be prepared.')),
+        "error",
+        () => reject(new Error("The print document could not be prepared.")),
         { once: true },
-      )
-    })
+      );
+    });
 
-    const view = frame.contentWindow
-    const printed = frame.contentDocument
+    const view = frame.contentWindow;
+    const printed = frame.contentDocument;
 
     if (view === null || printed === null) {
-      throw new Error('The print document could not be prepared.')
+      throw new Error("The print document could not be prepared.");
     }
 
     /**
@@ -99,18 +99,18 @@ export const printExportHtml = async (html: string): Promise<void> => {
      * after the print has been captured is a résumé printed in a fallback, with
      * different line breaks from the one on screen.
      */
-    await printed.fonts.ready
+    await printed.fonts.ready;
 
     const settled = new Promise<void>((resolve) => {
-      view.addEventListener('afterprint', () => resolve(), { once: true })
-      setTimeout(resolve, CLEANUP_FALLBACK_MS)
-    })
+      view.addEventListener("afterprint", () => resolve(), { once: true });
+      setTimeout(resolve, CLEANUP_FALLBACK_MS);
+    });
 
-    view.focus()
-    view.print()
+    view.focus();
+    view.print();
 
-    await settled
+    await settled;
   } finally {
-    removeFrame()
+    removeFrame();
   }
-}
+};

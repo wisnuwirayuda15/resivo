@@ -1,7 +1,7 @@
-import { clsx } from 'clsx'
-import { twMerge } from 'tailwind-merge'
+import { clsx } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-import type { ClassValue } from 'clsx'
+import type { ClassValue } from "clsx";
 
 /**
  * Combines Tailwind class names.
@@ -13,4 +13,4 @@ import type { ClassValue } from 'clsx'
  * a component's own default rather than depending on stylesheet order.
  */
 export const cn = (...inputs: Array<ClassValue>): string =>
-  twMerge(clsx(inputs))
+  twMerge(clsx(inputs));

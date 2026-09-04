@@ -1,9 +1,9 @@
-import { loader } from '@monaco-editor/react'
-import * as monaco from 'monaco-editor'
-import cssWorker from 'monaco-editor/language/css/css.worker?worker'
-import editorWorker from 'monaco-editor/editor/editor.worker?worker'
+import { loader } from "@monaco-editor/react";
+import * as monaco from "monaco-editor";
+import cssWorker from "monaco-editor/language/css/css.worker?worker";
+import editorWorker from "monaco-editor/editor/editor.worker?worker";
 
-import type { editor } from 'monaco-editor'
+import type { editor } from "monaco-editor";
 
 /**
  * Monaco, wired for a local-first app.
@@ -28,21 +28,21 @@ import type { editor } from 'monaco-editor'
 
 declare global {
   interface Window {
-    MonacoEnvironment?: monaco.Environment
+    MonacoEnvironment?: monaco.Environment;
   }
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window !== "undefined") {
   window.MonacoEnvironment = {
     getWorker: (_workerId, label) =>
       // Markdown needs no worker of its own (it is tokenised in the main
       // thread), so anything that is not CSS gets the generic editor worker.
-      label === 'css' || label === 'scss' || label === 'less'
+      label === "css" || label === "scss" || label === "less"
         ? new cssWorker()
         : new editorWorker(),
-  }
+  };
 
-  loader.config({ monaco })
+  loader.config({ monaco });
 }
 
 /**
@@ -52,81 +52,81 @@ if (typeof window !== 'undefined') {
  * for the scheme that is not currently applied would be built from the wrong
  * values.
  */
-export const RESIVO_THEME = 'resivo'
+export const RESIVO_THEME = "resivo";
 
 const token = (root: Element, name: string, fallback: string): string => {
-  const value = getComputedStyle(root).getPropertyValue(name).trim()
+  const value = getComputedStyle(root).getPropertyValue(name).trim();
 
-  return value === '' ? fallback : value
-}
+  return value === "" ? fallback : value;
+};
 
 /** Monaco wants six hex digits with no alpha and no `var()`. A palette entry
  * that resolves to anything else is dropped in favour of the fallback rather
  * than passed on, because an unparseable colour makes Monaco throw. */
-const HEX = /^#[0-9a-f]{6}$/i
+const HEX = /^#[0-9a-f]{6}$/i;
 
 const colour = (root: Element, name: string, fallback: string): string => {
-  const value = token(root, name, fallback)
+  const value = token(root, name, fallback);
 
-  return HEX.test(value) ? value : fallback
-}
+  return HEX.test(value) ? value : fallback;
+};
 
 export const buildTheme = (
   root: Element,
   dark: boolean,
 ): editor.IStandaloneThemeData => {
   const syntax = {
-    comment: colour(root, '--syn-comment', dark ? '#6f6f68' : '#9b9b93'),
-    key: colour(root, '--syn-key', dark ? '#57b6ae' : '#066560'),
-    string: colour(root, '--syn-string', dark ? '#d9a95c' : '#8a5606'),
-    number: colour(root, '--syn-number', dark ? '#7fb0e6' : '#2563a8'),
-    heading: colour(root, '--syn-heading', dark ? '#f2f2f0' : '#1d1d1a'),
-    punct: colour(root, '--syn-punct', dark ? '#8a8a83' : '#79796f'),
-    selector: colour(root, '--syn-selector', dark ? '#b98ad9' : '#7a3ea8'),
-    gutter: colour(root, '--syn-gutter', dark ? '#4d4d47' : '#9b9b93'),
-  }
+    comment: colour(root, "--syn-comment", dark ? "#6f6f68" : "#9b9b93"),
+    key: colour(root, "--syn-key", dark ? "#57b6ae" : "#066560"),
+    string: colour(root, "--syn-string", dark ? "#d9a95c" : "#8a5606"),
+    number: colour(root, "--syn-number", dark ? "#7fb0e6" : "#2563a8"),
+    heading: colour(root, "--syn-heading", dark ? "#f2f2f0" : "#1d1d1a"),
+    punct: colour(root, "--syn-punct", dark ? "#8a8a83" : "#79796f"),
+    selector: colour(root, "--syn-selector", dark ? "#b98ad9" : "#7a3ea8"),
+    gutter: colour(root, "--syn-gutter", dark ? "#4d4d47" : "#9b9b93"),
+  };
 
-  const surface = colour(root, '--bg-code', dark ? '#131417' : '#fbfbfa')
-  const text = colour(root, '--text-body', dark ? '#d7d7d3' : '#2e2e2a')
+  const surface = colour(root, "--bg-code", dark ? "#131417" : "#fbfbfa");
+  const text = colour(root, "--text-body", dark ? "#d7d7d3" : "#2e2e2a");
 
   return {
-    base: dark ? 'vs-dark' : 'vs',
+    base: dark ? "vs-dark" : "vs",
     // Inherits Monaco's own rules for the tokens the design system says nothing
     // about, rather than leaving them unstyled.
     inherit: true,
     rules: [
-      { token: 'comment', foreground: syntax.comment },
-      { token: 'keyword', foreground: syntax.key },
-      { token: 'string', foreground: syntax.string },
-      { token: 'number', foreground: syntax.number },
-      { token: 'attribute.name', foreground: syntax.key },
-      { token: 'attribute.value', foreground: syntax.string },
-      { token: 'tag', foreground: syntax.selector },
-      { token: 'delimiter', foreground: syntax.punct },
+      { token: "comment", foreground: syntax.comment },
+      { token: "keyword", foreground: syntax.key },
+      { token: "string", foreground: syntax.string },
+      { token: "number", foreground: syntax.number },
+      { token: "attribute.name", foreground: syntax.key },
+      { token: "attribute.value", foreground: syntax.string },
+      { token: "tag", foreground: syntax.selector },
+      { token: "delimiter", foreground: syntax.punct },
       // Markdown: headings carry the document's structure, so they get the
       // strongest colour on the page and the only bold run.
-      { token: 'keyword.md', foreground: syntax.heading, fontStyle: 'bold' },
-      { token: 'strong.md', foreground: text, fontStyle: 'bold' },
-      { token: 'emphasis.md', foreground: text, fontStyle: 'italic' },
-      { token: 'string.link.md', foreground: syntax.string },
-      { token: 'variable.md', foreground: syntax.key },
+      { token: "keyword.md", foreground: syntax.heading, fontStyle: "bold" },
+      { token: "strong.md", foreground: text, fontStyle: "bold" },
+      { token: "emphasis.md", foreground: text, fontStyle: "italic" },
+      { token: "string.link.md", foreground: syntax.string },
+      { token: "variable.md", foreground: syntax.key },
       // CSS, for the tab phase 8 fills in.
-      { token: 'attribute.name.css', foreground: syntax.key },
-      { token: 'attribute.value.css', foreground: syntax.string },
-      { token: 'tag.css', foreground: syntax.selector },
+      { token: "attribute.name.css", foreground: syntax.key },
+      { token: "attribute.value.css", foreground: syntax.string },
+      { token: "tag.css", foreground: syntax.selector },
     ],
     colors: {
-      'editor.background': surface,
-      'editor.foreground': text,
-      'editorLineNumber.foreground': syntax.gutter,
-      'editorLineNumber.activeForeground': text,
-      'editorGutter.background': surface,
-      'editorIndentGuide.background1': syntax.gutter,
-      'editorWidget.background': surface,
-      'editorHoverWidget.background': surface,
+      "editor.background": surface,
+      "editor.foreground": text,
+      "editorLineNumber.foreground": syntax.gutter,
+      "editorLineNumber.activeForeground": text,
+      "editorGutter.background": surface,
+      "editorIndentGuide.background1": syntax.gutter,
+      "editorWidget.background": surface,
+      "editorHoverWidget.background": surface,
     },
-  }
-}
+  };
+};
 
 /**
  * Editor options shared by both tabs.
@@ -142,21 +142,21 @@ export const EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
   lineHeight: 1.7,
   fontLigatures: false,
   minimap: { enabled: false },
-  wordWrap: 'on',
-  wrappingStrategy: 'advanced',
+  wordWrap: "on",
+  wrappingStrategy: "advanced",
   folding: false,
   lineNumbersMinChars: 3,
   lineDecorationsWidth: 8,
   glyphMargin: false,
-  renderLineHighlight: 'none',
+  renderLineHighlight: "none",
   overviewRulerLanes: 0,
   hideCursorInOverviewRuler: true,
   scrollbar: { verticalScrollbarSize: 10, horizontalScrollbarSize: 10 },
   scrollBeyondLastLine: false,
   padding: { top: 10, bottom: 24 },
   quickSuggestions: false,
-  occurrencesHighlight: 'off',
+  occurrencesHighlight: "off",
   selectionHighlight: false,
   automaticLayout: true,
   tabSize: 2,
-}
+};

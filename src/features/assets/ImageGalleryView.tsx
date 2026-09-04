@@ -1,23 +1,23 @@
-import { useState } from 'react'
-import { Box, Button, Loader, SegmentedControl, Text } from '@mantine/core'
+import { useState } from "react";
+import { Box, Button, Loader, SegmentedControl, Text } from "@mantine/core";
 
-import { EmptyState } from '@/components/EmptyState'
+import { EmptyState } from "@/components/EmptyState";
 
-import { AssetNameInput } from './components/AssetNameInput'
-import { AssetUpload, UploadError } from './components/AssetUpload'
-import { DeleteImageDialog } from './components/deleteDialogs'
-import { Thumb } from './components/Thumb'
-import { IMAGE_ACCEPT } from './readImage'
-import { formatBytes } from './format'
+import { AssetNameInput } from "./components/AssetNameInput";
+import { AssetUpload, UploadError } from "./components/AssetUpload";
+import { DeleteImageDialog } from "./components/deleteDialogs";
+import { Thumb } from "./components/Thumb";
+import { IMAGE_ACCEPT } from "./readImage";
+import { formatBytes } from "./format";
 import {
   useAddImage,
   useDeleteImage,
   useImages,
   useRenameImage,
   useUnusedImages,
-} from './queries'
+} from "./queries";
 
-import type { ImageSummary } from '@/database/index'
+import type { ImageSummary } from "@/database/index";
 
 /**
  * The image gallery, as a page of its own.
@@ -31,20 +31,20 @@ import type { ImageSummary } from '@/database/index'
  * nothing refers to any more.
  */
 export const ImageGalleryView: React.FC = () => {
-  const { data: images, isPending } = useImages()
-  const { data: unused } = useUnusedImages()
-  const add = useAddImage()
-  const rename = useRenameImage()
-  const remove = useDeleteImage()
+  const { data: images, isPending } = useImages();
+  const { data: unused } = useUnusedImages();
+  const add = useAddImage();
+  const rename = useRenameImage();
+  const remove = useDeleteImage();
 
-  const [filter, setFilter] = useState<'all' | 'unused'>('all')
-  const [confirming, setConfirming] = useState<ImageSummary | null>(null)
+  const [filter, setFilter] = useState<"all" | "unused">("all");
+  const [confirming, setConfirming] = useState<ImageSummary | null>(null);
 
-  const all = images ?? []
-  const unusedIds = new Set((unused ?? []).map((image) => image.id))
+  const all = images ?? [];
+  const unusedIds = new Set((unused ?? []).map((image) => image.id));
   const visible =
-    filter === 'all' ? all : all.filter((image) => unusedIds.has(image.id))
-  const totalBytes = all.reduce((sum, image) => sum + image.size, 0)
+    filter === "all" ? all : all.filter((image) => unusedIds.has(image.id));
+  const totalBytes = all.reduce((sum, image) => sum + image.size, 0);
 
   return (
     <Box className="p-6">
@@ -64,7 +64,7 @@ export const ImageGalleryView: React.FC = () => {
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{' '}
+          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{" "}
           unused
         </Text>
 
@@ -74,11 +74,11 @@ export const ImageGalleryView: React.FC = () => {
           <SegmentedControl
             aria-label="Filter images"
             data={[
-              { value: 'all', label: 'All' },
-              { value: 'unused', label: 'Unused' },
+              { value: "all", label: "All" },
+              { value: "unused", label: "Unused" },
             ]}
             onChange={(value) =>
-              setFilter(value === 'unused' ? 'unused' : 'all')
+              setFilter(value === "unused" ? "unused" : "all")
             }
             size="xs"
             value={filter}
@@ -124,7 +124,7 @@ export const ImageGalleryView: React.FC = () => {
                   span
                 >
                   {image.width}×{image.height} · {formatBytes(image.size)}
-                  {unusedIds.has(image.id) ? ' · unused' : ''}
+                  {unusedIds.has(image.id) ? " · unused" : ""}
                 </Text>
                 <Button
                   color="red"
@@ -145,13 +145,13 @@ export const ImageGalleryView: React.FC = () => {
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
-            remove.mutate(confirming.id)
+            remove.mutate(confirming.id);
           }
 
-          setConfirming(null)
+          setConfirming(null);
         }}
         unused={confirming !== null && unusedIds.has(confirming.id)}
       />
     </Box>
-  )
-}
+  );
+};

@@ -25,12 +25,12 @@
    * the page perform, and a long travel on every section is the thing that
    * makes a marketing page feel like it is fighting the scroll.
    */
-  [data-reveal='pending'] {
+  [data-reveal="pending"] {
     opacity: 0;
     transform: translateY(10px);
   }
 
-  [data-reveal='shown'] {
+  [data-reveal="shown"] {
     opacity: 1;
     transform: none;
   }

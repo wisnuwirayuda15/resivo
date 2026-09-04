@@ -24,16 +24,16 @@ Notes on the Analytical Engine, with the first published algorithm.
 
 - Translated Menabrea's memoir, then tripled it in footnotes
 :::
-`
+`;
 
 /** How a line is coloured. The whole highlighter, because two kinds is enough
  * to show that the directives are not prose. */
-export type SourceLineKind = 'heading' | 'directive' | 'text'
+export type SourceLineKind = "heading" | "directive" | "text";
 
 export const sourceLineKind = (line: string): SourceLineKind => {
-  if (line.startsWith('#')) {
-    return 'heading'
+  if (line.startsWith("#")) {
+    return "heading";
   }
 
-  return line.startsWith('::') || line === ':::' ? 'directive' : 'text'
-}
+  return line.startsWith("::") || line === ":::" ? "directive" : "text";
+};

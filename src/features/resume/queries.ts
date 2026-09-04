@@ -1,10 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { groupRepo, resumeRepo } from '@/database/index'
+import { groupRepo, resumeRepo } from "@/database/index";
 
-import type { QueryClient } from '@tanstack/react-query'
-import type { ResumeRecord, ResumeSummary } from '@/database/index'
-import type { TemplateId } from './model/document'
+import type { QueryClient } from "@tanstack/react-query";
+import type { ResumeRecord, ResumeSummary } from "@/database/index";
+import type { TemplateId } from "./model/document";
 
 /**
  * Query bindings over the resume and group repositories.
@@ -22,17 +22,17 @@ import type { TemplateId } from './model/document'
  */
 
 export const resumeKeys = {
-  all: ['resumes'] as const,
-  list: () => [...resumeKeys.all, 'list'] as const,
-  archived: () => [...resumeKeys.all, 'archived'] as const,
-  detail: (id: string) => [...resumeKeys.all, 'detail', id] as const,
-}
+  all: ["resumes"] as const,
+  list: () => [...resumeKeys.all, "list"] as const,
+  archived: () => [...resumeKeys.all, "archived"] as const,
+  detail: (id: string) => [...resumeKeys.all, "detail", id] as const,
+};
 
 export const groupKeys = {
-  all: ['groups'] as const,
-  list: () => [...groupKeys.all, 'list'] as const,
-  counts: () => [...groupKeys.all, 'counts'] as const,
-}
+  all: ["groups"] as const,
+  list: () => [...groupKeys.all, "list"] as const,
+  counts: () => [...groupKeys.all, "counts"] as const,
+};
 
 // ---------------------------------------------------------------------------
 // Reads
@@ -42,17 +42,17 @@ export const useResumes = () =>
   useQuery({
     queryKey: resumeKeys.list(),
     queryFn: () => resumeRepo.listResumes(),
-  })
+  });
 
 export const useArchivedResumes = () =>
   useQuery({
     queryKey: resumeKeys.archived(),
     queryFn: () => resumeRepo.listArchivedResumes(),
-  })
+  });
 
 export const useResume = (id: string | undefined) =>
   useQuery({
-    queryKey: resumeKeys.detail(id ?? ''),
+    queryKey: resumeKeys.detail(id ?? ""),
     /**
      * `null`, never `undefined`, for a resume that is not there.
      *
@@ -79,19 +79,19 @@ export const useResume = (id: string | undefined) =>
      * about a resume that is sitting right there.
      */
     retry: false,
-  })
+  });
 
 export const useGroups = () =>
   useQuery({
     queryKey: groupKeys.list(),
     queryFn: () => groupRepo.listGroups(),
-  })
+  });
 
 export const useGroupCounts = () =>
   useQuery({
     queryKey: groupKeys.counts(),
     queryFn: () => groupRepo.countResumesByGroup(),
-  })
+  });
 
 // ---------------------------------------------------------------------------
 // Writes
@@ -110,21 +110,21 @@ const invalidateLibrary = async (client: QueryClient): Promise<void> => {
   await Promise.all([
     client.invalidateQueries({ queryKey: resumeKeys.all }),
     client.invalidateQueries({ queryKey: groupKeys.all }),
-  ])
-}
+  ]);
+};
 
 export const useCreateResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (input: {
-      title?: string
-      groupId?: string
-      templateId?: TemplateId
+      title?: string;
+      groupId?: string;
+      templateId?: TemplateId;
     }) => resumeRepo.createResume(input),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 /**
  * Records a save against both cached views of the resume.
@@ -152,7 +152,10 @@ export const patchSavedResume = (
   client: QueryClient,
   record: ResumeRecord,
 ): void => {
-  client.setQueryData<ResumeRecord | null>(resumeKeys.detail(record.id), record)
+  client.setQueryData<ResumeRecord | null>(
+    resumeKeys.detail(record.id),
+    record,
+  );
 
   client.setQueryData<Array<ResumeSummary>>(resumeKeys.list(), (summaries) =>
     summaries === undefined
@@ -164,105 +167,105 @@ export const patchSavedResume = (
               : summary,
           )
           .sort((a, b) => b.updatedAt - a.updatedAt),
-  )
-}
+  );
+};
 
 /** Imperative save, for an explicit "Save now" action. The debounced path lives
  * in `features/editor/useAutosave`. */
 export const useSaveResumeDocument = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       id,
       document,
     }: {
-      id: string
-      document: Parameters<typeof resumeRepo.saveResumeDocument>[1]
+      id: string;
+      document: Parameters<typeof resumeRepo.saveResumeDocument>[1];
     }) => resumeRepo.saveResumeDocument(id, document),
     onSuccess: (record) => patchSavedResume(client, record),
-  })
-}
+  });
+};
 
 export const useUpdateResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: ({
       id,
       changes,
     }: {
-      id: string
-      changes: Parameters<typeof resumeRepo.updateResume>[1]
+      id: string;
+      changes: Parameters<typeof resumeRepo.updateResume>[1];
     }) => resumeRepo.updateResume(id, changes),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 export const useDuplicateResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => resumeRepo.duplicateResume(id),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 export const useArchiveResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => resumeRepo.archiveResume(id),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 export const useRestoreResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => resumeRepo.restoreResume(id),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 export const useDeleteResume = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => resumeRepo.deleteResume(id),
     onSuccess: async (_result, id) => {
-      client.removeQueries({ queryKey: resumeKeys.detail(id) })
-      await invalidateLibrary(client)
+      client.removeQueries({ queryKey: resumeKeys.detail(id) });
+      await invalidateLibrary(client);
     },
-  })
-}
+  });
+};
 
 export const useCreateGroup = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (name: string) => groupRepo.createGroup(name),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};
 
 export const useRenameGroup = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) =>
       groupRepo.renameGroup(id, name),
     onSuccess: () => client.invalidateQueries({ queryKey: groupKeys.all }),
-  })
-}
+  });
+};
 
 /** Deleting a group moves its resumes out, so the resume lists change too. */
 export const useDeleteGroup = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => groupRepo.deleteGroup(id),
     onSuccess: () => invalidateLibrary(client),
-  })
-}
+  });
+};

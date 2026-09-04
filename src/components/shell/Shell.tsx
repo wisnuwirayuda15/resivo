@@ -1,28 +1,28 @@
-import { useEffect, useState } from 'react'
-import { AppShell, Burger, Overlay } from '@mantine/core'
-import { useDisclosure, useHotkeys } from '@mantine/hooks'
-import { useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from "react";
+import { AppShell, Burger, Overlay } from "@mantine/core";
+import { useDisclosure, useHotkeys } from "@mantine/hooks";
+import { useNavigate } from "@tanstack/react-router";
 
-import { ClientOnly } from '@/components/client-only'
-import { AppTour } from '@/features/onboarding/AppTour'
-import { CommandPalette } from '@/features/commands/CommandPalette'
-import { KeyboardShortcuts } from '@/components/KeyboardShortcuts'
-import { NewGroupDialog } from '@/features/resume/components/NewGroupDialog'
-import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
+import { ClientOnly } from "@/components/client-only";
+import { AppTour } from "@/features/onboarding/AppTour";
+import { CommandPalette } from "@/features/commands/CommandPalette";
+import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
+import { NewGroupDialog } from "@/features/resume/components/NewGroupDialog";
+import { NewResumeDialog } from "@/features/resume/components/NewResumeDialog";
 
-import { AppBar } from './AppBar'
-import { Sidebar } from './Sidebar'
-import { applySidebarCollapsed, readSidebarCollapsed } from './sidebarState'
+import { AppBar } from "./AppBar";
+import { Sidebar } from "./Sidebar";
+import { applySidebarCollapsed, readSidebarCollapsed } from "./sidebarState";
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface ShellProps {
-  title: string
-  actions?: ReactNode
-  children: ReactNode
-  activeGroupId?: string
+  title: string;
+  actions?: ReactNode;
+  children: ReactNode;
+  activeGroupId?: string;
   /** True when the current view is the unfiltered library. */
-  allActive?: boolean
+  allActive?: boolean;
 }
 
 /**
@@ -47,14 +47,14 @@ export const Shell: React.FC<ShellProps> = ({
   activeGroupId,
   allActive = false,
 }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const [navOpened, { toggle: toggleNav, close: closeNav }] =
-    useDisclosure(false)
-  const [newResumeOpen, setNewResumeOpen] = useState(false)
-  const [newGroupOpen, setNewGroupOpen] = useState(false)
+    useDisclosure(false);
+  const [newResumeOpen, setNewResumeOpen] = useState(false);
+  const [newGroupOpen, setNewGroupOpen] = useState(false);
   // Owned here rather than in the app bar, so the same sheet can be opened from
   // anywhere that needs to.
-  const [shortcutsOpen, shortcuts] = useDisclosure(false)
+  const [shortcutsOpen, shortcuts] = useDisclosure(false);
   /**
    * A counter rather than a boolean.
    *
@@ -62,7 +62,7 @@ export const Shell: React.FC<ShellProps> = ({
    * needs an edge to fire on, and by then the flag from the first run is
    * already set.
    */
-  const [tourRequests, setTourRequests] = useState(0)
+  const [tourRequests, setTourRequests] = useState(0);
 
   /**
    * The navbar held open by the tour, kept apart from the one the user opened.
@@ -71,7 +71,7 @@ export const Shell: React.FC<ShellProps> = ({
    * already dims everything except its cutout, and a second veil over that
    * would darken the very row it is pointing at.
    */
-  const [tourNav, setTourNav] = useState(false)
+  const [tourNav, setTourNav] = useState(false);
 
   /**
    * Read lazily rather than in an effect, and safe to: nothing the server
@@ -81,15 +81,16 @@ export const Shell: React.FC<ShellProps> = ({
    * value on the very first client render without contradicting the markup it
    * is hydrating.
    */
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(readSidebarCollapsed)
-  const toggleSidebar = () => setSidebarCollapsed((collapsed) => !collapsed)
+  const [sidebarCollapsed, setSidebarCollapsed] =
+    useState(readSidebarCollapsed);
+  const toggleSidebar = () => setSidebarCollapsed((collapsed) => !collapsed);
 
   // Declarative rather than done in the toggle, so the attribute and the
   // preference cannot drift from the state that drives the rail's contents. On
   // the first pass it agrees with the head script and does nothing.
   useEffect(() => {
-    applySidebarCollapsed(sidebarCollapsed)
-  }, [sidebarCollapsed])
+    applySidebarCollapsed(sidebarCollapsed);
+  }, [sidebarCollapsed]);
 
   /**
    * The shortcut every editor with a sidebar has.
@@ -99,7 +100,7 @@ export const Shell: React.FC<ShellProps> = ({
    * shortcut relies on. It also cancels the browser's own binding, which matters
    * on Firefox, where Ctrl+B opens the bookmarks sidebar.
    */
-  useHotkeys([['mod+B', toggleSidebar]])
+  useHotkeys([["mod+B", toggleSidebar]]);
 
   return (
     /* Outside the shell, because a tour step points at the sidebar and the app
@@ -111,12 +112,12 @@ export const Shell: React.FC<ShellProps> = ({
         // The height and width come from the tokens rather than from literals,
         // so `h-toolbar` and `w-sidebar` elsewhere cannot drift out of step with
         // the shell they are lining up against.
-        header={{ height: 'var(--spacing-toolbar)' }}
+        header={{ height: "var(--spacing-toolbar)" }}
         navbar={{
           // Through the variable rather than the token, so the rail can be
           // switched from an attribute on `<html>` before the first paint.
-          width: 'var(--sidebar-width)',
-          breakpoint: 'sm',
+          width: "var(--sidebar-width)",
+          breakpoint: "sm",
           // Below the breakpoint the sidebar becomes an overlay, opened by the
           // burger in the header. Desktop keeps it permanently visible.
           collapsed: { mobile: !navOpened && !tourNav },
@@ -159,12 +160,12 @@ export const Shell: React.FC<ShellProps> = ({
           <ClientOnly>
             <Sidebar
               onNewResume={() => {
-                setNewResumeOpen(true)
-                closeNav()
+                setNewResumeOpen(true);
+                closeNav();
               }}
               onNewGroup={() => {
-                setNewGroupOpen(true)
-                closeNav()
+                setNewGroupOpen(true);
+                closeNav();
               }}
               // Tapping a destination on mobile should dismiss the overlay.
               onNavigate={closeNav}
@@ -201,7 +202,7 @@ export const Shell: React.FC<ShellProps> = ({
             opened={newResumeOpen}
             onClose={() => setNewResumeOpen(false)}
             onCreated={(id) =>
-              navigate({ to: '/resumes/$resumeId', params: { resumeId: id } })
+              navigate({ to: "/resumes/$resumeId", params: { resumeId: id } })
             }
           />
           <NewGroupDialog
@@ -219,5 +220,5 @@ export const Shell: React.FC<ShellProps> = ({
         </ClientOnly>
       </AppShell>
     </AppTour>
-  )
-}
+  );
+};

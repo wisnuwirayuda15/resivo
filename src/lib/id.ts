@@ -16,29 +16,29 @@ export const createId = (): string => {
   // `never` on the fallback path: its lib type always declares `randomUUID`,
   // even though older and insecure-origin runtimes do not ship it.
   const source: Partial<Crypto> | undefined =
-    typeof crypto === 'undefined' ? undefined : crypto
+    typeof crypto === "undefined" ? undefined : crypto;
 
-  if (typeof source?.randomUUID === 'function') {
-    return source.randomUUID()
+  if (typeof source?.randomUUID === "function") {
+    return source.randomUUID();
   }
 
-  const bytes = new Uint8Array(16)
-  if (typeof source?.getRandomValues === 'function') {
-    source.getRandomValues(bytes)
+  const bytes = new Uint8Array(16);
+  if (typeof source?.getRandomValues === "function") {
+    source.getRandomValues(bytes);
   } else {
     for (let i = 0; i < bytes.length; i++) {
-      bytes.set([Math.floor(Math.random() * 256)], i)
+      bytes.set([Math.floor(Math.random() * 256)], i);
     }
   }
 
   const hex = Array.from(bytes, (byte) =>
-    byte.toString(16).padStart(2, '0'),
-  ).join('')
+    byte.toString(16).padStart(2, "0"),
+  ).join("");
 
   // RFC 4122 version 4 layout: the version nibble is pinned to 4 and the
   // variant nibble to 8-b. Patched on the hex string rather than the byte array
   // so no element is read back (`noUncheckedIndexedAccess`).
-  const variant = ((parseInt(hex.slice(16, 17), 16) & 0x3) | 0x8).toString(16)
+  const variant = ((parseInt(hex.slice(16, 17), 16) & 0x3) | 0x8).toString(16);
 
   return [
     hex.slice(0, 8),
@@ -46,5 +46,5 @@ export const createId = (): string => {
     `4${hex.slice(13, 16)}`,
     `${variant}${hex.slice(17, 20)}`,
     hex.slice(20),
-  ].join('-')
-}
+  ].join("-");
+};

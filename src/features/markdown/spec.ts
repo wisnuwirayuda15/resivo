@@ -1,6 +1,6 @@
-import { SECTION_KINDS } from '@/features/resume/model/document'
+import { SECTION_KINDS } from "@/features/resume/model/document";
 
-import type { SectionKind } from '@/features/resume/model/document'
+import type { SectionKind } from "@/features/resume/model/document";
 
 /**
  * Resivo-Markdown, the shared vocabulary of the codec.
@@ -25,21 +25,21 @@ import type { SectionKind } from '@/features/resume/model/document'
  */
 
 /** Container directive: one structured entry. */
-export const ENTRY_DIRECTIVE = 'entry'
+export const ENTRY_DIRECTIVE = "entry";
 
 /** Leaf directives, block level, one line each. */
-export const CONTACT_DIRECTIVE = 'contact'
-export const TAGS_DIRECTIVE = 'tags'
-export const LABEL_DIRECTIVE = 'label'
-export const IMAGE_DIRECTIVE = 'image'
-export const PAGE_BREAK_DIRECTIVE = 'pagebreak'
+export const CONTACT_DIRECTIVE = "contact";
+export const TAGS_DIRECTIVE = "tags";
+export const LABEL_DIRECTIVE = "label";
+export const IMAGE_DIRECTIVE = "image";
+export const PAGE_BREAK_DIRECTIVE = "pagebreak";
 
 /** Text directive: an icon inside a run of text. */
-export const ICON_DIRECTIVE = 'icon'
+export const ICON_DIRECTIVE = "icon";
 
 /** How a tag list is written and read back. A comma is what a reader would type
  * for a list of skills, so it is what the format uses. */
-export const TAG_SEPARATOR = ', '
+export const TAG_SEPARATOR = ", ";
 
 /**
  * Heading text to section kind.
@@ -54,41 +54,41 @@ export const TAG_SEPARATOR = ', '
  * template lays the section out.
  */
 const SECTION_SYNONYMS: Record<string, SectionKind> = {
-  summary: 'summary',
-  about: 'summary',
-  profile: 'summary',
-  objective: 'summary',
-  experience: 'experience',
-  'work experience': 'experience',
-  'professional experience': 'experience',
-  employment: 'experience',
-  'work history': 'experience',
-  education: 'education',
-  skills: 'skills',
-  'technical skills': 'skills',
-  projects: 'projects',
-  certifications: 'certifications',
-  certificates: 'certifications',
-  awards: 'awards',
-  honours: 'awards',
-  honors: 'awards',
-  publications: 'publications',
-  languages: 'languages',
-  interests: 'interests',
-  hobbies: 'interests',
-}
+  summary: "summary",
+  about: "summary",
+  profile: "summary",
+  objective: "summary",
+  experience: "experience",
+  "work experience": "experience",
+  "professional experience": "experience",
+  employment: "experience",
+  "work history": "experience",
+  education: "education",
+  skills: "skills",
+  "technical skills": "skills",
+  projects: "projects",
+  certifications: "certifications",
+  certificates: "certifications",
+  awards: "awards",
+  honours: "awards",
+  honors: "awards",
+  publications: "publications",
+  languages: "languages",
+  interests: "interests",
+  hobbies: "interests",
+};
 
 export const sectionKindFromTitle = (title: string): SectionKind => {
-  const normalized = title.trim().toLowerCase()
-  const matched = SECTION_SYNONYMS[normalized]
+  const normalized = title.trim().toLowerCase();
+  const matched = SECTION_SYNONYMS[normalized];
 
   if (matched !== undefined) {
-    return matched
+    return matched;
   }
 
   // A heading that is exactly a kind's own name still matches, so a kind added
   // to the model later needs no entry in the table above.
   return SECTION_KINDS.includes(normalized as SectionKind)
     ? (normalized as SectionKind)
-    : 'custom'
-}
+    : "custom";
+};

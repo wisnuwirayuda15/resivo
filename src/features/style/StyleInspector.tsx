@@ -1,19 +1,19 @@
-import { ScrollArea, Tabs } from '@mantine/core'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { ScrollArea, Tabs } from "@mantine/core";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { AssetsPanel } from '@/features/assets/AssetsPanel'
-import { cn } from '@/lib/utils'
-import { Icon } from '@/features/icons/IconRenderer'
+import { AssetsPanel } from "@/features/assets/AssetsPanel";
+import { cn } from "@/lib/utils";
+import { Icon } from "@/features/icons/IconRenderer";
 
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 
-import { StylePanel } from './StylePanel'
-import { SectionsPanel } from './SectionsPanel'
-import { TemplateSwitcher } from './TemplateSwitcher'
-import { ControlGroup } from './controls'
+import { StylePanel } from "./StylePanel";
+import { SectionsPanel } from "./SectionsPanel";
+import { TemplateSwitcher } from "./TemplateSwitcher";
+import { ControlGroup } from "./controls";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { Recipe } from "@/features/editor/mutations";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * Panel 3, the style inspector.
@@ -28,9 +28,9 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  */
 
 interface StyleInspectorProps {
-  document: ResumeDocument
-  apply: (recipe: Recipe, options?: { coalesce?: string }) => void
-  className?: string
+  document: ResumeDocument;
+  apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
+  className?: string;
 }
 
 export const StyleInspector: React.FC<StyleInspectorProps> = ({
@@ -39,7 +39,7 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
   className,
 }) => (
   <OnboardingTour.Target id={TOUR_TARGET_IDS.inspector}>
-    <aside className={cn('bg-surface flex min-h-0 flex-col', className)}>
+    <aside className={cn("bg-surface flex min-h-0 flex-col", className)}>
       {/* `keepMounted={false}` so an inactive tab costs nothing: the style tab
         alone is thirty controlled inputs, and none of them holds state worth
         preserving across a tab switch, every value they show lives in the
@@ -111,4 +111,4 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
       </Tabs>
     </aside>
   </OnboardingTour.Target>
-)
+);

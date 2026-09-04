@@ -1,10 +1,10 @@
-import { Link } from '@tanstack/react-router'
-import { Box, Button, Text } from '@mantine/core'
+import { Link } from "@tanstack/react-router";
+import { Box, Button, Text } from "@mantine/core";
 
-import { PaperMiniature } from '@/features/templates/PaperMiniature'
+import { PaperMiniature } from "@/features/templates/PaperMiniature";
 
-import { Reveal } from './Reveal'
-import { SourcePanel } from './SourcePanel'
+import { Reveal } from "./Reveal";
+import { SourcePanel } from "./SourcePanel";
 
 /**
  * The hero.
@@ -82,7 +82,7 @@ export const Hero: React.FC = () => (
         <Box className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
           {/* `max-w-none` from `sm` up, or the cap meant for a phone would
               keep the panel at 360px while the row around it grew. */}
-          <SourcePanel className="w-full max-w-[360px] sm:min-w-0 sm:max-w-none sm:flex-1" />
+          <SourcePanel className="w-full max-w-[360px] sm:max-w-none sm:min-w-0 sm:flex-1" />
 
           <Box className="flex-none sm:mt-10">
             {/* Classic, because it is the one template whose accent is the
@@ -94,4 +94,4 @@ export const Hero: React.FC = () => (
       </Reveal>
     </Box>
   </Box>
-)
+);

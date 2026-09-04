@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { Box, Button, Menu, Text } from '@mantine/core'
+import { useState } from "react";
+import { Box, Button, Menu, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { downloadBlob, safeFilename } from '@/lib/download'
+import { Icon } from "@/features/icons/IconRenderer";
+import { downloadBlob, safeFilename } from "@/lib/download";
 
-import { buildExportHtml, exportAdapters } from './adapters'
-import { printExportHtml } from './print'
+import { buildExportHtml, exportAdapters } from "./adapters";
+import { printExportHtml } from "./print";
 
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The export menu.
@@ -24,16 +24,16 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  */
 
 const ICONS: Record<string, string> = {
-  html: 'file-text',
-  markdown: 'markdown-logo',
-}
+  html: "file-text",
+  markdown: "markdown-logo",
+};
 
 interface ExportMenuProps {
-  document: ResumeDocument
-  title: string
+  document: ResumeDocument;
+  title: string;
   /** The page breaks the preview measured, so a file export matches what is on
    * screen. Absent until the first measurement lands. */
-  pages?: ReadonlyArray<ReadonlyArray<string>>
+  pages?: ReadonlyArray<ReadonlyArray<string>>;
 }
 
 export const ExportMenu: React.FC<ExportMenuProps> = ({
@@ -41,8 +41,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
   title,
   pages,
 }) => {
-  const [busy, setBusy] = useState<string | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [busy, setBusy] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   /**
    * One path for every entry in the menu, including PDF.
@@ -52,38 +52,38 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
    * same function rather than a second one beside it.
    */
   const run = async (format: string) => {
-    const context = { document: resume, title, pages }
+    const context = { document: resume, title, pages };
 
-    setBusy(format)
-    setError(null)
+    setBusy(format);
+    setError(null);
 
     try {
-      if (format === 'pdf') {
-        await printExportHtml(await buildExportHtml(context))
+      if (format === "pdf") {
+        await printExportHtml(await buildExportHtml(context));
       } else {
         const adapter = exportAdapters.find(
           (candidate) => candidate.format === format,
-        )
+        );
 
         if (adapter === undefined) {
-          return
+          return;
         }
 
         downloadBlob(
           await adapter.run(context),
           safeFilename(title, adapter.extension),
-        )
+        );
       }
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : 'The export could not be written.',
-      )
+          : "The export could not be written.",
+      );
     } finally {
-      setBusy(null)
+      setBusy(null);
     }
-  }
+  };
 
   return (
     <Box className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
           <Menu.Item
             disabled={pages === undefined}
             leftSection={<Icon name="file-pdf" size={14} />}
-            onClick={() => void run('pdf')}
+            onClick={() => void run("pdf")}
           >
             <Text className="text-[13px]">PDF</Text>
             <Text className="text-subtle text-[11px]">
@@ -126,7 +126,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
             <Menu.Item
               key={adapter.format}
               leftSection={
-                <Icon name={ICONS[adapter.format] ?? 'file-text'} size={14} />
+                <Icon name={ICONS[adapter.format] ?? "file-text"} size={14} />
               }
               onClick={() => void run(adapter.format)}
             >
@@ -137,5 +137,5 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
         </Menu.Dropdown>
       </Menu>
     </Box>
-  )
-}
+  );
+};

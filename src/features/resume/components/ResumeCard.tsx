@@ -1,25 +1,25 @@
-import { Link } from '@tanstack/react-router'
-import { Box, Menu, Text, Tooltip, UnstyledButton } from '@mantine/core'
+import { Link } from "@tanstack/react-router";
+import { Box, Menu, Text, Tooltip, UnstyledButton } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { PaperMiniature } from '@/features/templates/PaperMiniature'
-import { RelativeTime } from '@/components/RelativeTime'
-import { templateName } from '@/features/templates/catalog'
+import { Icon } from "@/features/icons/IconRenderer";
+import { PaperMiniature } from "@/features/templates/PaperMiniature";
+import { RelativeTime } from "@/components/RelativeTime";
+import { templateName } from "@/features/templates/catalog";
 
-import { moveDestinations } from '../groups'
+import { moveDestinations } from "../groups";
 
-import type { GroupRecord, ResumeSummary } from '@/database/index'
+import type { GroupRecord, ResumeSummary } from "@/database/index";
 
 interface ResumeCardProps {
-  resume: ResumeSummary
+  resume: ResumeSummary;
   /** Every group the resume could be moved to, in the sidebar's order. */
-  groups: ReadonlyArray<GroupRecord>
-  onRename: () => void
-  onDuplicate: () => void
-  onMove: (groupId: string) => void
-  onArchive: () => void
-  onRestore: () => void
-  onDelete: () => void
+  groups: ReadonlyArray<GroupRecord>;
+  onRename: () => void;
+  onDuplicate: () => void;
+  onMove: (groupId: string) => void;
+  onArchive: () => void;
+  onRestore: () => void;
+  onDelete: () => void;
 }
 
 /**
@@ -39,9 +39,9 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
   onRestore,
   onDelete,
 }) => {
-  const archived = resume.archivedAt !== 0
+  const archived = resume.archivedAt !== 0;
 
-  const destinations = moveDestinations(groups, resume.groupId)
+  const destinations = moveDestinations(groups, resume.groupId);
 
   return (
     // Only colour and shadow cross-fade, never layout properties, which
@@ -68,7 +68,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             className="text-subtle mt-1 truncate font-mono text-[11px]"
             component="div"
           >
-            Edited <RelativeTime value={resume.updatedAt} /> ·{' '}
+            Edited <RelativeTime value={resume.updatedAt} /> ·{" "}
             {templateName(resume.templateId)}
           </Text>
         </Box>
@@ -146,5 +146,5 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
         </Menu>
       </Box>
     </Box>
-  )
-}
+  );
+};

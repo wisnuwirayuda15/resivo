@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
-import Editor from '@monaco-editor/react'
-import { Loader, useComputedColorScheme } from '@mantine/core'
+import { useEffect, useRef, useState } from "react";
+import Editor from "@monaco-editor/react";
+import { Loader, useComputedColorScheme } from "@mantine/core";
 
-import { sanitizeCss } from '@/features/css/sanitize'
+import { sanitizeCss } from "@/features/css/sanitize";
 
-import { EDITOR_OPTIONS, RESIVO_THEME, buildTheme } from './monaco'
+import { EDITOR_OPTIONS, RESIVO_THEME, buildTheme } from "./monaco";
 
-import type { editor } from 'monaco-editor'
-import type { Monaco } from '@monaco-editor/react'
+import type { editor } from "monaco-editor";
+import type { Monaco } from "@monaco-editor/react";
 
 /**
  * The `style.css` tab.
@@ -24,15 +24,15 @@ import type { Monaco } from '@monaco-editor/react'
  * rewritten under the caret.
  */
 
-const SAVE_DELAY_MS = 300
+const SAVE_DELAY_MS = 300;
 
-const MARKER_OWNER = 'resivo-css'
+const MARKER_OWNER = "resivo-css";
 
 interface CssEditorProps {
-  css: string
-  onChange: (css: string) => void
+  css: string;
+  onChange: (css: string) => void;
   /** Reports how many rules were refused, for the tab strip. */
-  onRefusalCount?: (count: number) => void
+  onRefusalCount?: (count: number) => void;
 }
 
 export const CssEditor: React.FC<CssEditorProps> = ({
@@ -40,27 +40,27 @@ export const CssEditor: React.FC<CssEditorProps> = ({
   onChange,
   onRefusalCount,
 }) => {
-  const scheme = useComputedColorScheme('light', {
+  const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
-  })
+  });
 
-  const monacoRef = useRef<Monaco | null>(null)
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const monacoRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [value, setValue] = useState(css)
+  const [value, setValue] = useState(css);
 
   useEffect(() => {
-    const monaco = monacoRef.current
+    const monaco = monacoRef.current;
 
     if (monaco !== null) {
       monaco.editor.defineTheme(
         RESIVO_THEME,
-        buildTheme(window.document.documentElement, scheme === 'dark'),
-      )
-      monaco.editor.setTheme(RESIVO_THEME)
+        buildTheme(window.document.documentElement, scheme === "dark"),
+      );
+      monaco.editor.setTheme(RESIVO_THEME);
     }
-  }, [scheme])
+  }, [scheme]);
 
   /**
    * Markers come from the sanitizer, not from Monaco's CSS service.
@@ -70,14 +70,14 @@ export const CssEditor: React.FC<CssEditorProps> = ({
    * refused rule is otherwise invisible, the paper simply does not change.
    */
   useEffect(() => {
-    const monaco = monacoRef.current
-    const model = editorRef.current?.getModel()
-    const { warnings } = sanitizeCss(value)
+    const monaco = monacoRef.current;
+    const model = editorRef.current?.getModel();
+    const { warnings } = sanitizeCss(value);
 
-    onRefusalCount?.(warnings.length)
+    onRefusalCount?.(warnings.length);
 
     if (monaco === null || model === null || model === undefined) {
-      return
+      return;
     }
 
     monaco.editor.setModelMarkers(
@@ -91,61 +91,61 @@ export const CssEditor: React.FC<CssEditorProps> = ({
         endLineNumber: warning.line,
         endColumn: model.getLineMaxColumn(warning.line),
       })),
-    )
-  }, [value, onRefusalCount])
+    );
+  }, [value, onRefusalCount]);
 
   const handleChange = (next: string | undefined) => {
     if (next === undefined) {
-      return
+      return;
     }
 
-    setValue(next)
+    setValue(next);
 
     if (timerRef.current !== null) {
-      clearTimeout(timerRef.current)
+      clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeout(() => {
-      timerRef.current = null
-      onChange(next)
-    }, SAVE_DELAY_MS)
-  }
+      timerRef.current = null;
+      onChange(next);
+    }, SAVE_DELAY_MS);
+  };
 
   /** Flushed on unmount, which is what happens when the user switches tabs. */
   useEffect(
     () => () => {
       if (timerRef.current !== null) {
-        clearTimeout(timerRef.current)
-        timerRef.current = null
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
 
-        const current = editorRef.current?.getValue()
+        const current = editorRef.current?.getValue();
 
         if (current !== undefined) {
-          onChange(current)
+          onChange(current);
         }
       }
     },
     [onChange],
-  )
+  );
 
   return (
     <Editor
       beforeMount={(monaco) => {
-        monacoRef.current = monaco
+        monacoRef.current = monaco;
         monaco.editor.defineTheme(
           RESIVO_THEME,
-          buildTheme(window.document.documentElement, scheme === 'dark'),
-        )
+          buildTheme(window.document.documentElement, scheme === "dark"),
+        );
       }}
       language="css"
       loading={<Loader size="sm" />}
       onChange={handleChange}
       onMount={(instance) => {
-        editorRef.current = instance
+        editorRef.current = instance;
       }}
       options={EDITOR_OPTIONS}
       theme={RESIVO_THEME}
       value={value}
     />
-  )
-}
+  );
+};

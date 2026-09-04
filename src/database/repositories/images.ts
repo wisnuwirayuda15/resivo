@@ -1,10 +1,10 @@
-import { createId } from '@/lib/id'
-import { hashBlob } from '@/lib/hash'
+import { createId } from "@/lib/id";
+import { hashBlob } from "@/lib/hash";
 
-import { getDb } from '../db'
-import { collectReferencedImageIds } from './resumes'
+import { getDb } from "../db";
+import { collectReferencedImageIds } from "./resumes";
 
-import type { ImageRecord } from '../records'
+import type { ImageRecord } from "../records";
 
 /**
  * Image rows.
@@ -16,24 +16,24 @@ import type { ImageRecord } from '../records'
 
 /** Metadata only, never loads blobs. Lets the gallery list hundreds of images
  * without pulling their bytes into memory. */
-export type ImageSummary = Omit<ImageRecord, 'blob'>
+export type ImageSummary = Omit<ImageRecord, "blob">;
 
-const toSummary = ({ blob: _blob, ...rest }: ImageRecord): ImageSummary => rest
+const toSummary = ({ blob: _blob, ...rest }: ImageRecord): ImageSummary => rest;
 
 export const listImages = async (): Promise<Array<ImageSummary>> => {
-  const records = await getDb().images.orderBy('createdAt').reverse().toArray()
+  const records = await getDb().images.orderBy("createdAt").reverse().toArray();
 
-  return records.map(toSummary)
-}
+  return records.map(toSummary);
+};
 
 export const getImage = async (id: string): Promise<ImageRecord | undefined> =>
-  getDb().images.get(id)
+  getDb().images.get(id);
 
 export interface AddImageInput {
-  name: string
-  blob: Blob
-  width: number
-  height: number
+  name: string;
+  blob: Blob;
+  width: number;
+  height: number;
 }
 
 /**
@@ -45,11 +45,11 @@ export interface AddImageInput {
  * for import conflict handling.
  */
 export const addImage = async (input: AddImageInput): Promise<ImageRecord> => {
-  const hash = await hashBlob(input.blob)
-  const existing = await getDb().images.where('hash').equals(hash).first()
+  const hash = await hashBlob(input.blob);
+  const existing = await getDb().images.where("hash").equals(hash).first();
 
   if (existing !== undefined) {
-    return existing
+    return existing;
   }
 
   const record: ImageRecord = {
@@ -62,20 +62,20 @@ export const addImage = async (input: AddImageInput): Promise<ImageRecord> => {
     size: input.blob.size,
     hash,
     createdAt: Date.now(),
-  }
+  };
 
-  await getDb().images.add(record)
+  await getDb().images.add(record);
 
-  return record
-}
+  return record;
+};
 
 export const renameImage = async (id: string, name: string): Promise<void> => {
-  await getDb().images.update(id, { name })
-}
+  await getDb().images.update(id, { name });
+};
 
 export const deleteImage = async (id: string): Promise<void> => {
-  await getDb().images.delete(id)
-}
+  await getDb().images.delete(id);
+};
 
 /**
  * Images no resume references.
@@ -88,18 +88,18 @@ export const listUnusedImages = async (): Promise<Array<ImageSummary>> => {
   const [images, referenced] = await Promise.all([
     listImages(),
     collectReferencedImageIds(),
-  ])
+  ]);
 
-  return images.filter((image) => !referenced.has(image.id))
-}
+  return images.filter((image) => !referenced.has(image.id));
+};
 
 /** Total bytes held by images, for the settings view. */
 export const totalImageBytes = async (): Promise<number> => {
-  let total = 0
+  let total = 0;
 
   await getDb().images.each((record) => {
-    total += record.size
-  })
+    total += record.size;
+  });
 
-  return total
-}
+  return total;
+};

@@ -1,25 +1,25 @@
-import { useCallback, useState } from 'react'
-import { Splitter, Tabs } from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { useCallback, useState } from "react";
+import { Splitter, Tabs } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { useTourPane } from './tourPane'
-import { cn } from '@/lib/utils'
-import { PreviewPane } from '@/features/preview/PreviewPane'
-import { StyleInspector } from '@/features/style/StyleInspector'
-import { applyMarkdown } from '@/features/markdown/index'
-import { patchDesign, setCustomCss } from '@/features/editor/mutations'
+import { Icon } from "@/features/icons/IconRenderer";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { useTourPane } from "./tourPane";
+import { cn } from "@/lib/utils";
+import { PreviewPane } from "@/features/preview/PreviewPane";
+import { StyleInspector } from "@/features/style/StyleInspector";
+import { applyMarkdown } from "@/features/markdown/index";
+import { patchDesign, setCustomCss } from "@/features/editor/mutations";
 
-import { readPaneSizes, writePaneSizes } from './panels'
-import { CodePane } from './CodePane'
+import { readPaneSizes, writePaneSizes } from "./panels";
+import { CodePane } from "./CodePane";
 
-import type { EditorPane } from './tourPane'
-import type { PaneSize } from './panels'
-import type { Recipe } from './mutations'
-import type { ParseWarning } from '@/features/markdown/index'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { EditorPane } from "./tourPane";
+import type { PaneSize } from "./panels";
+import type { Recipe } from "./mutations";
+import type { ParseWarning } from "@/features/markdown/index";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The editor's three panels: code, preview, style.
@@ -36,7 +36,7 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * simply overflowed sideways.
  */
 
-const PANE_COUNT = 3
+const PANE_COUNT = 3;
 
 /**
  * The breakpoint, and why it is this one.
@@ -45,7 +45,7 @@ const PANE_COUNT = 3
  * and rounding up rather than down means the three-pane layout is never offered
  * at a width where it is already cramped.
  */
-const WIDE = '(min-width: 1200px)'
+const WIDE = "(min-width: 1200px)";
 
 /** The design system's widths for the two side panels. */
 /**
@@ -62,15 +62,15 @@ const WIDE = '(min-width: 1200px)'
  * space left over at mount. That is worth knowing and is not this constant's job
  * to fix.
  */
-const CODE_DEFAULT = '400px'
-const INSPECTOR_DEFAULT = '288px'
+const CODE_DEFAULT = "400px";
+const INSPECTOR_DEFAULT = "288px";
 
-const DEFAULT_SIZES: Array<PaneSize> = [CODE_DEFAULT, 100, INSPECTOR_DEFAULT]
+const DEFAULT_SIZES: Array<PaneSize> = [CODE_DEFAULT, 100, INSPECTOR_DEFAULT];
 
 interface EditorLayoutProps {
-  document: ResumeDocument
-  apply: (recipe: Recipe, options?: { coalesce?: string }) => void
-  replace: (document: ResumeDocument, options?: { coalesce?: string }) => void
+  document: ResumeDocument;
+  apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
+  replace: (document: ResumeDocument, options?: { coalesce?: string }) => void;
 }
 
 export const EditorLayout: React.FC<EditorLayoutProps> = ({
@@ -85,11 +85,11 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    */
   const [sizes, setSizes] = useState<Array<PaneSize>>(
     () => readPaneSizes(PANE_COUNT) ?? DEFAULT_SIZES,
-  )
-  const [warnings, setWarnings] = useState<Array<ParseWarning>>([])
+  );
+  const [warnings, setWarnings] = useState<Array<ParseWarning>>([]);
 
   /** True only between pointerdown and pointerup on a splitter handle. */
-  const [resizing, setResizing] = useState(false)
+  const [resizing, setResizing] = useState(false);
 
   /**
    * The tab, where there is only one pane.
@@ -97,7 +97,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    * The paper is the default because the document is the point; the other two
    * are things done to it.
    */
-  const [pane, setPane] = useState<EditorPane>('paper')
+  const [pane, setPane] = useState<EditorPane>("paper");
 
   /**
    * A pane the tour is asking for, which wins while it is asking.
@@ -107,8 +107,8 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    * when it does. Writing through would have the tour quietly reset the tab
    * someone had picked before it started.
    */
-  const requestedPane = useTourPane((state) => state.requested)
-  const activePane = requestedPane ?? pane
+  const requestedPane = useTourPane((state) => state.requested);
+  const activePane = requestedPane ?? pane;
 
   /**
    * Read during the first render rather than in an effect. This only mounts
@@ -116,7 +116,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    * an effect would paint the wrong layout for a frame, which on a narrow screen
    * means a horizontal overflow appearing and vanishing.
    */
-  const wide = useMediaQuery(WIDE, true, { getInitialValueInEffect: false })
+  const wide = useMediaQuery(WIDE, true, { getInitialValueInEffect: false });
 
   /**
    * Parsing lives here because this is what owns the store.
@@ -127,22 +127,22 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    */
   const handleSourceChange = useCallback(
     (source: string) => {
-      const result = applyMarkdown(document, source)
+      const result = applyMarkdown(document, source);
 
-      setWarnings(result.warnings)
-      replace(result.document, { coalesce: 'markdown' })
+      setWarnings(result.warnings);
+      replace(result.document, { coalesce: "markdown" });
     },
     [document, replace],
-  )
+  );
 
   /**
    * Custom CSS is stored verbatim; the preview sanitizes it on the way out. One
    * coalesce key, so a stylesheet typed in one sitting is one undo step.
    */
   const handleCustomCss = useCallback(
-    (css: string) => apply(setCustomCss(css), { coalesce: 'customCss' }),
+    (css: string) => apply(setCustomCss(css), { coalesce: "customCss" }),
     [apply],
-  )
+  );
 
   const code = (
     <CodePane
@@ -152,7 +152,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
       onSourceChange={handleSourceChange}
       warnings={warnings}
     />
-  )
+  );
 
   const preview = (
     <PreviewPane
@@ -162,11 +162,11 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
       onPaperSizeChange={(size) => apply(patchDesign({ paper: { size } }))}
       title={document.meta.fullName}
     />
-  )
+  );
 
   const inspector = (
     <StyleInspector apply={apply} className="h-full" document={document} />
-  )
+  );
 
   if (!wide) {
     return (
@@ -190,8 +190,8 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
         onChange={(next) => {
           // Narrowed rather than cast: the three values are the tabs' own, and
           // a cast here would keep compiling if a fourth were ever added.
-          if (next === 'code' || next === 'paper' || next === 'style') {
-            setPane(next)
+          if (next === "code" || next === "paper" || next === "style") {
+            setPane(next);
           }
         }}
         value={activePane}
@@ -239,7 +239,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
           {inspector}
         </Tabs.Panel>
       </Tabs>
-    )
+    );
   }
 
   return (
@@ -255,11 +255,11 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
        * to the document doing the tracking; nothing inside the frame wants a
        * pointer while a pane is being resized anyway.
        */
-      className={cn('h-full', resizing && '[&_iframe]:pointer-events-none')}
+      className={cn("h-full", resizing && "[&_iframe]:pointer-events-none")}
       lineSize={1}
       onResizeEnd={(_handle, next) => {
-        setResizing(false)
-        writePaneSizes(PANE_COUNT, next)
+        setResizing(false);
+        writePaneSizes(PANE_COUNT, next);
       }}
       onResizeStart={() => setResizing(true)}
       onSizeChange={setSizes}
@@ -277,5 +277,5 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
         {inspector}
       </Splitter.Pane>
     </Splitter>
-  )
-}
+  );
+};

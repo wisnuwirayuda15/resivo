@@ -1,10 +1,10 @@
-import { Box, Text } from '@mantine/core'
+import { Box, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { PaperMiniature } from '@/features/templates/PaperMiniature'
-import { cn } from '@/lib/utils'
+import { Icon } from "@/features/icons/IconRenderer";
+import { PaperMiniature } from "@/features/templates/PaperMiniature";
+import { cn } from "@/lib/utils";
 
-import { Reveal } from './Reveal'
+import { Reveal } from "./Reveal";
 
 /**
  * The rest of what is in the app.
@@ -19,25 +19,25 @@ import { Reveal } from './Reveal'
 
 /** A real stylesheet, from the guide's own styling chapter. */
 const CSS_SAMPLE = [
-  '.rp-section-title {',
-  '  text-transform: uppercase;',
-  '  letter-spacing: 0.08em;',
-  '}',
-]
+  ".rp-section-title {",
+  "  text-transform: uppercase;",
+  "  letter-spacing: 0.08em;",
+  "}",
+];
 
 /** Real glyph names, drawn from the catalog the app ships. */
 const GLYPHS = [
-  'envelope',
-  'map-pin',
-  'github-logo',
-  'globe',
-  'phone',
-  'graduation-cap',
-  'briefcase',
-  'certificate',
-]
+  "envelope",
+  "map-pin",
+  "github-logo",
+  "globe",
+  "phone",
+  "graduation-cap",
+  "briefcase",
+  "certificate",
+];
 
-const CELL = 'rounded-panel border-line-soft border p-6'
+const CELL = "rounded-panel border-line-soft border p-6";
 
 export const Capabilities: React.FC = () => (
   <Box className="border-line-soft border-t" component="section">
@@ -55,7 +55,7 @@ export const Capabilities: React.FC = () => (
           arrangement only where a two-column cell is still wide enough to hold
           a sentence. */}
       <Box className="mt-12 grid gap-4 sm:grid-cols-2 md:grid-cols-6">
-        <Reveal className={cn(CELL, 'bg-surface md:col-span-4')}>
+        <Reveal className={cn(CELL, "bg-surface md:col-span-4")}>
           <Box className="flex flex-col gap-6 md:flex-row md:items-center md:gap-8">
             <Box className="min-w-0 flex-1">
               <Text className="text-title text-[15px] font-medium">
@@ -69,13 +69,13 @@ export const Capabilities: React.FC = () => (
               </Text>
             </Box>
 
-            <Box className="bg-sunken rounded-xs flex flex-none justify-center p-4">
+            <Box className="bg-sunken flex flex-none justify-center rounded-xs p-4">
               <PaperMiniature size="card" templateId="classic" />
             </Box>
           </Box>
         </Reveal>
 
-        <Reveal className={cn(CELL, 'bg-surface md:col-span-2')} order={1}>
+        <Reveal className={cn(CELL, "bg-surface md:col-span-2")} order={1}>
           <Text className="text-title text-[15px] font-medium">
             Markdown that comes back out
           </Text>
@@ -91,7 +91,7 @@ export const Capabilities: React.FC = () => (
         <Reveal
           className={cn(
             CELL,
-            'bg-accent-quiet border-line-accent md:col-span-2',
+            "bg-accent-quiet border-line-accent md:col-span-2",
           )}
           order={2}
         >
@@ -108,7 +108,7 @@ export const Capabilities: React.FC = () => (
           </Box>
         </Reveal>
 
-        <Reveal className={cn(CELL, 'bg-surface md:col-span-2')} order={3}>
+        <Reveal className={cn(CELL, "bg-surface md:col-span-2")} order={3}>
           <Text className="text-title text-[15px] font-medium">
             Images and fonts, shared
           </Text>
@@ -118,7 +118,7 @@ export const Capabilities: React.FC = () => (
           </Text>
         </Reveal>
 
-        <Reveal className={cn(CELL, 'bg-surface md:col-span-2')} order={4}>
+        <Reveal className={cn(CELL, "bg-surface md:col-span-2")} order={4}>
           <Text className="text-title text-[15px] font-medium">
             Everything from the keyboard
           </Text>
@@ -127,9 +127,9 @@ export const Capabilities: React.FC = () => (
             listed where you can find them.
           </Text>
           <Box className="mt-5 flex items-center gap-1.5">
-            {['Ctrl', 'K'].map((key) => (
+            {["Ctrl", "K"].map((key) => (
               <Text
-                className="border-line-soft bg-raised rounded-xs text-subtle border px-1.5 py-0.5 font-mono text-[11px]"
+                className="border-line-soft bg-raised text-subtle rounded-xs border px-1.5 py-0.5 font-mono text-[11px]"
                 key={key}
                 span
               >
@@ -139,7 +139,7 @@ export const Capabilities: React.FC = () => (
           </Box>
         </Reveal>
 
-        <Reveal className={cn(CELL, 'bg-surface md:col-span-6')} order={4}>
+        <Reveal className={cn(CELL, "bg-surface md:col-span-6")} order={4}>
           <Box className="flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
             <Box className="min-w-0 flex-1">
               <Text className="text-title text-[15px] font-medium">
@@ -169,4 +169,4 @@ export const Capabilities: React.FC = () => (
       </Box>
     </Box>
   </Box>
-)
+);

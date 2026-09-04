@@ -1,6 +1,6 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from "@playwright/test";
 
-import type { Page } from '@playwright/test'
+import type { Page } from "@playwright/test";
 
 /**
  * What a crawler and an unfurler see.
@@ -18,139 +18,139 @@ import type { Page } from '@playwright/test'
  */
 
 /** Google truncates a description at roughly 160 characters. */
-const DESCRIPTION_MAX = 160
+const DESCRIPTION_MAX = 160;
 
 const content = async (page: Page, selector: string) =>
-  page.locator(selector).first().getAttribute('content')
+  page.locator(selector).first().getAttribute("content");
 
-test('the landing page is described, indexable and unfurlable', async ({
+test("the landing page is described, indexable and unfurlable", async ({
   page,
 }) => {
-  await page.goto('/')
+  await page.goto("/");
 
-  await expect(page).toHaveTitle('Resivo, a local-first resume builder')
+  await expect(page).toHaveTitle("Resivo, a local-first resume builder");
 
-  const description = await content(page, 'meta[name="description"]')
-  expect(description).toContain('Markdown')
-  expect((description ?? '').length).toBeLessThanOrEqual(DESCRIPTION_MAX)
+  const description = await content(page, 'meta[name="description"]');
+  expect(description).toContain("Markdown");
+  expect((description ?? "").length).toBeLessThanOrEqual(DESCRIPTION_MAX);
 
-  expect(await content(page, 'meta[name="robots"]')).toBe('index, follow')
+  expect(await content(page, 'meta[name="robots"]')).toBe("index, follow");
 
   // The social card, and the size that makes the wordmark on it legible.
-  expect(await content(page, 'meta[property="og:title"]')).toContain('Resivo')
-  expect(await content(page, 'meta[property="og:image"]')).toBe('/og.png')
+  expect(await content(page, 'meta[property="og:title"]')).toContain("Resivo");
+  expect(await content(page, 'meta[property="og:image"]')).toBe("/og.png");
   expect(await content(page, 'meta[name="twitter:card"]')).toBe(
-    'summary_large_image',
-  )
+    "summary_large_image",
+  );
 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
-    'href',
-    '/',
-  )
+    "href",
+    "/",
+  );
 
   // Exactly one h1, and it is the claim rather than the wordmark.
-  const headings = page.locator('h1')
-  await expect(headings).toHaveCount(1)
-  await expect(headings).toContainText('never leaves this browser')
-})
+  const headings = page.locator("h1");
+  await expect(headings).toHaveCount(1);
+  await expect(headings).toContainText("never leaves this browser");
+});
 
-test('both theme colours survive the head merge', async ({ page }) => {
-  await page.goto('/')
+test("both theme colours survive the head merge", async ({ page }) => {
+  await page.goto("/");
 
-  const colours = page.locator('meta[name="theme-color"]')
+  const colours = page.locator('meta[name="theme-color"]');
 
-  await expect(colours).toHaveCount(2)
+  await expect(colours).toHaveCount(2);
   await expect(colours.nth(0)).toHaveAttribute(
-    'media',
-    '(prefers-color-scheme: light)',
-  )
+    "media",
+    "(prefers-color-scheme: light)",
+  );
   await expect(colours.nth(1)).toHaveAttribute(
-    'media',
-    '(prefers-color-scheme: dark)',
-  )
-})
+    "media",
+    "(prefers-color-scheme: dark)",
+  );
+});
 
-test('the structured data parses and names the app', async ({ page }) => {
-  await page.goto('/')
+test("the structured data parses and names the app", async ({ page }) => {
+  await page.goto("/");
 
   const raw = await page
     .locator('script[type="application/ld+json"]')
     .first()
-    .textContent()
+    .textContent();
 
-  const data = JSON.parse(raw ?? '{}')
+  const data = JSON.parse(raw ?? "{}");
 
-  expect(data['@type']).toBe('SoftwareApplication')
-  expect(data.name).toBe('Resivo')
-  expect(data.featureList.length).toBeGreaterThan(3)
-})
+  expect(data["@type"]).toBe("SoftwareApplication");
+  expect(data.name).toBe("Resivo");
+  expect(data.featureList.length).toBeGreaterThan(3);
+});
 
-test('the two other public pages carry their own title and description', async ({
+test("the two other public pages carry their own title and description", async ({
   page,
 }) => {
   for (const [path, fragment] of [
-    ['/about', 'About Resivo'],
-    ['/templates', 'templates'],
+    ["/about", "About Resivo"],
+    ["/templates", "templates"],
   ] as const) {
-    await page.goto(path)
+    await page.goto(path);
 
-    await expect(page).toHaveTitle(new RegExp(fragment, 'i'))
-    expect(await content(page, 'meta[name="robots"]')).toBe('index, follow')
+    await expect(page).toHaveTitle(new RegExp(fragment, "i"));
+    expect(await content(page, 'meta[name="robots"]')).toBe("index, follow");
 
-    const description = await content(page, 'meta[name="description"]')
-    expect((description ?? '').length).toBeGreaterThan(40)
-    expect((description ?? '').length).toBeLessThanOrEqual(DESCRIPTION_MAX)
+    const description = await content(page, 'meta[name="description"]');
+    expect((description ?? "").length).toBeGreaterThan(40);
+    expect((description ?? "").length).toBeLessThanOrEqual(DESCRIPTION_MAX);
 
     // The shell renders the route title as the page's h1.
-    await expect(page.locator('h1')).toHaveCount(1)
+    await expect(page.locator("h1")).toHaveCount(1);
   }
-})
+});
 
-test('the app routes ask not to be indexed', async ({ page }) => {
+test("the app routes ask not to be indexed", async ({ page }) => {
   for (const path of [
-    '/resumes',
-    '/archive',
-    '/images',
-    '/fonts',
-    '/settings',
+    "/resumes",
+    "/archive",
+    "/images",
+    "/fonts",
+    "/settings",
   ]) {
-    await page.goto(path)
+    await page.goto(path);
 
     expect(await content(page, 'meta[name="robots"]')).toBe(
-      'noindex, nofollow, noimageindex',
-    )
+      "noindex, nofollow, noimageindex",
+    );
   }
-})
+});
 
-test('robots.txt is served, and keeps crawlers out of the app', async ({
+test("robots.txt is served, and keeps crawlers out of the app", async ({
   request,
 }) => {
-  const response = await request.get('/robots.txt')
+  const response = await request.get("/robots.txt");
 
-  expect(response.status()).toBe(200)
+  expect(response.status()).toBe(200);
 
-  const body = await response.text()
+  const body = await response.text();
 
-  expect(body).toContain('User-agent: *')
+  expect(body).toContain("User-agent: *");
 
   for (const path of [
-    '/resumes',
-    '/archive',
-    '/images',
-    '/fonts',
-    '/settings',
+    "/resumes",
+    "/archive",
+    "/images",
+    "/fonts",
+    "/settings",
   ]) {
-    expect(body).toContain(`Disallow: ${path}`)
+    expect(body).toContain(`Disallow: ${path}`);
   }
-})
+});
 
-test('the social card is a real image at the size unfurlers crop from', async ({
+test("the social card is a real image at the size unfurlers crop from", async ({
   request,
 }) => {
-  const response = await request.get('/og.png')
+  const response = await request.get("/og.png");
 
-  expect(response.status()).toBe(200)
-  expect(response.headers()['content-type']).toContain('image/png')
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("image/png");
 
   /**
    * The dimensions, read out of the PNG header rather than trusted.
@@ -159,8 +159,8 @@ test('the social card is a real image at the size unfurlers crop from', async ({
    * integers at bytes 16 and 20. An image at the wrong size is cropped by
    * every unfurler, which is the failure this catches.
    */
-  const bytes = await response.body()
+  const bytes = await response.body();
 
-  expect(bytes.readUInt32BE(16)).toBe(1200)
-  expect(bytes.readUInt32BE(20)).toBe(630)
-})
+  expect(bytes.readUInt32BE(16)).toBe(1200);
+  expect(bytes.readUInt32BE(20)).toBe(630);
+});

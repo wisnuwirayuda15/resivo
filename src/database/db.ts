@@ -1,15 +1,15 @@
-import Dexie from 'dexie'
+import Dexie from "dexie";
 
-import { hasIndexedDb } from '@/lib/client'
+import { hasIndexedDb } from "@/lib/client";
 
-import type { Table } from 'dexie'
+import type { Table } from "dexie";
 import type {
   FontRecord,
   GroupRecord,
   ImageRecord,
   ResumeRecord,
   SettingRecord,
-} from './records'
+} from "./records";
 
 /**
  * The local database, the only place user data lives.
@@ -21,17 +21,17 @@ import type {
  * development instead of quietly rendering an empty library.
  */
 
-export const DB_NAME = 'resivo'
+export const DB_NAME = "resivo";
 
 class ResivoDB extends Dexie {
-  declare resumes: Table<ResumeRecord, string>
-  declare groups: Table<GroupRecord, string>
-  declare images: Table<ImageRecord, string>
-  declare fonts: Table<FontRecord, string>
-  declare settings: Table<SettingRecord, string>
+  declare resumes: Table<ResumeRecord, string>;
+  declare groups: Table<GroupRecord, string>;
+  declare images: Table<ImageRecord, string>;
+  declare fonts: Table<FontRecord, string>;
+  declare settings: Table<SettingRecord, string>;
 
   constructor(name: string = DB_NAME) {
-    super(name)
+    super(name);
 
     /**
      * Schema v1.
@@ -44,16 +44,16 @@ class ResivoDB extends Dexie {
      * already ordered, without a sort in JavaScript.
      */
     this.version(1).stores({
-      resumes: 'id, groupId, updatedAt, archivedAt, [groupId+order], title',
-      groups: 'id, order',
-      images: 'id, name, hash, createdAt',
-      fonts: 'id, family, createdAt',
-      settings: 'key',
-    })
+      resumes: "id, groupId, updatedAt, archivedAt, [groupId+order], title",
+      groups: "id, order",
+      images: "id, name, hash, createdAt",
+      fonts: "id, family, createdAt",
+      settings: "key",
+    });
   }
 }
 
-let instance: ResivoDB | undefined
+let instance: ResivoDB | undefined;
 
 /**
  * Opens (or returns) the database connection.
@@ -65,29 +65,29 @@ let instance: ResivoDB | undefined
 export const getDb = (): ResivoDB => {
   if (!hasIndexedDb()) {
     throw new Error(
-      'IndexedDB is unavailable. The Resivo database is browser-only, reach it ' +
-        'from a client-only boundary, and note that private browsing windows may ' +
-        'block it entirely.',
-    )
+      "IndexedDB is unavailable. The Resivo database is browser-only, reach it " +
+        "from a client-only boundary, and note that private browsing windows may " +
+        "block it entirely.",
+    );
   }
 
-  instance ??= new ResivoDB()
+  instance ??= new ResivoDB();
 
-  return instance
-}
+  return instance;
+};
 
 /** True when the database can be reached, for rendering a graceful fallback
  * instead of throwing (private windows, locked-down webviews). */
-export const isDbAvailable = (): boolean => hasIndexedDb()
+export const isDbAvailable = (): boolean => hasIndexedDb();
 
 /**
  * Test seam: swaps in a throwaway database and resets the memoized connection.
  * Production code never calls this.
  */
 export const __setDbForTesting = (name: string): ResivoDB => {
-  instance = new ResivoDB(name)
+  instance = new ResivoDB(name);
 
-  return instance
-}
+  return instance;
+};
 
-export type { ResivoDB }
+export type { ResivoDB };

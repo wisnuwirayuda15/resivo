@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router'
-import { Box, Button, Text } from '@mantine/core'
+import { Link } from "@tanstack/react-router";
+import { Box, Button, Text } from "@mantine/core";
 
-import { Logo } from '@/components/shell/Logo'
+import { Logo } from "@/components/shell/Logo";
 
-import { Reveal } from './Reveal'
+import { Reveal } from "./Reveal";
 
 /**
  * The last ask, and the footer under it.
@@ -14,10 +14,10 @@ import { Reveal } from './Reveal'
  */
 
 const FOOTER_LINKS = [
-  { label: 'Templates', to: '/templates' },
-  { label: 'About', to: '/about' },
-  { label: 'Settings', to: '/settings' },
-] as const
+  { label: "Templates", to: "/templates" },
+  { label: "About", to: "/about" },
+  { label: "Settings", to: "/settings" },
+] as const;
 
 export const Closing: React.FC = () => (
   <>
@@ -74,4 +74,4 @@ export const Closing: React.FC = () => (
       </Box>
     </Box>
   </>
-)
+);

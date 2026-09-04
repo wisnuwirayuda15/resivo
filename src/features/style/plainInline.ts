@@ -1,4 +1,4 @@
-import type { InlineText } from '@/features/resume/model/document'
+import type { InlineText } from "@/features/resume/model/document";
 
 /**
  * Whether a run of inline text is plain enough to edit as a string.
@@ -11,5 +11,5 @@ import type { InlineText } from '@/features/resume/model/document'
 export const isPlainInline = (value: InlineText): boolean =>
   value.length === 0 ||
   (value.length === 1 &&
-    value[0]?.type === 'text' &&
-    (value[0].marks ?? []).length === 0)
+    value[0]?.type === "text" &&
+    (value[0].marks ?? []).length === 0);

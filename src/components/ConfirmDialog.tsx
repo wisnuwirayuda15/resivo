@@ -1,17 +1,17 @@
-import { Button, Group, Modal, Stack } from '@mantine/core'
+import { Button, Group, Modal, Stack } from "@mantine/core";
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface ConfirmDialogProps {
-  opened: boolean
-  title: string
-  confirmLabel: string
+  opened: boolean;
+  title: string;
+  confirmLabel: string;
   /** Styles the confirm button as destructive. Use only when the action cannot
    * be undone. */
-  danger?: boolean
-  onConfirm: () => void
-  onCancel: () => void
-  children: ReactNode
+  danger?: boolean;
+  onConfirm: () => void;
+  onCancel: () => void;
+  children: ReactNode;
 }
 
 /**
@@ -38,10 +38,10 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         <Button variant="default" onClick={onCancel} data-autofocus>
           Cancel
         </Button>
-        <Button color={danger ? 'red' : undefined} onClick={onConfirm}>
+        <Button color={danger ? "red" : undefined} onClick={onConfirm}>
           {confirmLabel}
         </Button>
       </Group>
     </Stack>
   </Modal>
-)
+);

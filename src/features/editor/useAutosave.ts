@@ -1,13 +1,13 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef } from "react";
 
-import { resumeRepo } from '@/database/index'
-import { patchSavedResume } from '@/features/resume/queries'
-import { useQueryClient } from '@tanstack/react-query'
+import { resumeRepo } from "@/database/index";
+import { patchSavedResume } from "@/features/resume/queries";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { createAutosave } from './autosave'
-import { useEditorStore } from './store'
+import { createAutosave } from "./autosave";
+import { useEditorStore } from "./store";
 
-import type { Autosave } from './autosave'
+import type { Autosave } from "./autosave";
 
 /**
  * Wires the editor store to IndexedDB.
@@ -21,12 +21,12 @@ import type { Autosave } from './autosave'
 export const useAutosave = (
   resumeId: string | undefined,
 ): { flush: () => Promise<void> } => {
-  const client = useQueryClient()
-  const autosaveRef = useRef<Autosave | undefined>(undefined)
+  const client = useQueryClient();
+  const autosaveRef = useRef<Autosave | undefined>(undefined);
 
   useEffect(() => {
     if (resumeId === undefined) {
-      return
+      return;
     }
 
     const autosave = createAutosave({
@@ -41,14 +41,14 @@ export const useAutosave = (
         patchSavedResume(
           client,
           await resumeRepo.saveResumeDocument(resumeId, document),
-        )
+        );
       },
       onSaved: (document) => useEditorStore.getState().markSaved(document),
       onStatusChange: (status) =>
         useEditorStore.getState().setSaveStatus(status),
-    })
+    });
 
-    autosaveRef.current = autosave
+    autosaveRef.current = autosave;
 
     const unsubscribe = useEditorStore.subscribe((state, previous) => {
       if (
@@ -56,9 +56,9 @@ export const useAutosave = (
         state.document !== previous.document &&
         state.resumeId === resumeId
       ) {
-        autosave.schedule(state.document)
+        autosave.schedule(state.document);
       }
-    })
+    });
 
     /**
      * `visibilitychange` rather than `beforeunload`: mobile browsers and
@@ -67,31 +67,31 @@ export const useAutosave = (
      * navigation case that visibility does not.
      */
     const flushNow = () => {
-      void autosave.flush()
-    }
+      void autosave.flush();
+    };
     const onVisibilityChange = () => {
-      if (document.visibilityState === 'hidden') {
-        flushNow()
+      if (document.visibilityState === "hidden") {
+        flushNow();
       }
-    }
+    };
 
-    document.addEventListener('visibilitychange', onVisibilityChange)
-    window.addEventListener('pagehide', flushNow)
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    window.addEventListener("pagehide", flushNow);
 
     return () => {
-      document.removeEventListener('visibilitychange', onVisibilityChange)
-      window.removeEventListener('pagehide', flushNow)
-      unsubscribe()
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      window.removeEventListener("pagehide", flushNow);
+      unsubscribe();
       // Flush rather than cancel: unmount usually means navigating away, and
       // discarding the last few hundred milliseconds of typing is data loss.
-      void autosave.flush()
-      autosaveRef.current = undefined
-    }
-  }, [resumeId, client])
+      void autosave.flush();
+      autosaveRef.current = undefined;
+    };
+  }, [resumeId, client]);
 
   return {
     flush: async () => {
-      await autosaveRef.current?.flush()
+      await autosaveRef.current?.flush();
     },
-  }
-}
+  };
+};

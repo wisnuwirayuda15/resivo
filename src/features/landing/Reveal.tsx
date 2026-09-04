@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react'
-import { Box } from '@mantine/core'
+import { useEffect, useRef, useState } from "react";
+import { Box } from "@mantine/core";
 
-import { cn } from '@/lib/utils'
+import { cn } from "@/lib/utils";
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 /**
  * Reveals its children once, when they first come into view.
@@ -36,21 +36,21 @@ import type { ReactNode } from 'react'
  * leaves the last item of a long grid arriving after the reader got there.
  */
 const DELAYS = [
-  'delay-0',
-  'delay-75',
-  'delay-150',
-  'delay-200',
-  'delay-300',
-] as const
+  "delay-0",
+  "delay-75",
+  "delay-150",
+  "delay-200",
+  "delay-300",
+] as const;
 
 interface RevealProps {
-  children: ReactNode
+  children: ReactNode;
   /**
    * Position in a group, for the stagger. Anything past the last delay reuses
    * it, so a long list ends up arriving together rather than trailing off.
    */
-  order?: number
-  className?: string
+  order?: number;
+  className?: string;
 }
 
 export const Reveal: React.FC<RevealProps> = ({
@@ -58,24 +58,24 @@ export const Reveal: React.FC<RevealProps> = ({
   order = 0,
   className,
 }) => {
-  const ref = useRef<HTMLDivElement | null>(null)
-  const [shown, setShown] = useState(false)
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [shown, setShown] = useState(false);
 
   useEffect(() => {
-    const element = ref.current
+    const element = ref.current;
 
     if (element === null) {
-      return
+      return;
     }
 
     /**
      * A browser without the observer gets the content, not the animation.
      * There is no version of this worth a polyfill.
      */
-    if (typeof IntersectionObserver === 'undefined') {
-      setShown(true)
+    if (typeof IntersectionObserver === "undefined") {
+      setShown(true);
 
-      return
+      return;
     }
 
     const observer = new IntersectionObserver(
@@ -94,30 +94,30 @@ export const Reveal: React.FC<RevealProps> = ({
         const arrived = entries.some(
           (entry) =>
             entry.isIntersecting || entry.boundingClientRect.bottom < 0,
-        )
+        );
 
         if (arrived) {
-          setShown(true)
-          observer.disconnect()
+          setShown(true);
+          observer.disconnect();
         }
       },
       // A quarter visible, and 80px early, so a section has finished arriving
       // by the time it is the thing being read.
-      { threshold: 0.25, rootMargin: '0px 0px -80px 0px' },
-    )
+      { threshold: 0.25, rootMargin: "0px 0px -80px 0px" },
+    );
 
-    observer.observe(element)
+    observer.observe(element);
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <Box
       className={cn(DELAYS[Math.min(order, DELAYS.length - 1)], className)}
-      data-reveal={shown ? 'shown' : 'pending'}
+      data-reveal={shown ? "shown" : "pending"}
       ref={ref}
     >
       {children}
     </Box>
-  )
-}
+  );
+};

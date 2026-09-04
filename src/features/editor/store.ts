@@ -1,10 +1,10 @@
-import { produce } from 'immer'
-import { create } from 'zustand'
+import { produce } from "immer";
+import { create } from "zustand";
 
-import type { StoreApi, UseBoundStore } from 'zustand'
-import type { ResumeDocument } from '@/features/resume/model/document'
-import type { Recipe } from './mutations'
-import type { SaveStatus } from './autosave'
+import type { StoreApi, UseBoundStore } from "zustand";
+import type { ResumeDocument } from "@/features/resume/model/document";
+import type { Recipe } from "./mutations";
+import type { SaveStatus } from "./autosave";
 
 /**
  * The working copy of the resume being edited.
@@ -23,7 +23,7 @@ import type { SaveStatus } from './autosave'
  */
 
 /** Bounded so a long session cannot grow the history without limit. */
-export const UNDO_LIMIT = 100
+export const UNDO_LIMIT = 100;
 
 /**
  * How long consecutive same-key edits keep merging into one undo step.
@@ -32,7 +32,7 @@ export const UNDO_LIMIT = 100
  * rather than purely time-based so switching field ends the run immediately,
  * undoing should never jump between two different places in the document.
  */
-export const COALESCE_WINDOW_MS = 700
+export const COALESCE_WINDOW_MS = 700;
 
 export interface ApplyOptions {
   /**
@@ -40,41 +40,41 @@ export interface ApplyOptions {
    * Typically the field being edited, e.g. `text:<blockId>`. Omit for discrete
    * changes (add, delete, reorder), which should each be undoable on their own.
    */
-  coalesce?: string
+  coalesce?: string;
 }
 
 export interface EditorState {
-  resumeId: string | null
+  resumeId: string | null;
   /** The live document. `null` when no resume is open. */
-  document: ResumeDocument | null
+  document: ResumeDocument | null;
   /** Last state known to be persisted, for the dirty check. */
-  baseline: ResumeDocument | null
-  past: Array<ResumeDocument>
-  future: Array<ResumeDocument>
-  coalesceKey: string | null
-  coalesceAt: number
+  baseline: ResumeDocument | null;
+  past: Array<ResumeDocument>;
+  future: Array<ResumeDocument>;
+  coalesceKey: string | null;
+  coalesceAt: number;
   /**
    * What autosave is doing, for the header's indicator. Kept here rather than
    * in the route so that reporting it re-renders one small component, not the
    * editor and everything under it.
    */
-  saveStatus: SaveStatus
+  saveStatus: SaveStatus;
 
-  load: (resumeId: string, document: ResumeDocument) => void
-  close: () => void
-  apply: (recipe: Recipe, options?: ApplyOptions) => void
+  load: (resumeId: string, document: ResumeDocument) => void;
+  close: () => void;
+  apply: (recipe: Recipe, options?: ApplyOptions) => void;
   /** Replaces the document wholesale, used by Markdown import, which
    * reconstructs the tree rather than patching it. */
-  replace: (document: ResumeDocument, options?: ApplyOptions) => void
-  undo: () => void
-  redo: () => void
+  replace: (document: ResumeDocument, options?: ApplyOptions) => void;
+  undo: () => void;
+  redo: () => void;
   /** Marks the current document as persisted. Called by autosave on success. */
-  markSaved: (document: ResumeDocument) => void
-  setSaveStatus: (status: SaveStatus) => void
+  markSaved: (document: ResumeDocument) => void;
+  setSaveStatus: (status: SaveStatus) => void;
 
-  isDirty: () => boolean
-  canUndo: () => boolean
-  canRedo: () => boolean
+  isDirty: () => boolean;
+  canUndo: () => boolean;
+  canRedo: () => boolean;
 }
 
 const initial = {
@@ -87,8 +87,8 @@ const initial = {
   coalesceAt: 0,
   // A document that has just been loaded came out of the database, so it is
   // saved. Anything else would report unsaved work before any was done.
-  saveStatus: 'saved',
-} satisfies Partial<EditorState>
+  saveStatus: "saved",
+} satisfies Partial<EditorState>;
 
 /**
  * Builds a store instance.
@@ -106,44 +106,44 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
     close: () => set({ ...initial }),
 
     apply: (recipe, options = {}) => {
-      const { document } = get()
+      const { document } = get();
 
       if (document === null) {
-        return
+        return;
       }
 
-      const next = produce(document, recipe)
+      const next = produce(document, recipe);
 
       // A recipe that changed nothing must not create an undo step, Immer
       // returns the same reference, which makes that cheap to detect.
       if (next === document) {
-        return
+        return;
       }
 
-      set(pushHistory(get(), document, next, options.coalesce))
+      set(pushHistory(get(), document, next, options.coalesce));
     },
 
     replace: (document, options = {}) => {
-      const current = get().document
+      const current = get().document;
 
       if (current === null || current === document) {
-        return
+        return;
       }
 
-      set(pushHistory(get(), current, document, options.coalesce))
+      set(pushHistory(get(), current, document, options.coalesce));
     },
 
     undo: () => {
-      const { past, future, document } = get()
+      const { past, future, document } = get();
 
       if (past.length === 0 || document === null) {
-        return
+        return;
       }
 
-      const previous = past[past.length - 1]
+      const previous = past[past.length - 1];
 
       if (previous === undefined) {
-        return
+        return;
       }
 
       set({
@@ -154,20 +154,20 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
         // step that was just undone.
         coalesceKey: null,
         coalesceAt: 0,
-      })
+      });
     },
 
     redo: () => {
-      const { past, future, document } = get()
+      const { past, future, document } = get();
 
       if (future.length === 0 || document === null) {
-        return
+        return;
       }
 
-      const [next, ...rest] = future
+      const [next, ...rest] = future;
 
       if (next === undefined) {
-        return
+        return;
       }
 
       set({
@@ -176,7 +176,7 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
         future: rest,
         coalesceKey: null,
         coalesceAt: 0,
-      })
+      });
     },
 
     markSaved: (document) => set({ baseline: document }),
@@ -184,16 +184,16 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
     setSaveStatus: (saveStatus) => set({ saveStatus }),
 
     isDirty: () => {
-      const { document, baseline } = get()
+      const { document, baseline } = get();
 
       // Reference comparison is sound because every edit produces a new
       // document object and nothing mutates one in place.
-      return document !== null && document !== baseline
+      return document !== null && document !== baseline;
     },
 
     canUndo: () => get().past.length > 0,
     canRedo: () => get().future.length > 0,
-  }))
+  }));
 
 /**
  * Decides whether an edit opens a new undo step or extends the current one.
@@ -207,16 +207,16 @@ const pushHistory = (
   next: ResumeDocument,
   coalesce: string | undefined,
 ): Partial<EditorState> => {
-  const now = Date.now()
+  const now = Date.now();
   const extend =
     coalesce !== undefined &&
     coalesce === state.coalesceKey &&
     now - state.coalesceAt < COALESCE_WINDOW_MS &&
-    state.past.length > 0
+    state.past.length > 0;
 
   const past = extend
     ? state.past
-    : [...state.past, previous].slice(-UNDO_LIMIT)
+    : [...state.past, previous].slice(-UNDO_LIMIT);
 
   return {
     document: next,
@@ -225,8 +225,8 @@ const pushHistory = (
     future: [],
     coalesceKey: coalesce ?? null,
     coalesceAt: coalesce === undefined ? 0 : now,
-  }
-}
+  };
+};
 
 /** The app-wide editor store. One resume is open at a time. */
-export const useEditorStore = createEditorStore()
+export const useEditorStore = createEditorStore();

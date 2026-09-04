@@ -1,12 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fontRepo, imageRepo } from '@/database/index'
+import { fontRepo, imageRepo } from "@/database/index";
 
-import { invalidateAsset } from './objectUrl'
-import { readFontFile } from './readFont'
-import { readImageFile } from './readImage'
+import { invalidateAsset } from "./objectUrl";
+import { readFontFile } from "./readFont";
+import { readImageFile } from "./readImage";
 
-import type { QueryClient } from '@tanstack/react-query'
+import type { QueryClient } from "@tanstack/react-query";
 
 /**
  * Query bindings over the image and font repositories.
@@ -20,12 +20,12 @@ import type { QueryClient } from '@tanstack/react-query'
  */
 
 export const assetKeys = {
-  images: ['assets', 'images'] as const,
-  unusedImages: ['assets', 'images', 'unused'] as const,
-  fonts: ['assets', 'fonts'] as const,
-  unusedFonts: ['assets', 'fonts', 'unused'] as const,
-  usage: ['assets', 'usage'] as const,
-}
+  images: ["assets", "images"] as const,
+  unusedImages: ["assets", "images", "unused"] as const,
+  fonts: ["assets", "fonts"] as const,
+  unusedFonts: ["assets", "fonts", "unused"] as const,
+  usage: ["assets", "usage"] as const,
+};
 
 /**
  * "Unused" is derived from every resume, so it goes stale when any document is
@@ -33,29 +33,29 @@ export const assetKeys = {
  * the badge honest instead of leaving it to be noticed later.
  */
 const invalidateAssets = async (client: QueryClient): Promise<void> => {
-  await client.invalidateQueries({ queryKey: ['assets'] })
-}
+  await client.invalidateQueries({ queryKey: ["assets"] });
+};
 
 export const useImages = () =>
   useQuery({
     queryKey: assetKeys.images,
     queryFn: () => imageRepo.listImages(),
-  })
+  });
 
 export const useUnusedImages = () =>
   useQuery({
     queryKey: assetKeys.unusedImages,
     queryFn: () => imageRepo.listUnusedImages(),
-  })
+  });
 
 export const useFonts = () =>
-  useQuery({ queryKey: assetKeys.fonts, queryFn: () => fontRepo.listFonts() })
+  useQuery({ queryKey: assetKeys.fonts, queryFn: () => fontRepo.listFonts() });
 
 export const useUnusedFonts = () =>
   useQuery({
     queryKey: assetKeys.unusedFonts,
     queryFn: () => fontRepo.listUnusedFonts(),
-  })
+  });
 
 /**
  * How much of the device's storage the assets take.
@@ -73,11 +73,11 @@ export const useAssetUsage = () =>
       const [images, fonts] = await Promise.all([
         imageRepo.totalImageBytes(),
         fontRepo.totalFontBytes(),
-      ])
+      ]);
 
-      return { images, fonts, total: images + fonts }
+      return { images, fonts, total: images + fonts };
     },
-  })
+  });
 
 // ---------------------------------------------------------------------------
 // Writes
@@ -91,57 +91,57 @@ export const useAssetUsage = () =>
  * rejects the same files with the same message.
  */
 export const useAddImage = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: async (file: File) =>
       imageRepo.addImage(await readImageFile(file)),
     onSuccess: () => invalidateAssets(client),
-  })
-}
+  });
+};
 
 export const useRenameImage = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, name }: { id: string; name: string }) =>
       imageRepo.renameImage(id, name),
     onSuccess: () => invalidateAssets(client),
-  })
-}
+  });
+};
 
 export const useDeleteImage = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => imageRepo.deleteImage(id),
     onSuccess: async (_result, id) => {
       // The row is gone, so anything still holding its URL is pointing at bytes
       // that no longer exist.
-      invalidateAsset('image', id)
-      await invalidateAssets(client)
+      invalidateAsset("image", id);
+      await invalidateAssets(client);
     },
-  })
-}
+  });
+};
 
 export const useAddFont = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: async (file: File) =>
       fontRepo.addFont(await readFontFile(file)),
     onSuccess: () => invalidateAssets(client),
-  })
-}
+  });
+};
 
 export const useDeleteFont = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (id: string) => fontRepo.deleteFont(id),
     onSuccess: async (_result, id) => {
-      invalidateAsset('font', id)
-      await invalidateAssets(client)
+      invalidateAsset("font", id);
+      await invalidateAssets(client);
     },
-  })
-}
+  });
+};

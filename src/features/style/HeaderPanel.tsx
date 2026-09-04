@@ -1,23 +1,26 @@
-import { useState } from 'react'
-import { Box, Text, TextInput, Tooltip, UnstyledButton } from '@mantine/core'
+import { useState } from "react";
+import { Box, Text, TextInput, Tooltip, UnstyledButton } from "@mantine/core";
 
-import { DocumentIcon, Icon } from '@/features/icons/IconRenderer'
-import { IconPicker } from '@/features/icons/IconPicker'
-import { plainText, text } from '@/features/resume/model/index'
+import { DocumentIcon, Icon } from "@/features/icons/IconRenderer";
+import { IconPicker } from "@/features/icons/IconPicker";
+import { plainText, text } from "@/features/resume/model/index";
 import {
   addContact,
   removeContact,
   setContactHref,
   setContactIcon,
   updateContactLabel,
-} from '@/features/editor/mutations'
-import { cn } from '@/lib/utils'
+} from "@/features/editor/mutations";
+import { cn } from "@/lib/utils";
 
-import { ControlGroup } from './controls'
-import { isPlainInline } from './plainInline'
+import { ControlGroup } from "./controls";
+import { isPlainInline } from "./plainInline";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { ContactItem, HeaderBlock } from '@/features/resume/model/document'
+import type { Recipe } from "@/features/editor/mutations";
+import type {
+  ContactItem,
+  HeaderBlock,
+} from "@/features/resume/model/document";
 
 /**
  * The header's contact list.
@@ -37,30 +40,30 @@ import type { ContactItem, HeaderBlock } from '@/features/resume/model/document'
  */
 
 interface HeaderPanelProps {
-  header: HeaderBlock
-  apply: (recipe: Recipe, options?: { coalesce?: string }) => void
+  header: HeaderBlock;
+  apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
 }
 
 const ContactRow: React.FC<{
-  contact: ContactItem
-  index: number
-  apply: HeaderPanelProps['apply']
+  contact: ContactItem;
+  index: number;
+  apply: HeaderPanelProps["apply"];
 }> = ({ contact, index, apply }) => {
-  const label = plainText(contact.label)
-  const editable = isPlainInline(contact.label)
-  const [picking, setPicking] = useState(false)
-  const [linking, setLinking] = useState(contact.href !== undefined)
+  const label = plainText(contact.label);
+  const editable = isPlainInline(contact.label);
+  const [picking, setPicking] = useState(false);
+  const [linking, setLinking] = useState(contact.href !== undefined);
 
   // Named by position, because a contact has no name of its own and an empty
   // one has no text either, "Delete contact" on four identical rows tells a
   // screen reader nothing about which.
-  const named = `contact ${index + 1}`
+  const named = `contact ${index + 1}`;
 
   return (
     <li className="border-line-soft flex flex-col gap-1 border-b px-2 py-1.5 last:border-b-0">
       <Box className="flex items-center gap-1">
         <Tooltip
-          label={contact.icon === undefined ? 'Add icon' : 'Change icon'}
+          label={contact.icon === undefined ? "Add icon" : "Change icon"}
         >
           <UnstyledButton
             aria-label={
@@ -69,10 +72,10 @@ const ContactRow: React.FC<{
                 : `Change the icon on ${named}`
             }
             className={cn(
-              'rounded-control flex size-[22px] flex-none items-center justify-center',
+              "rounded-control flex size-[22px] flex-none items-center justify-center",
               contact.icon === undefined
-                ? 'border-line text-subtle hover:text-body hover:bg-active border border-dashed'
-                : 'text-accent hover:bg-active',
+                ? "border-line text-subtle hover:text-body hover:bg-active border border-dashed"
+                : "text-accent hover:bg-active",
             )}
             onClick={() => setPicking(true)}
           >
@@ -114,15 +117,15 @@ const ContactRow: React.FC<{
           )}
         </Box>
 
-        <Tooltip label={contact.href === undefined ? 'Add a link' : 'Link'}>
+        <Tooltip label={contact.href === undefined ? "Add a link" : "Link"}>
           <UnstyledButton
             aria-label={`Link for ${named}`}
             aria-pressed={linking}
             className={cn(
-              'rounded-control flex size-[22px] flex-none items-center justify-center',
+              "rounded-control flex size-[22px] flex-none items-center justify-center",
               contact.href === undefined
-                ? 'text-subtle hover:text-body hover:bg-active'
-                : 'text-accent hover:bg-active',
+                ? "text-subtle hover:text-body hover:bg-active"
+                : "text-accent hover:bg-active",
             )}
             onClick={() => setLinking((current) => !current)}
           >
@@ -153,7 +156,7 @@ const ContactRow: React.FC<{
             })
           }
           placeholder="https://example.com"
-          value={contact.href ?? ''}
+          value={contact.href ?? ""}
         />
       ) : null}
 
@@ -161,9 +164,9 @@ const ContactRow: React.FC<{
         onChange={(name, weight) =>
           apply(
             setContactIcon(contact.id, {
-              library: 'phosphor',
+              library: "phosphor",
               name,
-              ...(weight === 'regular' ? {} : { weight }),
+              ...(weight === "regular" ? {} : { weight }),
             }),
           )
         }
@@ -174,8 +177,8 @@ const ContactRow: React.FC<{
         weight={contact.icon?.weight}
       />
     </li>
-  )
-}
+  );
+};
 
 export const HeaderPanel: React.FC<HeaderPanelProps> = ({ header, apply }) => (
   <ControlGroup title="Contacts">
@@ -205,4 +208,4 @@ export const HeaderPanel: React.FC<HeaderPanelProps> = ({ header, apply }) => (
       Add contact
     </UnstyledButton>
   </ControlGroup>
-)
+);

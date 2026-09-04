@@ -1,14 +1,14 @@
-import { defineConfig } from 'vite'
-import { devtools } from '@tanstack/devtools-vite'
+import { devtools } from "@tanstack/devtools-vite";
+import { defineConfig } from "vite";
 
-import { tanstackStart } from '@tanstack/react-start/plugin/vite'
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
 
-import viteReact, { reactCompilerPreset } from '@vitejs/plugin-react'
-import babel from '@rolldown/plugin-babel'
-import tailwindcss from '@tailwindcss/vite'
-import { nitro } from 'nitro/vite'
-import svgr from 'vite-plugin-svgr'
-import mantineTheme from 'tailwind-preset-mantine/vite'
+import babel from "@rolldown/plugin-babel";
+import tailwindcss from "@tailwindcss/vite";
+import viteReact, { reactCompilerPreset } from "@vitejs/plugin-react";
+import { nitro } from "nitro/vite";
+import mantineTheme from "tailwind-preset-mantine/vite";
+import svgr from "vite-plugin-svgr";
 
 const config = defineConfig({
   resolve: { tsconfigPaths: true },
@@ -21,8 +21,8 @@ const config = defineConfig({
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),
     // Regenerates src/styles/theme.css from the Mantine theme (never hand-edit it).
-    mantineTheme({ input: './src/styles/theme.ts' }),
+    mantineTheme({ input: "./src/styles/theme.ts" }),
   ],
-})
+});
 
-export default config
+export default config;

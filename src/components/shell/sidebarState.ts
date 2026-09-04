@@ -16,10 +16,10 @@
  * browser last chose.
  */
 
-const STORAGE_KEY = 'resivo.sidebar.collapsed'
+const STORAGE_KEY = "resivo.sidebar.collapsed";
 
 /** The value of `data-sidebar` the stylesheet keys the rail width off. */
-const RAIL = 'rail'
+const RAIL = "rail";
 
 /**
  * Restores the attribute before the first paint.
@@ -29,17 +29,17 @@ const RAIL = 'rail'
  * browser set to block site data throws on the property access rather than
  * returning null, and a throw here would abort the rest of the head.
  */
-export const SIDEBAR_RESTORE_SCRIPT = `try{if(localStorage.getItem('${STORAGE_KEY}')==='1')document.documentElement.dataset.sidebar='${RAIL}'}catch{}`
+export const SIDEBAR_RESTORE_SCRIPT = `try{if(localStorage.getItem('${STORAGE_KEY}')==='1')document.documentElement.dataset.sidebar='${RAIL}'}catch{}`;
 
 export const readSidebarCollapsed = (): boolean => {
   try {
-    return localStorage.getItem(STORAGE_KEY) === '1'
+    return localStorage.getItem(STORAGE_KEY) === "1";
   } catch {
     // Also the server, where there is no `localStorage` at all. Expanded is the
     // right answer for both: it is what the markup already says.
-    return false
+    return false;
   }
-}
+};
 
 /**
  * Moves the attribute the width depends on, and remembers the choice.
@@ -49,15 +49,15 @@ export const readSidebarCollapsed = (): boolean => {
  */
 export const applySidebarCollapsed = (collapsed: boolean): void => {
   if (collapsed) {
-    document.documentElement.dataset.sidebar = RAIL
+    document.documentElement.dataset.sidebar = RAIL;
   } else {
-    delete document.documentElement.dataset.sidebar
+    delete document.documentElement.dataset.sidebar;
   }
 
   try {
-    localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0')
+    localStorage.setItem(STORAGE_KEY, collapsed ? "1" : "0");
   } catch {
     // A full or blocked store costs the preference on the next visit, nothing
     // more, the sidebar still collapses for this one.
   }
-}
+};

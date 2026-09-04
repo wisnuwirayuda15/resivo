@@ -5,37 +5,37 @@ import {
   ScrollArea,
   Tooltip,
   UnstyledButton,
-} from '@mantine/core'
-import { useMediaQuery } from '@mantine/hooks'
-import { Link } from '@tanstack/react-router'
+} from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
+import { Link } from "@tanstack/react-router";
 
-import { UNGROUPED } from '@/database/index'
-import { Icon } from '@/features/icons/IconRenderer'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { GroupRow } from '@/features/resume/components/GroupRow'
-import { useGroupCounts, useGroups } from '@/features/resume/queries'
-import { cn } from '@/lib/utils'
+import { UNGROUPED } from "@/database/index";
+import { Icon } from "@/features/icons/IconRenderer";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { GroupRow } from "@/features/resume/components/GroupRow";
+import { useGroupCounts, useGroups } from "@/features/resume/queries";
+import { cn } from "@/lib/utils";
 
-import { Logo, LogoMark } from './Logo'
+import { Logo, LogoMark } from "./Logo";
 import {
   NavButton,
   NavGroup,
   NavItemContent,
   NavLink,
   navItemClassName,
-} from './NavItem'
+} from "./NavItem";
 
 interface SidebarProps {
-  onNewResume: () => void
-  onNewGroup: () => void
+  onNewResume: () => void;
+  onNewGroup: () => void;
   /** Called after any navigation, so the mobile overlay can dismiss itself. */
-  onNavigate: () => void
+  onNavigate: () => void;
   /** The group currently filtered to, from the URL. */
-  activeGroupId?: string
+  activeGroupId?: string;
   /** True when the library route is showing everything. */
-  allActive: boolean
+  allActive: boolean;
   /** Asked for the rail. Honoured only where the sidebar is permanent. */
-  collapsed: boolean
+  collapsed: boolean;
 }
 
 /**
@@ -50,7 +50,7 @@ interface SidebarProps {
  * own breakpoint regardless of `--sidebar-width`. This decides the part React
  * owns: whether the rows are icons or icons with labels.
  */
-const PERMANENT = '(min-width: 48em)'
+const PERMANENT = "(min-width: 48em)";
 
 /**
  * Contents of the navbar.
@@ -82,8 +82,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   allActive,
   collapsed,
 }) => {
-  const groups = useGroups()
-  const counts = useGroupCounts()
+  const groups = useGroups();
+  const counts = useGroupCounts();
 
   /**
    * Read during the first render, not in an effect. This only ever mounts inside
@@ -92,22 +92,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
    */
   const permanent = useMediaQuery(PERMANENT, true, {
     getInitialValueInEffect: false,
-  })
-  const rail = collapsed && permanent
+  });
+  const rail = collapsed && permanent;
 
   const total = Array.from(counts.data?.values() ?? []).reduce(
     (sum, count) => sum + count,
     0,
-  )
-  const ungroupedCount = counts.data?.get(UNGROUPED)
-  const hasGroups = (groups.data?.length ?? 0) > 0
+  );
+  const ungroupedCount = counts.data?.get(UNGROUPED);
+  const hasGroups = (groups.data?.length ?? 0) > 0;
 
   return (
     <>
       <AppShell.Section
         className={cn(
-          'border-line flex h-toolbar items-center border-b',
-          rail ? 'justify-center px-0' : 'gap-2 px-3',
+          "border-line h-toolbar flex items-center border-b",
+          rail ? "justify-center px-0" : "gap-2 px-3",
         )}
       >
         {rail ? (
@@ -183,7 +183,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 search={{ group: UNGROUPED }}
                 onClick={onNavigate}
                 className={navItemClassName(activeGroupId === UNGROUPED)}
-                aria-current={activeGroupId === UNGROUPED ? 'page' : undefined}
+                aria-current={activeGroupId === UNGROUPED ? "page" : undefined}
               >
                 <NavItemContent
                   icon="folder-open"
@@ -224,7 +224,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </AppShell.Section>
 
       <AppShell.Section
-        className={cn('border-line-soft border-t', rail ? 'p-1' : 'p-1.5')}
+        className={cn("border-line-soft border-t", rail ? "p-1" : "p-1.5")}
       >
         <NavGroup collapsed={rail}>
           <NavLink
@@ -255,5 +255,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </AppShell.Section>
       )}
     </>
-  )
-}
+  );
+};

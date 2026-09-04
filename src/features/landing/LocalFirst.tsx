@@ -1,6 +1,6 @@
-import { Box, Text } from '@mantine/core'
+import { Box, Text } from "@mantine/core";
 
-import { Reveal } from './Reveal'
+import { Reveal } from "./Reveal";
 
 /**
  * The one section that is an argument rather than a feature.
@@ -40,4 +40,4 @@ export const LocalFirst: React.FC = () => (
       </Reveal>
     </Box>
   </Box>
-)
+);

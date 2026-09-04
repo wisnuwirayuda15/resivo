@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Alert,
   Box,
@@ -10,22 +10,22 @@ import {
   Stack,
   Text,
   TextInput,
-} from '@mantine/core'
+} from "@mantine/core";
 
-import { UNGROUPED } from '@/database/index'
-import { Icon } from '@/features/icons/IconRenderer'
-import { applyMarkdown } from '@/features/markdown/index'
-import { createEmptyDocument } from '../model/index'
-import { templateList } from '@/features/templates/catalog'
+import { UNGROUPED } from "@/database/index";
+import { Icon } from "@/features/icons/IconRenderer";
+import { applyMarkdown } from "@/features/markdown/index";
+import { createEmptyDocument } from "../model/index";
+import { templateList } from "@/features/templates/catalog";
 import {
   useLastTemplate,
   useRememberTemplate,
-} from '@/features/settings/queries'
+} from "@/features/settings/queries";
 
-import { TemplateTile } from './TemplateTile'
-import { useCreateResume, useGroups } from '../queries'
+import { TemplateTile } from "./TemplateTile";
+import { useCreateResume, useGroups } from "../queries";
 
-import type { ResumeDocument, TemplateId } from '../model/document'
+import type { ResumeDocument, TemplateId } from "../model/document";
 
 /**
  * A Markdown file the dialog has read but not yet turned into a resume.
@@ -36,18 +36,18 @@ import type { ResumeDocument, TemplateId } from '../model/document'
  * cheap; a stale `templateId` inside a stored document is not.
  */
 interface ImportedMarkdown {
-  filename: string
-  source: string
+  filename: string;
+  source: string;
   /** Counted, not listed: the file is not open yet, so there is nowhere to point
    * at. The editor shows each one against its line once the resume exists. */
-  warningCount: number
+  warningCount: number;
   /** The name the file's own `#` heading gave, if it gave one. */
-  fullName: string
+  fullName: string;
 }
 
 /** Enough for any resume, and small enough that reading it cannot hang the
  * dialog. A Markdown resume is a few kilobytes. */
-const MAX_IMPORT_BYTES = 1024 * 1024
+const MAX_IMPORT_BYTES = 1024 * 1024;
 
 const documentFrom = (
   templateId: TemplateId,
@@ -56,26 +56,26 @@ const documentFrom = (
   const { document, warnings } = applyMarkdown(
     createEmptyDocument(templateId),
     source,
-  )
+  );
 
   return {
     document,
     warningCount: warnings.length,
     fullName: document.meta.fullName,
-  }
-}
+  };
+};
 
 /** `resume.md` becomes `resume`. A fallback for when the file has no `#`
  * heading to take a name from. */
 const withoutExtension = (filename: string): string =>
-  filename.replace(/\.[^.]+$/, '')
+  filename.replace(/\.[^.]+$/, "");
 
 interface NewResumeDialogProps {
-  opened: boolean
-  onClose: () => void
-  onCreated: (resumeId: string) => void
+  opened: boolean;
+  onClose: () => void;
+  onCreated: (resumeId: string) => void;
   /** Preselects a group when opened from inside one. */
-  defaultGroupId?: string
+  defaultGroupId?: string;
 }
 
 /**
@@ -91,7 +91,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   onCreated,
   defaultGroupId,
 }) => {
-  const [title, setTitle] = useState('')
+  const [title, setTitle] = useState("");
   /**
    * The template, as "what the user picked, or what they picked last time".
    *
@@ -100,29 +100,29 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
    * would show `classic` selected for that tick and then move the selection
    * under the pointer.
    */
-  const [picked, setPicked] = useState<TemplateId | null>(null)
-  const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED)
-  const [imported, setImported] = useState<ImportedMarkdown | null>(null)
-  const [importError, setImportError] = useState<string | null>(null)
+  const [picked, setPicked] = useState<TemplateId | null>(null);
+  const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED);
+  const [imported, setImported] = useState<ImportedMarkdown | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
 
-  const groups = useGroups()
-  const createResume = useCreateResume()
-  const lastTemplate = useLastTemplate()
-  const rememberTemplate = useRememberTemplate()
+  const groups = useGroups();
+  const createResume = useCreateResume();
+  const lastTemplate = useLastTemplate();
+  const rememberTemplate = useRememberTemplate();
 
-  const templateId = picked ?? lastTemplate.data ?? 'classic'
-  const setTemplateId = setPicked
+  const templateId = picked ?? lastTemplate.data ?? "classic";
+  const setTemplateId = setPicked;
 
   const close = () => {
-    onClose()
+    onClose();
     // Reset after closing so the fields do not visibly clear during the exit
     // transition.
-    setTitle('')
-    setPicked(null)
-    setGroupId(defaultGroupId ?? UNGROUPED)
-    setImported(null)
-    setImportError(null)
-  }
+    setTitle("");
+    setPicked(null);
+    setGroupId(defaultGroupId ?? UNGROUPED);
+    setImported(null);
+    setImportError(null);
+  };
 
   /**
    * Reads a Markdown file and parses it once, to report what came of it.
@@ -133,49 +133,49 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
    */
   const importFile = async (file: File | null) => {
     if (file === null) {
-      return
+      return;
     }
 
-    setImportError(null)
+    setImportError(null);
 
     if (file.size > MAX_IMPORT_BYTES) {
       setImportError(
         `${file.name} is ${Math.round(file.size / 1024)} KB. Markdown resumes are a few kilobytes; this is probably not one.`,
-      )
-      return
+      );
+      return;
     }
 
-    const source = await file.text()
+    const source = await file.text();
 
-    if (source.trim() === '') {
-      setImportError(`${file.name} is empty.`)
-      return
+    if (source.trim() === "") {
+      setImportError(`${file.name} is empty.`);
+      return;
     }
 
-    const parsed = documentFrom(templateId, source)
+    const parsed = documentFrom(templateId, source);
 
     setImported({
       filename: file.name,
       source,
       warningCount: parsed.warningCount,
       fullName: parsed.fullName,
-    })
+    });
 
     // Only a name the user has not already typed is overwritten.
     setTitle((current) =>
-      current.trim() === ''
-        ? parsed.fullName === ''
+      current.trim() === ""
+        ? parsed.fullName === ""
           ? withoutExtension(file.name)
           : parsed.fullName
         : current,
-    )
-  }
+    );
+  };
 
   const submit = async () => {
     const created = await createResume.mutateAsync({
       // An untitled resume is normal, the repository supplies the placeholder
       // rather than this dialog insisting on a name up front.
-      ...(title.trim() === '' ? {} : { title: title.trim() }),
+      ...(title.trim() === "" ? {} : { title: title.trim() }),
       templateId,
       ...(groupId === UNGROUPED ? {} : { groupId }),
       // Parsed here rather than at import, so the template chosen by now is the
@@ -183,15 +183,15 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
       ...(imported === null
         ? {}
         : { document: documentFrom(templateId, imported.source).document }),
-    })
+    });
 
     // Remembered after the resume exists, so a failed create does not change
     // what the dialog offers next time.
-    rememberTemplate.mutate(templateId)
+    rememberTemplate.mutate(templateId);
 
-    close()
-    onCreated(created.id)
-  }
+    close();
+    onCreated(created.id);
+  };
 
   return (
     <Modal opened={opened} onClose={close} title="New resume" size={620}>
@@ -226,15 +226,15 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             onChange={(event) => setTitle(event.currentTarget.value)}
             // Enter submits, since the template is already chosen by then.
             onKeyDown={(event) => {
-              if (event.key === 'Enter') {
-                void submit()
+              if (event.key === "Enter") {
+                void submit();
               }
             }}
           />
           <Select
             label="Group"
             data={[
-              { value: UNGROUPED, label: 'No group' },
+              { value: UNGROUPED, label: "No group" },
               ...(groups.data ?? []).map((group) => ({
                 value: group.id,
                 label: group.name,
@@ -262,9 +262,9 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             title={imported.filename}
           >
             {imported.warningCount === 0
-              ? 'Read with nothing left over.'
+              ? "Read with nothing left over."
               : `Read. ${imported.warningCount} ${
-                  imported.warningCount === 1 ? 'line' : 'lines'
+                  imported.warningCount === 1 ? "line" : "lines"
                 } could not be typeset and are kept as source text, the editor points at each one.`}
           </Alert>
         )}
@@ -282,7 +282,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
                 leftSection={<Icon name="file-arrow-down" size={15} />}
                 variant="subtle"
               >
-                {imported === null ? 'Import Markdown' : 'Choose another file'}
+                {imported === null ? "Import Markdown" : "Choose another file"}
               </Button>
             )}
           </FileButton>
@@ -304,5 +304,5 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
         </Group>
       </Stack>
     </Modal>
-  )
-}
+  );
+};

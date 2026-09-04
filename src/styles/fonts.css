@@ -15,12 +15,12 @@
  * `--font-serif` has no Mantine equivalent because the app chrome never uses a
  * serif, it exists purely for `.resivo-paper`.
  */
-@import '@fontsource-variable/instrument-sans';
-@import '@fontsource-variable/jetbrains-mono';
-@import '@fontsource-variable/source-serif-4';
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/source-serif-4";
 
 :root {
   --font-serif:
-    'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia,
-    'Times New Roman', serif;
+    "Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia,
+    "Times New Roman", serif;
 }

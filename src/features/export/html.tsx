@@ -1,16 +1,16 @@
-import { renderToStaticMarkup } from 'react-dom/server'
+import { renderToStaticMarkup } from "react-dom/server";
 
-import { documentFlow, flowItemClass } from '@/features/preview/flow'
-import { renderFlow } from '@/features/preview/renderFlow'
-import { previewStylesheet } from '@/features/preview/css'
-import { sanitizeCss } from '@/features/css/sanitize'
-import { fontFaceCss } from '@/features/assets/fontFaces'
-import { resolveTemplate } from '@/features/templates/registry'
+import { documentFlow, flowItemClass } from "@/features/preview/flow";
+import { renderFlow } from "@/features/preview/renderFlow";
+import { previewStylesheet } from "@/features/preview/css";
+import { sanitizeCss } from "@/features/css/sanitize";
+import { fontFaceCss } from "@/features/assets/fontFaces";
+import { resolveTemplate } from "@/features/templates/registry";
 
-import type { ImageMap } from '@/features/assets/useAssetUrls'
-import type { FontSource } from '@/features/assets/fontFaces'
-import type { ResumeDocument } from '@/features/resume/model/document'
-import type { RenderContext } from '@/features/templates/renderer/types'
+import type { ImageMap } from "@/features/assets/useAssetUrls";
+import type { FontSource } from "@/features/assets/fontFaces";
+import type { ResumeDocument } from "@/features/resume/model/document";
+import type { RenderContext } from "@/features/templates/renderer/types";
 
 /**
  * HTML export: one file, no network.
@@ -26,12 +26,12 @@ import type { RenderContext } from '@/features/templates/renderer/types'
  */
 
 export interface HtmlExportInput {
-  document: ResumeDocument
-  title: string
+  document: ResumeDocument;
+  title: string;
   /** Images as `data:` URLs. Same shape the preview passes as object URLs. */
-  images: ImageMap
+  images: ImageMap;
   /** Custom fonts as `data:` URLs. */
-  fonts: ReadonlyArray<FontSource>
+  fonts: ReadonlyArray<FontSource>;
   /**
    * The bundled typefaces, already inlined, see `inlineBuiltinFonts`.
    *
@@ -39,7 +39,7 @@ export interface HtmlExportInput {
    * the line breaks and therefore the pages of a document whose only job is to
    * look like the one that was laid out.
    */
-  builtinFontCss?: string
+  builtinFontCss?: string;
   /**
    * The page breaks the preview settled on, as flow-item ids per page.
    *
@@ -51,30 +51,30 @@ export interface HtmlExportInput {
    * which is what happens if a document is exported before its first
    * measurement lands.
    */
-  pages?: ReadonlyArray<ReadonlyArray<string>>
+  pages?: ReadonlyArray<ReadonlyArray<string>>;
 }
 
 /** Escapes text for a `<title>`, which is the one place export writes prose of
  * its own into the document. */
 const escapeHtml = (value: string): string =>
   value
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 
 export const exportHtml = ({
   document: resume,
   title,
   images,
   fonts,
-  builtinFontCss = '',
+  builtinFontCss = "",
   pages,
 }: HtmlExportInput): string => {
   const items = documentFlow(resume, {
     keepHeadingWithContent: resume.design.pagination?.keepHeadingWithContent,
-  })
-  const template = resolveTemplate(resume.templateId)
+  });
+  const template = resolveTemplate(resume.templateId);
 
   /**
    * `print` mode, and no `apply`. Two independent reasons the output cannot
@@ -85,36 +85,36 @@ export const exportHtml = ({
     locale: resume.meta.locale,
     design: resume.design,
     images,
-    mode: 'print',
-  }
+    mode: "print",
+  };
 
   const rendered = new Map(
     renderFlow(resume, template, context, items).map(({ item, node }) => [
       item.id,
       { item, node },
     ]),
-  )
+  );
 
-  const layout = pages ?? [items.map((item) => item.id)]
+  const layout = pages ?? [items.map((item) => item.id)];
 
   const body = layout
     .map((ids) => {
       const contents = ids
         .map((id) => {
-          const entry = rendered.get(id)
+          const entry = rendered.get(id);
 
           return entry === undefined
-            ? ''
-            : `<div class="${flowItemClass(entry.item.type)}">${renderToStaticMarkup(entry.node)}</div>`
+            ? ""
+            : `<div class="${flowItemClass(entry.item.type)}">${renderToStaticMarkup(entry.node)}</div>`;
         })
-        .join('')
+        .join("");
 
       return (
         `<div class="resivo-paper rp-page" data-template="${resume.templateId}" ` +
         `data-size="${resume.design.paper.size}"><div class="rp-page-body">${contents}</div></div>`
-      )
+      );
     })
-    .join('')
+    .join("");
 
   const css = previewStylesheet({
     templateId: resume.templateId,
@@ -123,9 +123,9 @@ export const exportHtml = ({
     // The bundled faces first: a user font that happens to share a family name
     // with one of them should win, and later rules do.
     fontFaces: [builtinFontCss, fontFaceCss(fonts)]
-      .filter((part) => part.trim() !== '')
-      .join('\n'),
-  })
+      .filter((part) => part.trim() !== "")
+      .join("\n"),
+  });
 
   /**
    * `rp-root` and `rp-pages` are kept so the exported file uses the same layout
@@ -146,5 +146,5 @@ ${css}
 <div class="rp-root"><div class="rp-pages">${body}</div></div>
 </body>
 </html>
-`
-}
+`;
+};

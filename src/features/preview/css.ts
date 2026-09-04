@@ -1,14 +1,14 @@
-import { templateLayerCss } from '@/features/templates/registry'
+import { templateLayerCss } from "@/features/templates/registry";
 
-import frameCssText from './frame.css?raw'
-import editingCssText from './editing.css?raw'
+import frameCssText from "./frame.css?raw";
+import editingCssText from "./editing.css?raw";
 
 import type {
   DesignConfig,
   FontRef,
   PaperSize,
   TemplateId,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * Assembling the preview iframe's stylesheet.
@@ -30,16 +30,16 @@ import type {
  * see the note in `frame.css`.
  */
 
-export const LAYER_ORDER = '@layer reset, template, tokens, custom;'
+export const LAYER_ORDER = "@layer reset, template, tokens, custom;";
 
 /** Physical page dimensions, as CSS lengths. */
 export const PAGE_DIMENSIONS: Record<
   PaperSize,
   { width: string; height: string }
 > = {
-  A4: { width: '210mm', height: '297mm' },
-  Letter: { width: '8.5in', height: '11in' },
-}
+  A4: { width: "210mm", height: "297mm" },
+  Letter: { width: "8.5in", height: "11in" },
+};
 
 // ---------------------------------------------------------------------------
 // Value guards
@@ -54,19 +54,19 @@ export const PAGE_DIMENSIONS: Record<
  * an injected declaration is not.
  */
 const COLOR_PATTERN =
-  /^(?:#[0-9a-f]{3,8}|[a-z]+|(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch)\(\s*[0-9a-z%.,\s/+-]+\s*\))$/i
+  /^(?:#[0-9a-f]{3,8}|[a-z]+|(?:rgb|rgba|hsl|hsla|hwb|lab|lch|oklab|oklch)\(\s*[0-9a-z%.,\s/+-]+\s*\))$/i;
 
 const safeColor = (value: string, fallback: string): string =>
-  COLOR_PATTERN.test(value.trim()) ? value.trim() : fallback
+  COLOR_PATTERN.test(value.trim()) ? value.trim() : fallback;
 
 /** Keeps a number inside a range the paper can actually render, and rejects
  * `NaN`/`Infinity` outright rather than emitting an invalid declaration. */
 const clamp = (value: number, min: number, max: number, fallback: number) =>
-  Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback
+  Number.isFinite(value) ? Math.min(max, Math.max(min, value)) : fallback;
 
 /** Two decimals is finer than any print device resolves, and keeps the emitted
  * stylesheet readable when someone inspects it. */
-const round = (value: number): number => Math.round(value * 100) / 100
+const round = (value: number): number => Math.round(value * 100) / 100;
 
 /**
  * The three bundled families are emitted as the `--font-*` variables that the
@@ -75,28 +75,28 @@ const round = (value: number): number => Math.round(value * 100) / 100
  * fallback, and stripped of the characters that could close the declaration.
  */
 const BUILTIN_STACKS: Record<string, string> = {
-  'Source Serif 4 Variable': 'var(--font-serif)',
-  'Instrument Sans Variable': 'var(--font-sans)',
-  'JetBrains Mono Variable': 'var(--font-mono)',
-}
+  "Source Serif 4 Variable": "var(--font-serif)",
+  "Instrument Sans Variable": "var(--font-sans)",
+  "JetBrains Mono Variable": "var(--font-mono)",
+};
 
 const fontValue = (font: FontRef, fallback: string): string => {
-  const builtin = BUILTIN_STACKS[font.family]
+  const builtin = BUILTIN_STACKS[font.family];
 
   if (builtin !== undefined) {
-    return builtin
+    return builtin;
   }
 
-  const family = font.family.replace(/["'\\;{}<>]/g, '').trim()
+  const family = font.family.replace(/["'\\;{}<>]/g, "").trim();
 
-  return family === '' ? fallback : `'${family}', var(--font-serif)`
-}
+  return family === "" ? fallback : `'${family}', var(--font-serif)`;
+};
 
-const AVATAR_RADIUS: Record<DesignConfig['image']['avatarShape'], string> = {
-  circle: '50%',
-  rounded: '6px',
-  square: '0',
-}
+const AVATAR_RADIUS: Record<DesignConfig["image"]["avatarShape"], string> = {
+  circle: "50%",
+  rounded: "6px",
+  square: "0",
+};
 
 // ---------------------------------------------------------------------------
 // Emitters
@@ -111,10 +111,10 @@ const AVATAR_RADIUS: Record<DesignConfig['image']['avatarShape'], string> = {
  * which is exactly the preview/print divergence this engine exists to prevent.
  */
 export const pageRule = (size: PaperSize): string => {
-  const { width, height } = PAGE_DIMENSIONS[size]
+  const { width, height } = PAGE_DIMENSIONS[size];
 
-  return `@page { size: ${width} ${height}; margin: 0; }`
-}
+  return `@page { size: ${width} ${height}; margin: 0; }`;
+};
 
 /**
  * The document's `DesignConfig` as `--paper-*` custom properties.
@@ -125,49 +125,49 @@ export const pageRule = (size: PaperSize): string => {
  * the design system's 22pt name.
  */
 export const designVars = (design: DesignConfig): string => {
-  const { paper, typography, colors, spacing, rules, image, icons } = design
-  const page = PAGE_DIMENSIONS[paper.size]
+  const { paper, typography, colors, spacing, rules, image, icons } = design;
+  const page = PAGE_DIMENSIONS[paper.size];
 
-  const base = clamp(typography.baseSize, 6, 24, 10.5)
-  const scale = clamp(typography.scale, 1, 2, 1.2)
+  const base = clamp(typography.baseSize, 6, 24, 10.5);
+  const scale = clamp(typography.scale, 1, 2, 1.2);
 
   const declarations: Array<[string, string]> = [
-    ['--paper-w', page.width],
-    ['--paper-h', page.height],
+    ["--paper-w", page.width],
+    ["--paper-h", page.height],
 
-    ['--paper-margin-top', `${clamp(paper.margin.top, 0, 3, 0.6)}in`],
-    ['--paper-margin-right', `${clamp(paper.margin.right, 0, 3, 0.6)}in`],
-    ['--paper-margin-bottom', `${clamp(paper.margin.bottom, 0, 3, 0.6)}in`],
-    ['--paper-margin-left', `${clamp(paper.margin.left, 0, 3, 0.6)}in`],
+    ["--paper-margin-top", `${clamp(paper.margin.top, 0, 3, 0.6)}in`],
+    ["--paper-margin-right", `${clamp(paper.margin.right, 0, 3, 0.6)}in`],
+    ["--paper-margin-bottom", `${clamp(paper.margin.bottom, 0, 3, 0.6)}in`],
+    ["--paper-margin-left", `${clamp(paper.margin.left, 0, 3, 0.6)}in`],
 
-    ['--paper-font-body', fontValue(typography.bodyFont, 'var(--font-serif)')],
+    ["--paper-font-body", fontValue(typography.bodyFont, "var(--font-serif)")],
     [
-      '--paper-font-head',
+      "--paper-font-head",
       fontValue(
         typography.headingFont ?? typography.bodyFont,
-        'var(--font-serif)',
+        "var(--font-serif)",
       ),
     ],
 
-    ['--paper-fs-body', `${round(base)}pt`],
-    ['--paper-fs-name', `${round(base * scale ** 4)}pt`],
-    ['--paper-fs-headline', `${round(base * scale)}pt`],
-    ['--paper-fs-section', `${round(base * scale)}pt`],
-    ['--paper-fs-small', `${round(base * 0.92)}pt`],
-    ['--paper-lh', `${clamp(typography.lineHeight, 1, 3, 1.42)}`],
+    ["--paper-fs-body", `${round(base)}pt`],
+    ["--paper-fs-name", `${round(base * scale ** 4)}pt`],
+    ["--paper-fs-headline", `${round(base * scale)}pt`],
+    ["--paper-fs-section", `${round(base * scale)}pt`],
+    ["--paper-fs-small", `${round(base * 0.92)}pt`],
+    ["--paper-lh", `${clamp(typography.lineHeight, 1, 3, 1.42)}`],
 
-    ['--paper-fw-body', `${clamp(typography.weights.body, 100, 900, 400)}`],
-    ['--paper-fw-head', `${clamp(typography.weights.heading, 100, 900, 600)}`],
+    ["--paper-fw-body", `${clamp(typography.weights.body, 100, 900, 400)}`],
+    ["--paper-fw-head", `${clamp(typography.weights.heading, 100, 900, 600)}`],
 
-    ['--paper-ink', safeColor(colors.text, '#1a1a18')],
-    ['--paper-heading', safeColor(colors.heading, '#1a1a18')],
-    ['--paper-accent', safeColor(colors.accent, '#0e7c76')],
-    ['--paper-ink-muted', safeColor(colors.muted, '#55554e')],
-    ['--paper-rule', safeColor(colors.rule, '#d8d8d3')],
+    ["--paper-ink", safeColor(colors.text, "#1a1a18")],
+    ["--paper-heading", safeColor(colors.heading, "#1a1a18")],
+    ["--paper-accent", safeColor(colors.accent, "#0e7c76")],
+    ["--paper-ink-muted", safeColor(colors.muted, "#55554e")],
+    ["--paper-rule", safeColor(colors.rule, "#d8d8d3")],
 
-    ['--paper-space-section', `${clamp(spacing.section, 0, 5, 0.9)}rem`],
-    ['--paper-space-block', `${clamp(spacing.paragraph, 0, 5, 0.35)}rem`],
-    ['--paper-space-heading', `${clamp(spacing.heading, 0, 5, 0.4)}rem`],
+    ["--paper-space-section", `${clamp(spacing.section, 0, 5, 0.9)}rem`],
+    ["--paper-space-block", `${clamp(spacing.paragraph, 0, 5, 0.35)}rem`],
+    ["--paper-space-heading", `${clamp(spacing.heading, 0, 5, 0.4)}rem`],
 
     /**
      * Turning dividers off zeroes the rule width as well as skipping the
@@ -175,46 +175,46 @@ export const designVars = (design: DesignConfig): string => {
      * template that draws its own rule from leaving a 1px line behind.
      */
     [
-      '--paper-rule-w',
-      rules.showDividers ? `${clamp(rules.width, 0, 8, 1)}px` : '0px',
+      "--paper-rule-w",
+      rules.showDividers ? `${clamp(rules.width, 0, 8, 1)}px` : "0px",
     ],
-    ['--paper-rule-color', safeColor(rules.color, '#d8d8d3')],
+    ["--paper-rule-color", safeColor(rules.color, "#d8d8d3")],
 
-    ['--paper-avatar-size', `${clamp(image.avatarSize, 24, 300, 84)}px`],
-    ['--paper-avatar-radius', AVATAR_RADIUS[image.avatarShape]],
+    ["--paper-avatar-size", `${clamp(image.avatarSize, 24, 300, 84)}px`],
+    ["--paper-avatar-radius", AVATAR_RADIUS[image.avatarShape]],
 
-    ['--paper-icon-size', `${clamp(icons.size, 6, 48, 12)}px`],
-    ['--paper-icon-color', safeColor(icons.color, '#55554e')],
-  ]
+    ["--paper-icon-size", `${clamp(icons.size, 6, 48, 12)}px`],
+    ["--paper-icon-color", safeColor(icons.color, "#55554e")],
+  ];
 
   const body = declarations
     .map(([name, value]) => `  ${name}: ${value};`)
-    .join('\n')
+    .join("\n");
 
-  return `.resivo-paper {\n${body}\n}`
-}
+  return `.resivo-paper {\n${body}\n}`;
+};
 
 // ---------------------------------------------------------------------------
 // Assembly
 // ---------------------------------------------------------------------------
 
 export interface StylesheetInput {
-  templateId: TemplateId
-  design: DesignConfig
+  templateId: TemplateId;
+  design: DesignConfig;
   /**
    * The user's CSS, already sanitized. Taking it pre-sanitized rather than
    * sanitizing here is deliberate: the editor has to show the warnings, so the
    * check runs once, where its result can be reported, and this function is
    * left with nothing to decide.
    */
-  customCss?: string
+  customCss?: string;
   /**
    * `@font-face` rules for the uploaded families this document uses, built by
    * `features/assets/fontFaces`. Passed in rather than built here because the
    * URLs inside them have lifetimes (object URLs in the preview, `data:` URLs
    * in an export), and this function is pure.
    */
-  fontFaces?: string
+  fontFaces?: string;
   /**
    * Include the editing chrome's rules.
    *
@@ -223,7 +223,7 @@ export interface StylesheetInput {
    * nothing from the editor" is a property of the whole file rather than of its
    * body.
    */
-  editing?: boolean
+  editing?: boolean;
 }
 
 /**
@@ -253,12 +253,12 @@ export const previewStylesheet = ({
      * no layer can override it, but a face has to be declared before the rule
      * that names it is resolved, and the token layer names it.
      */
-    ...(fontFaces === undefined || fontFaces.trim() === '' ? [] : [fontFaces]),
+    ...(fontFaces === undefined || fontFaces.trim() === "" ? [] : [fontFaces]),
     frameCssText,
     ...(editing ? [editingCssText] : []),
     `@layer template {\n${templateLayerCss(templateId)}\n}`,
     `@layer tokens {\n${designVars(design)}\n}`,
-    ...(customCss === undefined || customCss.trim() === ''
+    ...(customCss === undefined || customCss.trim() === ""
       ? []
       : [`@layer custom {\n${customCss}\n}`]),
-  ].join('\n\n')
+  ].join("\n\n");

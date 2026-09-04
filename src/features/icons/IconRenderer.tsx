@@ -1,22 +1,22 @@
-import { useCatalogGlyph } from './useCatalogGlyph'
+import { useCatalogGlyph } from "./useCatalogGlyph";
 
-import { resolveIcon } from './registry'
+import { resolveIcon } from "./registry";
 
-import type { IconRef } from '@/features/resume/model/document'
+import type { IconRef } from "@/features/resume/model/document";
 
 interface IconProps {
   /** Kebab-case Phosphor name, e.g. `envelope-simple`. */
-  name: string
-  weight?: IconRef['weight']
+  name: string;
+  weight?: IconRef["weight"];
   /** Defaults to `1em`, so an icon tracks the font size of whatever contains
    * it: the design system sizes glyphs relative to their context. */
-  size?: number | string
+  size?: number | string;
   /** Defaults to `currentColor`, so an icon inherits its surrounding text
    * colour rather than needing to be told. */
-  color?: string
-  opacity?: number
-  title?: string
-  className?: string
+  color?: string;
+  opacity?: number;
+  title?: string;
+  className?: string;
 }
 
 /**
@@ -30,18 +30,18 @@ interface IconProps {
  */
 export const Icon: React.FC<IconProps> = ({
   name,
-  weight = 'regular',
-  size = '1em',
-  color = 'currentColor',
+  weight = "regular",
+  size = "1em",
+  color = "currentColor",
   opacity,
   title,
   className,
 }) => {
-  const Component = resolveIcon(name)
+  const Component = resolveIcon(name);
   const catalogGlyph = useCatalogGlyph(
     Component === undefined ? name : undefined,
     weight,
-  )
+  );
 
   if (Component === undefined) {
     /**
@@ -63,12 +63,12 @@ export const Icon: React.FC<IconProps> = ({
         <span
           aria-hidden
           className={className}
-          style={{ display: 'inline-block', width: size, height: size }}
+          style={{ display: "inline-block", width: size, height: size }}
           data-icon-name={name}
           data-icon-weight={weight}
           data-unknown-icon={name}
         />
-      )
+      );
     }
 
     return (
@@ -90,8 +90,8 @@ export const Icon: React.FC<IconProps> = ({
         fill={color}
         opacity={opacity}
         {...(title === undefined
-          ? { 'aria-hidden': true }
-          : { role: 'img', 'aria-label': title })}
+          ? { "aria-hidden": true }
+          : { role: "img", "aria-label": title })}
         /**
          * The markup is generated from the icon package's own assets by
          * `scripts/generate-icon-catalog.mjs`, which takes only the drawable
@@ -100,7 +100,7 @@ export const Icon: React.FC<IconProps> = ({
          */
         dangerouslySetInnerHTML={{ __html: catalogGlyph }}
       />
-    )
+    );
   }
 
   return (
@@ -114,14 +114,14 @@ export const Icon: React.FC<IconProps> = ({
       opacity={opacity}
       // Phosphor renders a <title> and drops aria-hidden when given one, so a
       // titled icon is announced and an untitled one is treated as decoration.
-      {...(title === undefined ? { 'aria-hidden': true } : { title })}
+      {...(title === undefined ? { "aria-hidden": true } : { title })}
     />
-  )
-}
+  );
+};
 
 /** Renders an `IconRef` straight from the document. */
 export const DocumentIcon: React.FC<
-  { icon: IconRef } & Omit<IconProps, 'name' | 'weight'>
+  { icon: IconRef } & Omit<IconProps, "name" | "weight">
 > = ({ icon, ...rest }) => (
   <Icon name={icon.name} weight={icon.weight} {...rest} />
-)
+);

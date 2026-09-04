@@ -1,11 +1,11 @@
-import type { Recipe } from '@/features/editor/mutations'
-import type { ImageMap } from '@/features/assets/useAssetUrls'
+import type { Recipe } from "@/features/editor/mutations";
+import type { ImageMap } from "@/features/assets/useAssetUrls";
 import type {
   Block,
   DesignConfig,
   HeaderBlock,
   Section,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * The contract between the paginator and a template.
@@ -24,24 +24,24 @@ import type {
  * a later pass has decisions of its own to make there, and a call site reading
  * `mode === 'print'` says what it means where `!editable` would not.
  */
-export type RenderMode = 'view' | 'edit' | 'print'
+export type RenderMode = "view" | "edit" | "print";
 
 export interface RenderContext {
-  mode: RenderMode
+  mode: RenderMode;
   /**
    * How an edit reaches the store. Absent outside `edit` mode, which is what
    * makes an editable field structurally unable to exist in an export.
    */
-  apply?: (recipe: Recipe) => void
+  apply?: (recipe: Recipe) => void;
   /** BCP 47 tag from the document's meta. Affects date formatting, not text. */
-  locale: string
+  locale: string;
   /**
    * The resolved style tokens. Renderers read them only for decisions CSS cannot
    * express, whether a divider exists at all, for instance. Everything visual
    * comes through `--paper-*` custom properties instead, so the style panel can
    * change it without a re-render of this tree.
    */
-  design: DesignConfig
+  design: DesignConfig;
   /**
    * Object URLs for the images this document references, keyed by row id.
    *
@@ -54,28 +54,28 @@ export interface RenderContext {
    * gone. The two are drawn differently, because one resolves itself and the
    * other never will.
    */
-  images: ImageMap
+  images: ImageMap;
 }
 
 export interface HeaderProps {
-  header: HeaderBlock
-  context: RenderContext
+  header: HeaderBlock;
+  context: RenderContext;
 }
 
 export interface SectionHeadingProps {
-  section: Section
-  context: RenderContext
+  section: Section;
+  context: RenderContext;
 }
 
 export interface BlockProps {
-  block: Block
+  block: Block;
   /** The section the block belongs to, for kind-dependent rendering. */
-  section: Section
-  context: RenderContext
+  section: Section;
+  context: RenderContext;
 }
 
 export interface TemplateComponents {
-  Header: React.FC<HeaderProps>
-  SectionHeading: React.FC<SectionHeadingProps>
-  Block: React.FC<BlockProps>
+  Header: React.FC<HeaderProps>;
+  SectionHeading: React.FC<SectionHeadingProps>;
+  Block: React.FC<BlockProps>;
 }

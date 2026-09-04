@@ -1,6 +1,6 @@
-import { z } from 'zod'
+import { z } from "zod";
 
-import { documentSchema } from '@/features/resume/model/index'
+import { documentSchema } from "@/features/resume/model/index";
 
 /**
  * The backup file's shape.
@@ -15,11 +15,11 @@ import { documentSchema } from '@/features/resume/model/index'
  * third more bytes, which is the right trade for a file written occasionally.
  */
 
-export const BACKUP_VERSION = 1
+export const BACKUP_VERSION = 1;
 
 /** Identifies the file as ours before anything else is trusted, so a JSON file
  * picked by mistake is rejected with a sentence rather than a type error. */
-export const BACKUP_KIND = 'resivo.backup'
+export const BACKUP_KIND = "resivo.backup";
 
 const imageSchema = z.object({
   id: z.string().min(1),
@@ -31,19 +31,19 @@ const imageSchema = z.object({
   hash: z.string(),
   createdAt: z.number(),
   /** The bytes, as a `data:` URL. */
-  data: z.string().startsWith('data:'),
-})
+  data: z.string().startsWith("data:"),
+});
 
 const fontSchema = z.object({
   id: z.string().min(1),
   family: z.string(),
   weight: z.number(),
-  style: z.enum(['normal', 'italic']),
-  format: z.enum(['woff2', 'woff', 'ttf', 'otf']),
+  style: z.enum(["normal", "italic"]),
+  format: z.enum(["woff2", "woff", "ttf", "otf"]),
   size: z.number().int().nonnegative(),
   createdAt: z.number(),
-  data: z.string().startsWith('data:'),
-})
+  data: z.string().startsWith("data:"),
+});
 
 const resumeSchema = z.object({
   id: z.string().min(1),
@@ -59,14 +59,14 @@ const resumeSchema = z.object({
    * migrations run on read, and this is a write.
    */
   document: documentSchema,
-})
+});
 
 const groupSchema = z.object({
   id: z.string().min(1),
   name: z.string(),
   order: z.number(),
   createdAt: z.number(),
-})
+});
 
 /**
  * A setting, as stored.
@@ -79,7 +79,7 @@ const groupSchema = z.object({
 const settingSchema = z.object({
   key: z.string().min(1),
   value: z.unknown(),
-})
+});
 
 export const backupSchema = z.object({
   kind: z.literal(BACKUP_KIND),
@@ -98,12 +98,12 @@ export const backupSchema = z.object({
    * invalid.
    */
   settings: z.array(settingSchema).optional(),
-})
+});
 
-export type Backup = z.infer<typeof backupSchema>
-export type BackupResume = z.infer<typeof resumeSchema>
-export type BackupImage = z.infer<typeof imageSchema>
-export type BackupFont = z.infer<typeof fontSchema>
+export type Backup = z.infer<typeof backupSchema>;
+export type BackupResume = z.infer<typeof resumeSchema>;
+export type BackupImage = z.infer<typeof imageSchema>;
+export type BackupFont = z.infer<typeof fontSchema>;
 
 export class BackupRejected extends Error {}
 
@@ -115,48 +115,48 @@ export class BackupRejected extends Error {}
  * about what to do next.
  */
 export const parseBackup = (text: string): Backup => {
-  let raw: unknown
+  let raw: unknown;
 
   try {
-    raw = JSON.parse(text)
+    raw = JSON.parse(text);
   } catch {
     throw new BackupRejected(
-      'That file is not valid JSON, so it is not a Resivo backup.',
-    )
+      "That file is not valid JSON, so it is not a Resivo backup.",
+    );
   }
 
-  const kind = (raw as { kind?: unknown } | null)?.kind
+  const kind = (raw as { kind?: unknown } | null)?.kind;
 
   if (kind !== BACKUP_KIND) {
     throw new BackupRejected(
-      'That JSON file is not a Resivo backup. A backup starts with ' +
+      "That JSON file is not a Resivo backup. A backup starts with " +
         `"kind": "${BACKUP_KIND}".`,
-    )
+    );
   }
 
-  const version = (raw as { version?: unknown }).version
+  const version = (raw as { version?: unknown }).version;
 
-  if (typeof version === 'number' && version > BACKUP_VERSION) {
+  if (typeof version === "number" && version > BACKUP_VERSION) {
     throw new BackupRejected(
       `That backup was written by a newer version of Resivo (format ${version}, ` +
         `this build reads ${BACKUP_VERSION}). Update before restoring it, ` +
-        'restoring it here could lose part of it.',
-    )
+        "restoring it here could lose part of it.",
+    );
   }
 
-  const result = backupSchema.safeParse(raw)
+  const result = backupSchema.safeParse(raw);
 
   if (!result.success) {
-    const first = result.error.issues[0]
+    const first = result.error.issues[0];
 
     throw new BackupRejected(
-      'That backup could not be read' +
+      "That backup could not be read" +
         (first === undefined
-          ? '.'
-          : `: ${first.message} (at ${first.path.join('.') || 'the top level'}).`) +
-        ' Nothing was changed.',
-    )
+          ? "."
+          : `: ${first.message} (at ${first.path.join(".") || "the top level"}).`) +
+        " Nothing was changed.",
+    );
   }
 
-  return result.data
-}
+  return result.data;
+};

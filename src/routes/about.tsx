@@ -1,9 +1,9 @@
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { Box, Text } from '@mantine/core'
+import { Link, createFileRoute } from "@tanstack/react-router";
+import { Box, Text } from "@mantine/core";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
+import { Shell } from "@/components/shell/Shell";
 
 /**
  * About.
@@ -36,10 +36,10 @@ const AboutRoute: React.FC = () => (
           Clearing this browser&rsquo;s storage deletes your resumes, and there
           is no copy anywhere else to fall back on. A private window keeps
           nothing after it closes, and another device sees none of this. The
-          backup file in{' '}
+          backup file in{" "}
           <Link className="text-accent hover:underline" to="/settings">
             Settings
-          </Link>{' '}
+          </Link>{" "}
           is the only thing that survives a cleared browser or a lost machine,
           it is worth writing one now rather than the first time it matters.
         </Text>
@@ -77,10 +77,10 @@ const AboutRoute: React.FC = () => (
           Templates and ATS
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
-          Every{' '}
+          Every{" "}
           <Link className="text-accent hover:underline" to="/templates">
             template
-          </Link>{' '}
+          </Link>{" "}
           is single-column and parser-safe: no tables holding the layout, no
           text in images, no two-column reading order for a machine to scramble.
           They differ in typeface, spacing, and how much hierarchy comes from
@@ -89,15 +89,15 @@ const AboutRoute: React.FC = () => (
       </Box>
     </Box>
   </Shell>
-)
+);
 
-export const Route = createFileRoute('/about')({
+export const Route = createFileRoute("/about")({
   head: () => ({
     meta: seo({
-      title: 'About Resivo, and what local-first costs',
+      title: "About Resivo, and what local-first costs",
       description:
-        'What Resivo is, how a resume builder with no server works, and the one thing to know before you clear your browser storage.',
+        "What Resivo is, how a resume builder with no server works, and the one thing to know before you clear your browser storage.",
     }),
   }),
   component: AboutRoute,
-})
+});

@@ -3,28 +3,28 @@ import {
   Link,
   Scripts,
   createRootRouteWithContext,
-} from '@tanstack/react-router'
+} from "@tanstack/react-router";
 import {
   Box,
   Button,
   ColorSchemeScript,
   Text,
   mantineHtmlProps,
-} from '@mantine/core'
+} from "@mantine/core";
 
-import { EmptyState } from '@/components/EmptyState'
-import { Providers } from '@/components/providers'
-import { SIDEBAR_RESTORE_SCRIPT } from '@/components/shell/sidebarState'
+import { EmptyState } from "@/components/EmptyState";
+import { Providers } from "@/components/providers";
+import { SIDEBAR_RESTORE_SCRIPT } from "@/components/shell/sidebarState";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import appCss from '@/styles/global.css?url'
+import appCss from "@/styles/global.css?url";
 
-import type { ErrorComponentProps } from '@tanstack/react-router'
-import type { QueryClient } from '@tanstack/react-query'
+import type { ErrorComponentProps } from "@tanstack/react-router";
+import type { QueryClient } from "@tanstack/react-query";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 /**
@@ -57,7 +57,7 @@ const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => (
       }
     />
   </Box>
-)
+);
 
 const RootNotFound: React.FC = () => (
   <Box className="bg-app min-h-dvh">
@@ -72,17 +72,17 @@ const RootNotFound: React.FC = () => (
       }
     />
   </Box>
-)
+);
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       /**
        * The defaults every route inherits.
@@ -93,11 +93,11 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
        * default. Every route that renders one device's data overrides
        * `robots` to say so.
        */
-      ...seo({ title: 'Resivo, a local-first resume builder' }),
+      ...seo({ title: "Resivo, a local-first resume builder" }),
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
       /**
@@ -111,29 +111,29 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
        * the SVG.
        */
       {
-        rel: 'icon',
-        href: '/favicon.svg',
-        type: 'image/svg+xml',
+        rel: "icon",
+        href: "/favicon.svg",
+        type: "image/svg+xml",
       },
       {
-        rel: 'icon',
-        href: '/favicon-32.png',
-        type: 'image/png',
-        sizes: '32x32',
+        rel: "icon",
+        href: "/favicon-32.png",
+        type: "image/png",
+        sizes: "32x32",
       },
       {
-        rel: 'apple-touch-icon',
-        href: '/apple-touch-icon.png',
+        rel: "apple-touch-icon",
+        href: "/apple-touch-icon.png",
       },
     ],
   }),
   errorComponent: RootErrorComponent,
   notFoundComponent: RootNotFound,
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
-  const { queryClient } = Route.useRouteContext()
+  const { queryClient } = Route.useRouteContext();
 
   return (
     /**
@@ -179,5 +179,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

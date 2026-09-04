@@ -12,27 +12,27 @@
  * far as this app is concerned.
  */
 
-const STORAGE_PREFIX = 'resivo.onboarding'
+const STORAGE_PREFIX = "resivo.onboarding";
 
-export type TourName = 'library' | 'editor'
+export type TourName = "library" | "editor";
 
-const storageKey = (name: TourName): string => `${STORAGE_PREFIX}.${name}`
+const storageKey = (name: TourName): string => `${STORAGE_PREFIX}.${name}`;
 
 export const hasSeenTour = (name: TourName): boolean => {
   // Guarded rather than assumed: this is called during render, and a browser
   // set to block site data throws on access rather than returning null.
   try {
-    return localStorage.getItem(storageKey(name)) !== null
+    return localStorage.getItem(storageKey(name)) !== null;
   } catch {
-    return false
+    return false;
   }
-}
+};
 
 export const markTourSeen = (name: TourName): void => {
   try {
-    localStorage.setItem(storageKey(name), String(Date.now()))
+    localStorage.setItem(storageKey(name), String(Date.now()));
   } catch {
     // A full or blocked store is not worth interrupting anything for. The cost
     // is that the tour offers itself again next time.
   }
-}
+};

@@ -1,8 +1,8 @@
-import { Box, Text } from '@mantine/core'
+import { Box, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
+import { Icon } from "@/features/icons/IconRenderer";
 
-import { Reveal } from './Reveal'
+import { Reveal } from "./Reveal";
 
 /**
  * The three editing surfaces.
@@ -15,21 +15,21 @@ import { Reveal } from './Reveal'
 
 const SURFACES = [
   {
-    icon: 'markdown-logo',
-    title: 'Markdown',
-    body: 'CommonMark and GFM, plus a few directives for the things a heading convention cannot get back out again.',
+    icon: "markdown-logo",
+    title: "Markdown",
+    body: "CommonMark and GFM, plus a few directives for the things a heading convention cannot get back out again.",
   },
   {
-    icon: 'cursor-text',
-    title: 'The paper',
-    body: 'Click any line to change it where it sits, or drag a block to move it. The page you edit is the page that prints.',
+    icon: "cursor-text",
+    title: "The paper",
+    body: "Click any line to change it where it sits, or drag a block to move it. The page you edit is the page that prints.",
   },
   {
-    icon: 'palette',
-    title: 'The style panel',
-    body: 'Every design token: paper size, margins, type, colour, rules, icons, and where the pages break.',
+    icon: "palette",
+    title: "The style panel",
+    body: "Every design token: paper size, margins, type, colour, rules, icons, and where the pages break.",
   },
-] as const
+] as const;
 
 export const Surfaces: React.FC = () => (
   <Box
@@ -47,7 +47,7 @@ export const Surfaces: React.FC = () => (
         </Text>
       </Reveal>
 
-      <Box className="border-line-soft mt-12 grid gap-10 border-t pt-10 sm:grid-cols-3 sm:gap-0 sm:divide-line-soft sm:divide-x">
+      <Box className="border-line-soft sm:divide-line-soft mt-12 grid gap-10 border-t pt-10 sm:grid-cols-3 sm:gap-0 sm:divide-x">
         {SURFACES.map((surface, index) => (
           <Reveal
             className="sm:px-6 sm:first:pl-0 sm:last:pr-0 md:px-8"
@@ -73,4 +73,4 @@ export const Surfaces: React.FC = () => (
       </Reveal>
     </Box>
   </Box>
-)
+);

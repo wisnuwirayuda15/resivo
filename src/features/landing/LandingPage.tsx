@@ -1,14 +1,14 @@
-import { Box } from '@mantine/core'
+import { Box } from "@mantine/core";
 
-import { SITE_DESCRIPTION, SITE_NAME } from '@/lib/seo'
+import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
 
-import { Capabilities } from './Capabilities'
-import { Closing } from './Closing'
-import { Hero } from './Hero'
-import { LandingNav } from './LandingNav'
-import { LocalFirst } from './LocalFirst'
-import { Surfaces } from './Surfaces'
-import { TemplateShowcase } from './TemplateShowcase'
+import { Capabilities } from "./Capabilities";
+import { Closing } from "./Closing";
+import { Hero } from "./Hero";
+import { LandingNav } from "./LandingNav";
+import { LocalFirst } from "./LocalFirst";
+import { Surfaces } from "./Surfaces";
+import { TemplateShowcase } from "./TemplateShowcase";
 
 /**
  * The landing page.
@@ -36,27 +36,27 @@ import { TemplateShowcase } from './TemplateShowcase'
  * tags and this is neither.
  */
 const STRUCTURED_DATA = {
-  '@context': 'https://schema.org',
-  '@type': 'SoftwareApplication',
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
   name: SITE_NAME,
-  applicationCategory: 'BusinessApplication',
-  applicationSubCategory: 'Resume builder',
-  operatingSystem: 'Any, runs in a web browser',
+  applicationCategory: "BusinessApplication",
+  applicationSubCategory: "Resume builder",
+  operatingSystem: "Any, runs in a web browser",
   description: SITE_DESCRIPTION,
   featureList: [
-    'Write a resume in Markdown',
-    'Edit the page directly',
-    'Style it with your own CSS',
-    'Measured page breaks',
-    'Export to PDF, self-contained HTML or Markdown',
-    'Stores everything in the browser, with no account and no server',
+    "Write a resume in Markdown",
+    "Edit the page directly",
+    "Style it with your own CSS",
+    "Measured page breaks",
+    "Export to PDF, self-contained HTML or Markdown",
+    "Stores everything in the browser, with no account and no server",
   ],
-}
+};
 
 export const LandingPage: React.FC = () => (
   <Box className="bg-app min-h-dvh">
     <noscript>
-      <style>{'[data-reveal]{opacity:1;transform:none}'}</style>
+      <style>{"[data-reveal]{opacity:1;transform:none}"}</style>
     </noscript>
 
     <script
@@ -72,4 +72,4 @@ export const LandingPage: React.FC = () => (
     <Capabilities />
     <Closing />
   </Box>
-)
+);

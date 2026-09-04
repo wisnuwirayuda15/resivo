@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Box, Text } from '@mantine/core'
+import { createFileRoute } from "@tanstack/react-router";
+import { Box, Text } from "@mantine/core";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { TemplateTile } from '@/features/resume/components/TemplateTile'
-import { templateList } from '@/features/templates/catalog'
+import { Shell } from "@/components/shell/Shell";
+import { TemplateTile } from "@/features/resume/components/TemplateTile";
+import { templateList } from "@/features/templates/catalog";
 
 /**
  * The template gallery.
@@ -38,15 +38,15 @@ const TemplatesRoute: React.FC = () => (
       </Box>
     </Box>
   </Shell>
-)
+);
 
-export const Route = createFileRoute('/templates')({
+export const Route = createFileRoute("/templates")({
   head: () => ({
     meta: seo({
-      title: 'Four ATS-friendly resume templates | Resivo',
+      title: "Four ATS-friendly resume templates | Resivo",
       description:
-        'Four single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.',
+        "Four single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.",
     }),
   }),
   component: TemplatesRoute,
-})
+});

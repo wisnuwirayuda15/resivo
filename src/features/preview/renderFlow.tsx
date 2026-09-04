@@ -1,11 +1,11 @@
-import type { FlowItem } from './flow'
-import type { ResolvedTemplate } from '@/features/templates/registry'
-import type { RenderContext } from '@/features/templates/renderer/types'
+import type { FlowItem } from "./flow";
+import type { ResolvedTemplate } from "@/features/templates/registry";
+import type { RenderContext } from "@/features/templates/renderer/types";
 import type {
   Block,
   ResumeDocument,
   Section,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * Turning a flattened flow into template-rendered nodes.
@@ -22,13 +22,13 @@ import type {
  */
 
 export interface RenderedFlowItem {
-  item: FlowItem
+  item: FlowItem;
   /**
    * `null` when the item names a section or block the document no longer
    * contains. Kept as an entry rather than dropped so the item list, the
    * measured metrics and the paginated output all stay index-for-index aligned.
    */
-  node: React.ReactNode
+  node: React.ReactNode;
 }
 
 export const renderFlow = (
@@ -37,29 +37,29 @@ export const renderFlow = (
   context: RenderContext,
   items: ReadonlyArray<FlowItem>,
 ): Array<RenderedFlowItem> => {
-  const { Header, SectionHeading, Block: BlockView } = template.components
+  const { Header, SectionHeading, Block: BlockView } = template.components;
 
   const sections = new Map<string, Section>(
     document.content.sections.map((section) => [section.id, section]),
-  )
-  const blocks = new Map<string, { section: Section; block: Block }>()
+  );
+  const blocks = new Map<string, { section: Section; block: Block }>();
 
   for (const section of document.content.sections) {
     for (const block of section.blocks) {
-      blocks.set(block.id, { section, block })
+      blocks.set(block.id, { section, block });
     }
   }
 
   return items.map((item) => {
     switch (item.type) {
-      case 'header':
+      case "header":
         return {
           item,
           node: <Header header={document.content.header} context={context} />,
-        }
+        };
 
-      case 'sectionHeading': {
-        const section = sections.get(item.sectionId ?? '')
+      case "sectionHeading": {
+        const section = sections.get(item.sectionId ?? "");
 
         return {
           item,
@@ -67,11 +67,11 @@ export const renderFlow = (
             section === undefined ? null : (
               <SectionHeading section={section} context={context} />
             ),
-        }
+        };
       }
 
-      case 'block': {
-        const found = blocks.get(item.blockId ?? '')
+      case "block": {
+        const found = blocks.get(item.blockId ?? "");
 
         return {
           item,
@@ -83,8 +83,8 @@ export const renderFlow = (
                 context={context}
               />
             ),
-        }
+        };
       }
     }
-  })
-}
+  });
+};

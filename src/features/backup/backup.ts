@@ -1,10 +1,10 @@
-import { getDb } from '@/database/db'
-import { blobToDataUrl } from '@/features/export/inline'
-import { createId } from '@/lib/id'
+import { getDb } from "@/database/db";
+import { blobToDataUrl } from "@/features/export/inline";
+import { createId } from "@/lib/id";
 
-import { BACKUP_KIND, BACKUP_VERSION } from './format'
+import { BACKUP_KIND, BACKUP_VERSION } from "./format";
 
-import type { Backup } from './format'
+import type { Backup } from "./format";
 
 /**
  * Writing and reading the whole local database.
@@ -18,7 +18,7 @@ import type { Backup } from './format'
  */
 
 export const createBackup = async (now: number): Promise<Backup> => {
-  const db = getDb()
+  const db = getDb();
 
   const [resumes, groups, images, fonts, settings] = await Promise.all([
     db.resumes.toArray(),
@@ -26,7 +26,7 @@ export const createBackup = async (now: number): Promise<Backup> => {
     db.images.toArray(),
     db.fonts.toArray(),
     db.settings.toArray(),
-  ])
+  ]);
 
   return {
     kind: BACKUP_KIND,
@@ -47,24 +47,24 @@ export const createBackup = async (now: number): Promise<Backup> => {
       })),
     ),
     settings,
-  }
-}
+  };
+};
 
 /** What a restore did, so the result can be reported rather than assumed. */
 export interface RestoreReport {
-  resumesAdded: number
+  resumesAdded: number;
   /** Restored under a new id because something already had that id. */
-  resumesRenumbered: number
-  groupsAdded: number
-  imagesAdded: number
+  resumesRenumbered: number;
+  groupsAdded: number;
+  imagesAdded: number;
   /** Skipped because the same bytes were already stored, matched on hash, so a
    * re-restore of the same backup does not double the space it takes. */
-  imagesAlreadyPresent: number
-  fontsAdded: number
-  fontsAlreadyPresent: number
+  imagesAlreadyPresent: number;
+  fontsAdded: number;
+  fontsAlreadyPresent: number;
   /** Settings the device did not already have. An existing preference is never
    * replaced, see the restore rule above. */
-  settingsAdded: number
+  settingsAdded: number;
 }
 
 const dataUrlToBlob = async (dataUrl: string, mime: string): Promise<Blob> => {
@@ -73,11 +73,11 @@ const dataUrlToBlob = async (dataUrl: string, mime: string): Promise<Blob> => {
    * means a byte-at-a-time loop over what can be several megabytes, on the main
    * thread, for no benefit.
    */
-  const response = await fetch(dataUrl)
-  const blob = await response.blob()
+  const response = await fetch(dataUrl);
+  const blob = await response.blob();
 
-  return blob.type === '' ? new Blob([blob], { type: mime }) : blob
-}
+  return blob.type === "" ? new Blob([blob], { type: mime }) : blob;
+};
 
 /**
  * Restores a backup alongside whatever is already stored.
@@ -89,7 +89,7 @@ export const restoreBackup = async (
   backup: Backup,
   now: number,
 ): Promise<RestoreReport> => {
-  const db = getDb()
+  const db = getDb();
 
   const report: RestoreReport = {
     resumesAdded: 0,
@@ -100,44 +100,44 @@ export const restoreBackup = async (
     fontsAdded: 0,
     fontsAlreadyPresent: 0,
     settingsAdded: 0,
-  }
+  };
 
   /**
    * Ids that had to change, so the documents that reference them can be
    * rewritten. An image restored under a new id would otherwise leave every
    * resume pointing at a row that is not there.
    */
-  const imageIdMap = new Map<string, string>()
-  const fontIdMap = new Map<string, string>()
+  const imageIdMap = new Map<string, string>();
+  const fontIdMap = new Map<string, string>();
 
   for (const image of backup.images) {
     // Content, not id: the same photograph restored twice is one row.
     const existingByHash = await db.images
-      .where('hash')
+      .where("hash")
       .equals(image.hash)
-      .first()
+      .first();
 
     if (existingByHash !== undefined) {
-      imageIdMap.set(image.id, existingByHash.id)
-      report.imagesAlreadyPresent += 1
-      continue
+      imageIdMap.set(image.id, existingByHash.id);
+      report.imagesAlreadyPresent += 1;
+      continue;
     }
 
-    const clash = await db.images.get(image.id)
-    const id = clash === undefined ? image.id : createId()
+    const clash = await db.images.get(image.id);
+    const id = clash === undefined ? image.id : createId();
 
     if (id !== image.id) {
-      imageIdMap.set(image.id, id)
+      imageIdMap.set(image.id, id);
     }
 
-    const { data, ...rest } = image
+    const { data, ...rest } = image;
 
     await db.images.add({
       ...rest,
       id,
       blob: await dataUrlToBlob(data, image.mime),
-    })
-    report.imagesAdded += 1
+    });
+    report.imagesAdded += 1;
   }
 
   for (const font of backup.fonts) {
@@ -147,33 +147,33 @@ export const restoreBackup = async (
      * id would produce two identical faces and let the browser pick.
      */
     const existing = (
-      await db.fonts.where('family').equals(font.family).toArray()
+      await db.fonts.where("family").equals(font.family).toArray()
     ).find(
       (candidate) =>
         candidate.weight === font.weight && candidate.style === font.style,
-    )
+    );
 
     if (existing !== undefined) {
-      fontIdMap.set(font.id, existing.id)
-      report.fontsAlreadyPresent += 1
-      continue
+      fontIdMap.set(font.id, existing.id);
+      report.fontsAlreadyPresent += 1;
+      continue;
     }
 
-    const clash = await db.fonts.get(font.id)
-    const id = clash === undefined ? font.id : createId()
+    const clash = await db.fonts.get(font.id);
+    const id = clash === undefined ? font.id : createId();
 
     if (id !== font.id) {
-      fontIdMap.set(font.id, id)
+      fontIdMap.set(font.id, id);
     }
 
-    const { data, ...rest } = font
+    const { data, ...rest } = font;
 
     await db.fonts.add({
       ...rest,
       id,
       blob: await dataUrlToBlob(data, `font/${font.format}`),
-    })
-    report.fontsAdded += 1
+    });
+    report.fontsAdded += 1;
   }
 
   /**
@@ -189,24 +189,24 @@ export const restoreBackup = async (
    */
   for (const setting of backup.settings ?? []) {
     if ((await db.settings.get(setting.key)) === undefined) {
-      await db.settings.add({ key: setting.key, value: setting.value })
-      report.settingsAdded += 1
+      await db.settings.add({ key: setting.key, value: setting.value });
+      report.settingsAdded += 1;
     }
   }
 
   for (const group of backup.groups) {
     if ((await db.groups.get(group.id)) === undefined) {
-      await db.groups.add(group)
-      report.groupsAdded += 1
+      await db.groups.add(group);
+      report.groupsAdded += 1;
     }
   }
 
   for (const resume of backup.resumes) {
-    const clash = await db.resumes.get(resume.id)
-    const id = clash === undefined ? resume.id : createId()
+    const clash = await db.resumes.get(resume.id);
+    const id = clash === undefined ? resume.id : createId();
 
     if (id !== resume.id) {
-      report.resumesRenumbered += 1
+      report.resumesRenumbered += 1;
     }
 
     /**
@@ -215,10 +215,10 @@ export const restoreBackup = async (
      * show it. Ungrouped is recoverable; invisible is not.
      */
     const groupId =
-      resume.groupId === '' ||
+      resume.groupId === "" ||
       (await db.groups.get(resume.groupId)) !== undefined
         ? resume.groupId
-        : ''
+        : "";
 
     await db.resumes.add({
       ...resume,
@@ -229,12 +229,12 @@ export const restoreBackup = async (
       // library by "recently edited" would otherwise bury what was just restored.
       updatedAt: now,
       ...(id === resume.id ? {} : { title: `${resume.title} (restored)` }),
-    })
-    report.resumesAdded += 1
+    });
+    report.resumesAdded += 1;
   }
 
-  return report
-}
+  return report;
+};
 
 /**
  * Rewrites the asset ids a document references.
@@ -249,35 +249,35 @@ const remapAssets = <T>(
   fonts: ReadonlyMap<string, string>,
 ): T => {
   if (images.size === 0 && fonts.size === 0) {
-    return document
+    return document;
   }
 
   const copy = structuredClone(document) as {
     content: {
-      header: { avatarImageId?: string }
+      header: { avatarImageId?: string };
       sections: Array<{
-        blocks: Array<{ kind: string; imageId?: string }>
-      }>
-    }
+        blocks: Array<{ kind: string; imageId?: string }>;
+      }>;
+    };
     design: {
       typography: {
-        bodyFont?: { fontId?: string }
-        headingFont?: { fontId?: string }
-      }
-    }
-  }
+        bodyFont?: { fontId?: string };
+        headingFont?: { fontId?: string };
+      };
+    };
+  };
 
-  const { header, sections } = copy.content
+  const { header, sections } = copy.content;
 
   if (header.avatarImageId !== undefined) {
     header.avatarImageId =
-      images.get(header.avatarImageId) ?? header.avatarImageId
+      images.get(header.avatarImageId) ?? header.avatarImageId;
   }
 
   for (const section of sections) {
     for (const block of section.blocks) {
-      if (block.kind === 'image' && block.imageId !== undefined) {
-        block.imageId = images.get(block.imageId) ?? block.imageId
+      if (block.kind === "image" && block.imageId !== undefined) {
+        block.imageId = images.get(block.imageId) ?? block.imageId;
       }
     }
   }
@@ -287,9 +287,9 @@ const remapAssets = <T>(
     copy.design.typography.headingFont,
   ]) {
     if (font?.fontId !== undefined) {
-      font.fontId = fonts.get(font.fontId) ?? font.fontId
+      font.fontId = fonts.get(font.fontId) ?? font.fontId;
     }
   }
 
-  return copy as T
-}
+  return copy as T;
+};

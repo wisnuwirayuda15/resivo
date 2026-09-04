@@ -8,19 +8,19 @@
  */
 
 export const downloadBlob = (blob: Blob, filename: string): void => {
-  const url = URL.createObjectURL(blob)
-  const anchor = document.createElement('a')
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
 
-  anchor.href = url
-  anchor.download = filename
-  anchor.rel = 'noopener'
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.rel = "noopener";
 
-  document.body.append(anchor)
-  anchor.click()
-  anchor.remove()
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
 
-  setTimeout(() => URL.revokeObjectURL(url), 0)
-}
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+};
 
 /**
  * A file name safe on every platform, derived from the resume's title.
@@ -31,10 +31,10 @@ export const downloadBlob = (blob: Blob, filename: string): void => {
  */
 export const safeFilename = (title: string, extension: string): string => {
   const base = title
-    .replace(/[/\\?%*:|"<>]/g, '')
-    .replace(/\s+/g, ' ')
+    .replace(/[/\\?%*:|"<>]/g, "")
+    .replace(/\s+/g, " ")
     .trim()
-    .slice(0, 80)
+    .slice(0, 80);
 
-  return `${base === '' ? 'resume' : base}.${extension}`
-}
+  return `${base === "" ? "resume" : base}.${extension}`;
+};

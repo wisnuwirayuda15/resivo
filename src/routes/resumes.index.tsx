@@ -1,21 +1,21 @@
-import { useState } from 'react'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Box, Button, Menu, Select, TextInput } from '@mantine/core'
-import { z } from 'zod'
+import { useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { Box, Button, Menu, Select, TextInput } from "@mantine/core";
+import { z } from "zod";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { ClientOnly } from '@/components/client-only'
-import { EmptyState } from '@/components/EmptyState'
-import { Icon } from '@/features/icons/IconRenderer'
-import { NewResumeDialog } from '@/features/resume/components/NewResumeDialog'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { ResumeLibrary } from '@/features/resume/components/ResumeLibrary'
-import { useGroups, useResumes } from '@/features/resume/queries'
+import { Shell } from "@/components/shell/Shell";
+import { ClientOnly } from "@/components/client-only";
+import { EmptyState } from "@/components/EmptyState";
+import { Icon } from "@/features/icons/IconRenderer";
+import { NewResumeDialog } from "@/features/resume/components/NewResumeDialog";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { ResumeLibrary } from "@/features/resume/components/ResumeLibrary";
+import { useGroups, useResumes } from "@/features/resume/queries";
 
-import type { SortKey } from '@/features/resume/components/ResumeLibrary'
+import type { SortKey } from "@/features/resume/components/ResumeLibrary";
 
 /**
  * Filter state lives in the URL, not in a store: it makes a filtered view
@@ -25,8 +25,8 @@ import type { SortKey } from '@/features/resume/components/ResumeLibrary'
 const searchSchema = z.object({
   group: z.string().optional(),
   q: z.string().optional(),
-  sort: z.enum(['edited', 'created', 'title']).default('edited'),
-})
+  sort: z.enum(["edited", "created", "title"]).default("edited"),
+});
 
 /**
  * The sort options, once.
@@ -36,39 +36,39 @@ const searchSchema = z.object({
  * could differ between widths.
  */
 const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
-  { value: 'edited', label: 'Last edited' },
-  { value: 'created', label: 'Date created' },
-  { value: 'title', label: 'Name' },
-]
+  { value: "edited", label: "Last edited" },
+  { value: "created", label: "Date created" },
+  { value: "title", label: "Name" },
+];
 
 const LibraryRoute: React.FC = () => {
-  const { group, q, sort } = Route.useSearch()
-  const navigate = useNavigate({ from: Route.fullPath })
-  const [newResumeOpen, setNewResumeOpen] = useState(false)
+  const { group, q, sort } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const [newResumeOpen, setNewResumeOpen] = useState(false);
 
-  const resumes = useResumes()
-  const groups = useGroups()
+  const resumes = useResumes();
+  const groups = useGroups();
 
   const groupName =
     group === undefined
       ? undefined
       : (groups.data?.find((candidate) => candidate.id === group)?.name ??
-        'Ungrouped')
+        "Ungrouped");
 
   const visible =
     group === undefined
       ? resumes.data
-      : resumes.data?.filter((resume) => resume.groupId === group)
+      : resumes.data?.filter((resume) => resume.groupId === group);
 
   const setSearch = (patch: { q?: string | undefined; sort?: SortKey }) =>
     navigate({
       search: (previous) => ({ ...previous, ...patch }),
       replace: true,
-    })
+    });
 
   return (
     <Shell
-      title={groupName ?? 'All resumes'}
+      title={groupName ?? "All resumes"}
       activeGroupId={group}
       allActive={group === undefined}
       actions={
@@ -81,11 +81,11 @@ const LibraryRoute: React.FC = () => {
             placeholder="Search resumes"
             aria-label="Search resumes"
             leftSection={<Icon name="magnifying-glass" size={15} />}
-            value={q ?? ''}
+            value={q ?? ""}
             onChange={(event) =>
               setSearch({
                 q:
-                  event.currentTarget.value === ''
+                  event.currentTarget.value === ""
                     ? undefined
                     : event.currentTarget.value,
               })
@@ -105,7 +105,7 @@ const LibraryRoute: React.FC = () => {
             aria-label="Sort resumes"
             data={SORT_OPTIONS}
             value={sort}
-            onChange={(value) => setSearch({ sort: value ?? 'edited' })}
+            onChange={(value) => setSearch({ sort: value ?? "edited" })}
             allowDeselect={false}
           />
 
@@ -127,7 +127,7 @@ const LibraryRoute: React.FC = () => {
                     key={option.value}
                     leftSection={
                       <Icon
-                        name={option.value === sort ? 'check' : 'dot-outline'}
+                        name={option.value === sort ? "check" : "dot-outline"}
                         size={15}
                       />
                     }
@@ -167,20 +167,20 @@ const LibraryRoute: React.FC = () => {
         <ResumeLibrary
           resumes={visible}
           isLoading={resumes.isLoading}
-          query={q ?? ''}
+          query={q ?? ""}
           sort={sort}
           emptyState={
             <EmptyState
               icon="file-text"
               title={
                 group === undefined
-                  ? 'No resumes yet'
+                  ? "No resumes yet"
                   : `Nothing in ${groupName}`
               }
               body={
                 group === undefined
-                  ? 'Create a resume to get started. Everything you write stays on this device.'
-                  : 'Move a resume into this group, or create one here.'
+                  ? "Create a resume to get started. Everything you write stays on this device."
+                  : "Move a resume into this group, or create one here."
               }
               action={
                 <Button
@@ -199,21 +199,21 @@ const LibraryRoute: React.FC = () => {
           onClose={() => setNewResumeOpen(false)}
           {...(group === undefined ? {} : { defaultGroupId: group })}
           onCreated={(resumeId) =>
-            navigate({ to: '/resumes/$resumeId', params: { resumeId } })
+            navigate({ to: "/resumes/$resumeId", params: { resumeId } })
           }
         />
       </ClientOnly>
     </Shell>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/resumes/')({
+export const Route = createFileRoute("/resumes/")({
   head: () => ({
     meta: seo({
-      title: 'Your resumes | Resivo',
+      title: "Your resumes | Resivo",
       indexable: false,
     }),
   }),
   validateSearch: searchSchema,
   component: LibraryRoute,
-})
+});

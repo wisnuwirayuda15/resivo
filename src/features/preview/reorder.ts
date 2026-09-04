@@ -11,17 +11,17 @@ import {
   moveBlock,
   moveBlockToSection,
   moveSection,
-} from '@/features/editor/mutations'
+} from "@/features/editor/mutations";
 
-import type { FlowItem } from './flow'
-import type { Recipe } from '@/features/editor/mutations'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { FlowItem } from "./flow";
+import type { Recipe } from "@/features/editor/mutations";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /** The item a drag or keyboard move acts on. */
 export interface MoveSubject {
-  item: FlowItem
+  item: FlowItem;
   /** Index of the item within `items`. */
-  index: number
+  index: number;
 }
 
 /**
@@ -30,7 +30,7 @@ export interface MoveSubject {
  * The header cannot: there is one, and it is first. Everything else (a section
  * heading, or a block) has a place in a list.
  */
-export const isMovable = (item: FlowItem): boolean => item.type !== 'header'
+export const isMovable = (item: FlowItem): boolean => item.type !== "header";
 
 /**
  * The recipe that moves `subject` to sit where `target` currently is.
@@ -53,84 +53,84 @@ export const moveRecipe = (
   target: FlowItem,
 ): Recipe | null => {
   if (subject.id === target.id || !isMovable(subject)) {
-    return null
+    return null;
   }
 
-  if (subject.type === 'sectionHeading') {
-    if (target.type !== 'sectionHeading') {
-      return null
+  if (subject.type === "sectionHeading") {
+    if (target.type !== "sectionHeading") {
+      return null;
     }
 
     const from = document.content.sections.findIndex(
       (section) => section.id === subject.sectionId,
-    )
+    );
     const to = document.content.sections.findIndex(
       (section) => section.id === target.sectionId,
-    )
+    );
 
-    return from === -1 || to === -1 ? null : moveSection(from, to)
+    return from === -1 || to === -1 ? null : moveSection(from, to);
   }
 
-  if (subject.type !== 'block') {
-    return null
+  if (subject.type !== "block") {
+    return null;
   }
 
   const fromSection = document.content.sections.find(
     (section) => section.id === subject.sectionId,
-  )
+  );
 
   if (fromSection === undefined) {
-    return null
+    return null;
   }
 
   const from = fromSection.blocks.findIndex(
     (block) => block.id === subject.blockId,
-  )
+  );
 
   if (from === -1) {
-    return null
+    return null;
   }
 
   // Dropped on a heading: the block goes to the top of that section, which is
   // the only unambiguous reading of "above everything in it".
-  if (target.type === 'sectionHeading') {
+  if (target.type === "sectionHeading") {
     return target.sectionId === subject.sectionId
       ? moveBlock(fromSection.id, from, 0)
       : moveBlockToSection(
           fromSection.id,
-          subject.blockId ?? '',
-          target.sectionId ?? '',
+          subject.blockId ?? "",
+          target.sectionId ?? "",
           0,
-        )
+        );
   }
 
-  if (target.type !== 'block') {
-    return null
+  if (target.type !== "block") {
+    return null;
   }
 
   const toSection = document.content.sections.find(
     (section) => section.id === target.sectionId,
-  )
+  );
 
   if (toSection === undefined) {
-    return null
+    return null;
   }
 
-  const to = toSection.blocks.findIndex((block) => block.id === target.blockId)
+  const to = toSection.blocks.findIndex((block) => block.id === target.blockId);
 
   if (to === -1) {
-    return null
+    return null;
   }
 
   return toSection.id === fromSection.id
     ? moveBlock(fromSection.id, from, to)
     : moveBlockToSection(
         fromSection.id,
-        subject.blockId ?? '',
+        subject.blockId ?? "",
         toSection.id,
         to,
-      )
-}
+      );
+};
 
 /**
  * The recipe for a one-step keyboard move.
@@ -147,27 +147,27 @@ export const stepRecipe = (
   subject: MoveSubject,
   direction: -1 | 1,
 ): Recipe | null => {
-  const { item, index } = subject
+  const { item, index } = subject;
 
   if (!isMovable(item)) {
-    return null
+    return null;
   }
 
-  const wanted = item.type === 'sectionHeading' ? 'sectionHeading' : 'block'
+  const wanted = item.type === "sectionHeading" ? "sectionHeading" : "block";
 
   for (
     let at = index + direction;
     at >= 0 && at < items.length;
     at += direction
   ) {
-    const candidate = items[at]
+    const candidate = items[at];
 
     if (candidate === undefined) {
-      return null
+      return null;
     }
 
     if (candidate.type === wanted) {
-      return moveRecipe(document, item, candidate)
+      return moveRecipe(document, item, candidate);
     }
 
     /**
@@ -175,12 +175,12 @@ export const stepRecipe = (
      * the section. The heading is a valid target (it means "the top"), but only
      * for a block, and only once.
      */
-    if (wanted === 'block' && candidate.type === 'sectionHeading') {
+    if (wanted === "block" && candidate.type === "sectionHeading") {
       return direction === -1 && candidate.sectionId === item.sectionId
         ? null
-        : moveRecipe(document, item, candidate)
+        : moveRecipe(document, item, candidate);
     }
   }
 
-  return null
-}
+  return null;
+};

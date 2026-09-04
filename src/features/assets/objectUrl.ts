@@ -13,50 +13,50 @@
  * away one that a second caller is still using.
  */
 
-import { fontRepo, imageRepo } from '@/database/index'
+import { fontRepo, imageRepo } from "@/database/index";
 
 export interface ResolvedImage {
-  url: string
+  url: string;
   /** Intrinsic pixel size, from the stored record rather than from the decoded
    * image, so a layout can reserve the right box before the bytes arrive. */
-  width: number
-  height: number
+  width: number;
+  height: number;
 }
 
 interface Entry<T> {
-  refs: number
+  refs: number;
   /** The in-flight or settled load. Kept so concurrent callers share one read
    * and one URL. */
-  value: Promise<T | null>
+  value: Promise<T | null>;
   /** Set once resolved, so releasing can revoke without awaiting. */
-  resolved?: T | null
+  resolved?: T | null;
 }
 
-type Kind = 'image' | 'font'
+type Kind = "image" | "font";
 
-const cache = new Map<string, Entry<ResolvedImage | string>>()
+const cache = new Map<string, Entry<ResolvedImage | string>>();
 
-const keyFor = (kind: Kind, id: string): string => `${kind}:${id}`
+const keyFor = (kind: Kind, id: string): string => `${kind}:${id}`;
 
 const urlOf = (value: ResolvedImage | string | null): string | undefined => {
   if (value === null) {
-    return undefined
+    return undefined;
   }
 
-  return typeof value === 'string' ? value : value.url
-}
+  return typeof value === "string" ? value : value.url;
+};
 
 const load = async (
   kind: Kind,
   id: string,
 ): Promise<ResolvedImage | string | null> => {
-  if (kind === 'font') {
-    const record = await fontRepo.getFont(id)
+  if (kind === "font") {
+    const record = await fontRepo.getFont(id);
 
-    return record === undefined ? null : URL.createObjectURL(record.blob)
+    return record === undefined ? null : URL.createObjectURL(record.blob);
   }
 
-  const record = await imageRepo.getImage(id)
+  const record = await imageRepo.getImage(id);
 
   return record === undefined
     ? null
@@ -64,85 +64,85 @@ const load = async (
         url: URL.createObjectURL(record.blob),
         width: record.width,
         height: record.height,
-      }
-}
+      };
+};
 
 const acquire = (
   kind: Kind,
   id: string,
 ): Promise<ResolvedImage | string | null> => {
-  const key = keyFor(kind, id)
-  const existing = cache.get(key)
+  const key = keyFor(kind, id);
+  const existing = cache.get(key);
 
   if (existing !== undefined) {
-    existing.refs += 1
+    existing.refs += 1;
 
-    return existing.value
+    return existing.value;
   }
 
   const entry: Entry<ResolvedImage | string> = {
     refs: 1,
     value: load(kind, id).then((value) => {
-      entry.resolved = value
+      entry.resolved = value;
 
       // Released while the read was in flight: revoke now rather than keeping a
       // URL nobody holds.
       if (entry.refs === 0) {
-        const url = urlOf(value)
+        const url = urlOf(value);
 
         if (url !== undefined) {
-          URL.revokeObjectURL(url)
+          URL.revokeObjectURL(url);
         }
 
-        cache.delete(key)
+        cache.delete(key);
       }
 
-      return value
+      return value;
     }),
-  }
+  };
 
-  cache.set(key, entry)
+  cache.set(key, entry);
 
-  return entry.value
-}
+  return entry.value;
+};
 
 const release = (kind: Kind, id: string): void => {
-  const key = keyFor(kind, id)
-  const entry = cache.get(key)
+  const key = keyFor(kind, id);
+  const entry = cache.get(key);
 
   if (entry === undefined) {
-    return
+    return;
   }
 
-  entry.refs -= 1
+  entry.refs -= 1;
 
   if (entry.refs > 0) {
-    return
+    return;
   }
 
   // `resolved` absent means the load has not settled; its own handler will see
   // the zero count and clean up. Deleting the entry here instead would let a
   // later acquire start a second read for the same blob.
-  if ('resolved' in entry) {
-    const url = urlOf(entry.resolved ?? null)
+  if ("resolved" in entry) {
+    const url = urlOf(entry.resolved ?? null);
 
     if (url !== undefined) {
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url);
     }
 
-    cache.delete(key)
+    cache.delete(key);
   }
-}
+};
 
 export const acquireImageUrl = (id: string): Promise<ResolvedImage | null> =>
-  acquire('image', id) as Promise<ResolvedImage | null>
+  acquire("image", id) as Promise<ResolvedImage | null>;
 
-export const releaseImageUrl = (id: string): void => release('image', id)
+export const releaseImageUrl = (id: string): void => release("image", id);
 
 export const acquireFontUrl = (id: string): Promise<string | null> =>
-  acquire('font', id) as Promise<string | null>
+  acquire("font", id) as Promise<string | null>;
 
-export const releaseFontUrl = (id: string): void => release('font', id)
+export const releaseFontUrl = (id: string): void => release("font", id);
 
 /**
  * Drops a cached URL regardless of who holds it.
@@ -152,23 +152,23 @@ export const releaseFontUrl = (id: string): void => release('font', id)
  * would show a broken image rather than re-reading.
  */
 export const invalidateAsset = (kind: Kind, id: string): void => {
-  const key = keyFor(kind, id)
-  const entry = cache.get(key)
+  const key = keyFor(kind, id);
+  const entry = cache.get(key);
 
   if (entry === undefined) {
-    return
+    return;
   }
 
-  cache.delete(key)
+  cache.delete(key);
 
   void entry.value.then((value) => {
-    const url = urlOf(value)
+    const url = urlOf(value);
 
     if (url !== undefined) {
-      URL.revokeObjectURL(url)
+      URL.revokeObjectURL(url);
     }
-  })
-}
+  });
+};
 
 /** Test seam: how many blobs currently hold a URL. */
-export const __cachedAssetCount = (): number => cache.size
+export const __cachedAssetCount = (): number => cache.size;

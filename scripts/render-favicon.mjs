@@ -1,6 +1,6 @@
-import { chromium } from '@playwright/test'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { chromium } from "@playwright/test";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 /**
  * Rasterises `public/favicon.svg` into the two PNGs that need to be bitmaps.
@@ -21,14 +21,14 @@ import { dirname, join } from 'node:path'
  */
 
 const SIZES = [
-  { file: 'favicon-32.png', size: 32 },
-  { file: 'apple-touch-icon.png', size: 180 },
-]
+  { file: "favicon-32.png", size: 32 },
+  { file: "apple-touch-icon.png", size: 180 },
+];
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
-const source = join(root, 'public', 'favicon.svg')
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const source = join(root, "public", "favicon.svg");
 
-const browser = await chromium.launch()
+const browser = await chromium.launch();
 
 try {
   for (const { file, size } of SIZES) {
@@ -36,14 +36,14 @@ try {
     // viewport, so the viewport is the output resolution.
     const page = await browser.newPage({
       viewport: { width: size, height: size },
-    })
+    });
 
-    await page.goto(`file://${source.replaceAll('\\', '/')}`)
-    await page.screenshot({ path: join(root, 'public', file) })
-    await page.close()
+    await page.goto(`file://${source.replaceAll("\\", "/")}`);
+    await page.screenshot({ path: join(root, "public", file) });
+    await page.close();
 
-    console.log(`${file}  ${size}x${size}`)
+    console.log(`${file}  ${size}x${size}`);
   }
 } finally {
-  await browser.close()
+  await browser.close();
 }

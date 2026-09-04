@@ -6,20 +6,20 @@ import {
   Drawer,
   Tabs,
   Text,
-} from '@mantine/core'
+} from "@mantine/core";
 import {
   CodeHighlight,
   CodeHighlightAdapterProvider,
-} from '@mantine/code-highlight'
+} from "@mantine/code-highlight";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { cn } from '@/lib/utils'
+import { Icon } from "@/features/icons/IconRenderer";
+import { cn } from "@/lib/utils";
 
-import { AI_PROMPT, GUIDE, guideMarkdown } from './content'
-import { guideHighlighter } from './highlighter'
+import { AI_PROMPT, GUIDE, guideMarkdown } from "./content";
+import { guideHighlighter } from "./highlighter";
 
-import type { GuideSection } from './content'
-import type { ReactNode } from 'react'
+import type { GuideSection } from "./content";
+import type { ReactNode } from "react";
 
 /**
  * How to write a resume here, the Markdown, and the styling.
@@ -38,38 +38,38 @@ import type { ReactNode } from 'react'
  */
 
 interface GuideDrawerProps {
-  opened: boolean
-  onClose: () => void
+  opened: boolean;
+  onClose: () => void;
 }
 
 /** Splits on `code spans` so the prose can name a directive as code. */
-const CODE_SPAN = /`([^`]+)`/g
+const CODE_SPAN = /`([^`]+)`/g;
 
 const richText = (text: string): Array<ReactNode> => {
-  const parts: Array<ReactNode> = []
-  let last = 0
+  const parts: Array<ReactNode> = [];
+  let last = 0;
 
   for (const match of text.matchAll(CODE_SPAN)) {
-    const at = match.index
+    const at = match.index;
 
     if (at > last) {
-      parts.push(text.slice(last, at))
+      parts.push(text.slice(last, at));
     }
 
     parts.push(
       <Code key={at} className="text-[12px]">
         {match[1]}
       </Code>,
-    )
-    last = at + match[0].length
+    );
+    last = at + match[0].length;
   }
 
   if (last < text.length) {
-    parts.push(text.slice(last))
+    parts.push(text.slice(last));
   }
 
-  return parts
-}
+  return parts;
+};
 
 /**
  * A copy control, in the two sizes this panel needs.
@@ -79,25 +79,25 @@ const richText = (text: string): Array<ReactNode> => {
  * clipboard would be noise.
  */
 const Copy: React.FC<{
-  value: string
-  label: string
-  icon?: string
-  primary?: boolean
-  className?: string
-}> = ({ value, label, icon = 'copy', primary = false, className }) => (
+  value: string;
+  label: string;
+  icon?: string;
+  primary?: boolean;
+  className?: string;
+}> = ({ value, label, icon = "copy", primary = false, className }) => (
   <CopyButton timeout={1600} value={value}>
     {({ copied, copy }) => (
       <Button
         className={className}
-        leftSection={<Icon name={copied ? 'check' : icon} size={14} />}
+        leftSection={<Icon name={copied ? "check" : icon} size={14} />}
         onClick={copy}
-        variant={primary ? 'filled' : 'default'}
+        variant={primary ? "filled" : "default"}
       >
-        {copied ? 'Copied' : label}
+        {copied ? "Copied" : label}
       </Button>
     )}
   </CopyButton>
-)
+);
 
 const Snippet: React.FC<{ code: string; language: string }> = ({
   code,
@@ -110,7 +110,7 @@ const Snippet: React.FC<{ code: string; language: string }> = ({
     radius="panel"
     withBorder
   />
-)
+);
 
 const Section: React.FC<{ section: GuideSection }> = ({ section }) => (
   <Box className="border-line-soft border-b py-4 last:border-b-0">
@@ -140,7 +140,7 @@ const Section: React.FC<{ section: GuideSection }> = ({ section }) => (
       />
     )}
   </Box>
-)
+);
 
 export const GuideDrawer: React.FC<GuideDrawerProps> = ({
   opened,
@@ -193,8 +193,8 @@ export const GuideDrawer: React.FC<GuideDrawerProps> = ({
           <Tabs.Panel key={chapter.id} value={chapter.id}>
             <Text
               className={cn(
-                'text-body max-w-[68ch] text-[12.5px] leading-relaxed',
-                'border-line-soft border-b pt-4 pb-4',
+                "text-body max-w-[68ch] text-[12.5px] leading-relaxed",
+                "border-line-soft border-b pt-4 pb-4",
               )}
             >
               {chapter.intro}
@@ -208,4 +208,4 @@ export const GuideDrawer: React.FC<GuideDrawerProps> = ({
       </Tabs>
     </CodeHighlightAdapterProvider>
   </Drawer>
-)
+);

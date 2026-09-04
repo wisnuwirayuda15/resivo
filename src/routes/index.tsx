@@ -1,7 +1,7 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { LandingPage } from '@/features/landing/LandingPage'
-import { SITE_DESCRIPTION, seo } from '@/lib/seo'
+import { LandingPage } from "@/features/landing/LandingPage";
+import { SITE_DESCRIPTION, seo } from "@/lib/seo";
 
 /**
  * The landing page.
@@ -16,10 +16,10 @@ import { SITE_DESCRIPTION, seo } from '@/lib/seo'
  * asking anybody to type their address into it, and there was nowhere for that
  * sentence to live.
  */
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   head: () => ({
     meta: seo({
-      title: 'Resivo, a local-first resume builder',
+      title: "Resivo, a local-first resume builder",
       description: SITE_DESCRIPTION,
     }),
     links: [
@@ -31,8 +31,8 @@ export const Route = createFileRoute('/')({
        * canonical resolves against the page, which is what makes `/` the
        * canonical form of `/index.html` or `/?utm_source=...`.
        */
-      { rel: 'canonical', href: '/' },
+      { rel: "canonical", href: "/" },
     ],
   }),
   component: LandingPage,
-})
+});

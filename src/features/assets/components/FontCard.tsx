@@ -1,17 +1,17 @@
-import { Box, Button, Text } from '@mantine/core'
+import { Box, Button, Text } from "@mantine/core";
 
-import { formatBytes } from '../format'
+import { formatBytes } from "../format";
 
-import type { FontSummary } from '@/database/index'
-import type { ReactNode } from 'react'
+import type { FontSummary } from "@/database/index";
+import type { ReactNode } from "react";
 
 interface FontCardProps {
-  font: FontSummary
-  unused: boolean
-  onDelete: () => void
+  font: FontSummary;
+  unused: boolean;
+  onDelete: () => void;
   /** Assignment controls, which only exist where there is a document to assign
    * the face to. The Fonts page has none. */
-  actions?: ReactNode
+  actions?: ReactNode;
 }
 
 /**
@@ -42,7 +42,7 @@ export const FontCard: React.FC<FontCardProps> = ({
         className="text-subtle flex-none font-mono text-[10px] tabular-nums"
         span
       >
-        {font.weight} {font.style === 'italic' ? 'italic' : ''} {font.format}{' '}
+        {font.weight} {font.style === "italic" ? "italic" : ""} {font.format}{" "}
         {formatBytes(font.size)}
       </Text>
     </Box>
@@ -63,4 +63,4 @@ export const FontCard: React.FC<FontCardProps> = ({
       </Button>
     </Box>
   </Box>
-)
+);

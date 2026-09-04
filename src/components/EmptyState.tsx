@@ -1,15 +1,15 @@
-import { Box, Text } from '@mantine/core'
+import { Box, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
+import { Icon } from "@/features/icons/IconRenderer";
 
-import type { ReactNode } from 'react'
+import type { ReactNode } from "react";
 
 interface EmptyStateProps {
-  icon: string
-  title: string
+  icon: string;
+  title: string;
   /** One or two sentences saying what to do next, never just "nothing here". */
-  body: string
-  action?: ReactNode
+  body: string;
+  action?: ReactNode;
 }
 
 /**
@@ -37,4 +37,4 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
     </Text>
     {action === undefined ? null : <Box className="mt-4">{action}</Box>}
   </Box>
-)
+);

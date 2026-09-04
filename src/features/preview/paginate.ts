@@ -13,14 +13,14 @@
  */
 
 export interface FlowMetric {
-  id: string
+  id: string;
   /**
    * Measured height in CSS pixels, INCLUDING the space above the item.
    *
    * Measured at zoom 1 and with fonts loaded; both matter, and both are the
    * caller's responsibility.
    */
-  height: number
+  height: number;
   /**
    * The part of `height` contributed by the space above the item.
    *
@@ -28,11 +28,11 @@ export interface FlowMetric {
    * which drops that space at the top of a page. Leading whitespace at a page
    * break is not just ugly, it is content the reader paid a line for.
    */
-  spaceBefore: number
+  spaceBefore: number;
   /** Must not be the last item on a page. See `documentFlow`. */
-  keepWithNext?: boolean
+  keepWithNext?: boolean;
   /** Must be the first item on a page. See `documentFlow`. */
-  breakBefore?: boolean
+  breakBefore?: boolean;
 }
 
 /**
@@ -44,7 +44,7 @@ export interface FlowMetric {
  * a full page onto a page of its own. Overshooting the content box by half a
  * pixel is invisible; a spurious page is not.
  */
-const SLACK = 0.5
+const SLACK = 0.5;
 
 /**
  * Distributes items across pages.
@@ -61,12 +61,12 @@ export const paginate = (
   items: ReadonlyArray<FlowMetric>,
   contentHeight: number,
 ): Array<Array<string>> => {
-  const pages: Array<Array<string>> = []
-  let current: Array<string> = []
-  let used = 0
+  const pages: Array<Array<string>> = [];
+  let current: Array<string> = [];
+  let used = 0;
 
   const heightOn = (item: FlowMetric, firstOnPage: boolean): number =>
-    firstOnPage ? item.height - item.spaceBefore : item.height
+    firstOnPage ? item.height - item.spaceBefore : item.height;
 
   for (const [index, item] of items.entries()) {
     /**
@@ -77,12 +77,12 @@ export const paginate = (
      * page, which is what asking for two breaks means.
      */
     if (item.breakBefore === true && current.length > 0) {
-      pages.push(current)
-      current = []
-      used = 0
+      pages.push(current);
+      current = [];
+      used = 0;
     }
 
-    let height = heightOn(item, current.length === 0)
+    let height = heightOn(item, current.length === 0);
 
     /**
      * A keep-with-next item reserves room for what follows it, so the pair
@@ -90,8 +90,8 @@ export const paginate = (
      * item's height is used as measured, because on a fresh page it would no
      * longer be first, the heading would be.
      */
-    const next = items[index + 1]
-    let required = height
+    const next = items[index + 1];
+    let required = height;
 
     if (item.keepWithNext === true && next !== undefined) {
       /**
@@ -105,28 +105,28 @@ export const paginate = (
        * absurdity.
        */
       const pairFits =
-        heightOn(item, true) + next.height <= contentHeight + SLACK
+        heightOn(item, true) + next.height <= contentHeight + SLACK;
 
       if (pairFits) {
-        required = height + next.height
+        required = height + next.height;
       }
     }
 
     if (current.length > 0 && used + required > contentHeight + SLACK) {
-      pages.push(current)
-      current = []
-      used = 0
+      pages.push(current);
+      current = [];
+      used = 0;
       // Now first on its page, so its leading space is dropped.
-      height = heightOn(item, true)
+      height = heightOn(item, true);
     }
 
-    current.push(item.id)
-    used += height
+    current.push(item.id);
+    used += height;
   }
 
   if (current.length > 0) {
-    pages.push(current)
+    pages.push(current);
   }
 
-  return pages.length > 0 ? pages : [[]]
-}
+  return pages.length > 0 ? pages : [[]];
+};

@@ -13,41 +13,41 @@
  */
 export const deepEqual = (a: unknown, b: unknown): boolean => {
   if (a === b) {
-    return true
+    return true;
   }
 
   if (
-    typeof a !== 'object' ||
-    typeof b !== 'object' ||
+    typeof a !== "object" ||
+    typeof b !== "object" ||
     a === null ||
     b === null
   ) {
-    return false
+    return false;
   }
 
   if (Array.isArray(a) || Array.isArray(b)) {
     if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) {
-      return false
+      return false;
     }
 
-    return a.every((item, index) => deepEqual(item, b[index]))
+    return a.every((item, index) => deepEqual(item, b[index]));
   }
 
-  const left = a as Record<string, unknown>
-  const right = b as Record<string, unknown>
+  const left = a as Record<string, unknown>;
+  const right = b as Record<string, unknown>;
 
   // Own enumerable keys only, and `undefined` values count: a key present with
   // `undefined` and a key absent mean the same thing in this model (an optional
   // field left unset), so both sides are filtered the same way.
   const keys = (value: Record<string, unknown>) =>
-    Object.keys(value).filter((key) => value[key] !== undefined)
+    Object.keys(value).filter((key) => value[key] !== undefined);
 
-  const leftKeys = keys(left)
-  const rightKeys = keys(right)
+  const leftKeys = keys(left);
+  const rightKeys = keys(right);
 
   if (leftKeys.length !== rightKeys.length) {
-    return false
+    return false;
   }
 
-  return leftKeys.every((key) => deepEqual(left[key], right[key]))
-}
+  return leftKeys.every((key) => deepEqual(left[key], right[key]));
+};

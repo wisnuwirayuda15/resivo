@@ -1,7 +1,7 @@
-import { createHighlightJsAdapter } from '@mantine/code-highlight'
-import hljs from 'highlight.js/lib/core'
-import css from 'highlight.js/lib/languages/css'
-import markdown from 'highlight.js/lib/languages/markdown'
+import { createHighlightJsAdapter } from "@mantine/code-highlight";
+import hljs from "highlight.js/lib/core";
+import css from "highlight.js/lib/languages/css";
+import markdown from "highlight.js/lib/languages/markdown";
 
 /**
  * The highlighter behind the guide's snippets.
@@ -20,7 +20,7 @@ import markdown from 'highlight.js/lib/languages/markdown'
  * session that never opens the guide never downloads any of it.
  */
 
-hljs.registerLanguage('css', css)
-hljs.registerLanguage('markdown', markdown)
+hljs.registerLanguage("css", css);
+hljs.registerLanguage("markdown", markdown);
 
-export const guideHighlighter = createHighlightJsAdapter(hljs)
+export const guideHighlighter = createHighlightJsAdapter(hljs);

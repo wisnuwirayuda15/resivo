@@ -1,10 +1,13 @@
-import { serializeDocument } from '@/features/markdown/index'
-import { documentFontIds, documentImageIds } from '@/features/assets/references'
+import { serializeDocument } from "@/features/markdown/index";
+import {
+  documentFontIds,
+  documentImageIds,
+} from "@/features/assets/references";
 
-import { exportHtml } from './html'
-import { inlineBuiltinFonts, inlineFonts, inlineImages } from './inline'
+import { exportHtml } from "./html";
+import { inlineBuiltinFonts, inlineFonts, inlineImages } from "./inline";
 
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The export formats.
@@ -17,25 +20,25 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  */
 
 export interface ExportContext {
-  document: ResumeDocument
+  document: ResumeDocument;
   /** The resume's title, for the file name and the HTML `<title>`. */
-  title: string
+  title: string;
   /**
    * The page breaks the preview measured, if it has. Only HTML uses them, but
    * every adapter receives the same context so the caller has nothing to decide.
    */
-  pages?: ReadonlyArray<ReadonlyArray<string>>
+  pages?: ReadonlyArray<ReadonlyArray<string>>;
 }
 
 export interface ExportAdapter {
-  format: 'html' | 'markdown'
-  label: string
+  format: "html" | "markdown";
+  label: string;
   /** What the format is good for, in the menu. Formats are not interchangeable
    * and the difference is not obvious from the extension. */
-  hint: string
-  mimeType: string
-  extension: string
-  run: (context: ExportContext) => Promise<Blob>
+  hint: string;
+  mimeType: string;
+  extension: string;
+  run: (context: ExportContext) => Promise<Blob>;
 }
 
 /**
@@ -59,29 +62,29 @@ export const buildExportHtml = async ({
     inlineImages(documentImageIds(document)),
     inlineFonts(documentFontIds(document)),
     inlineBuiltinFonts(),
-  ])
+  ]);
 
-  return exportHtml({ document, title, images, fonts, builtinFontCss, pages })
-}
+  return exportHtml({ document, title, images, fonts, builtinFontCss, pages });
+};
 
 const htmlAdapter: ExportAdapter = {
-  format: 'html',
-  label: 'HTML',
-  hint: 'One self-contained file. Same layout as the preview, no network.',
-  mimeType: 'text/html;charset=utf-8',
-  extension: 'html',
+  format: "html",
+  label: "HTML",
+  hint: "One self-contained file. Same layout as the preview, no network.",
+  mimeType: "text/html;charset=utf-8",
+  extension: "html",
   run: async (context) =>
     new Blob([await buildExportHtml(context)], {
-      type: 'text/html;charset=utf-8',
+      type: "text/html;charset=utf-8",
     }),
-}
+};
 
 const markdownAdapter: ExportAdapter = {
-  format: 'markdown',
-  label: 'Markdown',
-  hint: 'Content only, in the same dialect the editor reads. Styling is lost.',
-  mimeType: 'text/markdown;charset=utf-8',
-  extension: 'md',
+  format: "markdown",
+  label: "Markdown",
+  hint: "Content only, in the same dialect the editor reads. Styling is lost.",
+  mimeType: "text/markdown;charset=utf-8",
+  extension: "md",
   /**
    * The editor's own serializer, not a second one written for export. A separate
    * writer would be a second thing that could disagree with the parser, and the
@@ -90,12 +93,12 @@ const markdownAdapter: ExportAdapter = {
   run: ({ document }) =>
     Promise.resolve(
       new Blob([serializeDocument(document)], {
-        type: 'text/markdown;charset=utf-8',
+        type: "text/markdown;charset=utf-8",
       }),
     ),
-}
+};
 
 export const exportAdapters: Array<ExportAdapter> = [
   htmlAdapter,
   markdownAdapter,
-]
+];

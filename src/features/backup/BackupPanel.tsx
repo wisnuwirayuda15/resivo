@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Alert,
   Box,
@@ -8,16 +8,16 @@ import {
   List,
   Loader,
   Text,
-} from '@mantine/core'
-import { useQueryClient } from '@tanstack/react-query'
+} from "@mantine/core";
+import { useQueryClient } from "@tanstack/react-query";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { downloadBlob } from '@/lib/download'
+import { Icon } from "@/features/icons/IconRenderer";
+import { downloadBlob } from "@/lib/download";
 
-import { createBackup, restoreBackup } from './backup'
-import { parseBackup } from './format'
+import { createBackup, restoreBackup } from "./backup";
+import { parseBackup } from "./format";
 
-import type { RestoreReport } from './backup'
+import type { RestoreReport } from "./backup";
 
 /**
  * Backup and restore.
@@ -30,107 +30,107 @@ import type { RestoreReport } from './backup'
  */
 
 const summarise = (report: RestoreReport): Array<string> => {
-  const lines: Array<string> = []
+  const lines: Array<string> = [];
 
   if (report.resumesAdded > 0) {
     lines.push(
-      `${report.resumesAdded} ${report.resumesAdded === 1 ? 'resume' : 'resumes'} restored` +
+      `${report.resumesAdded} ${report.resumesAdded === 1 ? "resume" : "resumes"} restored` +
         (report.resumesRenumbered > 0
           ? ` (${report.resumesRenumbered} kept alongside an existing copy)`
-          : ''),
-    )
+          : ""),
+    );
   }
 
   if (report.groupsAdded > 0) {
-    lines.push(`${report.groupsAdded} groups restored`)
+    lines.push(`${report.groupsAdded} groups restored`);
   }
 
   if (report.imagesAdded > 0) {
-    lines.push(`${report.imagesAdded} images restored`)
+    lines.push(`${report.imagesAdded} images restored`);
   }
 
   if (report.imagesAlreadyPresent > 0) {
     lines.push(
       `${report.imagesAlreadyPresent} images were already stored, so they were not duplicated`,
-    )
+    );
   }
 
   if (report.fontsAdded > 0) {
-    lines.push(`${report.fontsAdded} fonts restored`)
+    lines.push(`${report.fontsAdded} fonts restored`);
   }
 
   if (report.fontsAlreadyPresent > 0) {
-    lines.push(`${report.fontsAlreadyPresent} fonts were already stored`)
+    lines.push(`${report.fontsAlreadyPresent} fonts were already stored`);
   }
 
   if (report.settingsAdded > 0) {
     lines.push(
-      `${report.settingsAdded} ${report.settingsAdded === 1 ? 'setting' : 'settings'} restored, leaving the ones this device already had`,
-    )
+      `${report.settingsAdded} ${report.settingsAdded === 1 ? "setting" : "settings"} restored, leaving the ones this device already had`,
+    );
   }
 
   return lines.length === 0
-    ? ['That backup was empty. Nothing changed.']
-    : lines
-}
+    ? ["That backup was empty. Nothing changed."]
+    : lines;
+};
 
 export const BackupPanel: React.FC = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
-  const [busy, setBusy] = useState<'backup' | 'restore' | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [report, setReport] = useState<RestoreReport | null>(null)
+  const [busy, setBusy] = useState<"backup" | "restore" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [report, setReport] = useState<RestoreReport | null>(null);
 
   const download = async () => {
-    setBusy('backup')
-    setError(null)
+    setBusy("backup");
+    setError(null);
 
     try {
-      const now = Date.now()
-      const backup = await createBackup(now)
-      const stamp = new Date(now).toISOString().slice(0, 10)
+      const now = Date.now();
+      const backup = await createBackup(now);
+      const stamp = new Date(now).toISOString().slice(0, 10);
 
       downloadBlob(
         // Indented, because a backup a user cannot read is a backup they cannot
         // check. The size cost is compression's problem, not theirs.
         new Blob([JSON.stringify(backup, null, 2)], {
-          type: 'application/json',
+          type: "application/json",
         }),
         `resivo-backup-${stamp}.json`,
-      )
+      );
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : 'The backup could not be written.',
-      )
+          : "The backup could not be written.",
+      );
     } finally {
-      setBusy(null)
+      setBusy(null);
     }
-  }
+  };
 
   const restore = async (file: File) => {
-    setBusy('restore')
-    setError(null)
-    setReport(null)
+    setBusy("restore");
+    setError(null);
+    setReport(null);
 
     try {
-      const parsed = parseBackup(await file.text())
+      const parsed = parseBackup(await file.text());
 
-      setReport(await restoreBackup(parsed, Date.now()))
+      setReport(await restoreBackup(parsed, Date.now()));
       // Everything the library and the asset panels show has changed underneath
       // them.
-      await client.invalidateQueries()
+      await client.invalidateQueries();
     } catch (cause) {
       setError(
         cause instanceof Error
           ? cause.message
-          : 'That file could not be restored.',
-      )
+          : "That file could not be restored.",
+      );
     } finally {
-      setBusy(null)
+      setBusy(null);
     }
-  }
+  };
 
   return (
     <Box className="flex max-w-[62ch] flex-col gap-6">
@@ -144,7 +144,7 @@ export const BackupPanel: React.FC = () => {
         <Button
           className="mt-3"
           leftSection={<Icon name="download-simple" size={14} />}
-          loading={busy === 'backup'}
+          loading={busy === "backup"}
           onClick={() => void download()}
           size="xs"
           variant="default"
@@ -158,7 +158,7 @@ export const BackupPanel: React.FC = () => {
         <Text className="text-muted mt-1 text-[13px]">
           Adds the contents of a backup to this device. Nothing already here is
           replaced or deleted: a resume that collides with one you already have
-          is restored beside it, marked{' '}
+          is restored beside it, marked{" "}
           <Code className="text-[12px]">(restored)</Code>, and an image whose
           bytes are already stored is not duplicated.
         </Text>
@@ -172,7 +172,7 @@ export const BackupPanel: React.FC = () => {
               {...props}
               className="mt-3"
               leftSection={<Icon name="upload-simple" size={14} />}
-              loading={busy === 'restore'}
+              loading={busy === "restore"}
               size="xs"
               variant="default"
             >
@@ -182,7 +182,7 @@ export const BackupPanel: React.FC = () => {
         </FileButton>
       </Box>
 
-      {busy === 'restore' ? (
+      {busy === "restore" ? (
         <Box className="flex items-center gap-2">
           <Loader size={14} />
           <Text className="text-muted text-[12px]">Restoring…</Text>
@@ -215,5 +215,5 @@ export const BackupPanel: React.FC = () => {
         </Alert>
       )}
     </Box>
-  )
-}
+  );
+};

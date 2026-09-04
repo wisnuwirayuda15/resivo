@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react'
-import { Text } from '@mantine/core'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import utc from 'dayjs/plugin/utc'
+import { useEffect, useState } from "react";
+import { Text } from "@mantine/core";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import utc from "dayjs/plugin/utc";
 
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
+dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 interface RelativeTimeProps {
   /** Epoch milliseconds. */
-  value: number
-  className?: string
+  value: number;
+  className?: string;
 }
 
 /**
@@ -43,24 +43,24 @@ interface RelativeTimeProps {
  * by a test rather than only by the comment above.
  */
 export const absoluteLabel = (value: number): string =>
-  dayjs(value).utc().format('D MMM YYYY')
+  dayjs(value).utc().format("D MMM YYYY");
 
 export const RelativeTime: React.FC<RelativeTimeProps> = ({
   value,
   className,
 }) => {
-  const [label, setLabel] = useState(() => absoluteLabel(value))
+  const [label, setLabel] = useState(() => absoluteLabel(value));
 
   useEffect(() => {
-    setLabel(dayjs(value).fromNow())
+    setLabel(dayjs(value).fromNow());
 
     // Refresh while the card stays open, so "a few seconds ago" does not sit
     // there going stale. A minute is fine: the phrasing only changes on that
     // scale anyway.
-    const timer = setInterval(() => setLabel(dayjs(value).fromNow()), 60_000)
+    const timer = setInterval(() => setLabel(dayjs(value).fromNow()), 60_000);
 
-    return () => clearInterval(timer)
-  }, [value])
+    return () => clearInterval(timer);
+  }, [value]);
 
   return (
     <Text
@@ -70,5 +70,5 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({
     >
       {label}
     </Text>
-  )
-}
+  );
+};

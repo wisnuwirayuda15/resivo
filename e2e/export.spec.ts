@@ -1,8 +1,8 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from "@playwright/test";
 
-import { createResume, openEmptyApp, typeMarkdown } from './app'
+import { createResume, openEmptyApp, typeMarkdown } from "./app";
 
-import type { Page } from '@playwright/test'
+import type { Page } from "@playwright/test";
 
 /**
  * The PDF path.
@@ -15,7 +15,7 @@ import type { Page } from '@playwright/test'
  * and thrown away.
  */
 
-const FRAME = '#resivo-print-document'
+const FRAME = "#resivo-print-document";
 
 /**
  * Watches for the print frame, and records the call.
@@ -28,28 +28,28 @@ const FRAME = '#resivo-print-document'
  */
 const watchPrint = (page: Page) =>
   page.addInitScript(() => {
-    const log: Array<{ event: string; markup?: string }> = []
+    const log: Array<{ event: string; markup?: string }> = [];
 
-    Object.defineProperty(window, '__printLog', { value: log })
+    Object.defineProperty(window, "__printLog", { value: log });
 
     const observer = new MutationObserver((records) => {
       for (const record of records) {
         for (const node of record.addedNodes) {
           if (
             node instanceof HTMLIFrameElement &&
-            node.id === 'resivo-print-document'
+            node.id === "resivo-print-document"
           ) {
-            log.push({ event: 'added', markup: node.srcdoc })
+            log.push({ event: "added", markup: node.srcdoc });
 
-            const view = node.contentWindow
+            const view = node.contentWindow;
 
             if (view !== null) {
-              const original = view.print.bind(view)
+              const original = view.print.bind(view);
 
               view.print = () => {
-                log.push({ event: 'print' })
-                original()
-              }
+                log.push({ event: "print" });
+                original();
+              };
             }
           }
         }
@@ -57,67 +57,67 @@ const watchPrint = (page: Page) =>
         for (const node of record.removedNodes) {
           if (
             node instanceof HTMLIFrameElement &&
-            node.id === 'resivo-print-document'
+            node.id === "resivo-print-document"
           ) {
-            log.push({ event: 'removed' })
+            log.push({ event: "removed" });
           }
         }
       }
-    })
+    });
 
-    document.addEventListener('DOMContentLoaded', () =>
+    document.addEventListener("DOMContentLoaded", () =>
       observer.observe(document.body, { childList: true }),
-    )
-  })
+    );
+  });
 
 const printLog = (page: Page) =>
   page.evaluate(
     () =>
       (window as unknown as { __printLog: Array<{ event: string }> })
         .__printLog,
-  )
+  );
 
 const printedMarkup = (page: Page) =>
   page.evaluate(
     () =>
       (
         window as unknown as {
-          __printLog: Array<{ event: string; markup?: string }>
+          __printLog: Array<{ event: string; markup?: string }>;
         }
-      ).__printLog.find((entry) => entry.event === 'added')?.markup ?? '',
-  )
+      ).__printLog.find((entry) => entry.event === "added")?.markup ?? "",
+  );
 
-test('prints the exported document, not the preview', async ({ page }) => {
-  test.slow()
+test("prints the exported document, not the preview", async ({ page }) => {
+  test.slow();
 
-  await watchPrint(page)
-  await openEmptyApp(page)
-  await createResume(page, 'Ada Lovelace')
+  await watchPrint(page);
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
 
-  await typeMarkdown(page, '# Ada Lovelace\n\nAnalytical engines\n')
+  await typeMarkdown(page, "# Ada Lovelace\n\nAnalytical engines\n");
 
-  await page.getByRole('button', { name: 'Export' }).click()
+  await page.getByRole("button", { name: "Export" }).click();
 
-  const pdf = page.getByRole('menuitem', { name: /PDF/ })
+  const pdf = page.getByRole("menuitem", { name: /PDF/ });
 
   // Enabled only once the first pagination has landed: the page breaks are a
   // measurement, and printing before one would fall back to a single page.
-  await expect(pdf).toBeEnabled()
-  await pdf.click()
+  await expect(pdf).toBeEnabled();
+  await pdf.click();
 
   await expect
     .poll(async () => (await printLog(page)).map((entry) => entry.event))
-    .toEqual(['added', 'print', 'removed'])
+    .toEqual(["added", "print", "removed"]);
 
-  const markup = await printedMarkup(page)
+  const markup = await printedMarkup(page);
 
   // The document is the export: page boxes, the resume's own text, and the
   // typefaces embedded rather than referenced.
-  expect(markup).toContain('resivo-paper')
-  expect(markup).toContain('Analytical engines')
-  expect(markup).toContain('@page')
-  expect(markup).toContain('@font-face')
-  expect(markup).toContain('data:font/woff2;base64,')
+  expect(markup).toContain("resivo-paper");
+  expect(markup).toContain("Analytical engines");
+  expect(markup).toContain("@page");
+  expect(markup).toContain("@font-face");
+  expect(markup).toContain("data:font/woff2;base64,");
 
   /**
    * And nothing from the editor.
@@ -127,10 +127,10 @@ test('prints the exported document, not the preview', async ({ page }) => {
    * this document. What must be absent is the elements, the measuring pass's
    * container, and any editable run.
    */
-  expect(markup).not.toContain('data-measure-flow')
-  expect(markup).not.toContain('data-editable')
-  expect(markup).not.toContain('vite')
+  expect(markup).not.toContain("data-measure-flow");
+  expect(markup).not.toContain("data-editable");
+  expect(markup).not.toContain("vite");
 
   // The frame is gone, so a second print starts from nothing.
-  await expect(page.locator(FRAME)).toHaveCount(0)
-})
+  await expect(page.locator(FRAME)).toHaveCount(0);
+});

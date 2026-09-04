@@ -1,8 +1,8 @@
-import { directiveToMarkdown } from 'mdast-util-directive'
-import { gfmToMarkdown } from 'mdast-util-gfm'
-import { toMarkdown } from 'mdast-util-to-markdown'
+import { directiveToMarkdown } from "mdast-util-directive";
+import { gfmToMarkdown } from "mdast-util-gfm";
+import { toMarkdown } from "mdast-util-to-markdown";
 
-import { plainText } from '@/features/resume/model/index'
+import { plainText } from "@/features/resume/model/index";
 
 import {
   CONTACT_DIRECTIVE,
@@ -13,9 +13,9 @@ import {
   LABEL_DIRECTIVE,
   TAGS_DIRECTIVE,
   TAG_SEPARATOR,
-} from './spec'
+} from "./spec";
 
-import type { Options as ToMarkdownOptions } from 'mdast-util-to-markdown'
+import type { Options as ToMarkdownOptions } from "mdast-util-to-markdown";
 import type {
   BlockContent,
   Heading,
@@ -25,7 +25,7 @@ import type {
   Root,
   RootContent,
   TableRow,
-} from 'mdast'
+} from "mdast";
 import type {
   Block,
   EntryBlock,
@@ -36,7 +36,7 @@ import type {
   NestedList,
   ResumeDocument,
   Section,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * The document as Resivo-Markdown.
@@ -77,14 +77,14 @@ import type {
  * that is set may not.
  */
 const WRITER: ToMarkdownOptions = {
-  bullet: '-',
-  emphasis: '_',
-  strong: '*',
-  rule: '-',
+  bullet: "-",
+  emphasis: "_",
+  strong: "*",
+  rule: "-",
   // Content one space after the marker, so a nested list is indented by exactly
   // the width of its parent's marker, which is what makes it a sublist rather
   // than a new list.
-  listItemIndent: 'one',
+  listItemIndent: "one",
   // Never indented code: four spaces of indentation is indistinguishable from a
   // deeply nested list item, and reads back as one.
   fences: true,
@@ -103,14 +103,14 @@ const WRITER: ToMarkdownOptions = {
      * and keeps the contact rows reading as the single block they are.
      */
     (left, right) =>
-      left.type === 'leafDirective' &&
-      right.type === 'leafDirective' &&
+      left.type === "leafDirective" &&
+      right.type === "leafDirective" &&
       left.name === CONTACT_DIRECTIVE &&
       right.name === CONTACT_DIRECTIVE
         ? 0
         : undefined,
   ],
-}
+};
 
 // ---------------------------------------------------------------------------
 // Inline text
@@ -124,16 +124,16 @@ const WRITER: ToMarkdownOptions = {
  * fixing it is what makes the output stable: the model stores a set, and a set
  * has no order to preserve.
  */
-const MARK_ORDER: Array<Mark> = ['bold', 'italic', 'strike', 'code']
+const MARK_ORDER: Array<Mark> = ["bold", "italic", "strike", "code"];
 
 const WRAPPERS: Record<
-  Exclude<Mark, 'code'>,
+  Exclude<Mark, "code">,
   (children: Array<PhrasingContent>) => PhrasingContent
 > = {
-  bold: (children) => ({ type: 'strong', children }),
-  italic: (children) => ({ type: 'emphasis', children }),
-  strike: (children) => ({ type: 'delete', children }),
-}
+  bold: (children) => ({ type: "strong", children }),
+  italic: (children) => ({ type: "emphasis", children }),
+  strike: (children) => ({ type: "delete", children }),
+};
 
 /**
  * A directive attribute holding text.
@@ -146,13 +146,13 @@ const WRAPPERS: Record<
  */
 const attributeText = (text: InlineText | undefined): string | undefined => {
   if (text === undefined) {
-    return undefined
+    return undefined;
   }
 
-  const flat = plainText(text)
+  const flat = plainText(text);
 
-  return flat === '' ? undefined : flat
-}
+  return flat === "" ? undefined : flat;
+};
 
 /** Drops the attributes that have no value, so an absent field writes nothing
  * rather than an empty pair of quotes. */
@@ -163,63 +163,63 @@ const attributes = (
     Object.entries(entries).filter(
       (entry): entry is [string, string] => entry[1] !== undefined,
     ),
-  )
+  );
 
 const inlineNode = (node: InlineNode): PhrasingContent => {
   switch (node.type) {
-    case 'text': {
-      const marks = node.marks ?? []
-      const inner: PhrasingContent = marks.includes('code')
-        ? { type: 'inlineCode', value: node.text }
-        : { type: 'text', value: node.text }
+    case "text": {
+      const marks = node.marks ?? [];
+      const inner: PhrasingContent = marks.includes("code")
+        ? { type: "inlineCode", value: node.text }
+        : { type: "text", value: node.text };
 
       // Innermost outwards, so the fixed order above reads as written.
       return MARK_ORDER.filter(
-        (mark): mark is Exclude<Mark, 'code'> => mark !== 'code',
+        (mark): mark is Exclude<Mark, "code"> => mark !== "code",
       )
         .filter((mark) => marks.includes(mark))
         .reduceRight<PhrasingContent>(
           (children, mark) => WRAPPERS[mark]([children]),
           inner,
-        )
+        );
     }
 
-    case 'link':
+    case "link":
       return {
-        type: 'link',
+        type: "link",
         url: node.href,
         children: inlineText(node.children),
-      }
+      };
 
-    case 'icon':
+    case "icon":
       return {
-        type: 'textDirective',
+        type: "textDirective",
         name: ICON_DIRECTIVE,
         attributes: attributes({
           name: node.icon.name,
           weight: node.icon.weight,
         }),
         children: [],
-      }
+      };
   }
-}
+};
 
 const inlineText = (text: InlineText): Array<PhrasingContent> =>
-  text.map(inlineNode)
+  text.map(inlineNode);
 
 /** A run on its own line. An empty run is an empty paragraph rather than a
  * missing one, so the block it belongs to keeps its shape. */
 const paragraph = (text: InlineText): BlockContent => ({
-  type: 'paragraph',
+  type: "paragraph",
   children: inlineText(text),
-})
+});
 
 // ---------------------------------------------------------------------------
 // Blocks
 // ---------------------------------------------------------------------------
 
 const listItem = (item: ListItem): MdastListItem => ({
-  type: 'listItem',
+  type: "listItem",
   // `null` rather than absent: that is how mdast says "not a task item", and
   // `undefined` would write an empty checkbox.
   checked: item.checked ?? null,
@@ -228,21 +228,21 @@ const listItem = (item: ListItem): MdastListItem => ({
     paragraph(item.text),
     ...(item.list === undefined ? [] : [list(item.list)]),
   ],
-})
+});
 
 const list = (source: NestedList): List => ({
-  type: 'list',
+  type: "list",
   ordered: source.ordered ?? false,
   start: source.ordered === true ? (source.start ?? 1) : null,
   spread: false,
   children: source.items.map(listItem),
-})
+});
 
 const entry = (block: EntryBlock): RootContent => {
-  const range = block.dateRange
+  const range = block.dateRange;
 
   return {
-    type: 'containerDirective',
+    type: "containerDirective",
     name: ENTRY_DIRECTIVE,
     attributes: attributes({
       title: attributeText(block.title),
@@ -250,7 +250,7 @@ const entry = (block: EntryBlock): RootContent => {
       location: attributeText(block.location),
       start: range?.start,
       end: range?.end,
-      current: range?.current === true ? 'true' : undefined,
+      current: range?.current === true ? "true" : undefined,
     }),
     children: [
       ...(block.summary === undefined || block.summary.length === 0
@@ -264,89 +264,89 @@ const entry = (block: EntryBlock): RootContent => {
             }),
           ]),
     ],
-  }
-}
+  };
+};
 
 const tableRow = (cells: Array<InlineText>): TableRow => ({
-  type: 'tableRow',
+  type: "tableRow",
   children: cells.map((cell) => ({
-    type: 'tableCell',
+    type: "tableCell",
     children: inlineText(cell),
   })),
-})
+});
 
 const blockNode = (block: Block): RootContent => {
   switch (block.kind) {
-    case 'paragraph':
-      return paragraph(block.text)
+    case "paragraph":
+      return paragraph(block.text);
 
-    case 'heading':
+    case "heading":
       return {
-        type: 'heading',
+        type: "heading",
         depth: block.level,
         children: inlineText(block.text),
-      }
+      };
 
-    case 'bulletList':
-      return list(block)
+    case "bulletList":
+      return list(block);
 
-    case 'quote':
+    case "quote":
       return {
-        type: 'blockquote',
+        type: "blockquote",
         children: block.paragraphs.map(paragraph),
-      }
+      };
 
-    case 'code':
+    case "code":
       return {
-        type: 'code',
+        type: "code",
         lang: block.language ?? null,
         meta: null,
         value: block.code,
-      }
+      };
 
-    case 'table':
+    case "table":
       return {
-        type: 'table',
+        type: "table",
         align: block.align,
         children: [tableRow(block.head), ...block.rows.map(tableRow)],
-      }
+      };
 
-    case 'entry':
-      return entry(block)
+    case "entry":
+      return entry(block);
 
-    case 'tagList':
+    case "tagList":
       return {
-        type: 'leafDirective',
+        type: "leafDirective",
         name: TAGS_DIRECTIVE,
         attributes: {},
-        children: [{ type: 'text', value: block.tags.join(TAG_SEPARATOR) }],
-      }
+        children: [{ type: "text", value: block.tags.join(TAG_SEPARATOR) }],
+      };
 
-    case 'divider':
-      return { type: 'thematicBreak' }
+    case "divider":
+      return { type: "thematicBreak" };
 
-    case 'pageBreak':
+    case "pageBreak":
       return {
-        type: 'leafDirective',
+        type: "leafDirective",
         name: PAGE_BREAK_DIRECTIVE,
         attributes: {},
         children: [],
-      }
+      };
 
-    case 'iconLabel':
+    case "iconLabel":
       return {
-        type: 'leafDirective',
+        type: "leafDirective",
         name: LABEL_DIRECTIVE,
         attributes: attributes({
           icon: block.icon.name,
           weight: block.icon.weight,
         }),
         children: inlineText(block.label),
-      }
+      };
 
-    case 'image':
+    case "image":
       return {
-        type: 'leafDirective',
+        type: "leafDirective",
         name: IMAGE_DIRECTIVE,
         attributes: attributes({
           id: block.imageId,
@@ -355,8 +355,8 @@ const blockNode = (block: Block): RootContent => {
               ? undefined
               : String(block.widthPercent),
         }),
-        children: [{ type: 'text', value: block.alt }],
-      }
+        children: [{ type: "text", value: block.alt }],
+      };
 
     /**
      * Written back exactly as it arrived. An `html` node is the one mdast node
@@ -364,10 +364,10 @@ const blockNode = (block: Block): RootContent => {
      * input" true: Markdown the model cannot represent is kept as source text
      * and reproduced character for character.
      */
-    case 'raw':
-      return { type: 'html', value: block.markdown }
+    case "raw":
+      return { type: "html", value: block.markdown };
   }
-}
+};
 
 // ---------------------------------------------------------------------------
 // Document
@@ -385,36 +385,36 @@ const blockNode = (block: Block): RootContent => {
  * read back as one; formatting inside it has nowhere to go.
  */
 const sectionHeading = (section: Section): Heading => {
-  const title = plainText(section.title)
+  const title = plainText(section.title);
 
   return {
-    type: 'heading',
+    type: "heading",
     depth: 2,
     // An untitled section (where content that arrived before any heading lives)
     // is a bare `##`, which reads back as the same empty title.
-    children: title === '' ? [] : [{ type: 'text', value: title }],
-  }
-}
+    children: title === "" ? [] : [{ type: "text", value: title }],
+  };
+};
 
 const documentToMdast = (document: ResumeDocument): Root => {
-  const { header, sections } = document.content
-  const children: Array<RootContent> = []
+  const { header, sections } = document.content;
+  const children: Array<RootContent> = [];
 
   // The name is the document's H1 whether or not it is set, so the file always
   // has the shape the parser expects and an empty resume is still editable.
   children.push({
-    type: 'heading',
+    type: "heading",
     depth: 1,
     children: inlineText(header.name),
-  })
+  });
 
   if (header.headline !== undefined && header.headline.length > 0) {
-    children.push(paragraph(header.headline))
+    children.push(paragraph(header.headline));
   }
 
   for (const contact of header.contacts) {
     children.push({
-      type: 'leafDirective',
+      type: "leafDirective",
       name: CONTACT_DIRECTIVE,
       attributes: attributes({
         icon: contact.icon?.name,
@@ -422,15 +422,15 @@ const documentToMdast = (document: ResumeDocument): Root => {
         href: contact.href,
       }),
       children: inlineText(contact.label),
-    })
+    });
   }
 
   for (const section of sections) {
-    children.push(sectionHeading(section), ...section.blocks.map(blockNode))
+    children.push(sectionHeading(section), ...section.blocks.map(blockNode));
   }
 
-  return { type: 'root', children }
-}
+  return { type: "root", children };
+};
 
 export const serializeDocument = (document: ResumeDocument): string =>
-  toMarkdown(documentToMdast(document), WRITER)
+  toMarkdown(documentToMdast(document), WRITER);

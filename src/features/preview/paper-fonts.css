@@ -15,17 +15,17 @@
  * would drag the app's colour scheme into the paper, the one thing the iframe
  * exists to prevent. Keep these in step with `theme.ts` and `styles/fonts.css`.
  */
-@import '@fontsource-variable/instrument-sans';
-@import '@fontsource-variable/jetbrains-mono';
-@import '@fontsource-variable/source-serif-4';
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/source-serif-4";
 
 :root {
   --font-sans:
-    'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui,
+    "Instrument Sans Variable", "Instrument Sans", ui-sans-serif, system-ui,
     sans-serif;
   --font-mono:
-    'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, monospace;
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
   --font-serif:
-    'Source Serif 4 Variable', 'Source Serif 4', ui-serif, Georgia,
-    'Times New Roman', serif;
+    "Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia,
+    "Times New Roman", serif;
 }

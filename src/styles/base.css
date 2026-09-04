@@ -120,6 +120,6 @@ pre {
   --sidebar-width: var(--spacing-sidebar);
 }
 
-html[data-sidebar='rail'] {
+html[data-sidebar="rail"] {
   --sidebar-width: var(--spacing-sidebar-rail);
 }

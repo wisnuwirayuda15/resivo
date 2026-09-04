@@ -9,14 +9,14 @@
  */
 
 /** True in the browser, false while rendering on the Nitro server. */
-export const isBrowser = (): boolean => typeof window !== 'undefined'
+export const isBrowser = (): boolean => typeof window !== "undefined";
 
 /**
  * IndexedDB is absent on the server, and can also be unavailable in the browser
  * (Firefox blocks it in private windows, and some embedded webviews disable it),
  * so availability is checked rather than inferred from `isBrowser()`.
  */
-export const hasIndexedDb = (): boolean => typeof indexedDB !== 'undefined'
+export const hasIndexedDb = (): boolean => typeof indexedDB !== "undefined";
 
 /**
  * Fails loudly when browser-only code is reached on the server.
@@ -29,7 +29,7 @@ export const assertBrowser = (feature: string): void => {
   if (!isBrowser()) {
     throw new Error(
       `${feature} is browser-only and was reached during server rendering. ` +
-        'Move it behind a client-only boundary (ssr: false, or an effect).',
-    )
+        "Move it behind a client-only boundary (ssr: false, or an effect).",
+    );
   }
-}
+};

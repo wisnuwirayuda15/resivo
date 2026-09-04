@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react'
-import { Box, Skeleton, Text } from '@mantine/core'
+import { useMemo, useState } from "react";
+import { Box, Skeleton, Text } from "@mantine/core";
 
-import { EmptyState } from '@/components/EmptyState'
+import { EmptyState } from "@/components/EmptyState";
 
-import { ResumeCard } from './ResumeCard'
-import { RenameResumeDialog } from './RenameResumeDialog'
-import { ConfirmDialog } from '@/components/ConfirmDialog'
+import { ResumeCard } from "./ResumeCard";
+import { RenameResumeDialog } from "./RenameResumeDialog";
+import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   useArchiveResume,
   useDeleteResume,
@@ -13,32 +13,32 @@ import {
   useGroups,
   useRestoreResume,
   useUpdateResume,
-} from '../queries'
+} from "../queries";
 
-import type { ResumeSummary } from '@/database/index'
+import type { ResumeSummary } from "@/database/index";
 
-export type SortKey = 'edited' | 'created' | 'title'
+export type SortKey = "edited" | "created" | "title";
 
 interface ResumeLibraryProps {
-  resumes: Array<ResumeSummary> | undefined
-  isLoading: boolean
-  query: string
-  sort: SortKey
+  resumes: Array<ResumeSummary> | undefined;
+  isLoading: boolean;
+  query: string;
+  sort: SortKey;
   /** Rendered when the user has no resumes at all, as opposed to none matching
    * the current search. */
-  emptyState: React.ReactNode
+  emptyState: React.ReactNode;
 }
 
 const compare = (sort: SortKey) => (a: ResumeSummary, b: ResumeSummary) => {
   switch (sort) {
-    case 'edited':
-      return b.updatedAt - a.updatedAt
-    case 'created':
-      return b.createdAt - a.createdAt
-    case 'title':
-      return a.title.localeCompare(b.title)
+    case "edited":
+      return b.updatedAt - a.updatedAt;
+    case "created":
+      return b.createdAt - a.createdAt;
+    case "title":
+      return a.title.localeCompare(b.title);
   }
-}
+};
 
 /**
  * The resume grid, with search, sort and per-card actions.
@@ -55,32 +55,36 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
   sort,
   emptyState,
 }) => {
-  const [renaming, setRenaming] = useState<ResumeSummary | undefined>(undefined)
-  const [deleting, setDeleting] = useState<ResumeSummary | undefined>(undefined)
+  const [renaming, setRenaming] = useState<ResumeSummary | undefined>(
+    undefined,
+  );
+  const [deleting, setDeleting] = useState<ResumeSummary | undefined>(
+    undefined,
+  );
 
-  const duplicate = useDuplicateResume()
-  const archive = useArchiveResume()
-  const restore = useRestoreResume()
-  const remove = useDeleteResume()
-  const update = useUpdateResume()
-  const groups = useGroups()
+  const duplicate = useDuplicateResume();
+  const archive = useArchiveResume();
+  const restore = useRestoreResume();
+  const remove = useDeleteResume();
+  const update = useUpdateResume();
+  const groups = useGroups();
 
   const visible = useMemo(() => {
-    const needle = query.trim().toLowerCase()
+    const needle = query.trim().toLowerCase();
     const matches =
-      needle === ''
+      needle === ""
         ? (resumes ?? [])
         : (resumes ?? []).filter((resume) =>
             // Title and the denormalized header name, so searching for the
             // person's name works as well as searching for the file's name.
-            [resume.title, resume.fullName, resume.headline ?? '']
-              .join(' ')
+            [resume.title, resume.fullName, resume.headline ?? ""]
+              .join(" ")
               .toLowerCase()
               .includes(needle),
-          )
+          );
 
-    return [...matches].sort(compare(sort))
-  }, [resumes, query, sort])
+    return [...matches].sort(compare(sort));
+  }, [resumes, query, sort]);
 
   if (isLoading) {
     return (
@@ -89,11 +93,11 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
           <Skeleton key={index} height={252} radius="card" />
         ))}
       </Box>
-    )
+    );
   }
 
   if ((resumes ?? []).length === 0) {
-    return <>{emptyState}</>
+    return <>{emptyState}</>;
   }
 
   if (visible.length === 0) {
@@ -103,7 +107,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
         title="No matches"
         body={`Nothing in this view matches "${query.trim()}". Try a shorter search, or clear it to see everything.`}
       />
-    )
+    );
   }
 
   return (
@@ -135,15 +139,15 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
           recover from), so it always asks first and names what will go. */}
       <ConfirmDialog
         opened={deleting !== undefined}
-        title={`Delete "${deleting?.title ?? ''}"?`}
+        title={`Delete "${deleting?.title ?? ""}"?`}
         confirmLabel="Delete"
         danger
         onCancel={() => setDeleting(undefined)}
         onConfirm={() => {
           if (deleting !== undefined) {
-            remove.mutate(deleting.id)
+            remove.mutate(deleting.id);
           }
-          setDeleting(undefined)
+          setDeleting(undefined);
         }}
       >
         <Text size="md" c="var(--text-muted)">
@@ -152,5 +156,5 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
         </Text>
       </ConfirmDialog>
     </>
-  )
-}
+  );
+};

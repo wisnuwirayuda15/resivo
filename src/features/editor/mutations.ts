@@ -1,8 +1,8 @@
-import { createId } from '@/lib/id'
-import { createSection, text } from '@/features/resume/model/index'
-import { templateDefaults } from '@/features/templates/defaults'
+import { createId } from "@/lib/id";
+import { createSection, text } from "@/features/resume/model/index";
+import { templateDefaults } from "@/features/templates/defaults";
 
-import type { Draft } from 'immer'
+import type { Draft } from "immer";
 import type {
   Block,
   DesignConfig,
@@ -13,7 +13,7 @@ import type {
   Section,
   SectionKind,
   TemplateId,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * Typed edits to the document.
@@ -27,28 +27,28 @@ import type {
  * structural sharing for free and snapshots stay cheap.
  */
 
-export type Recipe = (draft: Draft<ResumeDocument>) => void
+export type Recipe = (draft: Draft<ResumeDocument>) => void;
 
 const findSection = (
   draft: Draft<ResumeDocument>,
   sectionId: string,
 ): Draft<Section> | undefined =>
-  draft.content.sections.find((section) => section.id === sectionId)
+  draft.content.sections.find((section) => section.id === sectionId);
 
 /** Moves an item within an array, clamping the destination. Shared by section
  * and block reordering so both behave identically at the boundaries. */
 const moveWithin = <T>(items: Array<T>, from: number, to: number): void => {
   if (from < 0 || from >= items.length) {
-    return
+    return;
   }
 
-  const clamped = Math.max(0, Math.min(to, items.length - 1))
-  const [moved] = items.splice(from, 1)
+  const clamped = Math.max(0, Math.min(to, items.length - 1));
+  const [moved] = items.splice(from, 1);
 
   if (moved !== undefined) {
-    items.splice(clamped, 0, moved)
+    items.splice(clamped, 0, moved);
   }
-}
+};
 
 // ---------------------------------------------------------------------------
 // Meta
@@ -65,12 +65,12 @@ const moveWithin = <T>(items: Array<T>, from: number, to: number): void => {
 export const setLocale =
   (locale: string): Recipe =>
   (draft) => {
-    const trimmed = locale.trim()
+    const trimmed = locale.trim();
 
     if (trimmed.length >= 2) {
-      draft.meta.locale = trimmed
+      draft.meta.locale = trimmed;
     }
-  }
+  };
 
 // ---------------------------------------------------------------------------
 // Header
@@ -79,42 +79,42 @@ export const setLocale =
 export const setHeaderName =
   (name: InlineText): Recipe =>
   (draft) => {
-    draft.content.header.name = name
-  }
+    draft.content.header.name = name;
+  };
 
 export const setHeaderHeadline =
   (headline: InlineText): Recipe =>
   (draft) => {
-    draft.content.header.headline = headline
-  }
+    draft.content.header.headline = headline;
+  };
 
 export const setAvatarImage =
   (imageId: string | undefined): Recipe =>
   (draft) => {
     if (imageId === undefined) {
-      delete draft.content.header.avatarImageId
+      delete draft.content.header.avatarImageId;
     } else {
-      draft.content.header.avatarImageId = imageId
+      draft.content.header.avatarImageId = imageId;
     }
-  }
+  };
 
 export const addContact =
-  (label = ''): Recipe =>
+  (label = ""): Recipe =>
   (draft) => {
-    draft.content.header.contacts.push({ id: createId(), label: text(label) })
-  }
+    draft.content.header.contacts.push({ id: createId(), label: text(label) });
+  };
 
 export const updateContactLabel =
   (contactId: string, label: InlineText): Recipe =>
   (draft) => {
     const contact = draft.content.header.contacts.find(
       (item) => item.id === contactId,
-    )
+    );
 
     if (contact !== undefined) {
-      contact.label = label
+      contact.label = label;
     }
-  }
+  };
 
 /**
  * The icon beside a contact.
@@ -127,18 +127,18 @@ export const setContactIcon =
   (draft) => {
     const contact = draft.content.header.contacts.find(
       (item) => item.id === contactId,
-    )
+    );
 
     if (contact === undefined) {
-      return
+      return;
     }
 
     if (icon === undefined) {
-      delete contact.icon
+      delete contact.icon;
     } else {
-      contact.icon = icon
+      contact.icon = icon;
     }
-  }
+  };
 
 /** Makes a contact a link, or stops it being one. An empty string clears it,
  * since that is what an emptied input produces. */
@@ -147,20 +147,20 @@ export const setContactHref =
   (draft) => {
     const contact = draft.content.header.contacts.find(
       (item) => item.id === contactId,
-    )
+    );
 
     if (contact === undefined) {
-      return
+      return;
     }
 
-    const trimmed = href.trim()
+    const trimmed = href.trim();
 
-    if (trimmed === '') {
-      delete contact.href
+    if (trimmed === "") {
+      delete contact.href;
     } else {
-      contact.href = trimmed
+      contact.href = trimmed;
     }
-  }
+  };
 
 export const removeContact =
   (contactId: string): Recipe =>
@@ -170,12 +170,12 @@ export const removeContact =
     // step for an edit that changed nothing.
     const index = draft.content.header.contacts.findIndex(
       (contact) => contact.id === contactId,
-    )
+    );
 
     if (index !== -1) {
-      draft.content.header.contacts.splice(index, 1)
+      draft.content.header.contacts.splice(index, 1);
     }
-  }
+  };
 
 // ---------------------------------------------------------------------------
 // Sections
@@ -184,33 +184,33 @@ export const removeContact =
 export const addSection =
   (kind: SectionKind, title: string, atIndex?: number): Recipe =>
   (draft) => {
-    const section = createSection(kind, title)
-    const index = atIndex ?? draft.content.sections.length
+    const section = createSection(kind, title);
+    const index = atIndex ?? draft.content.sections.length;
 
-    draft.content.sections.splice(index, 0, section)
-  }
+    draft.content.sections.splice(index, 0, section);
+  };
 
 export const removeSection =
   (sectionId: string): Recipe =>
   (draft) => {
     const index = draft.content.sections.findIndex(
       (section) => section.id === sectionId,
-    )
+    );
 
     if (index !== -1) {
-      draft.content.sections.splice(index, 1)
+      draft.content.sections.splice(index, 1);
     }
-  }
+  };
 
 export const setSectionTitle =
   (sectionId: string, title: InlineText): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section !== undefined) {
-      section.title = title
+      section.title = title;
     }
-  }
+  };
 
 /**
  * Hides a section instead of deleting it.
@@ -221,18 +221,18 @@ export const setSectionTitle =
 export const setSectionHidden =
   (sectionId: string, hidden: boolean): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section === undefined) {
-      return
+      return;
     }
 
     if (hidden) {
-      section.hidden = true
+      section.hidden = true;
     } else {
-      delete section.hidden
+      delete section.hidden;
     }
-  }
+  };
 
 /**
  * Sets or clears a section's icon.
@@ -244,18 +244,18 @@ export const setSectionHidden =
 export const setSectionIcon =
   (sectionId: string, icon: IconRef | undefined): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section === undefined) {
-      return
+      return;
     }
 
     if (icon === undefined) {
-      delete section.icon
+      delete section.icon;
     } else {
-      section.icon = icon
+      section.icon = icon;
     }
-  }
+  };
 
 /**
  * Whether the section starts on a fresh sheet.
@@ -266,36 +266,36 @@ export const setSectionIcon =
  * preserve a field that says "default".
  */
 export const setSectionBreakBefore =
-  (sectionId: string, breakBefore: 'auto' | 'page'): Recipe =>
+  (sectionId: string, breakBefore: "auto" | "page"): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section === undefined) {
-      return
+      return;
     }
 
-    if (breakBefore === 'auto') {
+    if (breakBefore === "auto") {
       if (section.style !== undefined) {
-        delete section.style.breakBefore
+        delete section.style.breakBefore;
 
         // An override object holding nothing is noise in the document and in
         // every diff of it.
         if (Object.keys(section.style).length === 0) {
-          delete section.style
+          delete section.style;
         }
       }
 
-      return
+      return;
     }
 
-    section.style = { ...section.style, breakBefore }
-  }
+    section.style = { ...section.style, breakBefore };
+  };
 
 export const moveSection =
   (from: number, to: number): Recipe =>
   (draft) => {
-    moveWithin(draft.content.sections, from, to)
-  }
+    moveWithin(draft.content.sections, from, to);
+  };
 
 // ---------------------------------------------------------------------------
 // Blocks
@@ -304,37 +304,37 @@ export const moveSection =
 export const addBlock =
   (sectionId: string, block: Block, atIndex?: number): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section === undefined) {
-      return
+      return;
     }
 
-    const index = atIndex ?? section.blocks.length
-    section.blocks.splice(index, 0, block as Draft<Block>)
-  }
+    const index = atIndex ?? section.blocks.length;
+    section.blocks.splice(index, 0, block as Draft<Block>);
+  };
 
 export const removeBlock =
   (sectionId: string, blockId: string): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
     const index =
-      section?.blocks.findIndex((block) => block.id === blockId) ?? -1
+      section?.blocks.findIndex((block) => block.id === blockId) ?? -1;
 
     if (section !== undefined && index !== -1) {
-      section.blocks.splice(index, 1)
+      section.blocks.splice(index, 1);
     }
-  }
+  };
 
 export const moveBlock =
   (sectionId: string, from: number, to: number): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
+    const section = findSection(draft, sectionId);
 
     if (section !== undefined) {
-      moveWithin(section.blocks, from, to)
+      moveWithin(section.blocks, from, to);
     }
-  }
+  };
 
 /**
  * Moves a block to another section, which is what a cross-section drag does.
@@ -348,29 +348,29 @@ export const moveBlockToSection =
     toIndex: number,
   ): Recipe =>
   (draft) => {
-    const source = findSection(draft, fromSectionId)
-    const target = findSection(draft, toSectionId)
+    const source = findSection(draft, fromSectionId);
+    const target = findSection(draft, toSectionId);
 
     if (source === undefined || target === undefined) {
-      return
+      return;
     }
 
-    const index = source.blocks.findIndex((block) => block.id === blockId)
+    const index = source.blocks.findIndex((block) => block.id === blockId);
 
     if (index === -1) {
-      return
+      return;
     }
 
-    const [moved] = source.blocks.splice(index, 1)
+    const [moved] = source.blocks.splice(index, 1);
 
     if (moved !== undefined) {
       target.blocks.splice(
         Math.max(0, Math.min(toIndex, target.blocks.length)),
         0,
         moved,
-      )
+      );
     }
-  }
+  };
 
 /**
  * How wide an image block draws, as a percentage of the content column.
@@ -388,22 +388,22 @@ export const setImageWidth =
     widthPercent: number | undefined,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block === undefined || block.kind !== 'image') {
-      return
+    if (block === undefined || block.kind !== "image") {
+      return;
     }
 
     if (widthPercent === undefined) {
-      delete block.widthPercent
-      return
+      delete block.widthPercent;
+      return;
     }
 
     // Clamped to the schema's own bounds, so a control that offers a bad number
     // cannot write a document that fails validation on the way to disk.
-    block.widthPercent = Math.max(1, Math.min(100, Math.round(widthPercent)))
-  }
+    block.widthPercent = Math.max(1, Math.min(100, Math.round(widthPercent)));
+  };
 
 /**
  * Replaces the text of whichever field a block exposes.
@@ -415,40 +415,40 @@ export const setImageWidth =
 export const setBlockText =
   (sectionId: string, blockId: string, value: InlineText): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
     if (block === undefined) {
-      return
+      return;
     }
 
     switch (block.kind) {
-      case 'paragraph':
-        block.text = value
-        break
-      case 'entry':
-        block.title = value
-        break
-      case 'iconLabel':
-        block.label = value
-        break
-      case 'heading':
-        block.text = value
-        break
+      case "paragraph":
+        block.text = value;
+        break;
+      case "entry":
+        block.title = value;
+        break;
+      case "iconLabel":
+        block.label = value;
+        break;
+      case "heading":
+        block.text = value;
+        break;
       // Lists, quotes, tables, tags, images, dividers, code and raw passthrough
       // have no single text field; they are edited through their own operations,
       // or in the Markdown pane where their content is literal.
-      case 'bulletList':
-      case 'quote':
-      case 'table':
-      case 'code':
-      case 'tagList':
-      case 'image':
-      case 'divider':
-      case 'raw':
-        break
+      case "bulletList":
+      case "quote":
+      case "table":
+      case "code":
+      case "tagList":
+      case "image":
+      case "divider":
+      case "raw":
+        break;
     }
-  }
+  };
 
 /**
  * One item of a list, at any nesting depth.
@@ -465,26 +465,26 @@ export const setBulletItem =
     value: InlineText,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind !== 'bulletList' || path.length === 0) {
-      return
+    if (block?.kind !== "bulletList" || path.length === 0) {
+      return;
     }
 
-    let items: Array<ListItem> | undefined = block.items
+    let items: Array<ListItem> | undefined = block.items;
 
     for (const index of path.slice(0, -1)) {
-      items = items?.[index]?.list?.items
+      items = items?.[index]?.list?.items;
     }
 
-    const last = path[path.length - 1] as number
-    const item = items?.[last]
+    const last = path[path.length - 1] as number;
+    const item = items?.[last];
 
     if (item !== undefined) {
-      item.text = value
+      item.text = value;
     }
-  }
+  };
 
 /** One paragraph of a block quote. */
 export const setQuoteParagraph =
@@ -495,13 +495,13 @@ export const setQuoteParagraph =
     value: InlineText,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind === 'quote' && index < block.paragraphs.length) {
-      block.paragraphs[index] = value
+    if (block?.kind === "quote" && index < block.paragraphs.length) {
+      block.paragraphs[index] = value;
     }
-  }
+  };
 
 /**
  * One cell of a table.
@@ -519,19 +519,19 @@ export const setTableCell =
     value: InlineText,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind !== 'table') {
-      return
+    if (block?.kind !== "table") {
+      return;
     }
 
-    const cells = row < 0 ? block.head : block.rows[row]
+    const cells = row < 0 ? block.head : block.rows[row];
 
     if (cells !== undefined && column < cells.length) {
-      cells[column] = value
+      cells[column] = value;
     }
-  }
+  };
 
 /**
  * One field of an entry.
@@ -550,29 +550,29 @@ export const setEntryField =
   (
     sectionId: string,
     blockId: string,
-    field: 'title' | 'subtitle' | 'location' | 'summary',
+    field: "title" | "subtitle" | "location" | "summary",
     value: InlineText,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind !== 'entry') {
-      return
+    if (block?.kind !== "entry") {
+      return;
     }
 
-    if (field === 'title') {
-      block.title = value
-      return
+    if (field === "title") {
+      block.title = value;
+      return;
     }
 
     if (value.length === 0) {
-      delete block[field]
-      return
+      delete block[field];
+      return;
     }
 
-    block[field] = value
-  }
+    block[field] = value;
+  };
 
 /** One bullet of an entry. Entry bullets are a different array from a bullet
  * list's items, so they need their own operation. */
@@ -584,13 +584,13 @@ export const setEntryBullet =
     value: InlineText,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind === 'entry' && itemIndex < block.bullets.length) {
-      block.bullets[itemIndex] = value
+    if (block?.kind === "entry" && itemIndex < block.bullets.length) {
+      block.bullets[itemIndex] = value;
     }
-  }
+  };
 
 /**
  * One tag.
@@ -607,22 +607,22 @@ export const setTag =
     value: string,
   ): Recipe =>
   (draft) => {
-    const section = findSection(draft, sectionId)
-    const block = section?.blocks.find((candidate) => candidate.id === blockId)
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
 
-    if (block?.kind !== 'tagList' || itemIndex >= block.tags.length) {
-      return
+    if (block?.kind !== "tagList" || itemIndex >= block.tags.length) {
+      return;
     }
 
-    const trimmed = value.trim()
+    const trimmed = value.trim();
 
-    if (trimmed === '') {
-      block.tags.splice(itemIndex, 1)
-      return
+    if (trimmed === "") {
+      block.tags.splice(itemIndex, 1);
+      return;
     }
 
-    block.tags[itemIndex] = trimmed
-  }
+    block.tags[itemIndex] = trimmed;
+  };
 
 // ---------------------------------------------------------------------------
 // Style, template, custom CSS
@@ -642,30 +642,30 @@ export const patchDesign =
     // to keep the runtime guard against an explicitly-undefined group honest.
     const entries = Object.entries(patch) as Array<
       [keyof DesignConfig, Record<string, unknown> | undefined]
-    >
+    >;
 
     for (const [group, values] of entries) {
       if (values === undefined) {
-        continue
+        continue;
       }
 
-      const current = draft.design[group]
+      const current = draft.design[group];
 
       if (current === undefined) {
         // A group that did not exist when this document was written,
         // `pagination`, so far. Assigning it is what makes an old document
         // settable without a migration that touches every row.
-        Object.assign(draft.design, { [group]: { ...values } })
-        continue
+        Object.assign(draft.design, { [group]: { ...values } });
+        continue;
       }
 
-      Object.assign(current, values)
+      Object.assign(current, values);
     }
-  }
+  };
 
 export type DeepPartial<T> = {
-  [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K]
-}
+  [K in keyof T]?: T[K] extends object ? Partial<T[K]> : T[K];
+};
 
 /**
  * Switches template.
@@ -677,15 +677,15 @@ export type DeepPartial<T> = {
 export const setTemplate =
   (templateId: TemplateId, options: { resetDesign: boolean }): Recipe =>
   (draft) => {
-    draft.templateId = templateId
+    draft.templateId = templateId;
 
     if (options.resetDesign) {
-      draft.design = templateDefaults(templateId)
+      draft.design = templateDefaults(templateId);
     }
-  }
+  };
 
 export const setCustomCss =
   (css: string): Recipe =>
   (draft) => {
-    draft.customCss = css
-  }
+    draft.customCss = css;
+  };

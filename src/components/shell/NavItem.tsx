@@ -1,11 +1,11 @@
-import { Link } from '@tanstack/react-router'
-import { Box, Text, Tooltip } from '@mantine/core'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
+import { Link } from "@tanstack/react-router";
+import { Box, Text, Tooltip } from "@mantine/core";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { cn } from '@/lib/utils'
-import { Icon } from '@/features/icons/IconRenderer'
+import { cn } from "@/lib/utils";
+import { Icon } from "@/features/icons/IconRenderer";
 
-import type { ComponentProps, ReactElement, ReactNode } from 'react'
+import type { ComponentProps, ReactElement, ReactNode } from "react";
 
 /**
  * Shared appearance for a sidebar row.
@@ -27,25 +27,25 @@ import type { ComponentProps, ReactElement, ReactNode } from 'react'
  */
 export const navItemClassName = (active = false, collapsed = false): string =>
   cn(
-    'flex items-center gap-2.5 rounded-control text-[13px]',
-    'h-[26px] transition-colors duration-fast ease-standard',
+    "flex items-center gap-2.5 rounded-control text-[13px]",
+    "h-[26px] transition-colors duration-fast ease-standard",
     // A centred 34px pill on the rail, not a full-width one: a fill that
     // reaches both edges of a 60px column reads as a band across the sidebar
     // rather than as one row being selected.
-    collapsed ? 'mx-auto w-[34px] justify-center px-0' : 'w-full px-2.5',
+    collapsed ? "mx-auto w-[34px] justify-center px-0" : "w-full px-2.5",
     active
-      ? 'bg-selected text-accent font-medium'
-      : 'text-muted hover:bg-hover hover:text-body',
-  )
+      ? "bg-selected text-accent font-medium"
+      : "text-muted hover:bg-hover hover:text-body",
+  );
 
 interface NavItemContentProps {
-  icon: string
-  label: string
+  icon: string;
+  label: string;
   /** Shown right-aligned. A zero is omitted rather than displayed, so an empty
    * group reads as empty instead of as a count of nothing. */
-  count?: number
+  count?: number;
   /** Rail: icon only. */
-  collapsed?: boolean
+  collapsed?: boolean;
 }
 
 export const NavItemContent: React.FC<NavItemContentProps> = ({
@@ -69,7 +69,7 @@ export const NavItemContent: React.FC<NavItemContentProps> = ({
       </>
     )}
   </>
-)
+);
 
 /**
  * Wraps a collapsed row so its label is still reachable.
@@ -94,14 +94,14 @@ const withRailLabel = (
     </Tooltip>
   ) : (
     row
-  )
+  );
 
 type NavLinkProps = NavItemContentProps &
-  Pick<ComponentProps<typeof Link>, 'to'> & {
-    active?: boolean
+  Pick<ComponentProps<typeof Link>, "to"> & {
+    active?: boolean;
     /** Lets the mobile navbar overlay dismiss itself once a row is tapped. */
-    onNavigate?: () => void
-  }
+    onNavigate?: () => void;
+  };
 
 /**
  * A row that navigates to a route with no search params.
@@ -132,7 +132,7 @@ export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
       aria-label={collapsed ? label : undefined}
       // Driven by the caller rather than by `activeProps`: several rows share one
       // route and differ only by their search params.
-      aria-current={active ? 'page' : undefined}
+      aria-current={active ? "page" : undefined}
     >
       <NavItemContent
         icon={icon}
@@ -141,14 +141,14 @@ export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
         collapsed={collapsed}
       />
     </Link>,
-  )
+  );
 
   return tourId === undefined ? (
     link
   ) : (
     <OnboardingTour.Target id={tourId}>{link}</OnboardingTour.Target>
-  )
-}
+  );
+};
 
 /** A row that performs an action instead of navigating. */
 export const NavButton: React.FC<
@@ -170,14 +170,14 @@ export const NavButton: React.FC<
         collapsed={collapsed}
       />
     </button>,
-  )
+  );
 
 interface NavGroupProps {
   /** Uppercase micro-label. Omitted for the first, unlabelled group. */
-  label?: string
+  label?: string;
   /** Rail: the micro-label goes, since there is no width to set it in. */
-  collapsed?: boolean
-  children: ReactNode
+  collapsed?: boolean;
+  children: ReactNode;
 }
 
 export const NavGroup: React.FC<NavGroupProps> = ({
@@ -185,7 +185,7 @@ export const NavGroup: React.FC<NavGroupProps> = ({
   collapsed = false,
   children,
 }) => (
-  <Box className={cn('pb-1.5', collapsed ? 'px-2' : 'px-2.5')}>
+  <Box className={cn("pb-1.5", collapsed ? "px-2" : "px-2.5")}>
     {label === undefined ? null : collapsed ? (
       /* A rule instead of the words. The grouping is the part that still means
          something in a rail; the name of the group is what the tooltips say. */
@@ -200,4 +200,4 @@ export const NavGroup: React.FC<NavGroupProps> = ({
     )}
     <Box className="flex flex-col gap-px">{children}</Box>
   </Box>
-)
+);

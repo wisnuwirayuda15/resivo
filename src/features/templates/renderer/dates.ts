@@ -1,6 +1,6 @@
-import { presentLabel } from './locales'
+import { presentLabel } from "./locales";
 
-import type { DateRange } from '@/features/resume/model/document'
+import type { DateRange } from "@/features/resume/model/document";
 
 /**
  * Date range formatting for the paper.
@@ -13,10 +13,10 @@ import type { DateRange } from '@/features/resume/model/document'
  */
 
 /** An en dash, the typographic separator for a span. */
-export const RANGE_DASH = '–'
+export const RANGE_DASH = "–";
 
-const YEAR_ONLY = /^\d{4}$/
-const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/
+const YEAR_ONLY = /^\d{4}$/;
+const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/;
 
 /**
  * Formats one end of a range.
@@ -26,37 +26,37 @@ const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/
  * a resume that shows the wrong month depending on where it is opened.
  */
 const formatPoint = (value: string, locale: string): string => {
-  const trimmed = value.trim()
+  const trimmed = value.trim();
 
-  if (trimmed === '' || YEAR_ONLY.test(trimmed)) {
-    return trimmed
+  if (trimmed === "" || YEAR_ONLY.test(trimmed)) {
+    return trimmed;
   }
 
-  const match = YEAR_MONTH.exec(trimmed)
+  const match = YEAR_MONTH.exec(trimmed);
 
   if (match === null) {
-    return trimmed
+    return trimmed;
   }
 
-  const [, yearText, monthText] = match
+  const [, yearText, monthText] = match;
 
   if (yearText === undefined || monthText === undefined) {
-    return trimmed
+    return trimmed;
   }
 
-  const month = Number(monthText)
+  const month = Number(monthText);
 
   // A month outside 1–12 is not a date the user meant; show what they typed.
   if (month < 1 || month > 12) {
-    return trimmed
+    return trimmed;
   }
 
   return new Intl.DateTimeFormat(locale, {
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(Date.UTC(Number(yearText), month - 1, 1)))
-}
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(Number(yearText), month - 1, 1)));
+};
 
 /**
  * Renders a range as a single line, e.g. `Mar 2021 – Present`.
@@ -70,10 +70,10 @@ export const formatDateRange = (
   locale: string,
 ): string => {
   if (range === undefined) {
-    return ''
+    return "";
   }
 
-  const start = formatPoint(range.start ?? '', locale)
+  const start = formatPoint(range.start ?? "", locale);
   // `current` wins over `end`, the model's rule, so that ticking "current"
   // never requires clearing a stale end date first.
   // The one word on the paper this app supplies rather than the user, so it
@@ -81,11 +81,11 @@ export const formatDateRange = (
   const end =
     range.current === true
       ? presentLabel(locale)
-      : formatPoint(range.end ?? '', locale)
+      : formatPoint(range.end ?? "", locale);
 
-  if (start !== '' && end !== '') {
-    return `${start} ${RANGE_DASH} ${end}`
+  if (start !== "" && end !== "") {
+    return `${start} ${RANGE_DASH} ${end}`;
   }
 
-  return start === '' ? end : start
-}
+  return start === "" ? end : start;
+};

@@ -1,4 +1,4 @@
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * Flattening a resume into the sequence the paginator distributes.
@@ -12,52 +12,52 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * their own, without a DOM.
  */
 
-export type FlowItemType = 'header' | 'sectionHeading' | 'block'
+export type FlowItemType = "header" | "sectionHeading" | "block";
 
 export interface FlowItem {
   /** Stable across renders, and unique within one document. */
-  id: string
-  type: FlowItemType
+  id: string;
+  type: FlowItemType;
   /** Set for `sectionHeading` and `block`. */
-  sectionId?: string
+  sectionId?: string;
   /** Set for `block`. */
-  blockId?: string
+  blockId?: string;
   /**
    * Marks an item that must not be the last thing on a page. Set on a section
    * heading that has content following it, a heading stranded at the foot of a
    * page is the classic orphan, and the one break a reader always notices.
    */
-  keepWithNext?: boolean
+  keepWithNext?: boolean;
   /**
    * Marks an item that must start a page. Set by a `pageBreak` block before it,
    * or by a section whose style says `breakBefore: 'page'`.
    */
-  breakBefore?: boolean
+  breakBefore?: boolean;
 }
 
 /** The class the renderer puts on each item, and that `frame.css` keys the
  * vertical rhythm off. Declared once here so the two cannot drift. */
 export const flowItemClass = (type: FlowItemType): string => {
   switch (type) {
-    case 'header':
-      return 'rp-item rp-item--header'
-    case 'sectionHeading':
-      return 'rp-item rp-item--section'
-    case 'block':
-      return 'rp-item rp-item--block'
+    case "header":
+      return "rp-item rp-item--header";
+    case "sectionHeading":
+      return "rp-item rp-item--section";
+    case "block":
+      return "rp-item rp-item--block";
   }
-}
+};
 
 const hasHeaderContent = (document: ResumeDocument): boolean => {
-  const { header } = document.content
+  const { header } = document.content;
 
   return (
     header.name.length > 0 ||
     (header.headline ?? []).length > 0 ||
     header.contacts.length > 0 ||
     header.avatarImageId !== undefined
-  )
-}
+  );
+};
 
 /**
  * Builds the flow for a document.
@@ -74,11 +74,11 @@ export const documentFlow = (
   document: ResumeDocument,
   options: { keepHeadingWithContent?: boolean } = {},
 ): Array<FlowItem> => {
-  const items: Array<FlowItem> = []
-  const keepHeadings = options.keepHeadingWithContent ?? true
+  const items: Array<FlowItem> = [];
+  const keepHeadings = options.keepHeadingWithContent ?? true;
 
   if (hasHeaderContent(document)) {
-    items.push({ id: 'header', type: 'header' })
+    items.push({ id: "header", type: "header" });
   }
 
   /**
@@ -89,24 +89,24 @@ export const documentFlow = (
    * "the thing after me starts a page". It carries no height, so it stays at the
    * foot of the outgoing page and costs nothing there.
    */
-  let pendingBreak = false
+  let pendingBreak = false;
 
   const push = (item: FlowItem): void => {
     // Not before the first item: there is no page to break away from, and
     // honouring it would produce a blank first sheet.
     items.push(
       pendingBreak && items.length > 0 ? { ...item, breakBefore: true } : item,
-    )
-    pendingBreak = false
-  }
+    );
+    pendingBreak = false;
+  };
 
   for (const section of document.content.sections) {
     if (section.hidden === true) {
-      continue
+      continue;
     }
 
-    if (section.style?.breakBefore === 'page') {
-      pendingBreak = true
+    if (section.style?.breakBefore === "page") {
+      pendingBreak = true;
     }
 
     /**
@@ -118,34 +118,34 @@ export const documentFlow = (
      * `keepWithNext` exists to prevent, produced by the very control meant to
      * give the user cleaner pages.
      */
-    if (keepHeadings && section.blocks[0]?.kind === 'pageBreak') {
-      pendingBreak = true
+    if (keepHeadings && section.blocks[0]?.kind === "pageBreak") {
+      pendingBreak = true;
     }
 
     push({
       id: `section:${section.id}`,
-      type: 'sectionHeading',
+      type: "sectionHeading",
       sectionId: section.id,
       // Nothing follows an empty section's heading, so there is nothing to keep
       // it with; forcing a break would only push a lone heading to the next page.
       ...(section.blocks.length > 0 && keepHeadings
         ? { keepWithNext: true }
         : {}),
-    })
+    });
 
     for (const block of section.blocks) {
       push({
         id: `block:${block.id}`,
-        type: 'block',
+        type: "block",
         sectionId: section.id,
         blockId: block.id,
-      })
+      });
 
-      if (block.kind === 'pageBreak') {
-        pendingBreak = true
+      if (block.kind === "pageBreak") {
+        pendingBreak = true;
       }
     }
   }
 
-  return items
-}
+  return items;
+};

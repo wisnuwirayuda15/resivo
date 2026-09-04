@@ -1,4 +1,4 @@
-import { defineConfig, devices } from '@playwright/test'
+import { defineConfig, devices } from "@playwright/test";
 
 /**
  * End-to-end config.
@@ -18,7 +18,7 @@ import { defineConfig, devices } from '@playwright/test'
  * bundling, which these tests are not about.
  */
 export default defineConfig({
-  testDir: './e2e',
+  testDir: "./e2e",
   // Serial. Every test shares one IndexedDB origin, so two of them writing
   // resumes at once would see each other's rows.
   workers: 1,
@@ -26,22 +26,22 @@ export default defineConfig({
   // Locally a failure is something to look at, not to paper over. In CI one
   // retry absorbs a genuinely flaky first paint without hiding a real break.
   retries: process.env.CI === undefined ? 0 : 1,
-  reporter: process.env.CI === undefined ? 'list' : [['list'], ['html']],
+  reporter: process.env.CI === undefined ? "list" : [["list"], ["html"]],
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: "http://localhost:3000",
     // Kept only for a failure: a trace of every passing run is a lot of disk
     // for something nobody opens.
-    trace: 'retain-on-failure',
-    screenshot: 'only-on-failure',
+    trace: "retain-on-failure",
+    screenshot: "only-on-failure",
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    command: 'bun run dev',
-    url: 'http://localhost:3000',
+    command: "bun run dev",
+    url: "http://localhost:3000",
     // A dev server already running is reused, so a watch-mode session and a test
     // run do not fight over the port.
     reuseExistingServer: true,
     // Cold start compiles Monaco and the icon catalog.
     timeout: 120_000,
   },
-})
+});

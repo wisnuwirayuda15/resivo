@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from "zod";
 
 import {
   DOCUMENT_VERSION,
@@ -7,7 +7,7 @@ import {
   PAPER_SIZES,
   SECTION_KINDS,
   TEMPLATE_IDS,
-} from './document'
+} from "./document";
 
 import type {
   Block,
@@ -16,7 +16,7 @@ import type {
   ListItem,
   ResumeDocument,
   Section,
-} from './document'
+} from "./document";
 
 /**
  * Runtime mirror of the document model.
@@ -41,44 +41,44 @@ const cssColor = z
   .min(1)
   .max(64)
   .refine((value) => !/[;{}<>\\]/.test(value), {
-    message: 'Colour may not contain ; { } < > or backslash',
+    message: "Colour may not contain ; { } < > or backslash",
   })
   .refine((value) => !/url\s*\(|@import|expression\s*\(/i.test(value), {
-    message: 'Colour may not reference external resources',
-  })
+    message: "Colour may not reference external resources",
+  });
 
 /** Stable node identity. Generated with `crypto.randomUUID`, but any non-empty
  * opaque string is accepted so imported documents keep their own ids. */
-const id = z.string().min(1).max(128)
+const id = z.string().min(1).max(128);
 
 const iconRefSchema = z.object({
-  library: z.literal('phosphor'),
+  library: z.literal("phosphor"),
   name: z
     .string()
     .min(1)
     .max(64)
-    .regex(/^[a-z0-9-]+$/, 'Phosphor icon names are lowercase and kebab-case'),
+    .regex(/^[a-z0-9-]+$/, "Phosphor icon names are lowercase and kebab-case"),
   weight: z.enum(ICON_WEIGHTS).optional(),
-})
+});
 
 // `link` nests inline nodes, so the union has to be lazy.
 const inlineNodeSchema: z.ZodType<InlineNode> = z.lazy(() =>
-  z.discriminatedUnion('type', [
+  z.discriminatedUnion("type", [
     z.object({
-      type: z.literal('text'),
+      type: z.literal("text"),
       text: z.string(),
       marks: z.array(z.enum(MARKS)).optional(),
     }),
     z.object({
-      type: z.literal('link'),
+      type: z.literal("link"),
       href: z.string().max(2048),
       children: z.array(inlineNodeSchema),
     }),
-    z.object({ type: z.literal('icon'), icon: iconRefSchema }),
+    z.object({ type: z.literal("icon"), icon: iconRefSchema }),
   ]),
-)
+);
 
-const inlineTextSchema = z.array(inlineNodeSchema)
+const inlineTextSchema = z.array(inlineNodeSchema);
 
 // ---------------------------------------------------------------------------
 // Blocks
@@ -88,7 +88,7 @@ const dateRangeSchema = z.object({
   start: z.string().max(64).optional(),
   end: z.string().max(64).optional(),
   current: z.boolean().optional(),
-})
+});
 
 /**
  * A list item nests a whole list, so like `link` this has to be lazy. The depth
@@ -107,44 +107,44 @@ const listItemSchema: z.ZodType<ListItem> = z.lazy(() =>
       })
       .optional(),
   }),
-)
+);
 
-const blockSchema = z.discriminatedUnion('kind', [
-  z.object({ id, kind: z.literal('paragraph'), text: inlineTextSchema }),
+const blockSchema = z.discriminatedUnion("kind", [
+  z.object({ id, kind: z.literal("paragraph"), text: inlineTextSchema }),
   z.object({
     id,
-    kind: z.literal('heading'),
+    kind: z.literal("heading"),
     level: z.union([z.literal(3), z.literal(4), z.literal(5), z.literal(6)]),
     text: inlineTextSchema,
   }),
   z.object({
     id,
-    kind: z.literal('bulletList'),
+    kind: z.literal("bulletList"),
     ordered: z.boolean().optional(),
     start: z.number().int().min(0).max(1_000_000).optional(),
     items: z.array(listItemSchema),
   }),
   z.object({
     id,
-    kind: z.literal('quote'),
+    kind: z.literal("quote"),
     paragraphs: z.array(inlineTextSchema),
   }),
   z.object({
     id,
-    kind: z.literal('code'),
+    kind: z.literal("code"),
     language: z.string().max(64).optional(),
     code: z.string(),
   }),
   z.object({
     id,
-    kind: z.literal('table'),
+    kind: z.literal("table"),
     head: z.array(inlineTextSchema),
     rows: z.array(z.array(inlineTextSchema)),
-    align: z.array(z.enum(['left', 'center', 'right']).nullable()),
+    align: z.array(z.enum(["left", "center", "right"]).nullable()),
   }),
   z.object({
     id,
-    kind: z.literal('entry'),
+    kind: z.literal("entry"),
     title: inlineTextSchema,
     subtitle: inlineTextSchema.optional(),
     location: inlineTextSchema.optional(),
@@ -154,26 +154,26 @@ const blockSchema = z.discriminatedUnion('kind', [
   }),
   z.object({
     id,
-    kind: z.literal('tagList'),
+    kind: z.literal("tagList"),
     tags: z.array(z.string().max(128)),
   }),
   z.object({
     id,
-    kind: z.literal('image'),
+    kind: z.literal("image"),
     imageId: id,
     alt: z.string().max(512),
     widthPercent: z.number().min(1).max(100).optional(),
   }),
-  z.object({ id, kind: z.literal('divider') }),
-  z.object({ id, kind: z.literal('pageBreak') }),
+  z.object({ id, kind: z.literal("divider") }),
+  z.object({ id, kind: z.literal("pageBreak") }),
   z.object({
     id,
-    kind: z.literal('iconLabel'),
+    kind: z.literal("iconLabel"),
     icon: iconRefSchema,
     label: inlineTextSchema,
   }),
-  z.object({ id, kind: z.literal('raw'), markdown: z.string() }),
-])
+  z.object({ id, kind: z.literal("raw"), markdown: z.string() }),
+]);
 
 // ---------------------------------------------------------------------------
 // Sections + content
@@ -191,29 +191,29 @@ const sectionSchema = z.object({
       spaceBefore: z.number().min(0).max(20).optional(),
       showDivider: z.boolean().optional(),
       columns: z.union([z.literal(1), z.literal(2)]).optional(),
-      breakBefore: z.enum(['auto', 'page']).optional(),
+      breakBefore: z.enum(["auto", "page"]).optional(),
     })
     .optional(),
-})
+});
 
 const contactItemSchema = z.object({
   id,
   icon: iconRefSchema.optional(),
   label: inlineTextSchema,
   href: z.string().max(2048).optional(),
-})
+});
 
 const headerSchema = z.object({
   name: inlineTextSchema,
   headline: inlineTextSchema.optional(),
   contacts: z.array(contactItemSchema),
   avatarImageId: id.optional(),
-})
+});
 
 const contentSchema = z.object({
   header: headerSchema,
   sections: z.array(sectionSchema),
-})
+});
 
 // ---------------------------------------------------------------------------
 // Design configuration
@@ -224,18 +224,18 @@ const boxEdgesSchema = z.object({
   right: z.number().min(0).max(4),
   bottom: z.number().min(0).max(4),
   left: z.number().min(0).max(4),
-})
+});
 
 const fontRefSchema = z
   .object({
     family: z.string().min(1).max(128),
-    source: z.enum(['builtin', 'custom']),
+    source: z.enum(["builtin", "custom"]),
     fontId: id.optional(),
   })
-  .refine((font) => font.source !== 'custom' || font.fontId !== undefined, {
-    message: 'A custom font must reference a row in the fonts table',
-    path: ['fontId'],
-  })
+  .refine((font) => font.source !== "custom" || font.fontId !== undefined, {
+    message: "A custom font must reference a row in the fonts table",
+    path: ["fontId"],
+  });
 
 const designConfigSchema = z.object({
   paper: z.object({
@@ -271,7 +271,7 @@ const designConfigSchema = z.object({
     color: cssColor,
   }),
   image: z.object({
-    avatarShape: z.enum(['circle', 'square', 'rounded']),
+    avatarShape: z.enum(["circle", "square", "rounded"]),
     avatarSize: z.number().min(16).max(512),
   }),
   icons: z.object({
@@ -284,7 +284,7 @@ const designConfigSchema = z.object({
   pagination: z
     .object({ keepHeadingWithContent: z.boolean().optional() })
     .optional(),
-})
+});
 
 // ---------------------------------------------------------------------------
 // Document
@@ -294,7 +294,7 @@ const metaSchema = z.object({
   fullName: z.string().max(256),
   headline: z.string().max(512).optional(),
   locale: z.string().min(2).max(35),
-})
+});
 
 export const documentSchema = z.object({
   /**
@@ -308,25 +308,25 @@ export const documentSchema = z.object({
   content: contentSchema,
   design: designConfigSchema,
   customCss: z.string().max(200_000),
-})
+});
 
-export const blockSchemaForTest = blockSchema
-export const sectionSchemaForTest = sectionSchema
-export const designConfigSchemaForTest = designConfigSchema
+export const blockSchemaForTest = blockSchema;
+export const sectionSchemaForTest = sectionSchema;
+export const designConfigSchemaForTest = designConfigSchema;
 
 /**
  * Compile-time guards that the runtime schemas still describe the interfaces.
  * If a field is added to `document.ts` without being added here, one of these
  * lines stops type-checking.
  */
-export type ParsedDocument = z.infer<typeof documentSchema>
-const _documentMatches = {} as ParsedDocument satisfies ResumeDocument
-const _blockMatches = {} as z.infer<typeof blockSchema> satisfies Block
-const _sectionMatches = {} as z.infer<typeof sectionSchema> satisfies Section
+export type ParsedDocument = z.infer<typeof documentSchema>;
+const _documentMatches = {} as ParsedDocument satisfies ResumeDocument;
+const _blockMatches = {} as z.infer<typeof blockSchema> satisfies Block;
+const _sectionMatches = {} as z.infer<typeof sectionSchema> satisfies Section;
 const _designMatches = {} as z.infer<
   typeof designConfigSchema
-> satisfies DesignConfig
-void _documentMatches
-void _blockMatches
-void _sectionMatches
-void _designMatches
+> satisfies DesignConfig;
+void _documentMatches;
+void _blockMatches;
+void _sectionMatches;
+void _designMatches;

@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Editor from '@monaco-editor/react'
-import { Loader, useComputedColorScheme } from '@mantine/core'
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Editor from "@monaco-editor/react";
+import { Loader, useComputedColorScheme } from "@mantine/core";
 
-import { serializeDocument } from '@/features/markdown/index'
+import { serializeDocument } from "@/features/markdown/index";
 
-import { EDITOR_OPTIONS, RESIVO_THEME, buildTheme } from './monaco'
+import { EDITOR_OPTIONS, RESIVO_THEME, buildTheme } from "./monaco";
 
-import type { editor } from 'monaco-editor'
-import type { Monaco } from '@monaco-editor/react'
-import type { ParseWarning } from '@/features/markdown/index'
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { editor } from "monaco-editor";
+import type { Monaco } from "@monaco-editor/react";
+import type { ParseWarning } from "@/features/markdown/index";
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * The Markdown tab.
@@ -36,17 +36,17 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * a preview starts to feel detached from the text, and far above the interval
  * between two keystrokes.
  */
-const PARSE_DELAY_MS = 250
+const PARSE_DELAY_MS = 250;
 
 /** Monaco replaces a whole owner's markers at once, which is how a warning the
  * user has fixed disappears without anything having to track it. */
-const MARKER_OWNER = 'resivo-markdown'
+const MARKER_OWNER = "resivo-markdown";
 
 interface MarkdownEditorProps {
-  document: ResumeDocument
+  document: ResumeDocument;
   /** Warnings from the caller's parse of the last text this reported. */
-  warnings: Array<ParseWarning>
-  onSourceChange: (source: string) => void
+  warnings: Array<ParseWarning>;
+  onSourceChange: (source: string) => void;
 }
 
 export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
@@ -54,18 +54,18 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   warnings,
   onSourceChange,
 }) => {
-  const scheme = useComputedColorScheme('light', {
+  const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
-  })
+  });
 
-  const monacoRef = useRef<Monaco | null>(null)
-  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
-  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const monacoRef = useRef<Monaco | null>(null);
+  const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** What the model currently serializes to, the other half of the divergence
    * check below. */
-  const serialized = useMemo(() => serializeDocument(resume), [resume])
-  const [value, setValue] = useState(serialized)
+  const serialized = useMemo(() => serializeDocument(resume), [resume]);
+  const [value, setValue] = useState(serialized);
 
   /**
    * A trigger, not a source of truth.
@@ -78,7 +78,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * another document, and a `focused` stuck at `true` would then block every
    * later synchronization.
    */
-  const [focusTick, setFocusTick] = useState(false)
+  const [focusTick, setFocusTick] = useState(false);
 
   /**
    * The view state to put back after the buffer is replaced.
@@ -88,7 +88,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * the document. Saving the state before the replacement and restoring it after
    * is what keeps the caret and the scroll position where the reader left them.
    */
-  const viewStateRef = useRef<editor.ICodeEditorViewState | null>(null)
+  const viewStateRef = useRef<editor.ICodeEditorViewState | null>(null);
 
   /**
    * Replaces the buffer from the model, unless the reader is typing in it.
@@ -109,19 +109,19 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * it is deliberately not part of the condition.
    */
   useEffect(() => {
-    const instance = editorRef.current
+    const instance = editorRef.current;
 
     if (
       instance === null ||
       instance.getValue() === serialized ||
       instance.hasTextFocus()
     ) {
-      return
+      return;
     }
 
-    viewStateRef.current = instance.saveViewState()
-    setValue(serialized)
-  }, [focusTick, serialized])
+    viewStateRef.current = instance.saveViewState();
+    setValue(serialized);
+  }, [focusTick, serialized]);
 
   /**
    * Runs after the child editor has applied the new `value`, child effects
@@ -129,14 +129,14 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * than a race against a frame.
    */
   useEffect(() => {
-    const instance = editorRef.current
-    const state = viewStateRef.current
+    const instance = editorRef.current;
+    const state = viewStateRef.current;
 
     if (instance !== null && state !== null) {
-      viewStateRef.current = null
-      instance.restoreViewState(state)
+      viewStateRef.current = null;
+      instance.restoreViewState(state);
     }
-  }, [value])
+  }, [value]);
 
   /**
    * The theme is rebuilt whenever the colour scheme changes, under one name.
@@ -147,23 +147,23 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * that are actually in effect.
    */
   useEffect(() => {
-    const monaco = monacoRef.current
+    const monaco = monacoRef.current;
 
     if (monaco !== null) {
       monaco.editor.defineTheme(
         RESIVO_THEME,
-        buildTheme(window.document.documentElement, scheme === 'dark'),
-      )
-      monaco.editor.setTheme(RESIVO_THEME)
+        buildTheme(window.document.documentElement, scheme === "dark"),
+      );
+      monaco.editor.setTheme(RESIVO_THEME);
     }
-  }, [scheme])
+  }, [scheme]);
 
   useEffect(() => {
-    const monaco = monacoRef.current
-    const model = editorRef.current?.getModel()
+    const monaco = monacoRef.current;
+    const model = editorRef.current?.getModel();
 
     if (monaco === null || model === null || model === undefined) {
-      return
+      return;
     }
 
     monaco.editor.setModelMarkers(
@@ -182,25 +182,25 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
         // its exact extent is not what the reader needs pointed out.
         endColumn: model.getLineMaxColumn(warning.line),
       })),
-    )
-  }, [warnings])
+    );
+  }, [warnings]);
 
   const handleChange = (next: string | undefined) => {
     if (next === undefined) {
-      return
+      return;
     }
 
-    setValue(next)
+    setValue(next);
 
     if (timerRef.current !== null) {
-      clearTimeout(timerRef.current)
+      clearTimeout(timerRef.current);
     }
 
     timerRef.current = setTimeout(() => {
-      timerRef.current = null
-      onSourceChange(next)
-    }, PARSE_DELAY_MS)
-  }
+      timerRef.current = null;
+      onSourceChange(next);
+    }, PARSE_DELAY_MS);
+  };
 
   /**
    * Parses what is in the buffer now, instead of when the timer would have.
@@ -212,49 +212,49 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    */
   const flush = useCallback(() => {
     if (timerRef.current === null) {
-      return
+      return;
     }
 
-    clearTimeout(timerRef.current)
-    timerRef.current = null
+    clearTimeout(timerRef.current);
+    timerRef.current = null;
 
-    const current = editorRef.current?.getValue()
+    const current = editorRef.current?.getValue();
 
     if (current !== undefined) {
-      onSourceChange(current)
+      onSourceChange(current);
     }
-  }, [onSourceChange])
+  }, [onSourceChange]);
 
-  useEffect(() => flush, [flush])
+  useEffect(() => flush, [flush]);
 
   return (
     <Editor
       beforeMount={(monaco) => {
-        monacoRef.current = monaco
+        monacoRef.current = monaco;
         monaco.editor.defineTheme(
           RESIVO_THEME,
-          buildTheme(window.document.documentElement, scheme === 'dark'),
-        )
+          buildTheme(window.document.documentElement, scheme === "dark"),
+        );
       }}
       language="markdown"
       loading={<Loader size="sm" />}
       onChange={handleChange}
       onMount={(instance) => {
-        editorRef.current = instance
+        editorRef.current = instance;
 
-        instance.onDidFocusEditorText(() => setFocusTick((tick) => !tick))
+        instance.onDidFocusEditorText(() => setFocusTick((tick) => !tick));
 
         // Blur is when a normalization that was withheld becomes safe to apply.
         // Flushing first is what makes the sync that follows a serialization of
         // everything typed, rather than of everything typed but the last word.
         instance.onDidBlurEditorText(() => {
-          flush()
-          setFocusTick((tick) => !tick)
-        })
+          flush();
+          setFocusTick((tick) => !tick);
+        });
       }}
       options={EDITOR_OPTIONS}
       theme={RESIVO_THEME}
       value={value}
     />
-  )
-}
+  );
+};

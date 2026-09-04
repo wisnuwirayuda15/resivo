@@ -125,7 +125,7 @@
  * slide content off the bottom of one page without it appearing on the next.
  */
 .rp-item[data-over]::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   right: 0;

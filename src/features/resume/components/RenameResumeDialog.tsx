@@ -1,42 +1,42 @@
-import { useEffect, useState } from 'react'
-import { Button, Group, Modal, Stack, TextInput } from '@mantine/core'
+import { useEffect, useState } from "react";
+import { Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 
-import { useUpdateResume } from '../queries'
+import { useUpdateResume } from "../queries";
 
-import type { ResumeSummary } from '@/database/index'
+import type { ResumeSummary } from "@/database/index";
 
 interface RenameResumeDialogProps {
   /** The resume being renamed, or undefined when closed. */
-  resume: ResumeSummary | undefined
-  onClose: () => void
+  resume: ResumeSummary | undefined;
+  onClose: () => void;
 }
 
 export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
   resume,
   onClose,
 }) => {
-  const [title, setTitle] = useState('')
-  const update = useUpdateResume()
+  const [title, setTitle] = useState("");
+  const update = useUpdateResume();
 
   // Seed the field whenever a different resume is opened, rather than deriving
   // it during render, the user must be able to edit it freely once it is open.
   useEffect(() => {
     if (resume !== undefined) {
-      setTitle(resume.title)
+      setTitle(resume.title);
     }
-  }, [resume])
+  }, [resume]);
 
   const submit = async () => {
-    const trimmed = title.trim()
+    const trimmed = title.trim();
 
-    if (resume === undefined || trimmed === '' || trimmed === resume.title) {
-      onClose()
-      return
+    if (resume === undefined || trimmed === "" || trimmed === resume.title) {
+      onClose();
+      return;
     }
 
-    await update.mutateAsync({ id: resume.id, changes: { title: trimmed } })
-    onClose()
-  }
+    await update.mutateAsync({ id: resume.id, changes: { title: trimmed } });
+    onClose();
+  };
 
   return (
     <Modal
@@ -52,8 +52,8 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
           value={title}
           onChange={(event) => setTitle(event.currentTarget.value)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter') {
-              void submit()
+            if (event.key === "Enter") {
+              void submit();
             }
           }}
         />
@@ -67,5 +67,5 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
         </Group>
       </Stack>
     </Modal>
-  )
-}
+  );
+};

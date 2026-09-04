@@ -1,10 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { ClientOnly } from '@/components/client-only'
-import { FontManagerView } from '@/features/assets/FontManagerView'
+import { Shell } from "@/components/shell/Shell";
+import { ClientOnly } from "@/components/client-only";
+import { FontManagerView } from "@/features/assets/FontManagerView";
 
 /** Font manager. Client-only, because it reads IndexedDB. */
 const FontsRoute: React.FC = () => (
@@ -13,14 +13,14 @@ const FontsRoute: React.FC = () => (
       <FontManagerView />
     </ClientOnly>
   </Shell>
-)
+);
 
-export const Route = createFileRoute('/fonts')({
+export const Route = createFileRoute("/fonts")({
   head: () => ({
     meta: seo({
-      title: 'Fonts | Resivo',
+      title: "Fonts | Resivo",
       indexable: false,
     }),
   }),
   component: FontsRoute,
-})
+});

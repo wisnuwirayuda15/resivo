@@ -1,7 +1,7 @@
-import { chromium } from '@playwright/test'
-import { readFileSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
-import { dirname, join } from 'node:path'
+import { chromium } from "@playwright/test";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
 
 /**
  * Draws `public/og.png`, the card a link to Resivo unfurls into.
@@ -20,30 +20,30 @@ import { dirname, join } from 'node:path'
  * roughly the middle 80 percent, so nothing here sits near an edge.
  */
 
-const WIDTH = 1200
-const HEIGHT = 630
+const WIDTH = 1200;
+const HEIGHT = 630;
 
-const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const logo = readFileSync(join(root, 'src', 'assets', 'logo.svg'), 'utf8')
+const logo = readFileSync(join(root, "src", "assets", "logo.svg"), "utf8");
 
 const font = readFileSync(
   join(
     root,
-    'node_modules',
-    '@fontsource-variable',
-    'instrument-sans',
-    'files',
-    'instrument-sans-latin-wght-normal.woff2',
+    "node_modules",
+    "@fontsource-variable",
+    "instrument-sans",
+    "files",
+    "instrument-sans-latin-wght-normal.woff2",
   ),
-).toString('base64')
+).toString("base64");
 
 /** The design system's own values, not near misses. */
-const INK = '#f2f2f0'
-const MUTED = '#a2a29b'
-const SUBTLE = '#8a8a83'
-const GROUND = '#121210'
-const ACCENT = '#32948e'
+const INK = "#f2f2f0";
+const MUTED = "#a2a29b";
+const SUBTLE = "#8a8a83";
+const GROUND = "#121210";
+const ACCENT = "#32948e";
 
 const html = `<!doctype html>
 <html>
@@ -116,23 +116,23 @@ const html = `<!doctype html>
     <div class="foot">No account. No server. No copy anywhere else.</div>
   </body>
 </html>
-`
+`;
 
-const browser = await chromium.launch()
+const browser = await chromium.launch();
 
 try {
   const page = await browser.newPage({
     viewport: { width: WIDTH, height: HEIGHT },
     deviceScaleFactor: 1,
-  })
+  });
 
   // Set rather than written to a file: the only asset is a data URL, so there
   // is nothing for a relative path to resolve against and nothing to clean up.
-  await page.setContent(html, { waitUntil: 'load' })
-  await page.evaluate(() => document.fonts.ready)
-  await page.screenshot({ path: join(root, 'public', 'og.png') })
+  await page.setContent(html, { waitUntil: "load" });
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: join(root, "public", "og.png") });
 
-  console.log(`og.png  ${WIDTH}x${HEIGHT}`)
+  console.log(`og.png  ${WIDTH}x${HEIGHT}`);
 } finally {
-  await browser.close()
+  await browser.close();
 }

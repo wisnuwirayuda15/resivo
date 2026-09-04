@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it } from "vitest";
 
-import { parseDocument } from '@/features/markdown/index'
-import { sanitizeCss } from '@/features/css/sanitize'
+import { parseDocument } from "@/features/markdown/index";
+import { sanitizeCss } from "@/features/css/sanitize";
 import {
   CONTACT_DIRECTIVE,
   ENTRY_DIRECTIVE,
@@ -10,9 +10,9 @@ import {
   LABEL_DIRECTIVE,
   PAGE_BREAK_DIRECTIVE,
   TAGS_DIRECTIVE,
-} from '@/features/markdown/spec'
+} from "@/features/markdown/spec";
 
-import { AI_PROMPT, GUIDE, guideMarkdown } from './content'
+import { AI_PROMPT, GUIDE, guideMarkdown } from "./content";
 
 /**
  * The guide has to be true.
@@ -35,7 +35,7 @@ const snippets = GUIDE.flatMap((chapter) =>
       ? []
       : [{ id: `${chapter.id}/${section.id}`, ...section.snippet }],
   ),
-)
+);
 
 /**
  * A snippet is an excerpt, so it is given the one thing a document must have.
@@ -44,41 +44,41 @@ const snippets = GUIDE.flatMap((chapter) =>
  * whole file, and a second H1 would make it a document with a heading in it.
  */
 const asDocument = (code: string): string =>
-  code.startsWith('# ') ? code : `# Ada Lovelace\n\n${code}\n`
+  code.startsWith("# ") ? code : `# Ada Lovelace\n\n${code}\n`;
 
-describe('the writing guide', () => {
-  it('has snippets in both chapters', () => {
-    expect(snippets.filter((one) => one.language === 'markdown')).not.toEqual(
+describe("the writing guide", () => {
+  it("has snippets in both chapters", () => {
+    expect(snippets.filter((one) => one.language === "markdown")).not.toEqual(
       [],
-    )
-    expect(snippets.filter((one) => one.language === 'css')).not.toEqual([])
-  })
+    );
+    expect(snippets.filter((one) => one.language === "css")).not.toEqual([]);
+  });
 
-  describe('every Markdown snippet parses cleanly', () => {
+  describe("every Markdown snippet parses cleanly", () => {
     for (const snippet of snippets.filter(
-      (one) => one.language === 'markdown',
+      (one) => one.language === "markdown",
     )) {
       it(snippet.id, () => {
-        const result = parseDocument(asDocument(snippet.code))
+        const result = parseDocument(asDocument(snippet.code));
 
-        expect(result.warnings).toEqual([])
-      })
+        expect(result.warnings).toEqual([]);
+      });
     }
-  })
+  });
 
-  describe('every CSS snippet survives the sanitizer', () => {
-    for (const snippet of snippets.filter((one) => one.language === 'css')) {
+  describe("every CSS snippet survives the sanitizer", () => {
+    for (const snippet of snippets.filter((one) => one.language === "css")) {
       it(snippet.id, () => {
-        const result = sanitizeCss(snippet.code)
+        const result = sanitizeCss(snippet.code);
 
-        expect(result.warnings).toEqual([])
-        expect(result.css).not.toBe('')
-      })
+        expect(result.warnings).toEqual([]);
+        expect(result.css).not.toBe("");
+      });
     }
-  })
+  });
 
-  it('reaches the whole directive vocabulary between the guide and the prompt', () => {
-    const everywhere = `${guideMarkdown()}\n${AI_PROMPT}`
+  it("reaches the whole directive vocabulary between the guide and the prompt", () => {
+    const everywhere = `${guideMarkdown()}\n${AI_PROMPT}`;
 
     for (const name of [
       CONTACT_DIRECTIVE,
@@ -89,11 +89,11 @@ describe('the writing guide', () => {
       PAGE_BREAK_DIRECTIVE,
       TAGS_DIRECTIVE,
     ]) {
-      expect(everywhere).toContain(name)
+      expect(everywhere).toContain(name);
     }
-  })
+  });
 
-  it('tells the model about every directive it may write', () => {
+  it("tells the model about every directive it may write", () => {
     // `image` is the exception, and is in the prompt as a prohibition: an image
     // id belongs to one browser's database, so a model cannot produce one.
     for (const name of [
@@ -104,32 +104,32 @@ describe('the writing guide', () => {
       PAGE_BREAK_DIRECTIVE,
       TAGS_DIRECTIVE,
     ]) {
-      expect(AI_PROMPT).toContain(name)
+      expect(AI_PROMPT).toContain(name);
     }
 
-    expect(AI_PROMPT).toContain(`Do not write \`::${IMAGE_DIRECTIVE}\``)
-  })
+    expect(AI_PROMPT).toContain(`Do not write \`::${IMAGE_DIRECTIVE}\``);
+  });
 
-  describe('the copied Markdown', () => {
-    const markdown = guideMarkdown()
+  describe("the copied Markdown", () => {
+    const markdown = guideMarkdown();
 
-    it('carries every chapter and section', () => {
+    it("carries every chapter and section", () => {
       for (const chapter of GUIDE) {
-        expect(markdown).toContain(`## ${chapter.title}`)
+        expect(markdown).toContain(`## ${chapter.title}`);
 
         for (const section of chapter.sections) {
-          expect(markdown).toContain(`### ${section.title}`)
+          expect(markdown).toContain(`### ${section.title}`);
         }
       }
-    })
+    });
 
-    it('closes every fence it opens', () => {
+    it("closes every fence it opens", () => {
       const fences = markdown
-        .split('\n')
-        .filter((line) => line.startsWith('```'))
+        .split("\n")
+        .filter((line) => line.startsWith("```"));
 
-      expect(fences.length % 2).toBe(0)
-      expect(fences.length).toBe(snippets.length * 2)
-    })
-  })
-})
+      expect(fences.length % 2).toBe(0);
+      expect(fences.length).toBe(snippets.length * 2);
+    });
+  });
+});

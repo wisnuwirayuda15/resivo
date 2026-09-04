@@ -1,6 +1,6 @@
-import { getDb } from '../db'
+import { getDb } from "../db";
 
-import type { SettingRecord } from '../records'
+import type { SettingRecord } from "../records";
 
 /**
  * Application settings, as a key/value table.
@@ -30,31 +30,31 @@ import type { SettingRecord } from '../records'
  */
 export const SETTING_KEYS = {
   /** Last template chosen in the new-resume dialog. */
-  lastTemplateId: 'editor.lastTemplateId',
-} as const
+  lastTemplateId: "editor.lastTemplateId",
+} as const;
 
-export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS]
+export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
 
 export const getSetting = async <T>(
   key: SettingKey,
   fallback: T,
 ): Promise<T> => {
-  const record = await getDb().settings.get(key)
+  const record = await getDb().settings.get(key);
 
-  return record === undefined ? fallback : (record.value as T)
-}
+  return record === undefined ? fallback : (record.value as T);
+};
 
 export const setSetting = async (
   key: SettingKey,
   value: unknown,
 ): Promise<void> => {
-  await getDb().settings.put({ key, value })
-}
+  await getDb().settings.put({ key, value });
+};
 
 export const deleteSetting = async (key: SettingKey): Promise<void> => {
-  await getDb().settings.delete(key)
-}
+  await getDb().settings.delete(key);
+};
 
 /** Every setting, for backup export. */
 export const listSettings = async (): Promise<Array<SettingRecord>> =>
-  getDb().settings.toArray()
+  getDb().settings.toArray();

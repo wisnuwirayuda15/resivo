@@ -1,16 +1,16 @@
-import { useState } from 'react'
-import { Box, Loader, Text } from '@mantine/core'
+import { useState } from "react";
+import { Box, Loader, Text } from "@mantine/core";
 
-import { EmptyState } from '@/components/EmptyState'
+import { EmptyState } from "@/components/EmptyState";
 
-import { AssetUpload, UploadError } from './components/AssetUpload'
-import { DeleteFontDialog } from './components/deleteDialogs'
-import { FontCard } from './components/FontCard'
-import { FONT_ACCEPT } from './readFont'
-import { formatBytes } from './format'
-import { useAddFont, useDeleteFont, useFonts, useUnusedFonts } from './queries'
+import { AssetUpload, UploadError } from "./components/AssetUpload";
+import { DeleteFontDialog } from "./components/deleteDialogs";
+import { FontCard } from "./components/FontCard";
+import { FONT_ACCEPT } from "./readFont";
+import { formatBytes } from "./format";
+import { useAddFont, useDeleteFont, useFonts, useUnusedFonts } from "./queries";
 
-import type { FontSummary } from '@/database/index'
+import type { FontSummary } from "@/database/index";
 
 /**
  * Uploaded fonts, as a page of its own.
@@ -21,16 +21,16 @@ import type { FontSummary } from '@/database/index'
  * about the files: what is stored, what it costs, and what nothing uses.
  */
 export const FontManagerView: React.FC = () => {
-  const { data: fonts, isPending } = useFonts()
-  const { data: unused } = useUnusedFonts()
-  const add = useAddFont()
-  const remove = useDeleteFont()
+  const { data: fonts, isPending } = useFonts();
+  const { data: unused } = useUnusedFonts();
+  const add = useAddFont();
+  const remove = useDeleteFont();
 
-  const [confirming, setConfirming] = useState<FontSummary | null>(null)
+  const [confirming, setConfirming] = useState<FontSummary | null>(null);
 
-  const all = fonts ?? []
-  const unusedIds = new Set((unused ?? []).map((font) => font.id))
-  const totalBytes = all.reduce((sum, font) => sum + font.size, 0)
+  const all = fonts ?? [];
+  const unusedIds = new Set((unused ?? []).map((font) => font.id));
+  const totalBytes = all.reduce((sum, font) => sum + font.size, 0);
 
   return (
     <Box className="p-6">
@@ -51,7 +51,7 @@ export const FontManagerView: React.FC = () => {
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{' '}
+          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{" "}
           unused
         </Text>
       </Box>
@@ -86,13 +86,13 @@ export const FontManagerView: React.FC = () => {
         onCancel={() => setConfirming(null)}
         onConfirm={() => {
           if (confirming !== null) {
-            remove.mutate(confirming.id)
+            remove.mutate(confirming.id);
           }
 
-          setConfirming(null)
+          setConfirming(null);
         }}
         unused={confirming !== null && unusedIds.has(confirming.id)}
       />
     </Box>
-  )
-}
+  );
+};

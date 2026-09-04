@@ -6,36 +6,36 @@
  * which blobs to read and hold while a document is open, and nothing else.
  */
 
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 export const documentImageIds = (document: ResumeDocument): Array<string> => {
-  const ids = new Set<string>()
-  const { header, sections } = document.content
+  const ids = new Set<string>();
+  const { header, sections } = document.content;
 
   if (header.avatarImageId !== undefined) {
-    ids.add(header.avatarImageId)
+    ids.add(header.avatarImageId);
   }
 
   for (const section of sections) {
     for (const block of section.blocks) {
-      if (block.kind === 'image') {
-        ids.add(block.imageId)
+      if (block.kind === "image") {
+        ids.add(block.imageId);
       }
     }
   }
 
-  return [...ids]
-}
+  return [...ids];
+};
 
 export const documentFontIds = (document: ResumeDocument): Array<string> => {
-  const ids = new Set<string>()
-  const { bodyFont, headingFont } = document.design.typography
+  const ids = new Set<string>();
+  const { bodyFont, headingFont } = document.design.typography;
 
   for (const font of [bodyFont, headingFont]) {
-    if (font?.source === 'custom' && font.fontId !== undefined) {
-      ids.add(font.fontId)
+    if (font?.source === "custom" && font.fontId !== undefined) {
+      ids.add(font.fontId);
     }
   }
 
-  return [...ids]
-}
+  return [...ids];
+};

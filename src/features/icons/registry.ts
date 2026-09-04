@@ -75,9 +75,9 @@ import {
   WarningCircleIcon,
   WarningIcon,
   XIcon,
-} from '@phosphor-icons/react'
+} from "@phosphor-icons/react";
 
-import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
+import type { Icon as PhosphorIcon } from "@phosphor-icons/react";
 
 /**
  * Maps the design system's kebab-case Phosphor names onto React components.
@@ -99,63 +99,63 @@ import type { Icon as PhosphorIcon } from '@phosphor-icons/react'
  */
 export const ICON_REGISTRY: Record<string, PhosphorIcon> = {
   // Documents and files
-  'file-text': FileTextIcon,
-  'file-plus': FilePlusIcon,
-  'file-pdf': FilePdfIcon,
-  'file-css': FileCssIcon,
-  'file-zip': FileZipIcon,
-  'file-arrow-down': FileArrowDownIcon,
-  'markdown-logo': MarkdownLogoIcon,
-  'clipboard-text': ClipboardTextIcon,
+  "file-text": FileTextIcon,
+  "file-plus": FilePlusIcon,
+  "file-pdf": FilePdfIcon,
+  "file-css": FileCssIcon,
+  "file-zip": FileZipIcon,
+  "file-arrow-down": FileArrowDownIcon,
+  "markdown-logo": MarkdownLogoIcon,
+  "clipboard-text": ClipboardTextIcon,
 
   // Organisation
   folder: FolderIcon,
-  'folder-open': FolderOpenIcon,
-  'squares-four': SquaresFourIcon,
-  'list-dashes': ListDashesIcon,
-  'list-checks': ListChecksIcon,
+  "folder-open": FolderOpenIcon,
+  "squares-four": SquaresFourIcon,
+  "list-dashes": ListDashesIcon,
+  "list-checks": ListChecksIcon,
   archive: ArchiveIcon,
   star: StarIcon,
   clock: ClockIcon,
-  'clock-clockwise': ClockClockwiseIcon,
+  "clock-clockwise": ClockClockwiseIcon,
 
   // Actions
   plus: PlusIcon,
   minus: MinusIcon,
-  'arrows-horizontal': ArrowsHorizontalIcon,
+  "arrows-horizontal": ArrowsHorizontalIcon,
   x: XIcon,
   check: CheckIcon,
-  'check-circle': CheckCircleIcon,
+  "check-circle": CheckCircleIcon,
   trash: TrashIcon,
   copy: CopyIcon,
   export: ExportIcon,
-  'download-simple': DownloadSimpleIcon,
-  'upload-simple': UploadSimpleIcon,
+  "download-simple": DownloadSimpleIcon,
+  "upload-simple": UploadSimpleIcon,
   printer: PrinterIcon,
-  'magnifying-glass': MagnifyingGlassIcon,
-  'arrow-counter-clockwise': ArrowCounterClockwiseIcon,
-  'arrow-u-up-left': ArrowUUpLeftIcon,
-  'arrow-u-up-right': ArrowUUpRightIcon,
-  'arrow-square-out': ArrowSquareOutIcon,
+  "magnifying-glass": MagnifyingGlassIcon,
+  "arrow-counter-clockwise": ArrowCounterClockwiseIcon,
+  "arrow-u-up-left": ArrowUUpLeftIcon,
+  "arrow-u-up-right": ArrowUUpRightIcon,
+  "arrow-square-out": ArrowSquareOutIcon,
 
   // Chrome and controls
   gear: GearIcon,
-  'sliders-horizontal': SlidersHorizontalIcon,
+  "sliders-horizontal": SlidersHorizontalIcon,
   palette: PaletteIcon,
   eye: EyeIcon,
-  'eye-slash': EyeSlashIcon,
+  "eye-slash": EyeSlashIcon,
   columns: ColumnsIcon,
-  'sidebar-simple': SidebarSimpleIcon,
-  'dots-three': DotsThreeIcon,
-  'dots-three-vertical': DotsThreeVerticalIcon,
-  'dots-six': DotsSixIcon,
-  'dots-six-vertical': DotsSixVerticalIcon,
-  'caret-left': CaretLeftIcon,
-  'caret-right': CaretRightIcon,
-  'caret-down': CaretDownIcon,
-  'caret-up': CaretUpIcon,
+  "sidebar-simple": SidebarSimpleIcon,
+  "dots-three": DotsThreeIcon,
+  "dots-three-vertical": DotsThreeVerticalIcon,
+  "dots-six": DotsSixIcon,
+  "dots-six-vertical": DotsSixVerticalIcon,
+  "caret-left": CaretLeftIcon,
+  "caret-right": CaretRightIcon,
+  "caret-down": CaretDownIcon,
+  "caret-up": CaretUpIcon,
   keyboard: KeyboardIcon,
-  'cursor-text': CursorTextIcon,
+  "cursor-text": CursorTextIcon,
   plugs: PlugsIcon,
   sparkle: SparkleIcon,
   sun: SunIcon,
@@ -164,34 +164,34 @@ export const ICON_REGISTRY: Record<string, PhosphorIcon> = {
   // Status
   info: InfoIcon,
   warning: WarningIcon,
-  'warning-circle': WarningCircleIcon,
-  'lock-simple': LockSimpleIcon,
+  "warning-circle": WarningCircleIcon,
+  "lock-simple": LockSimpleIcon,
 
   // Typography and media
-  'text-aa': TextAaIcon,
-  'text-h': TextHIcon,
+  "text-aa": TextAaIcon,
+  "text-h": TextHIcon,
   image: ImageIcon,
 
   // Resume content, contact rows and section headings
-  'envelope-simple': EnvelopeSimpleIcon,
+  "envelope-simple": EnvelopeSimpleIcon,
   envelope: EnvelopeIcon,
   phone: PhoneIcon,
-  'map-pin': MapPinIcon,
-  'globe-simple': GlobeSimpleIcon,
-  'link-simple': LinkSimpleIcon,
-  'github-logo': GithubLogoIcon,
-  'linkedin-logo': LinkedinLogoIcon,
+  "map-pin": MapPinIcon,
+  "globe-simple": GlobeSimpleIcon,
+  "link-simple": LinkSimpleIcon,
+  "github-logo": GithubLogoIcon,
+  "linkedin-logo": LinkedinLogoIcon,
   briefcase: BriefcaseIcon,
-  'graduation-cap': GraduationCapIcon,
+  "graduation-cap": GraduationCapIcon,
   certificate: CertificateIcon,
   trophy: TrophyIcon,
   translate: TranslateIcon,
   user: UserIcon,
-}
+};
 
 /** Undefined for an unknown name, so the renderer can degrade instead of
  * throwing on a document that names an icon this build does not carry. */
 export const resolveIcon = (name: string): PhosphorIcon | undefined =>
-  ICON_REGISTRY[name]
+  ICON_REGISTRY[name];
 
-export const ICON_NAMES = Object.keys(ICON_REGISTRY)
+export const ICON_NAMES = Object.keys(ICON_REGISTRY);

@@ -1,12 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { Box, Loader, Text } from '@mantine/core'
+import { Box, Loader, Text } from "@mantine/core";
+import { createFileRoute } from "@tanstack/react-router";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { ClientOnly } from '@/components/client-only'
-import { BackupPanel } from '@/features/backup/BackupPanel'
-import { StoragePanel } from '@/features/settings/StoragePanel'
+import { ClientOnly } from "@/components/client-only";
+import { Shell } from "@/components/shell/Shell";
+import { BackupPanel } from "@/features/backup/BackupPanel";
+import { StoragePanel } from "@/features/settings/StoragePanel";
 
 /**
  * Settings.
@@ -62,14 +62,14 @@ const SettingsRoute: React.FC = () => (
       </Box>
     </Box>
   </Shell>
-)
+);
 
-export const Route = createFileRoute('/settings')({
+export const Route = createFileRoute("/settings")({
   head: () => ({
     meta: seo({
-      title: 'Settings | Resivo',
+      title: "Settings | Resivo",
       indexable: false,
     }),
   }),
   component: SettingsRoute,
-})
+});

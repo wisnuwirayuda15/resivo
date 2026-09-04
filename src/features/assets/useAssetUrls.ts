@@ -1,13 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from "react";
 
 import {
   acquireFontUrl,
   acquireImageUrl,
   releaseFontUrl,
   releaseImageUrl,
-} from './objectUrl'
+} from "./objectUrl";
 
-import type { ResolvedImage } from './objectUrl'
+import type { ResolvedImage } from "./objectUrl";
 
 /**
  * Object URLs for a set of stored assets, held for exactly as long as the
@@ -23,87 +23,88 @@ import type { ResolvedImage } from './objectUrl'
  */
 
 /** `null` for an id whose row is gone, see `ImageMap`. */
-export type ImageMap = ReadonlyMap<string, ResolvedImage | null>
+export type ImageMap = ReadonlyMap<string, ResolvedImage | null>;
 
-const EMPTY_IMAGES: ImageMap = new Map()
-const EMPTY_URLS: ReadonlyMap<string, string> = new Map()
+const EMPTY_IMAGES: ImageMap = new Map();
+const EMPTY_URLS: ReadonlyMap<string, string> = new Map();
 
 /**
  * A stable dependency for a set of ids: sorted, so order does not matter, and
  * joined, because an effect can only depend on a primitive. Ids are generated,
  * so the separator cannot appear inside one.
  */
-const idsKey = (ids: ReadonlyArray<string>): string => [...ids].sort().join(',')
+const idsKey = (ids: ReadonlyArray<string>): string =>
+  [...ids].sort().join(",");
 
 export const useImageUrls = (ids: ReadonlyArray<string>): ImageMap => {
-  const [resolved, setResolved] = useState<ImageMap>(EMPTY_IMAGES)
-  const key = idsKey(ids)
+  const [resolved, setResolved] = useState<ImageMap>(EMPTY_IMAGES);
+  const key = idsKey(ids);
 
   useEffect(() => {
-    const wanted = key === '' ? [] : key.split(',')
+    const wanted = key === "" ? [] : key.split(",");
 
     if (wanted.length === 0) {
-      setResolved(EMPTY_IMAGES)
+      setResolved(EMPTY_IMAGES);
 
-      return
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
 
     // Acquired synchronously, so the release below always balances even if this
     // effect is cleaned up before the reads finish.
     const loads = wanted.map(
       async (id) => [id, await acquireImageUrl(id)] as const,
-    )
+    );
 
     void Promise.all(loads).then((entries) => {
       if (cancelled) {
-        return
+        return;
       }
 
       // Nulls are kept, not filtered: an id mapped to `null` is a row that is
       // gone, an id that is absent is one still being read, and the paper draws
       // those two differently.
-      setResolved(new Map(entries))
-    })
+      setResolved(new Map(entries));
+    });
 
     return () => {
-      cancelled = true
+      cancelled = true;
 
       for (const id of wanted) {
-        releaseImageUrl(id)
+        releaseImageUrl(id);
       }
-    }
-  }, [key])
+    };
+  }, [key]);
 
-  return resolved
-}
+  return resolved;
+};
 
 export const useFontUrls = (
   ids: ReadonlyArray<string>,
 ): ReadonlyMap<string, string> => {
   const [resolved, setResolved] =
-    useState<ReadonlyMap<string, string>>(EMPTY_URLS)
-  const key = idsKey(ids)
+    useState<ReadonlyMap<string, string>>(EMPTY_URLS);
+  const key = idsKey(ids);
 
   useEffect(() => {
-    const wanted = key === '' ? [] : key.split(',')
+    const wanted = key === "" ? [] : key.split(",");
 
     if (wanted.length === 0) {
-      setResolved(EMPTY_URLS)
+      setResolved(EMPTY_URLS);
 
-      return
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
 
     const loads = wanted.map(
       async (id) => [id, await acquireFontUrl(id)] as const,
-    )
+    );
 
     void Promise.all(loads).then((entries) => {
       if (cancelled) {
-        return
+        return;
       }
 
       setResolved(
@@ -112,47 +113,49 @@ export const useFontUrls = (
             (entry): entry is [string, string] => entry[1] !== null,
           ),
         ),
-      )
-    })
+      );
+    });
 
     return () => {
-      cancelled = true
+      cancelled = true;
 
       for (const id of wanted) {
-        releaseFontUrl(id)
+        releaseFontUrl(id);
       }
-    }
-  }, [key])
+    };
+  }, [key]);
 
-  return resolved
-}
+  return resolved;
+};
 
 /** One image, for the gallery's thumbnails. */
 export const useImageUrl = (
   id: string | undefined,
 ): ResolvedImage | undefined => {
-  const [resolved, setResolved] = useState<ResolvedImage | undefined>(undefined)
+  const [resolved, setResolved] = useState<ResolvedImage | undefined>(
+    undefined,
+  );
 
   useEffect(() => {
     if (id === undefined) {
-      setResolved(undefined)
+      setResolved(undefined);
 
-      return
+      return;
     }
 
-    let cancelled = false
+    let cancelled = false;
 
     void acquireImageUrl(id).then((value) => {
       if (!cancelled) {
-        setResolved(value ?? undefined)
+        setResolved(value ?? undefined);
       }
-    })
+    });
 
     return () => {
-      cancelled = true
-      releaseImageUrl(id)
-    }
-  }, [id])
+      cancelled = true;
+      releaseImageUrl(id);
+    };
+  }, [id]);
 
-  return resolved
-}
+  return resolved;
+};

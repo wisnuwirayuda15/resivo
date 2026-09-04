@@ -1,12 +1,12 @@
-import { Fragment } from 'react'
+import { Fragment } from "react";
 
-import { DocumentIcon } from '@/features/icons/IconRenderer'
+import { DocumentIcon } from "@/features/icons/IconRenderer";
 
 import type {
   InlineNode,
   InlineText,
   Mark,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * Renders the document's rich inline text.
@@ -24,25 +24,25 @@ import type {
  * more than it sounds: unstable nesting would change the rendered box tree,
  * which would change measured heights, which would move page breaks.
  */
-const MARK_ORDER: Array<Mark> = ['strike', 'code', 'italic', 'bold']
+const MARK_ORDER: Array<Mark> = ["strike", "code", "italic", "bold"];
 
 const wrapMark = (mark: Mark, children: React.ReactNode): React.ReactNode => {
   switch (mark) {
-    case 'bold':
-      return <strong className="rp-strong">{children}</strong>
-    case 'italic':
-      return <em>{children}</em>
-    case 'code':
-      return <code className="rp-code">{children}</code>
-    case 'strike':
-      return <s>{children}</s>
+    case "bold":
+      return <strong className="rp-strong">{children}</strong>;
+    case "italic":
+      return <em>{children}</em>;
+    case "code":
+      return <code className="rp-code">{children}</code>;
+    case "strike":
+      return <s>{children}</s>;
   }
-}
+};
 
 const InlineNodeView: React.FC<{ node: InlineNode }> = ({ node }) => {
   switch (node.type) {
-    case 'text': {
-      const marks = node.marks ?? []
+    case "text": {
+      const marks = node.marks ?? [];
 
       return (
         <>
@@ -53,10 +53,10 @@ const InlineNodeView: React.FC<{ node: InlineNode }> = ({ node }) => {
             node.text,
           )}
         </>
-      )
+      );
     }
 
-    case 'link':
+    case "link":
       /**
        * `rel` is set even though the preview never navigates: the same markup is
        * what the HTML export ships, and that file is opened in a real browser
@@ -71,12 +71,12 @@ const InlineNodeView: React.FC<{ node: InlineNode }> = ({ node }) => {
         >
           <InlineTextView value={node.children} />
         </a>
-      )
+      );
 
-    case 'icon':
-      return <DocumentIcon icon={node.icon} />
+    case "icon":
+      return <DocumentIcon icon={node.icon} />;
   }
-}
+};
 
 /**
  * Keyed by index, which is safe here and nowhere else in this codebase: an
@@ -91,4 +91,4 @@ export const InlineTextView: React.FC<{ value: InlineText }> = ({ value }) => (
       </Fragment>
     ))}
   </>
-)
+);

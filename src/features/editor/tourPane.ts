@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { create } from "zustand";
 
 /**
  * Which editor pane the tour is asking for.
@@ -18,14 +18,14 @@ import { create } from 'zustand'
  * pane for the length of a step and gives it back rather than resetting it.
  */
 
-export type EditorPane = 'code' | 'paper' | 'style'
+export type EditorPane = "code" | "paper" | "style";
 
 interface TourPaneState {
-  requested: EditorPane | null
-  request: (pane: EditorPane | null) => void
+  requested: EditorPane | null;
+  request: (pane: EditorPane | null) => void;
 }
 
 export const useTourPane = create<TourPaneState>((set) => ({
   requested: null,
   request: (pane) => set({ requested: pane }),
-}))
+}));

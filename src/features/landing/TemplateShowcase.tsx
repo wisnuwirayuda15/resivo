@@ -1,13 +1,13 @@
-import { useState } from 'react'
-import { Box, Text, UnstyledButton } from '@mantine/core'
+import { useState } from "react";
+import { Box, Text, UnstyledButton } from "@mantine/core";
 
-import { PaperMiniature } from '@/features/templates/PaperMiniature'
-import { cn } from '@/lib/utils'
-import { templateList } from '@/features/templates/catalog'
+import { PaperMiniature } from "@/features/templates/PaperMiniature";
+import { cn } from "@/lib/utils";
+import { templateList } from "@/features/templates/catalog";
 
-import { Reveal } from './Reveal'
+import { Reveal } from "./Reveal";
 
-import type { TemplateId } from '@/features/resume/model/document'
+import type { TemplateId } from "@/features/resume/model/document";
 
 /**
  * The four templates, switched by the reader.
@@ -28,7 +28,7 @@ import type { TemplateId } from '@/features/resume/model/document'
  * is no hover at all.
  */
 export const TemplateShowcase: React.FC = () => {
-  const [active, setActive] = useState<TemplateId>('classic')
+  const [active, setActive] = useState<TemplateId>("classic");
 
   return (
     <Box className="bg-surface border-line-soft border-t" component="section">
@@ -51,13 +51,13 @@ export const TemplateShowcase: React.FC = () => {
           <Reveal className="sm:col-span-7">
             <Box className="border-line-soft border-t">
               {templateList.map((template) => {
-                const selected = template.id === active
+                const selected = template.id === active;
                 return (
                   <UnstyledButton
                     aria-pressed={selected}
                     className={cn(
-                      'border-line-soft duration-base ease-standard block w-full border-b px-1 py-4 text-left transition-colors',
-                      selected ? 'bg-selected' : 'hover:bg-hover',
+                      "border-line-soft duration-base ease-standard block w-full border-b px-1 py-4 text-left transition-colors",
+                      selected ? "bg-selected" : "hover:bg-hover",
                     )}
                     key={template.id}
                     onClick={() => setActive(template.id)}
@@ -66,8 +66,8 @@ export const TemplateShowcase: React.FC = () => {
                   >
                     <Text
                       className={cn(
-                        'duration-base ease-standard text-[15px] font-medium transition-colors',
-                        selected ? 'text-accent' : 'text-title',
+                        "duration-base ease-standard text-[15px] font-medium transition-colors",
+                        selected ? "text-accent" : "text-title",
                       )}
                       component="div"
                     >
@@ -80,7 +80,7 @@ export const TemplateShowcase: React.FC = () => {
                       {template.description}
                     </Text>
                   </UnstyledButton>
-                )
+                );
               })}
             </Box>
           </Reveal>
@@ -93,9 +93,9 @@ export const TemplateShowcase: React.FC = () => {
                 {templateList.map((template, index) => (
                   <Box
                     className={cn(
-                      'duration-base ease-standard transition-opacity',
-                      index === 0 ? 'relative' : 'absolute inset-0',
-                      template.id === active ? 'opacity-100' : 'opacity-0',
+                      "duration-base ease-standard transition-opacity",
+                      index === 0 ? "relative" : "absolute inset-0",
+                      template.id === active ? "opacity-100" : "opacity-0",
                     )}
                     key={template.id}
                   >
@@ -108,5 +108,5 @@ export const TemplateShowcase: React.FC = () => {
         </Box>
       </Box>
     </Box>
-  )
-}
+  );
+};

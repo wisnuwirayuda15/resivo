@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { SETTING_KEYS, settingsRepo } from '@/database/index'
+import { SETTING_KEYS, settingsRepo } from "@/database/index";
 
-import type { TemplateId } from '@/features/resume/model/document'
+import type { TemplateId } from "@/features/resume/model/document";
 
 /**
  * Query bindings over the settings table.
@@ -15,9 +15,9 @@ import type { TemplateId } from '@/features/resume/model/document'
  */
 
 export const settingKeys = {
-  all: ['settings'] as const,
-  lastTemplate: ['settings', SETTING_KEYS.lastTemplateId] as const,
-}
+  all: ["settings"] as const,
+  lastTemplate: ["settings", SETTING_KEYS.lastTemplateId] as const,
+};
 
 /**
  * The template the last resume was created with.
@@ -35,14 +35,14 @@ export const useLastTemplate = () =>
         SETTING_KEYS.lastTemplateId,
         null,
       ),
-  })
+  });
 
 export const useRememberTemplate = () => {
-  const client = useQueryClient()
+  const client = useQueryClient();
 
   return useMutation({
     mutationFn: (templateId: TemplateId) =>
       settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, templateId),
     onSuccess: () => client.invalidateQueries({ queryKey: settingKeys.all }),
-  })
-}
+  });
+};

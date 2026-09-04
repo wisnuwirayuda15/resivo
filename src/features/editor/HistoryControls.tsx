@@ -1,14 +1,14 @@
-import { Box, Tooltip, UnstyledButton } from '@mantine/core'
-import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
-import { useOs } from '@mantine/hooks'
+import { Box, Tooltip, UnstyledButton } from "@mantine/core";
+import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
+import { useOs } from "@mantine/hooks";
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
-import { cn } from '@/lib/utils'
+import { Icon } from "@/features/icons/IconRenderer";
+import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { cn } from "@/lib/utils";
 
-import { useEditorStore } from './store'
+import { useEditorStore } from "./store";
 
-import type { ComponentProps } from 'react'
+import type { ComponentProps } from "react";
 
 /**
  * Undo and redo for the document.
@@ -25,9 +25,9 @@ import type { ComponentProps } from 'react'
  * always act on the document, whatever has focus.
  */
 
-interface HistoryButtonProps extends ComponentProps<'button'> {
-  icon: string
-  label: string
+interface HistoryButtonProps extends ComponentProps<"button"> {
+  icon: string;
+  label: string;
 }
 
 /**
@@ -50,25 +50,25 @@ const HistoryButton = ({
     component="button"
     {...rest}
     className={cn(
-      'text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40',
+      "text-muted hover:bg-hover hover:text-body rounded-control duration-fast ease-standard flex h-[30px] w-[30px] items-center justify-center transition-colors disabled:pointer-events-none disabled:opacity-40",
       className,
     )}
   >
     <Icon name={icon} size={16} />
   </UnstyledButton>
-)
+);
 
 export const HistoryControls: React.FC = () => {
-  const undo = useEditorStore((state) => state.undo)
-  const redo = useEditorStore((state) => state.redo)
+  const undo = useEditorStore((state) => state.undo);
+  const redo = useEditorStore((state) => state.redo);
   // Called in the selector rather than read as a field: both are derived from
   // the history arrays, and a boolean is a stable enough result to subscribe to.
-  const canUndo = useEditorStore((state) => state.canUndo())
-  const canRedo = useEditorStore((state) => state.canRedo())
+  const canUndo = useEditorStore((state) => state.canUndo());
+  const canRedo = useEditorStore((state) => state.canRedo());
 
   // The label has to name the right key or it is worse than no label. `useOs`
   // resolves on the client only, which is fine: this whole control is client-only.
-  const modifier = useOs() === 'macos' ? '⌘' : 'Ctrl+'
+  const modifier = useOs() === "macos" ? "⌘" : "Ctrl+";
 
   return (
     /* One control group, and the tour points at the pair, each button is a
@@ -93,5 +93,5 @@ export const HistoryControls: React.FC = () => {
         </Tooltip>
       </Box>
     </OnboardingTour.Target>
-  )
-}
+  );
+};

@@ -1,4 +1,4 @@
-import type { ResumeDocument } from '@/features/resume/model/document'
+import type { ResumeDocument } from "@/features/resume/model/document";
 
 /**
  * Debounced autosave.
@@ -16,9 +16,9 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * Long enough that a burst of typing is one write, short enough that the user
  * never perceives a lag between stopping and being saved.
  */
-export const AUTOSAVE_DELAY_MS = 600
+export const AUTOSAVE_DELAY_MS = 600;
 
-export type SaveFn = (document: ResumeDocument) => Promise<void>
+export type SaveFn = (document: ResumeDocument) => Promise<void>;
 
 /**
  * What the indicator in the header reports.
@@ -30,29 +30,29 @@ export type SaveFn = (document: ResumeDocument) => Promise<void>
  * that nobody can act on. 'error' persists until a later write succeeds,
  * because a failed save is not something to flash and forget.
  */
-export type SaveStatus = 'saved' | 'saving' | 'error'
+export type SaveStatus = "saved" | "saving" | "error";
 
 export interface Autosave {
   /** Queues a save, restarting the debounce window. */
-  schedule: (document: ResumeDocument) => void
+  schedule: (document: ResumeDocument) => void;
   /** Writes any pending document immediately. Safe to call when nothing is
    * pending. Resolves once the write has settled. */
-  flush: () => Promise<void>
+  flush: () => Promise<void>;
   /** Cancels pending work without writing. For teardown after an explicit
    * discard, not for normal unmount, which should flush. */
-  cancel: () => void
-  hasPending: () => boolean
+  cancel: () => void;
+  hasPending: () => boolean;
   /** The current state, for a caller that missed the transitions. */
-  status: () => SaveStatus
+  status: () => SaveStatus;
 }
 
 export interface AutosaveOptions {
-  save: SaveFn
-  delay?: number
-  onSaved?: (document: ResumeDocument) => void
-  onError?: (error: unknown, document: ResumeDocument) => void
+  save: SaveFn;
+  delay?: number;
+  onSaved?: (document: ResumeDocument) => void;
+  onError?: (error: unknown, document: ResumeDocument) => void;
   /** Called on every transition, and never with the state it is already in. */
-  onStatusChange?: (status: SaveStatus) => void
+  onStatusChange?: (status: SaveStatus) => void;
 }
 
 export const createAutosave = ({
@@ -62,32 +62,32 @@ export const createAutosave = ({
   onError,
   onStatusChange,
 }: AutosaveOptions): Autosave => {
-  let timer: ReturnType<typeof setTimeout> | undefined
-  let pending: ResumeDocument | undefined
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  let pending: ResumeDocument | undefined;
   /** Serialises writes: IndexedDB would accept overlapping puts, but the later
    * one could land first and persist a stale document. */
-  let inFlight: Promise<void> = Promise.resolve()
+  let inFlight: Promise<void> = Promise.resolve();
 
   const clearTimer = () => {
     if (timer !== undefined) {
-      clearTimeout(timer)
-      timer = undefined
+      clearTimeout(timer);
+      timer = undefined;
     }
-  }
+  };
 
-  let status: SaveStatus = 'saved'
+  let status: SaveStatus = "saved";
 
   const setStatus = (next: SaveStatus) => {
     if (next !== status) {
-      status = next
-      onStatusChange?.(next)
+      status = next;
+      onStatusChange?.(next);
     }
-  }
+  };
 
   const write = async (document: ResumeDocument): Promise<void> => {
     try {
-      await save(document)
-      onSaved?.(document)
+      await save(document);
+      onSaved?.(document);
 
       /**
        * Only back to rest if nothing arrived while this was in flight.
@@ -98,13 +98,13 @@ export const createAutosave = ({
        * behind it.
        */
       if (pending === undefined && timer === undefined) {
-        setStatus('saved')
+        setStatus("saved");
       }
     } catch (error) {
-      setStatus('error')
-      onError?.(error, document)
+      setStatus("error");
+      onError?.(error, document);
     }
-  }
+  };
 
   /**
    * Claims the pending document SYNCHRONOUSLY, then queues the write.
@@ -116,38 +116,38 @@ export const createAutosave = ({
    * two distinct saves into one.
    */
   const run = () => {
-    clearTimer()
+    clearTimer();
 
-    const document = pending
+    const document = pending;
 
     if (document === undefined) {
-      return
+      return;
     }
 
-    pending = undefined
-    inFlight = inFlight.then(() => write(document))
-  }
+    pending = undefined;
+    inFlight = inFlight.then(() => write(document));
+  };
 
   return {
     schedule: (document) => {
-      pending = document
-      clearTimer()
-      timer = setTimeout(run, delay)
-      setStatus('saving')
+      pending = document;
+      clearTimer();
+      timer = setTimeout(run, delay);
+      setStatus("saving");
     },
 
     flush: async () => {
-      run()
+      run();
 
-      await inFlight
+      await inFlight;
     },
 
     cancel: () => {
-      clearTimer()
-      pending = undefined
+      clearTimer();
+      pending = undefined;
     },
 
     hasPending: () => pending !== undefined,
     status: () => status,
-  }
-}
+  };
+};

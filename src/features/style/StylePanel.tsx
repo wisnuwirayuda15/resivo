@@ -1,9 +1,9 @@
-import { Box } from '@mantine/core'
+import { Box } from "@mantine/core";
 
-import { BUILTIN_FONTS } from '@/features/templates/defaults'
-import { DOCUMENT_LOCALES } from '@/features/templates/renderer/locales'
-import { useFonts } from '@/features/assets/queries'
-import { patchDesign, setLocale } from '@/features/editor/mutations'
+import { BUILTIN_FONTS } from "@/features/templates/defaults";
+import { DOCUMENT_LOCALES } from "@/features/templates/renderer/locales";
+import { useFonts } from "@/features/assets/queries";
+import { patchDesign, setLocale } from "@/features/editor/mutations";
 
 import {
   ColorField,
@@ -12,15 +12,15 @@ import {
   SelectField,
   SliderField,
   SwitchField,
-} from './controls'
+} from "./controls";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { FontSummary } from '@/database/index'
+import type { Recipe } from "@/features/editor/mutations";
+import type { FontSummary } from "@/database/index";
 import type {
   DesignConfig,
   FontRef,
   PaperSize,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * The Style tab, the whole `DesignConfig`, one control per token.
@@ -38,15 +38,15 @@ import type {
  * regular and an italic of the same face), and selecting one has to mean one
  * row, because that row is what the `@font-face` rule is built from.
  */
-type FontKey = 'serif' | 'sans' | 'mono' | `custom:${string}`
+type FontKey = "serif" | "sans" | "mono" | `custom:${string}`;
 
 interface StylePanelProps {
-  design: DesignConfig
+  design: DesignConfig;
   /** The document's BCP 47 tag. Not part of `DesignConfig` (it changes what the
    * dates say, not how they look), but this panel is where a document-wide
    * setting belongs. */
-  locale: string
-  apply: (recipe: Recipe, options?: { coalesce?: string }) => void
+  locale: string;
+  apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
 }
 
 /**
@@ -65,13 +65,13 @@ const localeOptions = (
     : [
         ...DOCUMENT_LOCALES.map(({ value, label }) => ({ value, label })),
         { value: locale, label: locale },
-      ]
+      ];
 
 const BUILTIN_OPTIONS: Array<{ value: FontKey; label: string }> = [
-  { value: 'serif', label: 'Source Serif 4' },
-  { value: 'sans', label: 'Instrument Sans' },
-  { value: 'mono', label: 'JetBrains Mono' },
-]
+  { value: "serif", label: "Source Serif 4" },
+  { value: "sans", label: "Instrument Sans" },
+  { value: "mono", label: "JetBrains Mono" },
+];
 
 /**
  * Maps a stored `FontRef` back to the option that produced it.
@@ -89,64 +89,64 @@ const fontKey = (
   font: FontRef | undefined,
   fonts: ReadonlyArray<FontSummary>,
 ): FontKey => {
-  if (font?.source === 'custom' && font.fontId !== undefined) {
+  if (font?.source === "custom" && font.fontId !== undefined) {
     return fonts.some((stored) => stored.id === font.fontId)
       ? `custom:${font.fontId}`
-      : 'serif'
+      : "serif";
   }
 
   const entry = Object.entries(BUILTIN_FONTS).find(
     ([, candidate]) => candidate.family === font?.family,
-  )
+  );
 
-  return (entry?.[0] as FontKey | undefined) ?? 'serif'
-}
+  return (entry?.[0] as FontKey | undefined) ?? "serif";
+};
 
 /** The `FontRef` a selected option stands for. */
 const fontRefFor = (
   key: FontKey,
   fonts: ReadonlyArray<FontSummary>,
 ): FontRef | undefined => {
-  if (!key.startsWith('custom:')) {
-    return BUILTIN_FONTS[key as 'serif' | 'sans' | 'mono']
+  if (!key.startsWith("custom:")) {
+    return BUILTIN_FONTS[key as "serif" | "sans" | "mono"];
   }
 
-  const fontId = key.slice('custom:'.length)
-  const stored = fonts.find((font) => font.id === fontId)
+  const fontId = key.slice("custom:".length);
+  const stored = fonts.find((font) => font.id === fontId);
 
   return stored === undefined
     ? undefined
-    : { family: stored.family, source: 'custom', fontId }
-}
+    : { family: stored.family, source: "custom", fontId };
+};
 
 const PAPER_SIZES: Array<{ value: PaperSize; label: string }> = [
-  { value: 'Letter', label: 'Letter' },
-  { value: 'A4', label: 'A4' },
-]
+  { value: "Letter", label: "Letter" },
+  { value: "A4", label: "A4" },
+];
 
 const AVATAR_SHAPES: Array<{
-  value: DesignConfig['image']['avatarShape']
-  label: string
+  value: DesignConfig["image"]["avatarShape"];
+  label: string;
 }> = [
-  { value: 'circle', label: 'Circle' },
-  { value: 'rounded', label: 'Rounded' },
-  { value: 'square', label: 'Square' },
-]
+  { value: "circle", label: "Circle" },
+  { value: "rounded", label: "Rounded" },
+  { value: "square", label: "Square" },
+];
 
 const WEIGHTS: Array<{ value: string; label: string }> = [
-  { value: '300', label: 'Light' },
-  { value: '400', label: 'Regular' },
-  { value: '500', label: 'Medium' },
-  { value: '600', label: 'Semibold' },
-  { value: '700', label: 'Bold' },
-]
+  { value: "300", label: "Light" },
+  { value: "400", label: "Regular" },
+  { value: "500", label: "Medium" },
+  { value: "600", label: "Semibold" },
+  { value: "700", label: "Bold" },
+];
 
 const MARGIN_EDGES = [
-  ['top', 'Top margin'],
-  ['right', 'Right margin'],
-  ['bottom', 'Bottom margin'],
-  ['left', 'Left margin'],
-] as const
+  ["top", "Top margin"],
+  ["right", "Right margin"],
+  ["bottom", "Bottom margin"],
+  ["left", "Left margin"],
+] as const;
 
 export const StylePanel: React.FC<StylePanelProps> = ({
   design,
@@ -158,8 +158,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
    * own: from the user's side there is one decision (what this resume is set in),
    * and where the file came from is not part of it.
    */
-  const { data: storedFonts } = useFonts()
-  const fonts = storedFonts ?? []
+  const { data: storedFonts } = useFonts();
+  const fonts = storedFonts ?? [];
 
   const fontOptions = [
     ...BUILTIN_OPTIONS,
@@ -168,11 +168,11 @@ export const StylePanel: React.FC<StylePanelProps> = ({
       // The family alone would be ambiguous where a face was uploaded in more
       // than one weight, and both rows would read identically in the list.
       label:
-        font.weight === 400 && font.style === 'normal'
+        font.weight === 400 && font.style === "normal"
           ? font.family
-          : `${font.family} ${font.weight}${font.style === 'italic' ? ' italic' : ''}`,
+          : `${font.family} ${font.weight}${font.style === "italic" ? " italic" : ""}`,
     })),
-  ]
+  ];
 
   /**
    * Dragging a slider or holding a stepper produces a stream of edits.
@@ -184,12 +184,12 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   const patch = (
     values: Parameters<typeof patchDesign>[0],
     coalesce?: string,
-  ) => apply(patchDesign(values), coalesce === undefined ? {} : { coalesce })
+  ) => apply(patchDesign(values), coalesce === undefined ? {} : { coalesce });
 
-  const { paper, typography, colors, spacing, rules, image, icons } = design
+  const { paper, typography, colors, spacing, rules, image, icons } = design;
   // Absent in a document written before pagination had settings, and its
   // absence means the default rather than "off".
-  const keepHeadings = design.pagination?.keepHeadingWithContent ?? true
+  const keepHeadings = design.pagination?.keepHeadingWithContent ?? true;
 
   return (
     <Box>
@@ -226,10 +226,10 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           data={fontOptions}
           label="Body font"
           onChange={(key) => {
-            const bodyFont = fontRefFor(key, fonts)
+            const bodyFont = fontRefFor(key, fonts);
 
             if (bodyFont !== undefined) {
-              patch({ typography: { bodyFont } })
+              patch({ typography: { bodyFont } });
             }
           }}
           value={fontKey(typography.bodyFont, fonts)}
@@ -238,10 +238,10 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           data={fontOptions}
           label="Heading font"
           onChange={(key) => {
-            const headingFont = fontRefFor(key, fonts)
+            const headingFont = fontRefFor(key, fonts);
 
             if (headingFont !== undefined) {
-              patch({ typography: { headingFont } })
+              patch({ typography: { headingFont } });
             }
           }}
           value={fontKey(typography.headingFont ?? typography.bodyFont, fonts)}
@@ -253,7 +253,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={24}
           min={6}
           onChange={(baseSize) =>
-            patch({ typography: { baseSize } }, 'design:baseSize')
+            patch({ typography: { baseSize } }, "design:baseSize")
           }
           step={0.25}
           suffix="pt"
@@ -265,7 +265,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           label="Scale"
           max={1.6}
           min={1}
-          onChange={(scale) => patch({ typography: { scale } }, 'design:scale')}
+          onChange={(scale) => patch({ typography: { scale } }, "design:scale")}
           step={0.005}
           value={typography.scale}
         />
@@ -275,7 +275,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={2}
           min={1}
           onChange={(lineHeight) =>
-            patch({ typography: { lineHeight } }, 'design:lineHeight')
+            patch({ typography: { lineHeight } }, "design:lineHeight")
           }
           step={0.01}
           value={typography.lineHeight}
@@ -310,13 +310,13 @@ export const StylePanel: React.FC<StylePanelProps> = ({
       <ControlGroup title="Colour">
         <ColorField
           label="Body text"
-          onChange={(text) => patch({ colors: { text } }, 'design:color.text')}
+          onChange={(text) => patch({ colors: { text } }, "design:color.text")}
           value={colors.text}
         />
         <ColorField
           label="Headings"
           onChange={(heading) =>
-            patch({ colors: { heading } }, 'design:color.heading')
+            patch({ colors: { heading } }, "design:color.heading")
           }
           value={colors.heading}
         />
@@ -324,7 +324,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           hint="Section headings and their icons. The one saturated colour on the page."
           label="Accent"
           onChange={(accent) =>
-            patch({ colors: { accent } }, 'design:color.accent')
+            patch({ colors: { accent } }, "design:color.accent")
           }
           value={colors.accent}
         />
@@ -332,7 +332,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           hint="Dates, locations and secondary lines."
           label="Muted"
           onChange={(muted) =>
-            patch({ colors: { muted } }, 'design:color.muted')
+            patch({ colors: { muted } }, "design:color.muted")
           }
           value={colors.muted}
         />
@@ -345,7 +345,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={5}
           min={0}
           onChange={(section) =>
-            patch({ spacing: { section } }, 'design:space.section')
+            patch({ spacing: { section } }, "design:space.section")
           }
           step={0.05}
           suffix="rem"
@@ -357,7 +357,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={5}
           min={0}
           onChange={(paragraph) =>
-            patch({ spacing: { paragraph } }, 'design:space.block')
+            patch({ spacing: { paragraph } }, "design:space.block")
           }
           step={0.05}
           suffix="rem"
@@ -369,7 +369,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={5}
           min={0}
           onChange={(heading) =>
-            patch({ spacing: { heading } }, 'design:space.heading')
+            patch({ spacing: { heading } }, "design:space.heading")
           }
           step={0.05}
           suffix="rem"
@@ -388,14 +388,14 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           label="Thickness"
           max={8}
           min={0}
-          onChange={(width) => patch({ rules: { width } }, 'design:rule.width')}
+          onChange={(width) => patch({ rules: { width } }, "design:rule.width")}
           step={0.5}
           suffix="px"
           value={rules.width}
         />
         <ColorField
           label="Colour"
-          onChange={(color) => patch({ rules: { color } }, 'design:rule.color')}
+          onChange={(color) => patch({ rules: { color } }, "design:rule.color")}
           value={rules.color}
         />
       </ControlGroup>
@@ -406,14 +406,14 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           label="Size"
           max={48}
           min={6}
-          onChange={(size) => patch({ icons: { size } }, 'design:icon.size')}
+          onChange={(size) => patch({ icons: { size } }, "design:icon.size")}
           step={1}
           suffix="px"
           value={icons.size}
         />
         <ColorField
           label="Colour"
-          onChange={(color) => patch({ icons: { color } }, 'design:icon.color')}
+          onChange={(color) => patch({ icons: { color } }, "design:icon.color")}
           value={icons.color}
         />
       </ControlGroup>
@@ -432,7 +432,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           max={300}
           min={24}
           onChange={(avatarSize) =>
-            patch({ image: { avatarSize } }, 'design:avatarSize')
+            patch({ image: { avatarSize } }, "design:avatarSize")
           }
           step={2}
           suffix="px"
@@ -461,5 +461,5 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
       </ControlGroup>
     </Box>
-  )
-}
+  );
+};

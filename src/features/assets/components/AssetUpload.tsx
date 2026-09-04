@@ -1,15 +1,15 @@
-import { Alert, Button, FileButton, Text } from '@mantine/core'
+import { Alert, Button, FileButton, Text } from "@mantine/core";
 
-import { Icon } from '@/features/icons/IconRenderer'
+import { Icon } from "@/features/icons/IconRenderer";
 
-import { errorMessage } from '../format'
+import { errorMessage } from "../format";
 
 interface AssetUploadProps {
   /** The `accept` string from `readImage` or `readFont`. */
-  accept: string
-  label: string
-  loading: boolean
-  onFile: (file: File) => void
+  accept: string;
+  label: string;
+  loading: boolean;
+  onFile: (file: File) => void;
 }
 
 /**
@@ -37,7 +37,7 @@ export const AssetUpload: React.FC<AssetUploadProps> = ({
       </Button>
     )}
   </FileButton>
-)
+);
 
 /**
  * Why the last upload was refused.
@@ -59,4 +59,4 @@ export const UploadError: React.FC<{ error: unknown; className?: string }> = ({
     >
       <Text className="text-[12px]">{errorMessage(error)}</Text>
     </Alert>
-  )
+  );

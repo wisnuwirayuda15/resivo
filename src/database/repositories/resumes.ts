@@ -1,15 +1,15 @@
-import { createId } from '@/lib/id'
-import { createEmptyDocument, syncMeta } from '@/features/resume/model/index'
+import { createId } from "@/lib/id";
+import { createEmptyDocument, syncMeta } from "@/features/resume/model/index";
 
-import { getDb } from '../db'
-import { migrateDocument } from '../migrations/documents'
-import { NOT_ARCHIVED, UNGROUPED } from '../records'
+import { getDb } from "../db";
+import { migrateDocument } from "../migrations/documents";
+import { NOT_ARCHIVED, UNGROUPED } from "../records";
 
 import type {
   ResumeDocument,
   TemplateId,
-} from '@/features/resume/model/document'
-import type { ResumeRecord } from '../records'
+} from "@/features/resume/model/document";
+import type { ResumeRecord } from "../records";
 
 /**
  * Resume rows.
@@ -20,15 +20,15 @@ import type { ResumeRecord } from '../records'
  */
 
 /** Everything the library needs to render a card, minus the document itself. */
-export type ResumeSummary = Omit<ResumeRecord, 'document'> & {
+export type ResumeSummary = Omit<ResumeRecord, "document"> & {
   /** Denormalized from the document so the list can search without parsing it. */
-  fullName: string
-  headline?: string
-  templateId: TemplateId
-}
+  fullName: string;
+  headline?: string;
+  templateId: TemplateId;
+};
 
 const toSummary = (record: ResumeRecord): ResumeSummary => {
-  const { document, ...rest } = record
+  const { document, ...rest } = record;
 
   return {
     ...rest,
@@ -37,29 +37,29 @@ const toSummary = (record: ResumeRecord): ResumeSummary => {
       ? {}
       : { headline: document.meta.headline }),
     templateId: document.templateId,
-  }
-}
+  };
+};
 
 /** Active resumes, newest edit first. */
 export const listResumes = async (): Promise<Array<ResumeSummary>> => {
   const records = await getDb()
-    .resumes.where('archivedAt')
+    .resumes.where("archivedAt")
     .equals(NOT_ARCHIVED)
-    .toArray()
+    .toArray();
 
-  return records.sort((a, b) => b.updatedAt - a.updatedAt).map(toSummary)
-}
+  return records.sort((a, b) => b.updatedAt - a.updatedAt).map(toSummary);
+};
 
 /** Archived resumes, most recently archived first. */
 export const listArchivedResumes = async (): Promise<Array<ResumeSummary>> => {
   const records = await getDb()
-    .resumes.where('archivedAt')
+    .resumes.where("archivedAt")
     .above(NOT_ARCHIVED)
     .reverse()
-    .toArray()
+    .toArray();
 
-  return records.map(toSummary)
-}
+  return records.map(toSummary);
+};
 
 /** A group's active resumes in their manual order, straight off the compound
  * index, no JavaScript sort. */
@@ -67,14 +67,14 @@ export const listResumesInGroup = async (
   groupId: string,
 ): Promise<Array<ResumeSummary>> => {
   const records = await getDb()
-    .resumes.where('[groupId+order]')
+    .resumes.where("[groupId+order]")
     .between([groupId, -Infinity], [groupId, Infinity])
-    .toArray()
+    .toArray();
 
   return records
     .filter((record) => record.archivedAt === NOT_ARCHIVED)
-    .map(toSummary)
-}
+    .map(toSummary);
+};
 
 /**
  * One resume, with its document migrated to the current format.
@@ -85,63 +85,63 @@ export const listResumesInGroup = async (
 export const getResume = async (
   id: string,
 ): Promise<ResumeRecord | undefined> => {
-  const record = await getDb().resumes.get(id)
+  const record = await getDb().resumes.get(id);
 
   if (record === undefined) {
-    return undefined
+    return undefined;
   }
 
-  const { document, migrated } = migrateDocument(record.document)
-  const upgraded: ResumeRecord = { ...record, document }
+  const { document, migrated } = migrateDocument(record.document);
+  const upgraded: ResumeRecord = { ...record, document };
 
   if (migrated) {
-    await getDb().resumes.put(upgraded)
+    await getDb().resumes.put(upgraded);
   }
 
-  return upgraded
-}
+  return upgraded;
+};
 
 export interface CreateResumeInput {
-  title?: string
-  groupId?: string
-  templateId?: TemplateId
+  title?: string;
+  groupId?: string;
+  templateId?: TemplateId;
   /** Supplied when importing or duplicating; omitted for a blank resume. */
-  document?: ResumeDocument
+  document?: ResumeDocument;
 }
 
 /** Appends after the last resume in the target group. */
 const nextOrder = async (groupId: string): Promise<number> => {
   const last = await getDb()
-    .resumes.where('[groupId+order]')
+    .resumes.where("[groupId+order]")
     .between([groupId, -Infinity], [groupId, Infinity])
-    .last()
+    .last();
 
-  return last === undefined ? 0 : last.order + 1
-}
+  return last === undefined ? 0 : last.order + 1;
+};
 
 export const createResume = async (
   input: CreateResumeInput = {},
 ): Promise<ResumeRecord> => {
-  const now = Date.now()
-  const groupId = input.groupId ?? UNGROUPED
+  const now = Date.now();
+  const groupId = input.groupId ?? UNGROUPED;
   const document =
-    input.document ?? createEmptyDocument(input.templateId ?? 'classic')
+    input.document ?? createEmptyDocument(input.templateId ?? "classic");
 
   const record: ResumeRecord = {
     id: createId(),
     groupId,
-    title: input.title ?? 'Untitled resume',
+    title: input.title ?? "Untitled resume",
     document: syncMeta(document),
     order: await nextOrder(groupId),
     createdAt: now,
     updatedAt: now,
     archivedAt: NOT_ARCHIVED,
-  }
+  };
 
-  await getDb().resumes.add(record)
+  await getDb().resumes.add(record);
 
-  return record
-}
+  return record;
+};
 
 /**
  * Persists an edited document. This is the autosave write path, so it does the
@@ -157,42 +157,42 @@ export const saveResumeDocument = async (
   id: string,
   document: ResumeDocument,
 ): Promise<ResumeRecord> => {
-  const db = getDb()
+  const db = getDb();
 
-  return db.transaction('rw', db.resumes, async () => {
-    const existing = await db.resumes.get(id)
+  return db.transaction("rw", db.resumes, async () => {
+    const existing = await db.resumes.get(id);
 
     if (existing === undefined) {
-      throw new Error(`Resume ${id} no longer exists.`)
+      throw new Error(`Resume ${id} no longer exists.`);
     }
 
     const saved: ResumeRecord = {
       ...existing,
       document: syncMeta(document),
       updatedAt: Date.now(),
-    }
+    };
 
-    await db.resumes.put(saved)
+    await db.resumes.put(saved);
 
-    return saved
-  })
-}
+    return saved;
+  });
+};
 
 /** Patches row-level fields. Does not touch the document. */
 export const updateResume = async (
   id: string,
-  changes: Partial<Pick<ResumeRecord, 'title' | 'groupId' | 'order'>>,
+  changes: Partial<Pick<ResumeRecord, "title" | "groupId" | "order">>,
 ): Promise<void> => {
-  await getDb().resumes.update(id, { ...changes, updatedAt: Date.now() })
-}
+  await getDb().resumes.update(id, { ...changes, updatedAt: Date.now() });
+};
 
 export const duplicateResume = async (
   id: string,
 ): Promise<ResumeRecord | undefined> => {
-  const source = await getResume(id)
+  const source = await getResume(id);
 
   if (source === undefined) {
-    return undefined
+    return undefined;
   }
 
   return createResume({
@@ -200,25 +200,25 @@ export const duplicateResume = async (
     groupId: source.groupId,
     // Structured-cloned so the copy shares no nested objects with the original.
     document: structuredClone(source.document),
-  })
-}
+  });
+};
 
 export const archiveResume = async (id: string): Promise<void> => {
-  const now = Date.now()
+  const now = Date.now();
 
-  await getDb().resumes.update(id, { archivedAt: now, updatedAt: now })
-}
+  await getDb().resumes.update(id, { archivedAt: now, updatedAt: now });
+};
 
 export const restoreResume = async (id: string): Promise<void> => {
   await getDb().resumes.update(id, {
     archivedAt: NOT_ARCHIVED,
     updatedAt: Date.now(),
-  })
-}
+  });
+};
 
 export const deleteResume = async (id: string): Promise<void> => {
-  await getDb().resumes.delete(id)
-}
+  await getDb().resumes.delete(id);
+};
 
 /**
  * Applies a new ordering within a group in one transaction, so the list never
@@ -227,14 +227,14 @@ export const deleteResume = async (id: string): Promise<void> => {
 export const reorderResumes = async (
   orderedIds: Array<string>,
 ): Promise<void> => {
-  const db = getDb()
+  const db = getDb();
 
-  await db.transaction('rw', db.resumes, async () => {
+  await db.transaction("rw", db.resumes, async () => {
     await Promise.all(
       orderedIds.map((id, order) => db.resumes.update(id, { order })),
-    )
-  })
-}
+    );
+  });
+};
 
 /**
  * Every image id referenced by any resume.
@@ -243,40 +243,40 @@ export const reorderResumes = async (
  * deliberate action rather than automatic cleanup.
  */
 export const collectReferencedImageIds = async (): Promise<Set<string>> => {
-  const referenced = new Set<string>()
+  const referenced = new Set<string>();
 
   await getDb().resumes.each((record) => {
-    const { header, sections } = record.document.content
+    const { header, sections } = record.document.content;
 
     if (header.avatarImageId !== undefined) {
-      referenced.add(header.avatarImageId)
+      referenced.add(header.avatarImageId);
     }
 
     for (const section of sections) {
       for (const block of section.blocks) {
-        if (block.kind === 'image') {
-          referenced.add(block.imageId)
+        if (block.kind === "image") {
+          referenced.add(block.imageId);
         }
       }
     }
-  })
+  });
 
-  return referenced
-}
+  return referenced;
+};
 
 /** Every custom font id referenced by any resume, for the same reason. */
 export const collectReferencedFontIds = async (): Promise<Set<string>> => {
-  const referenced = new Set<string>()
+  const referenced = new Set<string>();
 
   await getDb().resumes.each((record) => {
-    const { bodyFont, headingFont } = record.document.design.typography
+    const { bodyFont, headingFont } = record.document.design.typography;
 
     for (const font of [bodyFont, headingFont]) {
-      if (font?.source === 'custom' && font.fontId !== undefined) {
-        referenced.add(font.fontId)
+      if (font?.source === "custom" && font.fontId !== undefined) {
+        referenced.add(font.fontId);
       }
     }
-  })
+  });
 
-  return referenced
-}
+  return referenced;
+};

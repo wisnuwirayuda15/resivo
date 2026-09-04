@@ -23,58 +23,58 @@
  * lazily on read (see `database/migrations/documents.ts`), so a content change
  * never forces an IndexedDB schema migration.
  */
-export const DOCUMENT_VERSION = 2
+export const DOCUMENT_VERSION = 2;
 
 /** Paper baselines defined by the design system's `.resivo-paper` scopes. */
 export const TEMPLATE_IDS = [
-  'classic',
-  'modern',
-  'technical',
-  'editorial',
-] as const
-export type TemplateId = (typeof TEMPLATE_IDS)[number]
+  "classic",
+  "modern",
+  "technical",
+  "editorial",
+] as const;
+export type TemplateId = (typeof TEMPLATE_IDS)[number];
 
-export const PAPER_SIZES = ['A4', 'Letter'] as const
-export type PaperSize = (typeof PAPER_SIZES)[number]
+export const PAPER_SIZES = ["A4", "Letter"] as const;
+export type PaperSize = (typeof PAPER_SIZES)[number];
 
 // ---------------------------------------------------------------------------
 // Rich inline text
 // ---------------------------------------------------------------------------
 
-export const MARKS = ['bold', 'italic', 'code', 'strike'] as const
-export type Mark = (typeof MARKS)[number]
+export const MARKS = ["bold", "italic", "code", "strike"] as const;
+export type Mark = (typeof MARKS)[number];
 
 export type InlineNode =
-  | { type: 'text'; text: string; marks?: Array<Mark> }
-  | { type: 'link'; href: string; children: Array<InlineNode> }
-  | { type: 'icon'; icon: IconRef }
+  | { type: "text"; text: string; marks?: Array<Mark> }
+  | { type: "link"; href: string; children: Array<InlineNode> }
+  | { type: "icon"; icon: IconRef };
 
 /** A run of formatted text. Empty array is a valid, empty value. */
-export type InlineText = Array<InlineNode>
+export type InlineText = Array<InlineNode>;
 
 // ---------------------------------------------------------------------------
 // Icons
 // ---------------------------------------------------------------------------
 
 export const ICON_WEIGHTS = [
-  'thin',
-  'light',
-  'regular',
-  'bold',
-  'fill',
-  'duotone',
-] as const
-export type IconWeight = (typeof ICON_WEIGHTS)[number]
+  "thin",
+  "light",
+  "regular",
+  "bold",
+  "fill",
+  "duotone",
+] as const;
+export type IconWeight = (typeof ICON_WEIGHTS)[number];
 
 /**
  * A reference to an icon, never a component. `library` exists so custom SVGs or
  * another icon set can be added later without touching the document schema.
  */
 export interface IconRef {
-  library: 'phosphor'
+  library: "phosphor";
   /** Phosphor icon name in kebab-case, e.g. `envelope-simple`. */
-  name: string
-  weight?: IconWeight
+  name: string;
+  weight?: IconWeight;
 }
 
 // ---------------------------------------------------------------------------
@@ -82,9 +82,9 @@ export interface IconRef {
 // ---------------------------------------------------------------------------
 
 export interface ParagraphBlock {
-  id: string
-  kind: 'paragraph'
-  text: InlineText
+  id: string;
+  kind: "paragraph";
+  text: InlineText;
 }
 
 /**
@@ -95,17 +95,17 @@ export interface ParagraphBlock {
  * what Markdown allows and what a flat `Array<InlineText>` could not express.
  */
 export interface ListItem {
-  text: InlineText
+  text: InlineText;
   /** A GFM task list checkbox. Absent when the item is not one. */
-  checked?: boolean
-  list?: NestedList
+  checked?: boolean;
+  list?: NestedList;
 }
 
 export interface NestedList {
-  ordered?: boolean
+  ordered?: boolean;
   /** First number of an ordered list, when it is not 1. */
-  start?: number
-  items: Array<ListItem>
+  start?: number;
+  items: Array<ListItem>;
 }
 
 /**
@@ -116,11 +116,11 @@ export interface NestedList {
  * the renderer key off the kind.
  */
 export interface BulletListBlock {
-  id: string
-  kind: 'bulletList'
-  ordered?: boolean
-  start?: number
-  items: Array<ListItem>
+  id: string;
+  kind: "bulletList";
+  ordered?: boolean;
+  start?: number;
+  items: Array<ListItem>;
 }
 
 /**
@@ -131,18 +131,18 @@ export interface BulletListBlock {
  * that could be read back as a section boundary.
  */
 export interface HeadingBlock {
-  id: string
-  kind: 'heading'
-  level: 3 | 4 | 5 | 6
-  text: InlineText
+  id: string;
+  kind: "heading";
+  level: 3 | 4 | 5 | 6;
+  text: InlineText;
 }
 
 /** A block quote. One run per paragraph; a quote containing anything richer is
  * kept as a `raw` block instead, because the model has no nesting here. */
 export interface QuoteBlock {
-  id: string
-  kind: 'quote'
-  paragraphs: Array<InlineText>
+  id: string;
+  kind: "quote";
+  paragraphs: Array<InlineText>;
 }
 
 /**
@@ -152,23 +152,23 @@ export interface QuoteBlock {
  * literal, so marks would be a lie about what the source says.
  */
 export interface CodeBlock {
-  id: string
-  kind: 'code'
-  language?: string
-  code: string
+  id: string;
+  kind: "code";
+  language?: string;
+  code: string;
 }
 
-export type TableAlign = 'left' | 'center' | 'right'
+export type TableAlign = "left" | "center" | "right";
 
 /** A GFM table. The header row is separate because GFM always has exactly one
  * and every renderer treats it differently. */
 export interface TableBlock {
-  id: string
-  kind: 'table'
-  head: Array<InlineText>
-  rows: Array<Array<InlineText>>
+  id: string;
+  kind: "table";
+  head: Array<InlineText>;
+  rows: Array<Array<InlineText>>;
   /** Per column, `null` where the source gave no alignment. */
-  align: Array<TableAlign | null>
+  align: Array<TableAlign | null>;
 }
 
 /**
@@ -177,46 +177,46 @@ export interface TableBlock {
  * directive for it.
  */
 export interface EntryBlock {
-  id: string
-  kind: 'entry'
+  id: string;
+  kind: "entry";
   /** Role, degree or project name. */
-  title: InlineText
+  title: InlineText;
   /** Company, school or client. */
-  subtitle?: InlineText
-  location?: InlineText
-  dateRange?: DateRange
-  summary?: InlineText
-  bullets: Array<InlineText>
+  subtitle?: InlineText;
+  location?: InlineText;
+  dateRange?: DateRange;
+  summary?: InlineText;
+  bullets: Array<InlineText>;
 }
 
 export interface DateRange {
   /** ISO `YYYY-MM` where possible, free text otherwise. */
-  start?: string
-  end?: string
+  start?: string;
+  end?: string;
   /** When true the renderer prints "Present" and ignores `end`. */
-  current?: boolean
+  current?: boolean;
 }
 
 /** Skills and similar chip lists. */
 export interface TagListBlock {
-  id: string
-  kind: 'tagList'
-  tags: Array<string>
+  id: string;
+  kind: "tagList";
+  tags: Array<string>;
 }
 
 export interface ImageBlock {
-  id: string
-  kind: 'image'
+  id: string;
+  kind: "image";
   /** Row id in the `images` table. The blob itself is never inlined here. */
-  imageId: string
-  alt: string
+  imageId: string;
+  alt: string;
   /** Rendered width as a percentage of the content column. */
-  widthPercent?: number
+  widthPercent?: number;
 }
 
 export interface DividerBlock {
-  id: string
-  kind: 'divider'
+  id: string;
+  kind: "divider";
 }
 
 /**
@@ -229,16 +229,16 @@ export interface DividerBlock {
  * drawn or not.
  */
 export interface PageBreakBlock {
-  id: string
-  kind: 'pageBreak'
+  id: string;
+  kind: "pageBreak";
 }
 
 /** Icon paired with a label, contact rows, links, locations. */
 export interface IconLabelBlock {
-  id: string
-  kind: 'iconLabel'
-  icon: IconRef
-  label: InlineText
+  id: string;
+  kind: "iconLabel";
+  icon: IconRef;
+  label: InlineText;
 }
 
 /**
@@ -248,9 +248,9 @@ export interface IconLabelBlock {
  * the editor shows a non-blocking warning. Never silently drop input.
  */
 export interface RawBlock {
-  id: string
-  kind: 'raw'
-  markdown: string
+  id: string;
+  kind: "raw";
+  markdown: string;
 }
 
 export type Block =
@@ -266,9 +266,9 @@ export type Block =
   | DividerBlock
   | PageBreakBlock
   | IconLabelBlock
-  | RawBlock
+  | RawBlock;
 
-export type BlockKind = Block['kind']
+export type BlockKind = Block["kind"];
 
 // ---------------------------------------------------------------------------
 // Sections
@@ -279,43 +279,43 @@ export type BlockKind = Block['kind']
  * for anything the user invents, and keeps its own title.
  */
 export const SECTION_KINDS = [
-  'summary',
-  'experience',
-  'education',
-  'skills',
-  'projects',
-  'certifications',
-  'awards',
-  'publications',
-  'languages',
-  'interests',
-  'custom',
-] as const
-export type SectionKind = (typeof SECTION_KINDS)[number]
+  "summary",
+  "experience",
+  "education",
+  "skills",
+  "projects",
+  "certifications",
+  "awards",
+  "publications",
+  "languages",
+  "interests",
+  "custom",
+] as const;
+export type SectionKind = (typeof SECTION_KINDS)[number];
 
 export interface SectionStyleOverride {
   /** Extra space above this section, in rem. Overrides `design.spacing.section`. */
-  spaceBefore?: number
-  showDivider?: boolean
-  columns?: 1 | 2
+  spaceBefore?: number;
+  showDivider?: boolean;
+  columns?: 1 | 2;
   /**
    * `page` starts the section on a fresh sheet. Absent and `auto` both mean
    * "wherever it falls", which is the default a resume wants, a forced break is
    * a decision about one section, not a habit.
    */
-  breakBefore?: 'auto' | 'page'
+  breakBefore?: "auto" | "page";
 }
 
 export interface Section {
-  id: string
-  kind: SectionKind
-  title: InlineText
-  icon?: IconRef
+  id: string;
+  kind: SectionKind;
+  title: InlineText;
+  icon?: IconRef;
   /** Hidden rather than deleted, so toggling it back is not an undo operation. */
-  hidden?: boolean
+  hidden?: boolean;
   /** Ordered by array index. */
-  blocks: Array<Block>
-  style?: SectionStyleOverride
+  blocks: Array<Block>;
+  style?: SectionStyleOverride;
 }
 
 // ---------------------------------------------------------------------------
@@ -327,26 +327,26 @@ export interface Section {
  * because it is not reorderable and every template renders it specially.
  */
 export interface HeaderBlock {
-  name: InlineText
-  headline?: InlineText
+  name: InlineText;
+  headline?: InlineText;
   /** Contact rows, email, phone, links. Each may carry an icon. */
-  contacts: Array<ContactItem>
+  contacts: Array<ContactItem>;
   /** Row id in the `images` table. */
-  avatarImageId?: string
+  avatarImageId?: string;
 }
 
 export interface ContactItem {
-  id: string
-  icon?: IconRef
-  label: InlineText
+  id: string;
+  icon?: IconRef;
+  label: InlineText;
   /** Set when the item should render as a link. */
-  href?: string
+  href?: string;
 }
 
 export interface ResumeContent {
-  header: HeaderBlock
+  header: HeaderBlock;
   /** Ordered by array index; drag-and-drop reorders this array. */
-  sections: Array<Section>
+  sections: Array<Section>;
 }
 
 // ---------------------------------------------------------------------------
@@ -355,18 +355,18 @@ export interface ResumeContent {
 
 /** Edge lengths in inches, matching the design system's paper margin token. */
 export interface BoxEdges {
-  top: number
-  right: number
-  bottom: number
-  left: number
+  top: number;
+  right: number;
+  bottom: number;
+  left: number;
 }
 
 export interface FontRef {
   /** CSS family name, e.g. `Source Serif 4 Variable`. */
-  family: string
-  source: 'builtin' | 'custom'
+  family: string;
+  source: "builtin" | "custom";
   /** Row id in the `fonts` table. Required when `source` is `custom`. */
-  fontId?: string
+  fontId?: string;
 }
 
 /**
@@ -376,49 +376,49 @@ export interface FontRef {
  */
 export interface DesignConfig {
   paper: {
-    size: PaperSize
-    margin: BoxEdges
-  }
+    size: PaperSize;
+    margin: BoxEdges;
+  };
   typography: {
-    bodyFont: FontRef
-    headingFont?: FontRef
+    bodyFont: FontRef;
+    headingFont?: FontRef;
     /** Body size in points, resumes are print documents, so pt not px. */
-    baseSize: number
+    baseSize: number;
     /** Modular scale ratio used to derive heading sizes. */
-    scale: number
-    lineHeight: number
-    weights: { body: number; heading: number }
-  }
+    scale: number;
+    lineHeight: number;
+    weights: { body: number; heading: number };
+  };
   colors: {
-    text: string
-    heading: string
-    accent: string
-    muted: string
-    rule: string
-  }
+    text: string;
+    heading: string;
+    accent: string;
+    muted: string;
+    rule: string;
+  };
   /** Vertical rhythm, in rem. */
   spacing: {
-    section: number
-    paragraph: number
-    heading: number
-  }
+    section: number;
+    paragraph: number;
+    heading: number;
+  };
   rules: {
-    showDividers: boolean
+    showDividers: boolean;
     /** Rule thickness in px. */
-    width: number
-    color: string
-  }
+    width: number;
+    color: string;
+  };
   image: {
-    avatarShape: 'circle' | 'square' | 'rounded'
+    avatarShape: "circle" | "square" | "rounded";
     /** Avatar edge length in px. */
-    avatarSize: number
-  }
+    avatarSize: number;
+  };
   icons: {
     /** Icon size in px. */
-    size: number
-    color: string
-    defaultWeight: IconWeight
-  }
+    size: number;
+    color: string;
+    defaultWeight: IconWeight;
+  };
   /**
    * How pagination behaves. Optional because documents written before it
    * existed have no such field, and its absence has to mean the default rather
@@ -430,8 +430,8 @@ export interface DesignConfig {
      * page. On by default: a heading stranded at the foot of a page is the one
      * break every reader notices. Off packs the pages tighter.
      */
-    keepHeadingWithContent?: boolean
-  }
+    keepHeadingWithContent?: boolean;
+  };
 }
 
 // ---------------------------------------------------------------------------
@@ -443,18 +443,18 @@ export interface DesignConfig {
  * can search and sort without parsing every document.
  */
 export interface ResumeMeta {
-  fullName: string
-  headline?: string
+  fullName: string;
+  headline?: string;
   /** BCP 47 tag, e.g. `en`. Affects date formatting, not content. */
-  locale: string
+  locale: string;
 }
 
 export interface ResumeDocument {
-  schemaVersion: number
-  templateId: TemplateId
-  meta: ResumeMeta
-  content: ResumeContent
-  design: DesignConfig
+  schemaVersion: number;
+  templateId: TemplateId;
+  meta: ResumeMeta;
+  content: ResumeContent;
+  design: DesignConfig;
   /** Raw user CSS. Sanitized and scoped at render time, never trusted. */
-  customCss: string
+  customCss: string;
 }

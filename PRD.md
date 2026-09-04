@@ -126,12 +126,12 @@ For example:
 
 ```tsx
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary'
+  variant?: "primary" | "secondary";
 }
 
-const Button = ({ variant = 'primary', ...props }: ButtonProps) => {
+const Button = ({ variant = "primary", ...props }: ButtonProps) => {
   // ...
-}
+};
 ```
 
 Additional principles:

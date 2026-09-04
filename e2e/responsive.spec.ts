@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from "@playwright/test";
 
 import {
   createResume,
@@ -6,7 +6,7 @@ import {
   openEditorPane,
   openEmptyApp,
   paper,
-} from './app'
+} from "./app";
 
 /**
  * The editor on a screen that cannot hold three panes.
@@ -17,35 +17,35 @@ import {
  * sideways and the paper was pushed off the screen.
  */
 
-test('falls back to one pane at a time on a narrow screen', async ({
+test("falls back to one pane at a time on a narrow screen", async ({
   page,
 }) => {
-  test.slow()
+  test.slow();
 
-  await page.setViewportSize({ width: 900, height: 800 })
+  await page.setViewportSize({ width: 900, height: 800 });
 
-  await openEmptyApp(page)
-  await createResume(page, 'Ada Lovelace')
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
 
   // The tab strip, which only exists below the breakpoint.
   await expect(
-    page.getByRole('tablist', { name: 'Editor panes' }),
-  ).toBeVisible()
-  await expectPaperReady(page)
+    page.getByRole("tablist", { name: "Editor panes" }),
+  ).toBeVisible();
+  await expectPaperReady(page);
 
   // Nothing overflows sideways: the document is the whole width, not a third of
   // a layout that does not fit.
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - window.innerWidth,
-  )
-  expect(overflow).toBeLessThanOrEqual(0)
+  );
+  expect(overflow).toBeLessThanOrEqual(0);
 
   // The other two panes are a tab away rather than gone.
-  await openEditorPane(page, 'Code')
-  await expect(page.locator('.monaco-editor').first()).toBeVisible()
+  await openEditorPane(page, "Code");
+  await expect(page.locator(".monaco-editor").first()).toBeVisible();
 
-  await openEditorPane(page, 'Style')
-  await expect(page.getByLabel('Body size')).toBeVisible()
+  await openEditorPane(page, "Style");
+  await expect(page.getByLabel("Body size")).toBeVisible();
 
   /**
    * Back to the paper, and it paginates again.
@@ -55,27 +55,27 @@ test('falls back to one pane at a time on a narrow screen', async ({
    * at zero width. Unmounting is what keeps the paper measured at the width it
    * is drawn at.
    */
-  await openEditorPane(page, 'Paper')
-  await expectPaperReady(page)
-  await expect(paper(page).locator('.rp-page').first()).toBeVisible()
-})
+  await openEditorPane(page, "Paper");
+  await expectPaperReady(page);
+  await expect(paper(page).locator(".rp-page").first()).toBeVisible();
+});
 
-test('uses all three panes once there is room', async ({ page }) => {
-  test.slow()
+test("uses all three panes once there is room", async ({ page }) => {
+  test.slow();
 
-  await page.setViewportSize({ width: 1440, height: 900 })
+  await page.setViewportSize({ width: 1440, height: 900 });
 
-  await openEmptyApp(page)
-  await createResume(page, 'Ada Lovelace')
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
 
   // No tab strip, and all three panes at once.
-  await expect(page.getByRole('tablist', { name: 'Editor panes' })).toHaveCount(
+  await expect(page.getByRole("tablist", { name: "Editor panes" })).toHaveCount(
     0,
-  )
-  await expect(page.locator('.monaco-editor').first()).toBeVisible()
-  await expect(page.getByLabel('Body size')).toBeVisible()
-  await expectPaperReady(page)
-})
+  );
+  await expect(page.locator(".monaco-editor").first()).toBeVisible();
+  await expect(page.getByLabel("Body size")).toBeVisible();
+  await expectPaperReady(page);
+});
 
 /**
  * The rail is for the permanent sidebar only.
@@ -85,35 +85,35 @@ test('uses all three panes once there is room', async ({ page }) => {
  * way to present the one thing the overlay was opened to show. So a preference
  * carried over from a wide screen has to be ignored rather than honoured.
  */
-test('ignores a collapsed sidebar where the sidebar is an overlay', async ({
+test("ignores a collapsed sidebar where the sidebar is an overlay", async ({
   page,
 }) => {
-  await openEmptyApp(page)
+  await openEmptyApp(page);
 
   // Collapsed while the sidebar is still permanent, which is the only place the
   // control exists.
-  await page.getByRole('button', { name: 'Toggle sidebar' }).click()
+  await page.getByRole("button", { name: "Toggle sidebar" }).click();
 
-  await page.setViewportSize({ width: 600, height: 800 })
+  await page.setViewportSize({ width: 600, height: 800 });
 
   // The toggle goes with the sidebar it toggles; the burger takes its place.
   await expect(
-    page.getByRole('button', { name: 'Toggle sidebar' }),
-  ).toBeHidden()
-  await page.getByRole('button', { name: 'Toggle navigation' }).click()
+    page.getByRole("button", { name: "Toggle sidebar" }),
+  ).toBeHidden();
+  await page.getByRole("button", { name: "Toggle navigation" }).click();
 
   // A drawer, with its labels back, not the rail the stored preference still
   // asks for, and not the whole viewport either: a drawer with no page beside
   // it leaves nothing to tap to dismiss it.
   const width = await page
-    .getByRole('navigation')
-    .evaluate((node) => Math.round(node.getBoundingClientRect().width))
-  expect(width).toBeLessThan(600)
-  await expect(page.getByText('No account. No cloud.')).toBeVisible()
-})
+    .getByRole("navigation")
+    .evaluate((node) => Math.round(node.getBoundingClientRect().width));
+  expect(width).toBeLessThan(600);
+  await expect(page.getByText("No account. No cloud.")).toBeVisible();
+});
 
 /** A phone, not a narrow desktop window. */
-const PHONE = { width: 375, height: 812 }
+const PHONE = { width: 375, height: 812 };
 
 /**
  * The editor at phone width.
@@ -124,33 +124,33 @@ const PHONE = { width: 375, height: 812 }
  * header 433px wide, and since nothing there scrolls it took the whole editor (
  * and the document) with it.
  */
-test('fits a phone, with nothing pushed off the side', async ({ page }) => {
-  test.slow()
+test("fits a phone, with nothing pushed off the side", async ({ page }) => {
+  test.slow();
 
-  await page.setViewportSize(PHONE)
+  await page.setViewportSize(PHONE);
 
-  await openEmptyApp(page)
-  await createResume(page, 'Ada Lovelace')
-  await expectPaperReady(page)
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
+  await expectPaperReady(page);
 
   const overflow = () =>
     page.evaluate(
       () =>
         document.documentElement.scrollWidth -
         document.documentElement.clientWidth,
-    )
+    );
 
-  expect(await overflow()).toBe(0)
+  expect(await overflow()).toBe(0);
 
   // Every pane, since each one is a different row of controls.
-  for (const pane of ['Code', 'Style', 'Paper'] as const) {
-    await openEditorPane(page, pane)
-    expect(await overflow()).toBe(0)
+  for (const pane of ["Code", "Style", "Paper"] as const) {
+    await openEditorPane(page, pane);
+    expect(await overflow()).toBe(0);
   }
 
   // What the strip keeps at this width.
-  await expect(page.getByText('1 page')).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Export' })).toBeVisible()
+  await expect(page.getByText("1 page")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Export" })).toBeVisible();
 
   /**
    * And what it folds away rather than drops.
@@ -159,22 +159,22 @@ test('fits a phone, with nothing pushed off the side', async ({ page }) => {
    * covers: an indicator that exists on a desktop and nowhere else is a
    * feature the small screen does not have.
    */
-  await expect(page.getByRole('button', { name: 'Zoom in' })).toBeHidden()
-  await page.getByRole('button', { name: 'Paper and zoom' }).click()
+  await expect(page.getByRole("button", { name: "Zoom in" })).toBeHidden();
+  await page.getByRole("button", { name: "Paper and zoom" }).click();
 
-  await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
-  await expect(page.getByRole('button', { name: 'Fit width' })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Zoom in" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Fit width" })).toBeVisible();
   // The label, not the radio: Mantine's segmented control parks the real input
   // off-screen and styles the label, so the input is never "visible".
-  await expect(page.locator('label').filter({ hasText: /^A4$/ })).toBeVisible()
+  await expect(page.locator("label").filter({ hasText: /^A4$/ })).toBeVisible();
 
   // The zoom really is the paper's, not a readout of its own.
-  const zoom = () => page.getByText(/^\d+%$/).innerText()
-  const before = await zoom()
+  const zoom = () => page.getByText(/^\d+%$/).innerText();
+  const before = await zoom();
 
-  await page.getByRole('button', { name: 'Zoom in' }).click()
-  await expect.poll(zoom).not.toBe(before)
-})
+  await page.getByRole("button", { name: "Zoom in" }).click();
+  await expect.poll(zoom).not.toBe(before);
+});
 
 /**
  * The navbar on a phone is a drawer.
@@ -184,26 +184,26 @@ test('fits a phone, with nothing pushed off the side', async ({ page }) => {
  * scrim and nothing beside it to tap, the only way out was to navigate
  * somewhere. Opening the menu to look at it was a one-way trip.
  */
-test('the navbar drawer closes when the page beside it is tapped', async ({
+test("the navbar drawer closes when the page beside it is tapped", async ({
   page,
 }) => {
-  await page.setViewportSize(PHONE)
-  await openEmptyApp(page)
+  await page.setViewportSize(PHONE);
+  await openEmptyApp(page);
 
-  const drawer = page.locator('nav.mantine-AppShell-navbar')
-  const settings = page.getByRole('link', { name: 'Settings' })
+  const drawer = page.locator("nav.mantine-AppShell-navbar");
+  const settings = page.getByRole("link", { name: "Settings" });
 
-  await page.getByRole('button', { name: 'Toggle navigation' }).click()
-  await expect(settings).toBeInViewport()
+  await page.getByRole("button", { name: "Toggle navigation" }).click();
+  await expect(settings).toBeInViewport();
 
   // There is a page beside it to tap at all, which is the half of the fix that
   // is easy to lose: a full-width drawer has no outside.
-  const box = await drawer.boundingBox()
-  expect(box?.width ?? PHONE.width).toBeLessThan(PHONE.width)
+  const box = await drawer.boundingBox();
+  expect(box?.width ?? PHONE.width).toBeLessThan(PHONE.width);
 
-  await page.mouse.click(PHONE.width - 20, 500)
-  await expect(settings).not.toBeInViewport()
-})
+  await page.mouse.click(PHONE.width - 20, 500);
+  await expect(settings).not.toBeInViewport();
+});
 
 /**
  * The tour, on the screen where it had the least room to work.
@@ -214,22 +214,22 @@ test('the navbar drawer closes when the page beside it is tapped', async ({
  * point at rows in the sidebar, which is a drawer here: the tour dimmed the app,
  * highlighted nothing, and left nothing on screen to go on with.
  */
-test('the tour can be walked through on a phone', async ({ page }) => {
-  test.slow()
+test("the tour can be walked through on a phone", async ({ page }) => {
+  test.slow();
 
-  await page.setViewportSize(PHONE)
-  await openEmptyApp(page)
+  await page.setViewportSize(PHONE);
+  await openEmptyApp(page);
 
   // Opted back in, the way the onboarding spec does.
   await page.evaluate(() => {
-    localStorage.removeItem('resivo.onboarding.library')
-    localStorage.removeItem('resivo.onboarding.editor')
-  })
-  await page.reload()
+    localStorage.removeItem("resivo.onboarding.library");
+    localStorage.removeItem("resivo.onboarding.editor");
+  });
+  await page.reload();
 
   const popover = page.locator(
-    '.mantine-OnboardingTourPopoverContent-popoverContent',
-  )
+    ".mantine-OnboardingTourPopoverContent-popoverContent",
+  );
   /**
    * The card's own box, not the content inside it.
    *
@@ -239,26 +239,26 @@ test('the tour can be walked through on a phone', async ({ page }) => {
    * while the content it held measured as being on screen.
    */
   const card = page
-    .locator('.mantine-Popover-dropdown')
-    .filter({ has: popover })
-  const focused = page.locator('[data-onboarding-tour-focus-reveal-focused]')
+    .locator(".mantine-Popover-dropdown")
+    .filter({ has: popover });
+  const focused = page.locator("[data-onboarding-tour-focus-reveal-focused]");
 
-  await expect(page.getByText('Start here')).toBeVisible({ timeout: 20_000 })
+  await expect(page.getByText("Start here")).toBeVisible({ timeout: 20_000 });
 
   // Inside the viewport at every step, and pointing at something visible at
   // every step, the two halves of "it works here at all".
   for (const heading of [
-    'Images and fonts are shared',
-    'This is the important one',
-    'Everything, from the keyboard',
+    "Images and fonts are shared",
+    "This is the important one",
+    "Everything, from the keyboard",
   ]) {
-    await expect(card).toBeInViewport({ ratio: 1 })
-    await page.getByRole('button', { name: 'Next' }).click()
-    await expect(page.getByText(heading)).toBeVisible()
-    await expect(focused).toBeInViewport({ ratio: 1 })
+    await expect(card).toBeInViewport({ ratio: 1 });
+    await page.getByRole("button", { name: "Next" }).click();
+    await expect(page.getByText(heading)).toBeVisible();
+    await expect(focused).toBeInViewport({ ratio: 1 });
   }
 
-  await expect(card).toBeInViewport({ ratio: 1 })
+  await expect(card).toBeInViewport({ ratio: 1 });
 
   /**
    * And using the width it has.
@@ -269,9 +269,9 @@ test('the tour can be walked through on a phone', async ({ page }) => {
    */
   const width = await card.evaluate((node) =>
     Math.round(node.getBoundingClientRect().width),
-  )
-  expect(width).toBe(PHONE.width - 16)
-})
+  );
+  expect(width).toBe(PHONE.width - 16);
+});
 
 /**
  * The editor tour, on the screen it used not to run on at all.
@@ -286,31 +286,33 @@ test('the tour can be walked through on a phone', async ({ page }) => {
  * the three pane steps point at the tab that opens the pane rather than at the
  * pane itself.
  */
-test('the editor tour runs on a phone, one tab at a time', async ({ page }) => {
-  test.slow()
+test("the editor tour runs on a phone, one tab at a time", async ({ page }) => {
+  test.slow();
 
-  await page.setViewportSize(PHONE)
-  await openEmptyApp(page)
-  await createResume(page, 'Ada Lovelace')
+  await page.setViewportSize(PHONE);
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
 
   // Opted back in for the editor only, and reloaded so it starts here.
-  await page.evaluate(() => localStorage.removeItem('resivo.onboarding.editor'))
-  await page.reload()
+  await page.evaluate(() =>
+    localStorage.removeItem("resivo.onboarding.editor"),
+  );
+  await page.reload();
 
   const popover = page.locator(
-    '.mantine-OnboardingTourPopoverContent-popoverContent',
-  )
+    ".mantine-OnboardingTourPopoverContent-popoverContent",
+  );
   const card = page
-    .locator('.mantine-Popover-dropdown')
-    .filter({ has: popover })
-  const focused = page.locator('[data-onboarding-tour-focus-reveal-focused]')
+    .locator(".mantine-Popover-dropdown")
+    .filter({ has: popover });
+  const focused = page.locator("[data-onboarding-tour-focus-reveal-focused]");
 
   // Scoped to the editor's own strip: the inspector has a tab called Style
   // too, and both are on screen once that pane is open.
   const paneTab = (name: string) =>
     page
-      .getByRole('tablist', { name: 'Editor panes' })
-      .getByRole('tab', { name, selected: true })
+      .getByRole("tablist", { name: "Editor panes" })
+      .getByRole("tab", { name, selected: true });
 
   /**
    * Each step, with the tab it has to have opened.
@@ -320,33 +322,33 @@ test('the editor tour runs on a phone, one tab at a time', async ({ page }) => {
    * gate was avoiding rather than fixing.
    */
   const steps = [
-    { heading: 'Markdown, and your own CSS', tab: 'Code' },
-    { heading: 'Every directive, with an example', tab: 'Code' },
-    { heading: 'The paper is editable too', tab: 'Paper' },
-    { heading: 'Export is the same document', tab: 'Paper' },
-    { heading: 'Three tabs worth knowing', tab: 'Style' },
-    { heading: 'Nothing here is one-way', tab: 'Style' },
-  ] as const
+    { heading: "Markdown, and your own CSS", tab: "Code" },
+    { heading: "Every directive, with an example", tab: "Code" },
+    { heading: "The paper is editable too", tab: "Paper" },
+    { heading: "Export is the same document", tab: "Paper" },
+    { heading: "Three tabs worth knowing", tab: "Style" },
+    { heading: "Nothing here is one-way", tab: "Style" },
+  ] as const;
 
   await expect(page.getByText(steps[0].heading)).toBeVisible({
     timeout: 30_000,
-  })
+  });
 
   for (const [index, step] of steps.entries()) {
-    await expect(page.getByText(step.heading)).toBeVisible()
-    await expect(paneTab(step.tab)).toBeVisible()
+    await expect(page.getByText(step.heading)).toBeVisible();
+    await expect(paneTab(step.tab)).toBeVisible();
 
     // On screen, and pointing at something on screen.
-    await expect(card).toBeInViewport({ ratio: 1 })
-    await expect(focused.first()).toBeInViewport({ ratio: 1 })
+    await expect(card).toBeInViewport({ ratio: 1 });
+    await expect(focused.first()).toBeInViewport({ ratio: 1 });
 
     if (index < steps.length - 1) {
-      await page.getByRole('button', { name: 'Next' }).click()
+      await page.getByRole("button", { name: "Next" }).click();
     }
   }
 
   // Ending it hands the tab strip back rather than leaving it where the tour
   // stopped: the paper is the pane the editor opens on.
-  await page.getByRole('button', { name: 'End' }).click()
-  await expect(paneTab('Paper')).toBeVisible()
-})
+  await page.getByRole("button", { name: "End" }).click();
+  await expect(paneTab("Paper")).toBeVisible();
+});

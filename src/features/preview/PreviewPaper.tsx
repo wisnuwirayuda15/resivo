@@ -5,7 +5,7 @@ import {
   useRef,
   useState,
   useSyncExternalStore,
-} from 'react'
+} from "react";
 
 import {
   DndContext,
@@ -14,39 +14,42 @@ import {
   closestCenter,
   useSensor,
   useSensors,
-} from '@dnd-kit/core'
-import { SortableContext } from '@dnd-kit/sortable'
+} from "@dnd-kit/core";
+import { SortableContext } from "@dnd-kit/sortable";
 
-import { loadedGlyphCount, onIconCatalogLoaded } from '@/features/icons/catalog'
+import {
+  loadedGlyphCount,
+  onIconCatalogLoaded,
+} from "@/features/icons/catalog";
 import {
   addBlock,
   removeBlock,
   setImageWidth,
-} from '@/features/editor/mutations'
+} from "@/features/editor/mutations";
 
-import { createId } from '@/lib/id'
-import { resolveTemplate } from '@/features/templates/registry'
+import { createId } from "@/lib/id";
+import { resolveTemplate } from "@/features/templates/registry";
 
-import { documentFlow, flowItemClass } from './flow'
-import { ItemChrome } from './ItemChrome'
-import { isMovable, moveRecipe, stepRecipe } from './reorder'
-import { paginate } from './paginate'
-import { renderFlow } from './renderFlow'
+import { documentFlow, flowItemClass } from "./flow";
+import { ItemChrome } from "./ItemChrome";
+import { isMovable, moveRecipe, stepRecipe } from "./reorder";
+import { paginate } from "./paginate";
+import { renderFlow } from "./renderFlow";
 
-import type { DragEndEvent } from '@dnd-kit/core'
-import type { Recipe } from '@/features/editor/mutations'
-import type { ImageMap } from '@/features/assets/useAssetUrls'
-import type { FlowItem } from './flow'
-import type { FlowMetric } from './paginate'
+import type { DragEndEvent } from "@dnd-kit/core";
+import type { Recipe } from "@/features/editor/mutations";
+import type { ImageMap } from "@/features/assets/useAssetUrls";
+import type { FlowItem } from "./flow";
+import type { FlowMetric } from "./paginate";
 import type {
   RenderContext,
   RenderMode,
-} from '@/features/templates/renderer/types'
+} from "@/features/templates/renderer/types";
 import type {
   DesignConfig,
   ResumeDocument,
   TemplateId,
-} from '@/features/resume/model/document'
+} from "@/features/resume/model/document";
 
 /**
  * The paper itself, rendered inside the preview iframe.
@@ -66,31 +69,31 @@ import type {
  */
 
 interface PreviewPaperProps {
-  document: ResumeDocument
+  document: ResumeDocument;
   /**
    * Bumped each time the iframe loads more typefaces. Not a rendering concern,
    * it is part of the pagination key, because heights measured against a
    * fallback face are wrong and must be discarded once the real face lands.
    */
-  fontEpoch: number
+  fontEpoch: number;
   /**
    * Object URLs for the images this document references. Resolved by the host,
    * because reading a blob is asynchronous and this component is inside the
    * iframe, where a suspense boundary would blank the paper.
    */
-  images: ImageMap
+  images: ImageMap;
   /**
    * `edit` mounts the editing chrome and makes every field writable. The
    * measuring pass ignores it entirely (see below), so switching modes cannot
    * move a page break.
    */
-  mode: RenderMode
+  mode: RenderMode;
   /** How an edit reaches the store. Required for `edit` to do anything. */
-  apply?: (recipe: Recipe) => void
+  apply?: (recipe: Recipe) => void;
   /** 1 = 100%. */
-  zoom: number
+  zoom: number;
   /** Called whenever pagination settles on a different number of pages. */
-  onPageCountChange?: (count: number) => void
+  onPageCountChange?: (count: number) => void;
   /**
    * Called with the flow-item ids on each page whenever pagination settles.
    *
@@ -98,29 +101,29 @@ interface PreviewPaperProps {
    * user is looking at. Pagination is a measurement, and there is nothing to
    * measure in a string, so export reuses this instead of estimating.
    */
-  onPaginated?: (pages: Array<Array<string>>) => void
+  onPaginated?: (pages: Array<Array<string>>) => void;
 }
 
 /** Everything that, if it changed, invalidates a set of page breaks. */
 interface PaginationKey {
-  items: Array<FlowItem>
-  design: DesignConfig
-  templateId: TemplateId
-  fontEpoch: number
+  items: Array<FlowItem>;
+  design: DesignConfig;
+  templateId: TemplateId;
+  fontEpoch: number;
   /** Bumped when the icon catalog arrives, see below. */
-  glyphEpoch: number
+  glyphEpoch: number;
   /**
    * An image landing changes the height of whatever holds it, so the breaks
    * computed without it are wrong. Compared by identity, which is why
    * `useImageUrls` returns a map that only changes when its contents do.
    */
-  images: ImageMap
+  images: ImageMap;
   /** Whether the frame has been laid out yet, see the observer below. */
-  laidOut: boolean
+  laidOut: boolean;
 }
 
 interface PaginationResult extends PaginationKey {
-  pages: Array<Array<string>>
+  pages: Array<Array<string>>;
 }
 
 /**
@@ -134,42 +137,42 @@ const readMetrics = (
   root: HTMLElement,
   items: ReadonlyArray<FlowItem>,
 ): { metrics: Array<FlowMetric>; contentHeight: number } | null => {
-  const probe = root.querySelector<HTMLElement>('[data-probe="page"]')
+  const probe = root.querySelector<HTMLElement>('[data-probe="page"]');
 
   if (probe === null || probe.clientHeight <= 0) {
-    return null
+    return null;
   }
 
   // DOM order matches item order, so the index is the join, no attribute
   // selector, and no escaping of ids that contain a colon.
   const nodes = Array.from(
-    root.querySelectorAll<HTMLElement>('[data-measure-flow] > [data-flow-id]'),
-  )
+    root.querySelectorAll<HTMLElement>("[data-measure-flow] > [data-flow-id]"),
+  );
 
   if (nodes.length !== items.length) {
-    return null
+    return null;
   }
 
   // The iframe's own window, not the app's: computed styles must be read through
   // the view the element actually belongs to.
-  const view = root.ownerDocument.defaultView
+  const view = root.ownerDocument.defaultView;
 
   if (view === null) {
-    return null
+    return null;
   }
 
-  const metrics: Array<FlowMetric> = []
+  const metrics: Array<FlowMetric> = [];
 
   for (const [index, item] of items.entries()) {
-    const node = nodes[index]
+    const node = nodes[index];
 
     if (node === undefined) {
-      return null
+      return null;
     }
 
     const spaceBefore = Number.parseFloat(
       view.getComputedStyle(node).paddingTop,
-    )
+    );
 
     metrics.push({
       id: item.id,
@@ -179,11 +182,11 @@ const readMetrics = (
       spaceBefore: Number.isFinite(spaceBefore) ? spaceBefore : 0,
       ...(item.keepWithNext === true ? { keepWithNext: true } : {}),
       ...(item.breakBefore === true ? { breakBefore: true } : {}),
-    })
+    });
   }
 
-  return { metrics, contentHeight: probe.clientHeight }
-}
+  return { metrics, contentHeight: probe.clientHeight };
+};
 
 export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   document,
@@ -209,12 +212,12 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     onIconCatalogLoaded,
     loadedGlyphCount,
     () => 0,
-  )
+  );
 
   const template = useMemo(
     () => resolveTemplate(document.templateId),
     [document.templateId],
-  )
+  );
   const items = useMemo(
     () =>
       documentFlow(document, {
@@ -222,7 +225,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
           document.design.pagination?.keepHeadingWithContent,
       }),
     [document],
-  )
+  );
 
   const context = useMemo<RenderContext>(
     () => ({
@@ -235,14 +238,14 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
        * writable by whether it was handed a way to write, so an export or a
        * print render cannot produce an editable node even by mistake.
        */
-      ...(mode === 'edit' ? { apply } : {}),
+      ...(mode === "edit" ? { apply } : {}),
     }),
     [document.meta.locale, document.design, images, mode, apply],
-  )
+  );
 
-  const rootRef = useRef<HTMLDivElement | null>(null)
-  const measureRef = useRef<HTMLDivElement | null>(null)
-  const [paged, setPaged] = useState<PaginationResult | null>(null)
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const measureRef = useRef<HTMLDivElement | null>(null);
+  const [paged, setPaged] = useState<PaginationResult | null>(null);
 
   /**
    * Whether the root has been laid out at all, not how wide it is.
@@ -265,13 +268,13 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * Watching height would have fed back on itself even more obviously: more
    * pages makes the root taller.
    */
-  const [laidOut, setLaidOut] = useState(false)
+  const [laidOut, setLaidOut] = useState(false);
 
   useEffect(() => {
-    const root = rootRef.current
+    const root = rootRef.current;
 
     if (root === null) {
-      return
+      return;
     }
 
     /**
@@ -283,14 +286,14 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
      */
     const observer = new ResizeObserver((entries) => {
       if ((entries[0]?.contentRect.width ?? 0) > 0) {
-        setLaidOut(true)
+        setLaidOut(true);
       }
-    })
+    });
 
-    observer.observe(root)
+    observer.observe(root);
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
 
   const stale =
     paged === null ||
@@ -300,7 +303,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     paged.fontEpoch !== fontEpoch ||
     paged.glyphEpoch !== glyphEpoch ||
     paged.images !== images ||
-    paged.laidOut !== laidOut
+    paged.laidOut !== laidOut;
 
   /**
    * Build every item's markup once, then place the same elements in both passes.
@@ -312,32 +315,32 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   const rendered = useMemo(
     () => renderFlow(document, template, context, items),
     [document, template, context, items],
-  )
+  );
 
   const nodeById = useMemo(
     () => new Map(rendered.map(({ item, node }) => [item.id, node])),
     [rendered],
-  )
+  );
   const itemById = useMemo(
     () => new Map(rendered.map(({ item }) => [item.id, item])),
     [rendered],
-  )
+  );
 
   useLayoutEffect(() => {
     if (!stale) {
-      return
+      return;
     }
 
-    const root = measureRef.current
+    const root = measureRef.current;
 
     if (root === null) {
-      return
+      return;
     }
 
-    const measured = readMetrics(root, items)
+    const measured = readMetrics(root, items);
 
     if (measured === null) {
-      return
+      return;
     }
 
     setPaged({
@@ -349,7 +352,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       images,
       laidOut,
       pages: paginate(measured.metrics, measured.contentHeight),
-    })
+    });
   }, [
     stale,
     items,
@@ -359,23 +362,23 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     glyphEpoch,
     images,
     laidOut,
-  ])
+  ]);
 
-  const pageCount = paged?.pages.length
+  const pageCount = paged?.pages.length;
 
   useEffect(() => {
     if (pageCount !== undefined) {
-      onPageCountChange?.(pageCount)
+      onPageCountChange?.(pageCount);
     }
-  }, [pageCount, onPageCountChange])
+  }, [pageCount, onPageCountChange]);
 
-  const breaks = paged?.pages
+  const breaks = paged?.pages;
 
   useEffect(() => {
     if (breaks !== undefined) {
-      onPaginated?.(breaks)
+      onPaginated?.(breaks);
     }
-  }, [breaks, onPaginated])
+  }, [breaks, onPaginated]);
 
   /**
    * A one-step keyboard move, or `null` when there is nowhere to go.
@@ -386,17 +389,17 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    */
   const step = (item: FlowItem, direction: -1 | 1) => {
     if (apply === undefined) {
-      return null
+      return null;
     }
 
-    const index = items.indexOf(item)
+    const index = items.indexOf(item);
     const recipe =
       index === -1
         ? null
-        : stepRecipe(document, items, { item, index }, direction)
+        : stepRecipe(document, items, { item, index }, direction);
 
-    return recipe === null ? null : () => apply(recipe)
-  }
+    return recipe === null ? null : () => apply(recipe);
+  };
 
   /**
    * Pointer and keyboard, because the keyboard path is not a nicety here: the
@@ -412,33 +415,33 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       activationConstraint: { distance: 4 },
     }),
     useSensor(KeyboardSensor),
-  )
+  );
 
   const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event
+    const { active, over } = event;
 
     if (apply === undefined || over === null || active.id === over.id) {
-      return
+      return;
     }
 
-    const subject = itemById.get(String(active.id))
-    const target = itemById.get(String(over.id))
+    const subject = itemById.get(String(active.id));
+    const target = itemById.get(String(over.id));
 
     if (subject === undefined || target === undefined) {
-      return
+      return;
     }
 
-    const recipe = moveRecipe(document, subject, target)
+    const recipe = moveRecipe(document, subject, target);
 
     if (recipe !== null) {
-      apply(recipe)
+      apply(recipe);
     }
-  }
+  };
 
   const pageAttributes = {
-    'data-template': document.templateId,
-    'data-size': document.design.paper.size,
-  }
+    "data-template": document.templateId,
+    "data-size": document.design.paper.size,
+  };
 
   /**
    * Per-item controls, on the chrome's second row.
@@ -449,23 +452,23 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * break.
    */
   const itemControls = (item: FlowItem): React.ReactNode => {
-    if (item.type !== 'block' || apply === undefined) {
-      return undefined
+    if (item.type !== "block" || apply === undefined) {
+      return undefined;
     }
 
     const section = document.content.sections.find(
       (candidate) => candidate.id === item.sectionId,
-    )
+    );
     const index = (section?.blocks ?? []).findIndex(
       (candidate) => candidate.id === item.blockId,
-    )
+    );
 
     if (section === undefined || index === -1) {
-      return undefined
+      return undefined;
     }
 
-    const imageWidth = widthControl(item)
-    const isBreak = section.blocks[index]?.kind === 'pageBreak'
+    const imageWidth = widthControl(item);
+    const isBreak = section.blocks[index]?.kind === "pageBreak";
 
     return (
       <>
@@ -480,7 +483,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
               apply(
                 addBlock(
                   section.id,
-                  { id: createId(), kind: 'pageBreak' },
+                  { id: createId(), kind: "pageBreak" },
                   index + 1,
                 ),
               )
@@ -492,8 +495,8 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
         )}
         {imageWidth}
       </>
-    )
-  }
+    );
+  };
 
   /**
    * The width control for an image block, or nothing for any other item.
@@ -508,16 +511,16 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * attribute into every exported Markdown file.
    */
   const widthControl = (item: FlowItem): React.ReactNode => {
-    if (item.type !== 'block' || apply === undefined) {
-      return undefined
+    if (item.type !== "block" || apply === undefined) {
+      return undefined;
     }
 
     const block = document.content.sections
       .find((section) => section.id === item.sectionId)
-      ?.blocks.find((candidate) => candidate.id === item.blockId)
+      ?.blocks.find((candidate) => candidate.id === item.blockId);
 
-    if (block?.kind !== 'image') {
-      return undefined
+    if (block?.kind !== "image") {
+      return undefined;
     }
 
     return (
@@ -525,15 +528,15 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
         aria-label="Image width"
         className="rp-chrome-select"
         onChange={(event) => {
-          const next = Number(event.currentTarget.value)
+          const next = Number(event.currentTarget.value);
 
           apply(
             setImageWidth(
-              item.sectionId ?? '',
-              item.blockId ?? '',
+              item.sectionId ?? "",
+              item.blockId ?? "",
               next === 100 ? undefined : next,
             ),
-          )
+          );
         }}
         value={block.widthPercent ?? 100}
       >
@@ -543,8 +546,8 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
         <option value={75}>75%</option>
         <option value={100}>100%</option>
       </select>
-    )
-  }
+    );
+  };
 
   /**
    * The pages, and (while editing) the drag context around them.
@@ -565,20 +568,20 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
         >
           <div className="rp-page-body" data-paged>
             {ids.map((id) => {
-              const item = itemById.get(id)
+              const item = itemById.get(id);
 
               if (item === undefined) {
-                return null
+                return null;
               }
 
-              const node = nodeById.get(id)
+              const node = nodeById.get(id);
 
-              if (mode !== 'edit' || apply === undefined) {
+              if (mode !== "edit" || apply === undefined) {
                 return (
                   <div className={flowItemClass(item.type)} key={id}>
                     {node}
                   </div>
-                )
+                );
               }
 
               return (
@@ -591,12 +594,12 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                   onMoveDown={step(item, 1)}
                   onMoveUp={step(item, -1)}
                   onRemove={
-                    item.type === 'block'
+                    item.type === "block"
                       ? () =>
                           apply(
                             removeBlock(
-                              item.sectionId ?? '',
-                              item.blockId ?? '',
+                              item.sectionId ?? "",
+                              item.blockId ?? "",
                             ),
                           )
                       : undefined
@@ -604,19 +607,19 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                 >
                   {node}
                 </ItemChrome>
-              )
+              );
             })}
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 
   return (
     <div className="rp-root" ref={rootRef}>
       {/* The zoomed subtree. The measuring container is a sibling, never a
           descendant, because `zoom` scales the numbers it would read. */}
-      {mode === 'edit' && apply !== undefined ? (
+      {mode === "edit" && apply !== undefined ? (
         <DndContext
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
@@ -658,5 +661,5 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};

@@ -1,6 +1,6 @@
-import { useHotkeys } from '@mantine/hooks'
+import { useHotkeys } from "@mantine/hooks";
 
-import { useEditorStore } from './store'
+import { useEditorStore } from "./store";
 
 /**
  * `Ctrl/Cmd+Z` and `Ctrl/Cmd+Shift+Z` for the document's history.
@@ -20,12 +20,12 @@ import { useEditorStore } from './store'
  * Windows outside the browser.
  */
 export const useDocumentHistoryShortcuts = (): void => {
-  const undo = useEditorStore((state) => state.undo)
-  const redo = useEditorStore((state) => state.redo)
+  const undo = useEditorStore((state) => state.undo);
+  const redo = useEditorStore((state) => state.redo);
 
   useHotkeys([
-    ['mod+Z', undo],
-    ['mod+shift+Z', redo],
-    ['mod+Y', redo],
-  ])
-}
+    ["mod+Z", undo],
+    ["mod+shift+Z", redo],
+    ["mod+Y", redo],
+  ]);
+};

@@ -1,6 +1,6 @@
-import { expect } from '@playwright/test'
+import { expect } from "@playwright/test";
 
-import type { Page } from '@playwright/test'
+import type { Page } from "@playwright/test";
 
 /**
  * Shared moves for the end-to-end specs.
@@ -16,7 +16,7 @@ import type { Page } from '@playwright/test'
  */
 
 /** The Dexie database, from `src/database/db.ts`. */
-const DB_NAME = 'resivo'
+const DB_NAME = "resivo";
 
 /**
  * A 2x2 PNG, correct down to its CRCs.
@@ -27,7 +27,7 @@ const DB_NAME = 'resivo'
  * and rejects a malformed chunk that a structural check would pass.
  */
 export const PNG_2X2 =
-  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEklEQVR4nGM4IScnF3CCAUIBAB6kBHUNzDQ/AAAAAElFTkSuQmCC'
+  "iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAEklEQVR4nGM4IScnF3CCAUIBAB6kBHUNzDQ/AAAAAElFTkSuQmCC";
 
 /**
  * Opens the app with an empty database.
@@ -39,7 +39,7 @@ export const PNG_2X2 =
 export const openEmptyApp = async (page: Page): Promise<void> => {
   // The library, not '/': that is the landing page now, and every spec here
   // is about the app behind it.
-  await page.goto('/resumes')
+  await page.goto("/resumes");
 
   /**
    * Marked as a returning user, unless a spec asks otherwise.
@@ -51,30 +51,30 @@ export const openEmptyApp = async (page: Page): Promise<void> => {
    */
   await page.evaluate(() => {
     try {
-      localStorage.setItem('resivo.onboarding.library', '1')
-      localStorage.setItem('resivo.onboarding.editor', '1')
+      localStorage.setItem("resivo.onboarding.library", "1");
+      localStorage.setItem("resivo.onboarding.editor", "1");
     } catch {
       // A browser that refuses storage would not show the tour either.
     }
-  })
+  });
 
   await page.evaluate(
     (name) =>
       new Promise<void>((resolve, reject) => {
-        const request = indexedDB.deleteDatabase(name)
+        const request = indexedDB.deleteDatabase(name);
 
-        request.onsuccess = () => resolve()
-        request.onerror = () => reject(new Error('could not delete database'))
+        request.onsuccess = () => resolve();
+        request.onerror = () => reject(new Error("could not delete database"));
         // Something still holds a connection. The reload below closes it, and
         // the delete completes then.
-        request.onblocked = () => resolve()
+        request.onblocked = () => resolve();
       }),
     DB_NAME,
-  )
+  );
 
-  await page.reload()
-  await expect(page.getByRole('link', { name: 'Templates' })).toBeVisible()
-}
+  await page.reload();
+  await expect(page.getByRole("link", { name: "Templates" })).toBeVisible();
+};
 
 /** Creates a resume through the dialog, and lands in its editor. */
 export const createResume = async (
@@ -92,23 +92,23 @@ export const createResume = async (
    * holds.
    */
   await page
-    .getByRole('banner')
-    .getByRole('button', { name: 'New resume' })
-    .click()
+    .getByRole("banner")
+    .getByRole("button", { name: "New resume" })
+    .click();
 
-  const dialog = page.getByRole('dialog', { name: 'New resume' })
-  await expect(dialog).toBeVisible()
+  const dialog = page.getByRole("dialog", { name: "New resume" });
+  await expect(dialog).toBeVisible();
 
   if (options.template !== undefined) {
-    await dialog.getByRole('button', { name: options.template }).click()
+    await dialog.getByRole("button", { name: options.template }).click();
   }
 
-  await dialog.getByLabel('Name').fill(title)
-  await dialog.getByRole('button', { name: 'Create resume' }).click()
+  await dialog.getByLabel("Name").fill(title);
+  await dialog.getByRole("button", { name: "Create resume" }).click();
 
-  await expect(page).toHaveURL(/\/resumes\/[0-9a-f-]{36}$/)
-  await expectPaperReady(page)
-}
+  await expect(page).toHaveURL(/\/resumes\/[0-9a-f-]{36}$/);
+  await expectPaperReady(page);
+};
 
 /**
  * The preview iframe, once it has painted a page.
@@ -117,28 +117,29 @@ export const createResume = async (
  * before it has any pages in it. Waiting for a page box is what makes the rest
  * of a spec able to assume there is something to look at.
  */
-export const paper = (page: Page) => page.frameLocator('iframe').locator('body')
+export const paper = (page: Page) =>
+  page.frameLocator("iframe").locator("body");
 
 export const expectPaperReady = async (page: Page): Promise<void> => {
-  await expect(paper(page).locator('[data-paged]').first()).toBeVisible({
+  await expect(paper(page).locator("[data-paged]").first()).toBeVisible({
     timeout: 30_000,
-  })
-}
+  });
+};
 
 /** The text on the rendered paper, with the measuring pass excluded. */
 export const paperText = async (page: Page): Promise<string> =>
-  paper(page).locator('[data-paged]').first().innerText()
+  paper(page).locator("[data-paged]").first().innerText();
 
 /** Types into the Markdown pane, replacing whatever is in it. */
 export const typeMarkdown = async (
   page: Page,
   source: string,
 ): Promise<void> => {
-  const editor = page.locator('.monaco-editor').first()
-  await expect(editor).toBeVisible()
+  const editor = page.locator(".monaco-editor").first();
+  await expect(editor).toBeVisible();
 
-  await editor.click()
-  await page.keyboard.press('ControlOrMeta+A')
+  await editor.click();
+  await page.keyboard.press("ControlOrMeta+A");
 
   /**
    * The delay is load-bearing. Do not set it to zero.
@@ -149,13 +150,13 @@ export const typeMarkdown = async (
    * arrives as `#a Lo…Wrote thm.`, at 15ms and at 40ms it arrives intact. So a
    * zero delay does not test the app, it tests the editor's input queue.
    */
-  await page.keyboard.type(source, { delay: 20 })
-}
+  await page.keyboard.type(source, { delay: 20 });
+};
 
 /** No-break space and middle dot, written as escapes so this file has no
  * characters in it that look like something they are not. */
-const NBSP = String.fromCharCode(0x00a0)
-const MIDDLE_DOT = String.fromCharCode(0x00b7)
+const NBSP = String.fromCharCode(0x00a0);
+const MIDDLE_DOT = String.fromCharCode(0x00b7);
 
 /**
  * What the Markdown pane is showing.
@@ -168,13 +169,13 @@ const MIDDLE_DOT = String.fromCharCode(0x00b7)
  */
 export const markdownPaneText = async (page: Page): Promise<string> => {
   const lines = await page.evaluate(() =>
-    [...document.querySelectorAll('.view-line')].map(
+    [...document.querySelectorAll(".view-line")].map(
       (node) => (node as HTMLElement).innerText,
     ),
-  )
+  );
 
-  return lines.join('\n').replaceAll(NBSP, ' ').replaceAll(MIDDLE_DOT, ' ')
-}
+  return lines.join("\n").replaceAll(NBSP, " ").replaceAll(MIDDLE_DOT, " ");
+};
 
 /**
  * Opens a named tab in the inspector on the right.
@@ -189,10 +190,10 @@ export const openInspectorTab = async (
   name: string,
 ): Promise<void> => {
   await page
-    .getByRole('tablist', { name: 'Inspector' })
-    .getByRole('tab', { name, exact: true })
-    .click()
-}
+    .getByRole("tablist", { name: "Inspector" })
+    .getByRole("tab", { name, exact: true })
+    .click();
+};
 
 /** A tab in the editor's own strip, which only exists below the breakpoint. */
 export const openEditorPane = async (
@@ -200,10 +201,10 @@ export const openEditorPane = async (
   name: string,
 ): Promise<void> => {
   await page
-    .getByRole('tablist', { name: 'Editor panes' })
-    .getByRole('tab', { name, exact: true })
-    .click()
-}
+    .getByRole("tablist", { name: "Editor panes" })
+    .getByRole("tab", { name, exact: true })
+    .click();
+};
 
 /**
  * The dropdown that is open right now.
@@ -213,7 +214,7 @@ export const openEditorPane = async (
  * its own dropdown too, and opens after its parent, hence `last`.
  */
 export const visibleMenu = (page: Page) =>
-  page.locator('[role="menu"]:visible').last()
+  page.locator('[role="menu"]:visible').last();
 
 /**
  * Opens a resume card's action menu and returns it.
@@ -224,7 +225,7 @@ export const visibleMenu = (page: Page) =>
  * to the one that is open now.
  */
 export const cardMenu = async (page: Page, title: string) => {
-  await page.getByRole('button', { name: `Actions for ${title}` }).click()
+  await page.getByRole("button", { name: `Actions for ${title}` }).click();
 
   /**
    * Found by name, not by "the visible one".
@@ -236,8 +237,8 @@ export const cardMenu = async (page: Page, title: string) => {
    * which is also what a screen reader needs to say which resume is about to be
    * archived.
    */
-  const menu = page.getByRole('menu', { name: `Actions for ${title}` })
-  await expect(menu).toBeVisible()
+  const menu = page.getByRole("menu", { name: `Actions for ${title}` });
+  await expect(menu).toBeVisible();
 
-  return menu
-}
+  return menu;
+};

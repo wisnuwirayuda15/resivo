@@ -1,14 +1,14 @@
-import { Box, Loader, Text } from '@mantine/core'
-import { Link } from '@tanstack/react-router'
+import { Box, Loader, Text } from "@mantine/core";
+import { Link } from "@tanstack/react-router";
 
-import { formatBytes } from '@/features/assets/format'
+import { formatBytes } from "@/features/assets/format";
 import {
   useAssetUsage,
   useFonts,
   useImages,
   useUnusedFonts,
   useUnusedImages,
-} from '@/features/assets/queries'
+} from "@/features/assets/queries";
 
 /**
  * What Resivo is holding on this device.
@@ -25,36 +25,36 @@ import {
  */
 
 const Row: React.FC<{
-  label: string
-  count: number
-  bytes: number
-  unused: number
-  to: '/images' | '/fonts'
+  label: string;
+  count: number;
+  bytes: number;
+  unused: number;
+  to: "/images" | "/fonts";
 }> = ({ label, count, bytes, unused, to }) => (
   <Box className="border-line-soft flex items-baseline justify-between gap-3 border-b py-2 last:border-b-0">
     <Link className="text-body hover:text-accent text-[13px]" to={to}>
       {label}
     </Link>
     <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-      {count} {count === 1 ? 'file' : 'files'} · {formatBytes(bytes)}
-      {unused === 0 ? '' : ` · ${unused} unused`}
+      {count} {count === 1 ? "file" : "files"} · {formatBytes(bytes)}
+      {unused === 0 ? "" : ` · ${unused} unused`}
     </Text>
   </Box>
-)
+);
 
 export const StoragePanel: React.FC = () => {
-  const usage = useAssetUsage()
-  const images = useImages()
-  const fonts = useFonts()
-  const unusedImages = useUnusedImages()
-  const unusedFonts = useUnusedFonts()
+  const usage = useAssetUsage();
+  const images = useImages();
+  const fonts = useFonts();
+  const unusedImages = useUnusedImages();
+  const unusedFonts = useUnusedFonts();
 
   if (usage.data === undefined) {
     return (
       <Box className="flex py-6">
         <Loader size="sm" />
       </Box>
-    )
+    );
   }
 
   return (
@@ -81,5 +81,5 @@ export const StoragePanel: React.FC = () => {
         yet: the Images and Fonts pages are where that decision is made.
       </Text>
     </Box>
-  )
-}
+  );
+};

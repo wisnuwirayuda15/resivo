@@ -1,6 +1,6 @@
-import type { OnboardingTourStep } from '@gfazioli/mantine-onboarding-tour'
-import type { EditorPane } from '@/features/editor/tourPane'
-import type { TourName } from './seen'
+import type { OnboardingTourStep } from "@gfazioli/mantine-onboarding-tour";
+import type { EditorPane } from "@/features/editor/tourPane";
+import type { TourName } from "./seen";
 
 /**
  * What the tour points at, and what it says.
@@ -19,16 +19,16 @@ import type { TourName } from './seen'
  */
 
 export const TOUR_TARGET_IDS = {
-  newResume: 'tour-new-resume',
-  assets: 'tour-assets',
-  settings: 'tour-settings',
-  appMenu: 'tour-app-menu',
-  code: 'tour-code',
-  guide: 'tour-guide',
-  paper: 'tour-paper',
-  paperTitlebar: 'tour-paper-titlebar',
-  inspector: 'tour-inspector',
-  history: 'tour-history',
+  newResume: "tour-new-resume",
+  assets: "tour-assets",
+  settings: "tour-settings",
+  appMenu: "tour-app-menu",
+  code: "tour-code",
+  guide: "tour-guide",
+  paper: "tour-paper",
+  paperTitlebar: "tour-paper-titlebar",
+  inspector: "tour-inspector",
+  history: "tour-history",
   /**
    * The tab strip's three buttons, used instead of the three panes above when
    * the editor is one pane at a time.
@@ -40,10 +40,10 @@ export const TOUR_TARGET_IDS = {
    * a 30px button with a card's worth of room underneath it. It is also the
    * more honest thing to point at on a screen where the pane is a tab.
    */
-  codeTab: 'tour-code-tab',
-  paperTab: 'tour-paper-tab',
-  styleTab: 'tour-style-tab',
-} as const
+  codeTab: "tour-code-tab",
+  paperTab: "tour-paper-tab",
+  styleTab: "tour-style-tab",
+} as const;
 
 /**
  * The steps whose anchor is a row in the sidebar.
@@ -56,7 +56,7 @@ export const TOUR_TARGET_IDS = {
 export const SIDEBAR_STEP_IDS: ReadonlySet<string> = new Set([
   TOUR_TARGET_IDS.assets,
   TOUR_TARGET_IDS.settings,
-])
+]);
 
 /**
  * Which editor pane each step needs open, where only one can be.
@@ -69,78 +69,78 @@ export const SIDEBAR_STEP_IDS: ReadonlySet<string> = new Set([
  * would point at nothing. The history step is in the app bar and needs no pane.
  */
 export const EDITOR_STEP_PANES: Readonly<Record<string, EditorPane>> = {
-  [TOUR_TARGET_IDS.codeTab]: 'code',
-  [TOUR_TARGET_IDS.guide]: 'code',
-  [TOUR_TARGET_IDS.paperTab]: 'paper',
-  [TOUR_TARGET_IDS.paperTitlebar]: 'paper',
-  [TOUR_TARGET_IDS.styleTab]: 'style',
-}
+  [TOUR_TARGET_IDS.codeTab]: "code",
+  [TOUR_TARGET_IDS.guide]: "code",
+  [TOUR_TARGET_IDS.paperTab]: "paper",
+  [TOUR_TARGET_IDS.paperTitlebar]: "paper",
+  [TOUR_TARGET_IDS.styleTab]: "style",
+};
 
 const LIBRARY_STEPS: Array<OnboardingTourStep> = [
   {
     id: TOUR_TARGET_IDS.newResume,
-    title: 'Start here',
+    title: "Start here",
     content:
-      'Pick one of four single-column templates, or import a Markdown file you already have, the importer keeps what it cannot typeset rather than dropping it.',
+      "Pick one of four single-column templates, or import a Markdown file you already have, the importer keeps what it cannot typeset rather than dropping it.",
   },
   {
     id: TOUR_TARGET_IDS.assets,
-    title: 'Images and fonts are shared',
+    title: "Images and fonts are shared",
     content:
-      'Uploaded once and available to every resume on this device, so the same photograph never has to be added twice. Both pages also show what nothing refers to any more, which is the only safe way to reclaim the space.',
+      "Uploaded once and available to every resume on this device, so the same photograph never has to be added twice. Both pages also show what nothing refers to any more, which is the only safe way to reclaim the space.",
   },
   {
     id: TOUR_TARGET_IDS.settings,
-    title: 'This is the important one',
+    title: "This is the important one",
     content:
-      'Everything lives in this browser and nowhere else. Clearing its storage deletes your resumes, and no server has a copy. The backup file in Settings is the only thing that survives that, writing one now is cheaper than wishing you had.',
+      "Everything lives in this browser and nowhere else. Clearing its storage deletes your resumes, and no server has a copy. The backup file in Settings is the only thing that survives that, writing one now is cheaper than wishing you had.",
   },
   {
     id: TOUR_TARGET_IDS.appMenu,
-    title: 'Everything, from the keyboard',
+    title: "Everything, from the keyboard",
     content:
-      'Ctrl+K (or Cmd+K) opens a command palette over the whole app: every page, every command, searchable. The menu here lists the other shortcuts, and is where this tour can be started again.',
+      "Ctrl+K (or Cmd+K) opens a command palette over the whole app: every page, every command, searchable. The menu here lists the other shortcuts, and is where this tour can be started again.",
   },
-]
+];
 
 const EDITOR_STEPS: Array<OnboardingTourStep> = [
   {
     id: TOUR_TARGET_IDS.code,
-    title: 'Markdown, and your own CSS',
+    title: "Markdown, and your own CSS",
     content:
-      'Two tabs. The Markdown is the document (headings, lists, tables, task lists), and the CSS is yours to restyle the paper with. It is sanitized and scoped, so it cannot reach the app around it or break the pagination it was measured against.',
+      "Two tabs. The Markdown is the document (headings, lists, tables, task lists), and the CSS is yours to restyle the paper with. It is sanitized and scoped, so it cannot reach the app around it or break the pagination it was measured against.",
   },
   {
     id: TOUR_TARGET_IDS.guide,
-    title: 'Every directive, with an example',
+    title: "Every directive, with an example",
     content:
-      'The format is Markdown plus a few directives (an entry, a contact, a list of skills), and this is where each one is written down, with an example that is checked against the real parser. It also copies a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.',
+      "The format is Markdown plus a few directives (an entry, a contact, a list of skills), and this is where each one is written down, with an example that is checked against the real parser. It also copies a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.",
   },
   {
     id: TOUR_TARGET_IDS.paper,
-    title: 'The paper is editable too',
+    title: "The paper is editable too",
     content:
-      'Switch to Visual and click any text to change it in place, or drag a block to move it. Every edit goes to the same document as the Markdown, which is why one undo history covers all of it.',
+      "Switch to Visual and click any text to change it in place, or drag a block to move it. Every edit goes to the same document as the Markdown, which is why one undo history covers all of it.",
   },
   {
     id: TOUR_TARGET_IDS.paperTitlebar,
-    title: 'Export is the same document',
+    title: "Export is the same document",
     content:
-      'HTML is one self-contained file (images and fonts inlined, no external reference of any kind), and PDF is that same file printed, so the two cannot disagree. Markdown uses the same writer the editor reads.',
+      "HTML is one self-contained file (images and fonts inlined, no external reference of any kind), and PDF is that same file printed, so the two cannot disagree. Markdown uses the same writer the editor reads.",
   },
   {
     id: TOUR_TARGET_IDS.inspector,
-    title: 'Three tabs worth knowing',
+    title: "Three tabs worth knowing",
     content:
-      'Style is every design token: paper size, margins, type, colour, rules, and where pages break. Sections is the outline: reorder, hide, add an icon, start a section on a new page. Assets places an image or sets the resume in an uploaded face.',
+      "Style is every design token: paper size, margins, type, colour, rules, and where pages break. Sections is the outline: reorder, hide, add an icon, start a section on a new page. Assets places an image or sets the resume in an uploaded face.",
   },
   {
     id: TOUR_TARGET_IDS.history,
-    title: 'Nothing here is one-way',
+    title: "Nothing here is one-way",
     content:
-      'Undo and redo cover the document, whichever surface the change came from: a slider, a drag, a keystroke on the paper. Autosave writes to this device as you go.',
+      "Undo and redo cover the document, whichever surface the change came from: a slider, a drag, a keystroke on the paper. Autosave writes to this device as you go.",
   },
-]
+];
 
 /**
  * The pane anchors, swapped for the tab that opens each pane.
@@ -153,15 +153,15 @@ const NARROW_EDITOR_ANCHORS: Readonly<Record<string, string>> = {
   [TOUR_TARGET_IDS.code]: TOUR_TARGET_IDS.codeTab,
   [TOUR_TARGET_IDS.paper]: TOUR_TARGET_IDS.paperTab,
   [TOUR_TARGET_IDS.inspector]: TOUR_TARGET_IDS.styleTab,
-}
+};
 
 const NARROW_EDITOR_STEPS: Array<OnboardingTourStep> = EDITOR_STEPS.map(
   (step) => {
-    const anchor = NARROW_EDITOR_ANCHORS[step.id]
+    const anchor = NARROW_EDITOR_ANCHORS[step.id];
 
-    return anchor === undefined ? step : { ...step, id: anchor }
+    return anchor === undefined ? step : { ...step, id: anchor };
   },
-)
+);
 
 export const tourSteps = (
   name: TourName,
@@ -172,9 +172,9 @@ export const tourSteps = (
    */
   options: { wideEditor: boolean } = { wideEditor: true },
 ): Array<OnboardingTourStep> => {
-  if (name === 'library') {
-    return LIBRARY_STEPS
+  if (name === "library") {
+    return LIBRARY_STEPS;
   }
 
-  return options.wideEditor ? EDITOR_STEPS : NARROW_EDITOR_STEPS
-}
+  return options.wideEditor ? EDITOR_STEPS : NARROW_EDITOR_STEPS;
+};

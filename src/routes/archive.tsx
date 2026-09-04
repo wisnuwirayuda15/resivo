@@ -1,12 +1,12 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { ClientOnly } from '@/components/client-only'
-import { EmptyState } from '@/components/EmptyState'
-import { ResumeLibrary } from '@/features/resume/components/ResumeLibrary'
-import { useArchivedResumes } from '@/features/resume/queries'
+import { Shell } from "@/components/shell/Shell";
+import { ClientOnly } from "@/components/client-only";
+import { EmptyState } from "@/components/EmptyState";
+import { ResumeLibrary } from "@/features/resume/components/ResumeLibrary";
+import { useArchivedResumes } from "@/features/resume/queries";
 
 /**
  * Archived resumes.
@@ -16,7 +16,7 @@ import { useArchivedResumes } from '@/features/resume/queries'
  * would defeat the point.
  */
 const ArchiveRoute: React.FC = () => {
-  const archived = useArchivedResumes()
+  const archived = useArchivedResumes();
 
   return (
     <Shell title="Archived">
@@ -36,15 +36,15 @@ const ArchiveRoute: React.FC = () => {
         />
       </ClientOnly>
     </Shell>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/archive')({
+export const Route = createFileRoute("/archive")({
   head: () => ({
     meta: seo({
-      title: 'Archive | Resivo',
+      title: "Archive | Resivo",
       indexable: false,
     }),
   }),
   component: ArchiveRoute,
-})
+});

@@ -1,4 +1,4 @@
-import { useSortable } from '@dnd-kit/sortable'
+import { useSortable } from "@dnd-kit/sortable";
 
 /**
  * The editing chrome around one flow item.
@@ -17,15 +17,15 @@ import { useSortable } from '@dnd-kit/sortable'
  */
 
 interface ItemChromeProps {
-  id: string
+  id: string;
   /** Disabled for the header, which has nowhere to move to. */
-  movable: boolean
+  movable: boolean;
   /** `null` when the move is impossible, first item, last item, nothing of its
    * kind in that direction. The button is rendered disabled rather than removed,
    * so the row of controls does not change width as an item moves. */
-  onMoveUp?: (() => void) | null
-  onMoveDown?: (() => void) | null
-  onRemove?: () => void
+  onMoveUp?: (() => void) | null;
+  onMoveDown?: (() => void) | null;
+  onRemove?: () => void;
   /**
    * Controls for what this particular item is, an image's width, so far.
    *
@@ -35,9 +35,9 @@ interface ItemChromeProps {
    * the chrome for the reason the chrome exists, the measuring pass does not
    * render any of this, so no control here can move a page break.
    */
-  extra?: React.ReactNode
-  children: React.ReactNode
-  className: string
+  extra?: React.ReactNode;
+  children: React.ReactNode;
+  className: string;
 }
 
 export const ItemChrome: React.FC<ItemChromeProps> = ({
@@ -57,7 +57,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
     setActivatorNodeRef,
     isDragging,
     isOver,
-  } = useSortable({ id, disabled: !movable })
+  } = useSortable({ id, disabled: !movable });
 
   /**
    * No transform is applied, unlike a normal sortable list.
@@ -70,9 +70,9 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   return (
     <div
       className={className}
-      data-dragging={isDragging ? '' : undefined}
+      data-dragging={isDragging ? "" : undefined}
       data-flow-id={id}
-      data-over={isOver && !isDragging ? '' : undefined}
+      data-over={isOver && !isDragging ? "" : undefined}
       ref={setNodeRef}
     >
       {movable ? (
@@ -132,5 +132,5 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
 
       {children}
     </div>
-  )
-}
+  );
+};

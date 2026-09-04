@@ -18,28 +18,28 @@
 
 interface DocumentLocale {
   /** BCP 47 language subtag. */
-  value: string
+  value: string;
   /** Endonym first, since this is chosen by the person writing the document. */
-  label: string
+  label: string;
   /** How an ongoing role's end is written on a resume in this language. */
-  present: string
+  present: string;
 }
 
 export const DOCUMENT_LOCALES: ReadonlyArray<DocumentLocale> = [
-  { value: 'en', label: 'English', present: 'Present' },
-  { value: 'id', label: 'Bahasa Indonesia', present: 'Sekarang' },
-  { value: 'de', label: 'Deutsch', present: 'heute' },
-  { value: 'es', label: 'Español', present: 'Actualidad' },
-  { value: 'fr', label: 'Français', present: 'Présent' },
-  { value: 'it', label: 'Italiano', present: 'Presente' },
-  { value: 'nl', label: 'Nederlands', present: 'Heden' },
-  { value: 'pl', label: 'Polski', present: 'Obecnie' },
-  { value: 'pt', label: 'Português', present: 'Presente' },
-  { value: 'tr', label: 'Türkçe', present: 'Halen' },
-  { value: 'ja', label: '日本語', present: '現在' },
-  { value: 'ko', label: '한국어', present: '현재' },
-  { value: 'zh', label: '中文', present: '至今' },
-]
+  { value: "en", label: "English", present: "Present" },
+  { value: "id", label: "Bahasa Indonesia", present: "Sekarang" },
+  { value: "de", label: "Deutsch", present: "heute" },
+  { value: "es", label: "Español", present: "Actualidad" },
+  { value: "fr", label: "Français", present: "Présent" },
+  { value: "it", label: "Italiano", present: "Presente" },
+  { value: "nl", label: "Nederlands", present: "Heden" },
+  { value: "pl", label: "Polski", present: "Obecnie" },
+  { value: "pt", label: "Português", present: "Presente" },
+  { value: "tr", label: "Türkçe", present: "Halen" },
+  { value: "ja", label: "日本語", present: "現在" },
+  { value: "ko", label: "한국어", present: "현재" },
+  { value: "zh", label: "中文", present: "至今" },
+];
 
 /**
  * The word for an ongoing role, for a document's locale.
@@ -49,8 +49,8 @@ export const DOCUMENT_LOCALES: ReadonlyArray<DocumentLocale> = [
  * as a missing end date, which says something different and untrue.
  */
 export const presentLabel = (locale: string): string => {
-  const language = locale.trim().toLowerCase().split(/[-_]/)[0] ?? ''
-  const match = DOCUMENT_LOCALES.find((entry) => entry.value === language)
+  const language = locale.trim().toLowerCase().split(/[-_]/)[0] ?? "";
+  const match = DOCUMENT_LOCALES.find((entry) => entry.value === language);
 
-  return match?.present ?? 'Present'
-}
+  return match?.present ?? "Present";
+};

@@ -10,12 +10,12 @@
  * file with no network, which is the whole point of the format.
  */
 
-import { fontRepo, imageRepo } from '@/database/index'
+import { fontRepo, imageRepo } from "@/database/index";
 
-import paperFontsCss from '@/features/preview/paper-fonts.css?inline'
+import paperFontsCss from "@/features/preview/paper-fonts.css?inline";
 
-import type { FontSource } from '@/features/assets/fontFaces'
-import type { ImageMap } from '@/features/assets/useAssetUrls'
+import type { FontSource } from "@/features/assets/fontFaces";
+import type { ImageMap } from "@/features/assets/useAssetUrls";
 
 /**
  * A blob as a `data:` URL.
@@ -27,19 +27,19 @@ import type { ImageMap } from '@/features/assets/useAssetUrls'
  * large enough for that to matter.
  */
 export const blobToDataUrl = async (blob: Blob): Promise<string> => {
-  const bytes = new Uint8Array(await blob.arrayBuffer())
+  const bytes = new Uint8Array(await blob.arrayBuffer());
 
-  const CHUNK = 0x8000
-  let binary = ''
+  const CHUNK = 0x8000;
+  let binary = "";
 
   for (let at = 0; at < bytes.length; at += CHUNK) {
-    binary += String.fromCharCode(...bytes.subarray(at, at + CHUNK))
+    binary += String.fromCharCode(...bytes.subarray(at, at + CHUNK));
   }
 
-  const mime = blob.type === '' ? 'application/octet-stream' : blob.type
+  const mime = blob.type === "" ? "application/octet-stream" : blob.type;
 
-  return `data:${mime};base64,${btoa(binary)}`
-}
+  return `data:${mime};base64,${btoa(binary)}`;
+};
 
 /**
  * The images a document references, as `data:` URLs.
@@ -53,7 +53,7 @@ export const inlineImages = async (
 ): Promise<ImageMap> => {
   const entries = await Promise.all(
     ids.map(async (id) => {
-      const record = await imageRepo.getImage(id)
+      const record = await imageRepo.getImage(id);
 
       return [
         id,
@@ -64,32 +64,32 @@ export const inlineImages = async (
               width: record.width,
               height: record.height,
             },
-      ] as const
+      ] as const;
     }),
-  )
+  );
 
-  return new Map(entries)
-}
+  return new Map(entries);
+};
 
 export const inlineFonts = async (
   ids: ReadonlyArray<string>,
 ): Promise<Array<FontSource>> => {
   const sources = await Promise.all(
     ids.map(async (id) => {
-      const record = await fontRepo.getFont(id)
+      const record = await fontRepo.getFont(id);
 
       if (record === undefined) {
-        return null
+        return null;
       }
 
-      const { blob, ...font } = record
+      const { blob, ...font } = record;
 
-      return { font, url: await blobToDataUrl(blob) }
+      return { font, url: await blobToDataUrl(blob) };
     }),
-  )
+  );
 
-  return sources.filter((source): source is FontSource => source !== null)
-}
+  return sources.filter((source): source is FontSource => source !== null);
+};
 
 /**
  * The bundled typefaces, inlined.
@@ -112,8 +112,8 @@ export const inlineFonts = async (
  * the asset URLs already rewritten.
  */
 export const inlineBuiltinFonts = async (): Promise<string> => {
-  const css = paperFontsCss
-  const base = window.location.href
+  const css = paperFontsCss;
+  const base = window.location.href;
 
   // Every `url(...)` in the sheet, deduplicated: the same subset file is
   // referenced by more than one rule.
@@ -121,20 +121,20 @@ export const inlineBuiltinFonts = async (): Promise<string> => {
     ...new Set(
       Array.from(
         css.matchAll(/url\((['"]?)([^'")]+)\1\)/g),
-        (match) => match[2] ?? '',
-      ).filter((href) => href !== '' && !href.startsWith('data:')),
+        (match) => match[2] ?? "",
+      ).filter((href) => href !== "" && !href.startsWith("data:")),
     ),
-  ]
+  ];
 
-  const inlined = new Map<string, string>()
+  const inlined = new Map<string, string>();
 
   await Promise.all(
     references.map(async (href) => {
       try {
-        const file = await fetch(new URL(href, base))
+        const file = await fetch(new URL(href, base));
 
         if (file.ok) {
-          inlined.set(href, await blobToDataUrl(await file.blob()))
+          inlined.set(href, await blobToDataUrl(await file.blob()));
         }
       } catch {
         // A face that cannot be fetched is left as it was: the export then
@@ -142,11 +142,11 @@ export const inlineBuiltinFonts = async (): Promise<string> => {
         // back, which is worse than inlining it and better than no file at all.
       }
     }),
-  )
+  );
 
   return css.replace(/url\((['"]?)([^'")]+)\1\)/g, (whole, _quote, href) => {
-    const data = inlined.get(String(href))
+    const data = inlined.get(String(href));
 
-    return data === undefined ? whole : `url(${data})`
-  })
-}
+    return data === undefined ? whole : `url(${data})`;
+  });
+};

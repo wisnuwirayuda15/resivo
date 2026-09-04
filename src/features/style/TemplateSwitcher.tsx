@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState } from "react";
 import {
   Box,
   Button,
@@ -7,18 +7,21 @@ import {
   Stack,
   Text,
   UnstyledButton,
-} from '@mantine/core'
+} from "@mantine/core";
 
 import {
   designMatchesTemplate,
   templateDefaults,
-} from '@/features/templates/defaults'
-import { TEMPLATE_CATALOG, templateList } from '@/features/templates/catalog'
-import { setTemplate } from '@/features/editor/mutations'
-import { cn } from '@/lib/utils'
+} from "@/features/templates/defaults";
+import { TEMPLATE_CATALOG, templateList } from "@/features/templates/catalog";
+import { setTemplate } from "@/features/editor/mutations";
+import { cn } from "@/lib/utils";
 
-import type { Recipe } from '@/features/editor/mutations'
-import type { DesignConfig, TemplateId } from '@/features/resume/model/document'
+import type { Recipe } from "@/features/editor/mutations";
+import type {
+  DesignConfig,
+  TemplateId,
+} from "@/features/resume/model/document";
 
 /**
  * Choosing a template, from inside the editor.
@@ -34,9 +37,9 @@ import type { DesignConfig, TemplateId } from '@/features/resume/model/document'
  */
 
 interface TemplateSwitcherProps {
-  templateId: TemplateId
-  design: DesignConfig
-  apply: (recipe: Recipe) => void
+  templateId: TemplateId;
+  design: DesignConfig;
+  apply: (recipe: Recipe) => void;
 }
 
 /**
@@ -52,7 +55,7 @@ interface TemplateSwitcherProps {
  * Mantine's `fw` style prop, which resolves a dynamic value at render.
  */
 const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
-  const design = templateDefaults(id)
+  const design = templateDefaults(id);
 
   return (
     <Box
@@ -68,51 +71,51 @@ const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
         Aa
       </Box>
     </Box>
-  )
-}
+  );
+};
 
 export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
   templateId,
   design,
   apply,
 }) => {
-  const [pending, setPending] = useState<TemplateId | null>(null)
+  const [pending, setPending] = useState<TemplateId | null>(null);
 
   const select = (next: TemplateId) => {
     if (next === templateId) {
-      return
+      return;
     }
 
     if (designMatchesTemplate(design, templateId)) {
-      apply(setTemplate(next, { resetDesign: true }))
-      return
+      apply(setTemplate(next, { resetDesign: true }));
+      return;
     }
 
-    setPending(next)
-  }
+    setPending(next);
+  };
 
   const commit = (resetDesign: boolean) => {
     if (pending !== null) {
-      apply(setTemplate(pending, { resetDesign }))
+      apply(setTemplate(pending, { resetDesign }));
     }
 
-    setPending(null)
-  }
+    setPending(null);
+  };
 
   return (
     <>
       <Box className="flex flex-col gap-1">
         {templateList.map((template) => {
-          const selected = template.id === templateId
+          const selected = template.id === templateId;
 
           return (
             <UnstyledButton
               aria-pressed={selected}
               className={cn(
-                'rounded-control duration-fast ease-standard flex items-center gap-2 border px-2 py-1.5 text-left transition-colors',
+                "rounded-control duration-fast ease-standard flex items-center gap-2 border px-2 py-1.5 text-left transition-colors",
                 selected
-                  ? 'border-line-accent bg-selected'
-                  : 'border-transparent hover:bg-hover',
+                  ? "border-line-accent bg-selected"
+                  : "hover:bg-hover border-transparent",
               )}
               key={template.id}
               onClick={() => select(template.id)}
@@ -127,7 +130,7 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
                 </Text>
               </Box>
             </UnstyledButton>
-          )
+          );
         })}
       </Box>
 
@@ -139,8 +142,8 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
       >
         <Stack gap="lg">
           <Text className="text-body text-[13px] leading-normal">
-            You have changed the style tokens on this resume. Switching to{' '}
-            {pending === null ? '' : TEMPLATE_CATALOG[pending].name} can keep
+            You have changed the style tokens on this resume. Switching to{" "}
+            {pending === null ? "" : TEMPLATE_CATALOG[pending].name} can keep
             those changes, or replace them with that template&rsquo;s own
             defaults. Your content is untouched either way.
           </Text>
@@ -160,5 +163,5 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
         </Stack>
       </Modal>
     </>
-  )
-}
+  );
+};

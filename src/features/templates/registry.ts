@@ -1,9 +1,9 @@
-import paperCssText from './paper.css?raw'
-import baseCssText from './base.css?raw'
-import { defaultComponents } from './renderer/defaults'
+import paperCssText from "./paper.css?raw";
+import baseCssText from "./base.css?raw";
+import { defaultComponents } from "./renderer/defaults";
 
-import type { TemplateId } from '@/features/resume/model/document'
-import type { TemplateComponents } from './renderer/types'
+import type { TemplateId } from "@/features/resume/model/document";
+import type { TemplateComponents } from "./renderer/types";
 
 /**
  * The template registry.
@@ -26,18 +26,18 @@ import type { TemplateComponents } from './renderer/types'
  */
 
 export interface ResumeTemplate {
-  id: TemplateId
+  id: TemplateId;
   /**
    * Bumped when this template's markup or CSS changes in a way that reflows an
    * existing resume. Nothing consumes it yet; it is what a future "re-paginate
    * cached page counts" step would key off.
    */
-  version: number
+  version: number;
   /** Appended last inside `@layer template`, so restating a rule overrides the
    * shared one. */
-  baseCss: string
+  baseCss: string;
   /** Overrides for the shared renderers. Anything omitted uses the default. */
-  components?: Partial<TemplateComponents>
+  components?: Partial<TemplateComponents>;
 }
 
 /**
@@ -47,7 +47,7 @@ export interface ResumeTemplate {
  * which is the convention the format is recognised by.
  */
 const classic: ResumeTemplate = {
-  id: 'classic',
+  id: "classic",
   version: 1,
   baseCss: `
 .resivo-paper[data-template='classic'] .rp-header {
@@ -60,7 +60,7 @@ const classic: ResumeTemplate = {
   justify-content: center;
 }
 `,
-}
+};
 
 /**
  * Modern, clean contemporary sans.
@@ -74,7 +74,7 @@ const classic: ResumeTemplate = {
  * system reads, a decorative rule beside it changes nothing about parsing.
  */
 const modern: ResumeTemplate = {
-  id: 'modern',
+  id: "modern",
   version: 1,
   baseCss: `
 .resivo-paper[data-template='modern'] .rp-section {
@@ -98,7 +98,7 @@ const modern: ResumeTemplate = {
   color: var(--paper-ink);
 }
 `,
-}
+};
 
 /**
  * Technical, denser, with monospace headings.
@@ -108,7 +108,7 @@ const modern: ResumeTemplate = {
  * and a tighter bullet indent buy back the horizontal space a mono face costs.
  */
 const technical: ResumeTemplate = {
-  id: 'technical',
+  id: "technical",
   version: 1,
   baseCss: `
 .resivo-paper[data-template='technical'] .rp-section-title {
@@ -126,7 +126,7 @@ const technical: ResumeTemplate = {
   list-style: square;
 }
 `,
-}
+};
 
 /**
  * Editorial, serif throughout, hierarchy from type size rather than rules.
@@ -136,7 +136,7 @@ const technical: ResumeTemplate = {
  * uppercase tracking, and the headline under the name is italic.
  */
 const editorial: ResumeTemplate = {
-  id: 'editorial',
+  id: "editorial",
   version: 1,
   baseCss: `
 .resivo-paper[data-template='editorial'] .rp-headline {
@@ -154,30 +154,30 @@ const editorial: ResumeTemplate = {
   font-style: italic;
 }
 `,
-}
+};
 
 const TEMPLATES: Record<TemplateId, ResumeTemplate> = {
   classic,
   modern,
   technical,
   editorial,
-}
+};
 
 export interface ResolvedTemplate {
-  id: TemplateId
-  version: number
-  components: TemplateComponents
+  id: TemplateId;
+  version: number;
+  components: TemplateComponents;
 }
 
 export const resolveTemplate = (id: TemplateId): ResolvedTemplate => {
-  const template = TEMPLATES[id]
+  const template = TEMPLATES[id];
 
   return {
     id: template.id,
     version: template.version,
     components: { ...defaultComponents, ...template.components },
-  }
-}
+  };
+};
 
 /**
  * Everything that belongs in the preview's `template` cascade layer, in
@@ -189,4 +189,4 @@ export const resolveTemplate = (id: TemplateId): ResolvedTemplate => {
  * paper miniatures pick up the same tokens.
  */
 export const templateLayerCss = (id: TemplateId): string =>
-  [paperCssText, baseCssText, TEMPLATES[id].baseCss].join('\n')
+  [paperCssText, baseCssText, TEMPLATES[id].baseCss].join("\n");

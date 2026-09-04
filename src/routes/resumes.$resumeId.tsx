@@ -1,19 +1,19 @@
-import { useEffect } from 'react'
-import { createFileRoute } from '@tanstack/react-router'
-import { Box, Loader } from '@mantine/core'
+import { useEffect } from "react";
+import { createFileRoute } from "@tanstack/react-router";
+import { Box, Loader } from "@mantine/core";
 
-import { seo } from '@/lib/seo'
+import { seo } from "@/lib/seo";
 
-import { Shell } from '@/components/shell/Shell'
-import { ClientOnly } from '@/components/client-only'
-import { EmptyState } from '@/components/EmptyState'
-import { EditorLayout } from '@/features/editor/EditorLayout'
-import { HistoryControls } from '@/features/editor/HistoryControls'
-import { SaveIndicator } from '@/features/editor/SaveIndicator'
-import { useAutosave } from '@/features/editor/useAutosave'
-import { useDocumentHistoryShortcuts } from '@/features/editor/useDocumentHistoryShortcuts'
-import { useEditorStore } from '@/features/editor/store'
-import { useResume } from '@/features/resume/queries'
+import { Shell } from "@/components/shell/Shell";
+import { ClientOnly } from "@/components/client-only";
+import { EmptyState } from "@/components/EmptyState";
+import { EditorLayout } from "@/features/editor/EditorLayout";
+import { HistoryControls } from "@/features/editor/HistoryControls";
+import { SaveIndicator } from "@/features/editor/SaveIndicator";
+import { useAutosave } from "@/features/editor/useAutosave";
+import { useDocumentHistoryShortcuts } from "@/features/editor/useDocumentHistoryShortcuts";
+import { useEditorStore } from "@/features/editor/store";
+import { useResume } from "@/features/resume/queries";
 
 /**
  * One resume.
@@ -28,15 +28,15 @@ import { useResume } from '@/features/resume/queries'
  * there is a document to edit at all.
  */
 const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
-  const resume = useResume(resumeId)
-  const load = useEditorStore((state) => state.load)
-  const apply = useEditorStore((state) => state.apply)
-  const replace = useEditorStore((state) => state.replace)
-  const openResumeId = useEditorStore((state) => state.resumeId)
-  const document = useEditorStore((state) => state.document)
+  const resume = useResume(resumeId);
+  const load = useEditorStore((state) => state.load);
+  const apply = useEditorStore((state) => state.apply);
+  const replace = useEditorStore((state) => state.replace);
+  const openResumeId = useEditorStore((state) => state.resumeId);
+  const document = useEditorStore((state) => state.document);
 
-  useAutosave(resumeId)
-  useDocumentHistoryShortcuts()
+  useAutosave(resumeId);
+  useDocumentHistoryShortcuts();
 
   useEffect(() => {
     // Guarded on the id rather than on `document === null`, so navigating from
@@ -47,13 +47,13 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
       resume.data !== null &&
       openResumeId !== resume.data.id
     ) {
-      load(resume.data.id, resume.data.document)
+      load(resume.data.id, resume.data.document);
     }
-  }, [resume.data, openResumeId, load])
+  }, [resume.data, openResumeId, load]);
 
   // Leaving the route closes the document. `useAutosave` flushes on its own
   // teardown, so this cannot drop a pending write.
-  useEffect(() => () => useEditorStore.getState().close(), [])
+  useEffect(() => () => useEditorStore.getState().close(), []);
 
   // `isPending` rather than `isLoading`: the latter is false while a query sits
   // between attempts, which would flash a wrong screen instead of the loader.
@@ -62,7 +62,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
       <Box className="flex justify-center py-20">
         <Loader size="sm" />
       </Box>
-    )
+    );
   }
 
   /**
@@ -81,10 +81,10 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
         body={
           resume.error instanceof Error
             ? resume.error.message
-            : 'The stored document could not be read.'
+            : "The stored document could not be read."
         }
       />
-    )
+    );
   }
 
   if (resume.data === null) {
@@ -94,7 +94,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
         title="Resume not found"
         body="It may have been deleted on this device. Go back to the library to see what is there."
       />
-    )
+    );
   }
 
   // One render between the record arriving and the store accepting it.
@@ -103,15 +103,15 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
       <Box className="flex justify-center py-20">
         <Loader size="sm" />
       </Box>
-    )
+    );
   }
 
-  return <EditorLayout apply={apply} document={document} replace={replace} />
-}
+  return <EditorLayout apply={apply} document={document} replace={replace} />;
+};
 
 const ResumeScreen: React.FC = () => {
-  const { resumeId } = Route.useParams()
-  const resume = useResume(resumeId)
+  const { resumeId } = Route.useParams();
+  const resume = useResume(resumeId);
 
   return (
     <Shell
@@ -127,7 +127,7 @@ const ResumeScreen: React.FC = () => {
           </Box>
         </ClientOnly>
       }
-      title={resume.data?.title ?? 'Resume'}
+      title={resume.data?.title ?? "Resume"}
     >
       {/* The editor fills the viewport rather than scrolling the page: the pane
           inside it owns its own scrolling, so the chrome never moves. */}
@@ -143,15 +143,15 @@ const ResumeScreen: React.FC = () => {
         </ClientOnly>
       </Box>
     </Shell>
-  )
-}
+  );
+};
 
-export const Route = createFileRoute('/resumes/$resumeId')({
+export const Route = createFileRoute("/resumes/$resumeId")({
   head: () => ({
     meta: seo({
-      title: 'Editor | Resivo',
+      title: "Editor | Resivo",
       indexable: false,
     }),
   }),
   component: ResumeScreen,
-})
+});

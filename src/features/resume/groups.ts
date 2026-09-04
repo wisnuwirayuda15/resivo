@@ -1,12 +1,12 @@
-import { UNGROUPED } from '@/database/index'
+import { UNGROUPED } from "@/database/index";
 
-import type { GroupRecord } from '@/database/index'
+import type { GroupRecord } from "@/database/index";
 
 /** A place a resume can be moved to. `UNGROUPED` has no record, so this is not
  * a `GroupRecord`. */
 export interface MoveDestination {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 /**
@@ -24,6 +24,6 @@ export const moveDestinations = (
   groups: ReadonlyArray<GroupRecord>,
   currentGroupId: string,
 ): Array<MoveDestination> =>
-  [{ id: UNGROUPED, name: 'Ungrouped' }, ...groups]
+  [{ id: UNGROUPED, name: "Ungrouped" }, ...groups]
     .filter((group) => group.id !== currentGroupId)
-    .map((group) => ({ id: group.id, name: group.name }))
+    .map((group) => ({ id: group.id, name: group.name }));
