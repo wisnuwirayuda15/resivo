@@ -5,7 +5,13 @@ import { useMediaQuery } from '@mantine/hooks'
 import { useRouterState } from '@tanstack/react-router'
 
 import { hasSeenTour, markTourSeen } from './seen'
-import { SIDEBAR_STEP_IDS, TOUR_TARGET_IDS, tourSteps } from './steps'
+import { useTourPane } from '@/features/editor/tourPane'
+import {
+  EDITOR_STEP_PANES,
+  SIDEBAR_STEP_IDS,
+  TOUR_TARGET_IDS,
+  tourSteps,
+} from './steps'
 
 import type { ReactNode } from 'react'
 import type { TourName } from './seen'
@@ -90,13 +96,11 @@ export const AppTour: React.FC<AppTourProps> = ({
   const name = tourForPath(pathname)
 
   /**
-   * The editor tour only runs where the three panes it describes exist.
-   *
-   * Below the breakpoint the editor is one pane behind a tab strip, so four of
-   * its five steps would point at components that are not mounted. Left unseen
-   * rather than marked seen, so it still runs on a wider screen later.
+   * Whether the editor is showing all three panes at once. The same breakpoint
+   * `EditorLayout` splits on, and what decides where the editor tour points:
+   * at the panes where they exist, at the tabs that open them where they do not.
    */
-  const wide = useMediaQuery('(min-width: 1200px)', true, {
+  const wideEditor = useMediaQuery('(min-width: 1200px)', true, {
     getInitialValueInEffect: false,
   })
 
@@ -107,7 +111,13 @@ export const AppTour: React.FC<AppTourProps> = ({
   const sidebarPermanent = useMediaQuery('(min-width: 48em)', true, {
     getInitialValueInEffect: false,
   })
-  const eligible = name !== null && (name !== 'editor' || wide)
+
+  /**
+   * How a step asks for the editor pane it lives in. Read as a stable action
+   * rather than through the hook's selector, so a pane change does not
+   * re-render the whole shell.
+   */
+  const requestPane = useTourPane((state) => state.request)
 
   const [started, setStarted] = useState(false)
 
@@ -121,10 +131,10 @@ export const AppTour: React.FC<AppTourProps> = ({
   useEffect(() => {
     // `eligible` already establishes that `name` is not null, and TypeScript
     // narrows through the alias.
-    if (eligible && !hasSeenTour(name)) {
+    if (name !== null && !hasSeenTour(name)) {
       setStarted(true)
     }
-  }, [eligible, name])
+  }, [name])
 
   useEffect(() => {
     if (restartSignal > 0 && name !== null) {
@@ -132,9 +142,27 @@ export const AppTour: React.FC<AppTourProps> = ({
     }
   }, [restartSignal, name])
 
+  /**
+   * A request dropped wherever it no longer applies.
+   *
+   * `finish` covers a tour that ends. This covers the two ways one stops
+   * applying without ending: navigating out of the editor, which would
+   * otherwise leave the next resume opening on whichever tab the tour reached,
+   * and the window growing past the three-pane breakpoint, where there is no
+   * tab strip for a request to mean anything to.
+   */
+  useEffect(() => {
+    if (name !== 'editor' || wideEditor) {
+      requestPane(null)
+    }
+  }, [name, wideEditor, requestPane])
+
   const finish = () => {
     setStarted(false)
     onRevealSidebar?.(false)
+    // Stops asking for a pane, which hands the tab strip back to whatever the
+    // user had chosen before the tour started.
+    requestPane(null)
 
     if (name !== null) {
       markTourSeen(name)
@@ -162,7 +190,10 @@ export const AppTour: React.FC<AppTourProps> = ({
         popoverProps: {
           position: popoverPosition(controller.selectedStepId),
           offset: 12,
-          middlewares: { flip: true, shift: { padding: 16 } },
+          // An 8px gutter rather than 16: the card is capped at the viewport
+          // less that much, so the two numbers agreeing is what leaves it the
+          // same margin on both sides instead of shifted against one edge.
+          middlewares: { flip: true, shift: { padding: 8 } },
         },
       })}
       onOnboardingTourEnd={finish}
@@ -175,9 +206,30 @@ export const AppTour: React.FC<AppTourProps> = ({
        * The cutout follows: the package re-measures on a 50ms poll for 1.5s
        * after each step, which comfortably outlasts the drawer's 200ms.
        */
-      onOnboardingTourChange={(step) =>
+      onOnboardingTourChange={(step) => {
         onRevealSidebar?.(!sidebarPermanent && SIDEBAR_STEP_IDS.has(step.id))
-      }
+        /**
+         * And the editor's tab strip, the same way.
+         *
+         * Where three panes fit this asks for nothing: none of the wide tour's
+         * anchors is behind a tab. Where they do not, the pane holding the
+         * step has to be the active tab before the step can anchor at all,
+         * since `keepMounted={false}` keeps the other two out of the document.
+         * Setting it here rather than in an effect is what makes the tab change
+         * and the step change one commit; the package re-measures its cutout on
+         * a 50ms poll for 1.5s afterwards, which covers the pane mounting.
+         *
+         * A step with no pane of its own — the last one points at the app bar —
+         * leaves the request where it was rather than dropping it. Releasing it
+         * mid-tour would swap the pane behind the card for no reason the reader
+         * can see; the release belongs at the end, and `finish` does it.
+         */
+        const pane = wideEditor ? undefined : EDITOR_STEP_PANES[step.id]
+
+        if (pane !== undefined) {
+          requestPane(pane)
+        }
+      }}
       /**
        * Skip is given a real button.
        *
@@ -195,7 +247,7 @@ export const AppTour: React.FC<AppTourProps> = ({
         </Button>
       )}
       started={started}
-      tour={tourSteps(name)}
+      tour={tourSteps(name, { wideEditor })}
       withNextButton
       withPrevButton
       withSkipButton

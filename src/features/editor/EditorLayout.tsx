@@ -1,8 +1,11 @@
 import { useCallback, useState } from 'react'
 import { Splitter, Tabs } from '@mantine/core'
 import { useMediaQuery } from '@mantine/hooks'
+import { OnboardingTour } from '@gfazioli/mantine-onboarding-tour'
 
 import { Icon } from '@/features/icons/IconRenderer'
+import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
+import { useTourPane } from './tourPane'
 import { cn } from '@/lib/utils'
 import { PreviewPane } from '@/features/preview/PreviewPane'
 import { StyleInspector } from '@/features/style/StyleInspector'
@@ -12,6 +15,7 @@ import { patchDesign, setCustomCss } from '@/features/editor/mutations'
 import { readPaneSizes, writePaneSizes } from './panels'
 import { CodePane } from './CodePane'
 
+import type { EditorPane } from './tourPane'
 import type { PaneSize } from './panels'
 import type { Recipe } from './mutations'
 import type { ParseWarning } from '@/features/markdown/index'
@@ -88,6 +92,25 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
   const [resizing, setResizing] = useState(false)
 
   /**
+   * The tab, where there is only one pane.
+   *
+   * The paper is the default because the document is the point; the other two
+   * are things done to it.
+   */
+  const [pane, setPane] = useState<EditorPane>('paper')
+
+  /**
+   * A pane the tour is asking for, which wins while it is asking.
+   *
+   * Not written into `pane`: the tour borrows the pane for the length of a
+   * step and then stops asking, and the user's own choice is still underneath
+   * when it does. Writing through would have the tour quietly reset the tab
+   * someone had picked before it started.
+   */
+  const requestedPane = useTourPane((state) => state.requested)
+  const activePane = requestedPane ?? pane
+
+  /**
    * Read during the first render rather than in an effect. This only mounts
    * inside a client-only boundary, so `matchMedia` is there — and deciding in
    * an effect would paint the wrong layout for a frame, which on a narrow screen
@@ -157,36 +180,53 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
        * which is the right price for a paper that is always measured at the
        * width it is drawn at.
        *
-       * The paper is the default tab because the document is the point; the
-       * other two are things done to it.
+       * Controlled, because the onboarding tour drives it: below this
+       * breakpoint four of its six steps are inside a pane, and a pane that is
+       * not the active tab is not in the document for the tour to point at.
        */
       <Tabs
         className="flex h-full min-h-0 flex-col"
-        defaultValue="paper"
         keepMounted={false}
+        onChange={(next) => {
+          // Narrowed rather than cast: the three values are the tabs' own, and
+          // a cast here would keep compiling if a fourth were ever added.
+          if (next === 'code' || next === 'paper' || next === 'style') {
+            setPane(next)
+          }
+        }}
+        value={activePane}
       >
         <Tabs.List
           aria-label="Editor panes"
           className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
         >
-          <Tabs.Tab
-            leftSection={<Icon name="markdown-logo" size={13} />}
-            value="code"
-          >
-            Code
-          </Tabs.Tab>
-          <Tabs.Tab
-            leftSection={<Icon name="file-text" size={13} />}
-            value="paper"
-          >
-            Paper
-          </Tabs.Tab>
-          <Tabs.Tab
-            leftSection={<Icon name="palette" size={13} />}
-            value="style"
-          >
-            Style
-          </Tabs.Tab>
+          {/* The tour points at these rather than at the panes they open, and
+              the anchors live here rather than beside the pane ones so that
+              exactly one of the two is in the document at a time. */}
+          <OnboardingTour.Target id={TOUR_TARGET_IDS.codeTab}>
+            <Tabs.Tab
+              leftSection={<Icon name="markdown-logo" size={13} />}
+              value="code"
+            >
+              Code
+            </Tabs.Tab>
+          </OnboardingTour.Target>
+          <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTab}>
+            <Tabs.Tab
+              leftSection={<Icon name="file-text" size={13} />}
+              value="paper"
+            >
+              Paper
+            </Tabs.Tab>
+          </OnboardingTour.Target>
+          <OnboardingTour.Target id={TOUR_TARGET_IDS.styleTab}>
+            <Tabs.Tab
+              leftSection={<Icon name="palette" size={13} />}
+              value="style"
+            >
+              Style
+            </Tabs.Tab>
+          </OnboardingTour.Target>
         </Tabs.List>
 
         <Tabs.Panel className="min-h-0 flex-1" value="code">

@@ -105,7 +105,9 @@ can drift from the preview. Markdown uses the same serializer the editor reads.
 and command; the application menu lists the shortcuts and the things worth
 knowing. A first visit offers a short tour — of the library, and of the editor
 the first time a resume is opened — which can be skipped from any step and
-restarted from that menu or the palette.
+restarted from that menu or the palette. Both run at any width: on a screen
+where the editor is one pane behind a tab strip, the tour opens the tab each
+step needs and points at that tab rather than at a column that is not there.
 
 ## How it works
 

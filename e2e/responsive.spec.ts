@@ -230,6 +230,17 @@ test('the tour can be walked through on a phone', async ({ page }) => {
   const popover = page.locator(
     '.mantine-OnboardingTourPopoverContent-popoverContent',
   )
+  /**
+   * The card's own box, not the content inside it.
+   *
+   * This is what the first attempt at the fix missed. Capping the content left
+   * the dropdown around it 369px wide and placed for that width, so its right
+   * edge — the last stepper dot with it — was 10px outside a 375px viewport
+   * while the content it held measured as being on screen.
+   */
+  const card = page
+    .locator('.mantine-Popover-dropdown')
+    .filter({ has: popover })
   const focused = page.locator('[data-onboarding-tour-focus-reveal-focused]')
 
   await expect(page.getByText('Start here')).toBeVisible({ timeout: 20_000 })
@@ -241,11 +252,101 @@ test('the tour can be walked through on a phone', async ({ page }) => {
     'This is the important one',
     'Everything, from the keyboard',
   ]) {
-    await expect(popover).toBeInViewport({ ratio: 1 })
+    await expect(card).toBeInViewport({ ratio: 1 })
     await page.getByRole('button', { name: 'Next' }).click()
     await expect(page.getByText(heading)).toBeVisible()
     await expect(focused).toBeInViewport({ ratio: 1 })
   }
 
-  await expect(popover).toBeInViewport({ ratio: 1 })
+  await expect(card).toBeInViewport({ ratio: 1 })
+
+  /**
+   * And using the width it has.
+   *
+   * A card that fits by being small is not the fix asked for: this one is
+   * capped at the viewport less an 8px gutter each side, so on a 375px screen
+   * it should be 359px rather than the package's own 400px cap clipped to fit.
+   */
+  const width = await card.evaluate((node) =>
+    Math.round(node.getBoundingClientRect().width),
+  )
+  expect(width).toBe(PHONE.width - 16)
+})
+
+/**
+ * The editor tour, on the screen it used not to run on at all.
+ *
+ * It was gated off below 1200px, because four of its six steps pointed at panes
+ * that are not mounted there: one pane shows at a time and `keepMounted={false}`
+ * keeps the other two out of the document. The gate meant a phone user was
+ * never shown the editor — and the two anchors that did exist were full-height
+ * columns, beside which a popover has nowhere to go.
+ *
+ * Both halves are fixed here: the tour asks for the tab each step needs, and
+ * the three pane steps point at the tab that opens the pane rather than at the
+ * pane itself.
+ */
+test('the editor tour runs on a phone, one tab at a time', async ({ page }) => {
+  test.slow()
+
+  await page.setViewportSize(PHONE)
+  await openEmptyApp(page)
+  await createResume(page, 'Ada Lovelace')
+
+  // Opted back in for the editor only, and reloaded so it starts here.
+  await page.evaluate(() => localStorage.removeItem('resivo.onboarding.editor'))
+  await page.reload()
+
+  const popover = page.locator(
+    '.mantine-OnboardingTourPopoverContent-popoverContent',
+  )
+  const card = page
+    .locator('.mantine-Popover-dropdown')
+    .filter({ has: popover })
+  const focused = page.locator('[data-onboarding-tour-focus-reveal-focused]')
+
+  // Scoped to the editor's own strip: the inspector has a tab called Style
+  // too, and both are on screen once that pane is open.
+  const paneTab = (name: string) =>
+    page
+      .getByRole('tablist', { name: 'Editor panes' })
+      .getByRole('tab', { name, selected: true })
+
+  /**
+   * Each step, with the tab it has to have opened.
+   *
+   * The tab is the assertion that matters. A step can look right and be
+   * pointing at a pane the reader cannot see, which is exactly what the old
+   * gate was avoiding rather than fixing.
+   */
+  const steps = [
+    { heading: 'Markdown, and your own CSS', tab: 'Code' },
+    { heading: 'Every directive, with an example', tab: 'Code' },
+    { heading: 'The paper is editable too', tab: 'Paper' },
+    { heading: 'Export is the same document', tab: 'Paper' },
+    { heading: 'Three tabs worth knowing', tab: 'Style' },
+    { heading: 'Nothing here is one-way', tab: 'Style' },
+  ] as const
+
+  await expect(page.getByText(steps[0].heading)).toBeVisible({
+    timeout: 30_000,
+  })
+
+  for (const [index, step] of steps.entries()) {
+    await expect(page.getByText(step.heading)).toBeVisible()
+    await expect(paneTab(step.tab)).toBeVisible()
+
+    // On screen, and pointing at something on screen.
+    await expect(card).toBeInViewport({ ratio: 1 })
+    await expect(focused.first()).toBeInViewport({ ratio: 1 })
+
+    if (index < steps.length - 1) {
+      await page.getByRole('button', { name: 'Next' }).click()
+    }
+  }
+
+  // Ending it hands the tab strip back rather than leaving it where the tour
+  // stopped: the paper is the pane the editor opens on.
+  await page.getByRole('button', { name: 'End' }).click()
+  await expect(paneTab('Paper')).toBeVisible()
 })

@@ -16,20 +16,30 @@
 @import '@gfazioli/mantine-onboarding-tour/styles.layer.css';
 
 /**
- * The tour's popover, kept inside the viewport.
+ * The tour's card: as wide as the screen allows, and never wider.
  *
- * It renders at a fixed 374px, which is wider than a 375px phone once the
- * arrow's offset is added — so on a phone the text was clipped and the "Next"
- * button was off the right edge, leaving a tour that could be started and not
- * finished. The package offers no width prop that reaches this element, and a
- * cap is the right shape for the fix anyway: it changes nothing on a screen
- * that has the room.
+ * The package caps its dropdown at 400px, which was wrong at both ends. On a
+ * phone that produced a 369px dropdown placed 16px from the left edge, so its
+ * right 10px — and the last stepper dot with it — sat outside a 375px viewport.
+ * On a desktop 400px is a narrow measure for paragraphs this long, which is
+ * what made the card read as cramped on the very screen with room to spare.
+ *
+ * One rule covers both, because both are the same rule: take the room there is.
+ * The 8px gutter is what keeps the card off the edge; 460px is the point where
+ * a paragraph of this length stops gaining from being given more.
+ *
+ * The cap belongs on the dropdown rather than on the card inside it. The
+ * dropdown is what the positioner measures, so capping only the card left the
+ * dropdown placed for a width it no longer had — which is how the overflow
+ * survived the first attempt at this.
  *
  * In the `components` layer, above the package's own `mantine-onboarding-tour`
  * layer and below Tailwind's utilities.
  */
 @layer components {
-  .mantine-OnboardingTourPopoverContent-popoverContent {
-    max-width: calc(100vw - 2rem);
+  .mantine-Popover-dropdown:has(
+    > .mantine-OnboardingTourPopoverContent-popoverContent
+  ) {
+    max-width: min(460px, calc(100vw - 1rem));
   }
 }
