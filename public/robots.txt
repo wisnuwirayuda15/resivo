@@ -1,0 +1,20 @@
+# Resivo
+#
+# Three pages are worth indexing: the landing page, the templates gallery and
+# the about page. Everything else renders the contents of one browser's
+# IndexedDB, so a crawler would only ever see an empty shell of it, and an
+# empty shell in a search index is worse than no result at all.
+#
+# The same routes also carry a `noindex` meta tag. The two are not redundant:
+# this file stops the fetch, the meta tag stops the indexing of a page that was
+# reached by a link from somewhere else.
+
+User-agent: *
+Allow: /
+
+Disallow: /resumes
+Disallow: /resumes/
+Disallow: /archive
+Disallow: /images
+Disallow: /fonts
+Disallow: /settings

@@ -3,6 +3,8 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Box, Button, Menu, Select, TextInput } from '@mantine/core'
 import { z } from 'zod'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
@@ -206,6 +208,12 @@ const LibraryRoute: React.FC = () => {
 }
 
 export const Route = createFileRoute('/resumes/')({
+  head: () => ({
+    meta: seo({
+      title: 'Your resumes | Resivo',
+      indexable: false,
+    }),
+  }),
   validateSearch: searchSchema,
   component: LibraryRoute,
 })

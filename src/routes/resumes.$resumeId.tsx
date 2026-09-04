@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { Box, Loader } from '@mantine/core'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
@@ -145,5 +147,11 @@ const ResumeScreen: React.FC = () => {
 }
 
 export const Route = createFileRoute('/resumes/$resumeId')({
+  head: () => ({
+    meta: seo({
+      title: 'Editor | Resivo',
+      indexable: false,
+    }),
+  }),
   component: ResumeScreen,
 })

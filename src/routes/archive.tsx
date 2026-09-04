@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { EmptyState } from '@/components/EmptyState'
@@ -37,4 +39,12 @@ const ArchiveRoute: React.FC = () => {
   )
 }
 
-export const Route = createFileRoute('/archive')({ component: ArchiveRoute })
+export const Route = createFileRoute('/archive')({
+  head: () => ({
+    meta: seo({
+      title: 'Archive | Resivo',
+      indexable: false,
+    }),
+  }),
+  component: ArchiveRoute,
+})

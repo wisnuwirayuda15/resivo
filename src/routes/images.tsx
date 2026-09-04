@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { ImageGalleryView } from '@/features/assets/ImageGalleryView'
@@ -13,4 +15,12 @@ const ImagesRoute: React.FC = () => (
   </Shell>
 )
 
-export const Route = createFileRoute('/images')({ component: ImagesRoute })
+export const Route = createFileRoute('/images')({
+  head: () => ({
+    meta: seo({
+      title: 'Images | Resivo',
+      indexable: false,
+    }),
+  }),
+  component: ImagesRoute,
+})

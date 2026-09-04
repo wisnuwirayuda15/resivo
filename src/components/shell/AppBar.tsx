@@ -113,11 +113,14 @@ export const AppBar: React.FC<AppBarProps> = ({
         </Tooltip>
       </Box>
 
-      {/* `truncate` rather than letting it wrap: the bar is one 44px row, and a
+      {/* An `h1`, because it is one: this is the page title, and every route
+          behind the shell had no heading at all until it was.
+
+          `truncate` rather than letting it wrap: the bar is one 44px row, and a
           two-line title in it pushes its own baseline off centre. */}
       <Text
-        span
         className="text-title truncate text-[14px] leading-none font-semibold"
+        component="h1"
       >
         {title}
       </Text>

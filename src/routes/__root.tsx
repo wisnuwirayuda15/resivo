@@ -16,6 +16,8 @@ import { EmptyState } from '@/components/EmptyState'
 import { Providers } from '@/components/providers'
 import { SIDEBAR_RESTORE_SCRIPT } from '@/components/shell/sidebarState'
 
+import { seo } from '@/lib/seo'
+
 import appCss from '@/styles/global.css?url'
 
 import type { ErrorComponentProps } from '@tanstack/react-router'
@@ -82,9 +84,16 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         name: 'viewport',
         content: 'width=device-width, initial-scale=1',
       },
-      {
-        title: 'Resivo',
-      },
+      /**
+       * The defaults every route inherits.
+       *
+       * A route's own `head` is merged after this one and wins on any tag with
+       * the same name, so this is what a page that says nothing gets: the
+       * landing page's own description, and no indexing claim beyond the
+       * default. Every route that renders one device's data overrides
+       * `robots` to say so.
+       */
+      ...seo({ title: 'Resivo, a local-first resume builder' }),
     ],
     links: [
       {
@@ -136,6 +145,23 @@ function RootDocument({ children }: { children: React.ReactNode }) {
      */
     <html lang="en" {...mantineHtmlProps}>
       <head>
+        {/* The browser chrome, per scheme.
+
+            Written here rather than through the route's `head`, which dedupes
+            meta tags by name and would keep only one of the two. Two are the
+            point: a single `theme-color` paints the address bar the same in
+            both schemes, and this app follows the system. The values are the
+            two `--bg-app` grounds from the design system. */}
+        <meta
+          content="#fbfbfa"
+          media="(prefers-color-scheme: light)"
+          name="theme-color"
+        />
+        <meta
+          content="#121210"
+          media="(prefers-color-scheme: dark)"
+          name="theme-color"
+        />
         <ColorSchemeScript defaultColorScheme="auto" />
         {/* Beside the colour-scheme script because it is the same problem: a
             preference this browser holds that the server-rendered markup cannot

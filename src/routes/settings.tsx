@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Box, Loader, Text } from '@mantine/core'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { ClientOnly } from '@/components/client-only'
 import { BackupPanel } from '@/features/backup/BackupPanel'
@@ -62,4 +64,12 @@ const SettingsRoute: React.FC = () => (
   </Shell>
 )
 
-export const Route = createFileRoute('/settings')({ component: SettingsRoute })
+export const Route = createFileRoute('/settings')({
+  head: () => ({
+    meta: seo({
+      title: 'Settings | Resivo',
+      indexable: false,
+    }),
+  }),
+  component: SettingsRoute,
+})

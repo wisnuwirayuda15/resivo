@@ -1,6 +1,8 @@
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Box, Text } from '@mantine/core'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 
 /**
@@ -15,7 +17,7 @@ const AboutRoute: React.FC = () => (
   <Shell title="About Resivo">
     <Box className="flex max-w-[68ch] flex-col gap-6 p-6">
       <Box>
-        <Text className="text-body text-[15px] font-medium">
+        <Text className="text-body text-[15px] font-medium" component="h2">
           A resume builder that keeps your resume
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
@@ -27,7 +29,7 @@ const AboutRoute: React.FC = () => (
       </Box>
 
       <Box>
-        <Text className="text-body text-[14px] font-medium">
+        <Text className="text-body text-[14px] font-medium" component="h2">
           What that costs
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
@@ -44,7 +46,9 @@ const AboutRoute: React.FC = () => (
       </Box>
 
       <Box>
-        <Text className="text-body text-[14px] font-medium">How it works</Text>
+        <Text className="text-body text-[14px] font-medium" component="h2">
+          How it works
+        </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
           One document, three ways to edit it: Markdown, the paper itself, and
           the style panel. All three write to the same model, which is what
@@ -56,7 +60,7 @@ const AboutRoute: React.FC = () => (
       </Box>
 
       <Box>
-        <Text className="text-body text-[14px] font-medium">
+        <Text className="text-body text-[14px] font-medium" component="h2">
           Exports and imports
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
@@ -69,7 +73,7 @@ const AboutRoute: React.FC = () => (
       </Box>
 
       <Box>
-        <Text className="text-body text-[14px] font-medium">
+        <Text className="text-body text-[14px] font-medium" component="h2">
           Templates and ATS
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
@@ -87,4 +91,13 @@ const AboutRoute: React.FC = () => (
   </Shell>
 )
 
-export const Route = createFileRoute('/about')({ component: AboutRoute })
+export const Route = createFileRoute('/about')({
+  head: () => ({
+    meta: seo({
+      title: 'About Resivo, and what local-first costs',
+      description:
+        'What Resivo is, how a resume builder with no server works, and the one thing to know before you clear your browser storage.',
+    }),
+  }),
+  component: AboutRoute,
+})

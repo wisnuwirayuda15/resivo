@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Box, Text } from '@mantine/core'
 
+import { seo } from '@/lib/seo'
+
 import { Shell } from '@/components/shell/Shell'
 import { TemplateTile } from '@/features/resume/components/TemplateTile'
 import { templateList } from '@/features/templates/catalog'
@@ -39,5 +41,12 @@ const TemplatesRoute: React.FC = () => (
 )
 
 export const Route = createFileRoute('/templates')({
+  head: () => ({
+    meta: seo({
+      title: 'Four ATS-friendly resume templates | Resivo',
+      description:
+        'Four single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.',
+    }),
+  }),
   component: TemplatesRoute,
 })
