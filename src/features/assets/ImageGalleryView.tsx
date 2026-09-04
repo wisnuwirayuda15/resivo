@@ -27,7 +27,7 @@ import type { ImageSummary } from '@/database/index'
  * Assets tab. The gallery in the inspector is the same data with a different
  * job: there, an image is being placed into the document in front of it, so it
  * carries a section picker and a selection. Here there is no document, so the
- * page is about the library itself — what is stored, what it costs, and what
+ * page is about the library itself, what is stored, what it costs, and what
  * nothing refers to any more.
  */
 export const ImageGalleryView: React.FC = () => {

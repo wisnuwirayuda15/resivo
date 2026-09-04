@@ -97,7 +97,7 @@ describe('documentFontIds', () => {
     expect(documentFontIds(document).sort()).toEqual(['f1', 'f2'])
   })
 
-  /** The built-in families are vendored stylesheets, not rows — asking the fonts
+  /** The built-in families are vendored stylesheets, not rows, asking the fonts
    * table for one would be a read that always misses. */
   it('ignores the built-in families', () => {
     expect(documentFontIds(createEmptyDocument())).toEqual([])

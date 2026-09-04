@@ -12,13 +12,13 @@ import type { AtRule, ChildNode, Container, Declaration, Rule } from 'postcss'
  *
  * **Reach the network.** Resivo is local-first: nothing about a resume should
  * ever leave the machine. `@import` and any `url()` that is not `data:` or
- * `blob:` would fetch — and therefore announce — on every render, which is a
+ * `blob:` would fetch (and therefore announce) on every render, which is a
  * privacy hole disguised as a font.
  *
  * **Escape its layer.** The stylesheet is assembled by wrapping this text in
  * `@layer custom { … }`. An unbalanced brace would close that block early and
  * drop everything after it into the *unlayered* origin, which outranks every
- * layer — including the page geometry the paginator measures against. The output
+ * layer, including the page geometry the paginator measures against. The output
  * here is re-emitted from a parsed tree rather than passed through, so its braces
  * are balanced by construction, not by inspection.
  *
@@ -30,11 +30,11 @@ import type { AtRule, ChildNode, Container, Declaration, Rule } from 'postcss'
  * **Run anything.** `expression()`, `behavior` and `-moz-binding` are the old
  * routes from a stylesheet to script execution. Long dead in current browsers,
  * cheap to refuse, and this text may be read by something other than the browser
- * it was written in — an exported HTML file opened years from now.
+ * it was written in, an exported HTML file opened years from now.
  *
  * The parsing is PostCSS's. It used to be a hand-rolled tokenizer, for a good
- * reason — the hard cases are all about context: a brace inside a string, a
- * semicolon inside `url()`, a comment that hides either — but that is an
+ * reason (the hard cases are all about context: a brace inside a string, a
+ * semicolon inside `url()`, a comment that hides either), but that is an
  * argument for a real parser, not for writing one here. A sanitizer is the last
  * place to keep a bespoke tokenizer, because every bypass it will ever have is a
  * disagreement between how it reads CSS and how the browser does.
@@ -62,7 +62,7 @@ export interface SanitizeResult {
 
 /**
  * At-rules that may appear, and whether their block holds declarations or more
- * rules. Anything absent is refused — an allow-list, because the list of
+ * rules. Anything absent is refused, an allow-list, because the list of
  * at-rules grows with the platform and a deny-list would silently admit the next
  * one.
  */
@@ -106,7 +106,7 @@ const REFUSED_POSITIONS = new Set(['fixed', 'sticky'])
 const ALLOWED_URL = /^(?:data:|blob:|#)/i
 
 const REMOTE_URL_MESSAGE =
-  'Only data: and blob: URLs are allowed — a remote URL would fetch over the network.'
+  'Only data: and blob: URLs are allowed, a remote URL would fetch over the network.'
 
 // ---------------------------------------------------------------------------
 // Values
@@ -180,7 +180,7 @@ const declarations = (
     const value = declaration.value.trim()
 
     /**
-     * `color: ;` — a property that was opened and then not given a value. Worth
+     * `color: ;`, a property that was opened and then not given a value. Worth
      * saying out loud, because it is invisible in the preview and the rest of
      * the block around it still applies.
      *
@@ -288,7 +288,7 @@ const statements = (container: Container, context: Context): Array<string> => {
     }
 
     if (node.type === 'decl') {
-      // A declaration where a rule belongs — outside any block.
+      // A declaration where a rule belongs, outside any block.
       warn(context, node, 'Expected "{" after the selector.')
       return
     }
@@ -315,7 +315,7 @@ const statements = (container: Container, context: Context): Array<string> => {
  * unbalanced brace or an unclosed block with a position, which is exactly what
  * the author needs to see and what a recovering parser silently swallows. The
  * recovering parser then does the parse that is actually used, because
- * discarding somebody's whole stylesheet over one typo would be hostile — a
+ * discarding somebody's whole stylesheet over one typo would be hostile, a
  * browser keeps going too, and so should this.
  *
  * Both are cheap: a resume's custom CSS is a few dozen rules, and this already

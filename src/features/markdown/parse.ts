@@ -41,7 +41,7 @@ import type {
  * Two things make this more than a tree walk.
  *
  * **Nothing is dropped.** Almost all of CommonMark and GFM has a block in the
- * model — headings, lists of either kind at any depth, task lists, quotes,
+ * model (headings, lists of either kind at any depth, task lists, quotes,
  * fences, tables. What is left is raw HTML, footnotes and link definitions, and
  * each of those becomes a `raw` block holding its exact source text, reported as
  * a warning rather than an error. Content that arrives before any heading opens
@@ -54,7 +54,7 @@ import type {
  * coalescing, restart every animation, and make autosave write a wholly new
  * tree for a one-character edit. Each section and block is therefore matched
  * back to the one it came from, which is also how the three fields with no
- * Markdown syntax — a section's `hidden` flag, its icon and its style override —
+ * Markdown syntax, a section's `hidden` flag, its icon and its style override,
  * survive the trip.
  */
 
@@ -74,7 +74,7 @@ export interface ParseResult {
  * A block before it is given an id.
  *
  * Written as a mapped type rather than `Omit<Block, 'id'>`, because `Omit` over
- * a union keeps only the keys every member shares — which would be `kind` alone,
+ * a union keeps only the keys every member shares, which would be `kind` alone,
  * and would quietly accept a paragraph with an image's fields.
  */
 type BlockDraft = {
@@ -146,7 +146,7 @@ const withMark = (text: InlineText, mark: Mark): InlineText =>
  * Merges adjacent runs that ended up with the same marks.
  *
  * `**a**b` parses as two nodes and would stay two nodes, which is harmless until
- * something compares documents for equality — then a reparse of unchanged text
+ * something compares documents for equality, then a reparse of unchanged text
  * looks like an edit. Normalising here keeps the model canonical.
  */
 const collapse = (text: InlineText): InlineText => {
@@ -218,8 +218,8 @@ const inlineNode = (node: unknown): InlineText => {
      * source. Keeping it as a link would make the round trip asymmetric: the
      * serializer writes `[text](href)`, which reads back as a genuine link, so
      * every save would add brackets the user never typed. An autolink is
-     * detected by position — its first child starts exactly where the node does,
-     * because there is no opening bracket to skip — and kept as text.
+     * detected by position (its first child starts exactly where the node does,
+     * because there is no opening bracket to skip), and kept as text.
      */
     case 'link': {
       const child = (typed.children ?? [])[0] as
@@ -333,7 +333,7 @@ interface MdastList {
  * A list, with its nesting kept.
  *
  * An item's own text lives in a paragraph; a list inside it is a sublist, and
- * anything else — a fence, a quote — is flattened into the item's text, because
+ * anything else (a fence, a quote) is flattened into the item's text, because
  * an item in this model holds one run and one sublist. That is the only lossy
  * corner left in list handling, and it is reported by the caller.
  */
@@ -476,7 +476,7 @@ const entryBlock = (node: {
  * A directive attribute holding text.
  *
  * Attributes are plain strings in the source, so any markup inside one is not
- * markup — an entry title of `**Lead**` is a title containing asterisks. Parsing
+ * markup, an entry title of `**Lead**` is a title containing asterisks. Parsing
  * it would make the round trip asymmetric, since the serializer writes the
  * attribute escaped.
  */
@@ -524,7 +524,7 @@ const blockFrom = (
       const depth = typed.depth
 
       // Clamped, not rejected. A heading below a section can only be deeper
-      // than it, and Markdown stops at six — so this is arithmetic rather than
+      // than it, and Markdown stops at six, so this is arithmetic rather than
       // a decision, and the clamp is what makes the type honest.
       const level = Math.min(6, Math.max(3, depth, sectionDepth + 1)) as
         3 | 4 | 5 | 6
@@ -653,7 +653,7 @@ const blockFrom = (
  * that have no written form.
  *
  * Matching prefers an unused previous section with the same heading, and falls
- * back to the next unused one in order — which is what makes renaming a heading
+ * back to the next unused one in order, which is what makes renaming a heading
  * keep its identity, and inserting a section above another not renumber
  * everything below it.
  */
@@ -714,8 +714,8 @@ const position = (node: RootContent): { line: number; column: number } => ({
  * One rule instead of a fixed `##`, because a resume written elsewhere and
  * pasted in is as likely to use `###` for its sections as `##`, and a document
  * whose every heading is one level too deep would otherwise have no sections at
- * all. Taking the shallowest present is deterministic — it never depends on
- * where in the file the parser has got to — and it agrees with `##` for every
+ * all. Taking the shallowest present is deterministic (it never depends on
+ * where in the file the parser has got to), and it agrees with `##` for every
  * document this app writes, because the serializer always emits `##`.
  */
 const sectionDepthOf = (children: Array<RootContent>): number => {
@@ -754,7 +754,7 @@ export const parseDocument = (
   /**
    * Opens an untitled section for content that arrived before any heading.
    *
-   * The alternative — warn and drop — is what this used to do, and it lost text
+   * The alternative (warn and drop) is what this used to do, and it lost text
    * the user had typed: the editor's buffer is replaced by a serialization of
    * the model, so anything the model does not hold is erased from the file too.
    * An untitled section holds it, renders it without a heading, and writes it

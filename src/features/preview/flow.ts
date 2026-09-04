@@ -8,7 +8,7 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * heading and each of its blocks are separate, because a long section has to be
  * allowed to continue onto the next page.
  *
- * Pure data — no React, no measurement — so the ordering rules are testable on
+ * Pure data (no React, no measurement), so the ordering rules are testable on
  * their own, without a DOM.
  */
 
@@ -24,7 +24,7 @@ export interface FlowItem {
   blockId?: string
   /**
    * Marks an item that must not be the last thing on a page. Set on a section
-   * heading that has content following it — a heading stranded at the foot of a
+   * heading that has content following it, a heading stranded at the foot of a
    * page is the classic orphan, and the one break a reader always notices.
    */
   keepWithNext?: boolean
@@ -62,7 +62,7 @@ const hasHeaderContent = (document: ResumeDocument): boolean => {
 /**
  * Builds the flow for a document.
  *
- * Hidden sections are skipped — that is what hiding means. An *empty* section is
+ * Hidden sections are skipped, that is what hiding means. An *empty* section is
  * kept, heading and all: the preview is the editing surface, and a heading with
  * nothing under it is how the user sees where content is meant to go. It costs
  * one line and disappears the moment they type.
@@ -84,8 +84,8 @@ export const documentFlow = (
   /**
    * Set on the next item pushed, then cleared.
    *
-   * A `pageBreak` block is in the flow like anything else — it has to be, or it
-   * could not be seen, moved or deleted on the paper — and what it means is
+   * A `pageBreak` block is in the flow like anything else (it has to be, or it
+   * could not be seen, moved or deleted on the paper), and what it means is
    * "the thing after me starts a page". It carries no height, so it stays at the
    * foot of the outgoing page and costs nothing there.
    */
@@ -114,7 +114,7 @@ export const documentFlow = (
      * heading.
      *
      * Otherwise the forced break would land between the two and strand the
-     * heading at the foot of the previous page — which is the orphan
+     * heading at the foot of the previous page, which is the orphan
      * `keepWithNext` exists to prevent, produced by the very control meant to
      * give the user cleaner pages.
      */

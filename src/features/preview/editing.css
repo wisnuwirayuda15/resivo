@@ -2,11 +2,11 @@
  * Editing chrome.
  *
  * Unlayered, like the page geometry above it, and every rule here is either
- * absolutely positioned or a property that cannot affect layout — outline,
+ * absolutely positioned or a property that cannot affect layout, outline,
  * background, cursor. That is load-bearing, and it is the CSS half of a
  * two-part guarantee that switching the editor on cannot move a page break:
  *
- *   the chrome — handles, drop rules — is rendered only in the paged pass, so
+ *   the chrome (handles, drop rules) is rendered only in the paged pass, so
  *   the paginator never measures it at all;
  *
  *   the editable wrapper *is* in the measured tree, so it is a bare inline

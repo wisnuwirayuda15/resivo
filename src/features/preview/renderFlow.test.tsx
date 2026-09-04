@@ -75,7 +75,7 @@ describe('renderFlow', () => {
   /**
    * The preview joins measured heights to items by index, so an item that
    * silently disappeared here would shift every measurement after it onto the
-   * wrong element — the page breaks would be computed from another block's
+   * wrong element, the page breaks would be computed from another block's
    * height.
    */
   it('keeps a placeholder entry for an item whose target is gone', () => {

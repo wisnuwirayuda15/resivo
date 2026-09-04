@@ -415,7 +415,7 @@ describe('restoreBackup', () => {
       backupWith({
         settings: [
           // The device has its own answer for this one, and a restore adds
-          // rather than replaces — including for preferences.
+          // rather than replaces, including for preferences.
           { key: 'editor.lastTemplateId', value: 'classic' },
           // A key this build does not know. Stored anyway: dropping it would
           // make a backup written by a newer build lossy on the way through.

@@ -43,7 +43,7 @@ import type { FontSummary, ImageSummary } from '@/database/index'
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
- * The Assets tab — the images and fonts stored on this device.
+ * The Assets tab, the images and fonts stored on this device.
  *
  * Device-wide, not per-resume, and the panel says so: the same photograph is
  * usually wanted on every version of a CV, and duplicating it per document would
@@ -132,7 +132,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
           {(images ?? []).map((image) => (
             <Tooltip
               key={image.id}
-              label={`${image.name} — ${image.width}×${image.height}, ${formatBytes(image.size)}${
+              label={`${image.name}, ${image.width}×${image.height}, ${formatBytes(image.size)}${
                 unusedIds.has(image.id) ? ', unused' : ''
               }`}
             >
@@ -273,7 +273,7 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
       ) : (fonts ?? []).length === 0 ? (
         <Text className="text-muted mt-2 text-[12px]">
           The three built-in families need no upload. Add a WOFF2, WOFF,
-          TrueType or OpenType file to use your own — it is embedded in an HTML
+          TrueType or OpenType file to use your own, it is embedded in an HTML
           export, so the file stays self-contained.
         </Text>
       ) : (

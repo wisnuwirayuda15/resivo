@@ -57,13 +57,13 @@ export interface RestoreReport {
   resumesRenumbered: number
   groupsAdded: number
   imagesAdded: number
-  /** Skipped because the same bytes were already stored — matched on hash, so a
+  /** Skipped because the same bytes were already stored, matched on hash, so a
    * re-restore of the same backup does not double the space it takes. */
   imagesAlreadyPresent: number
   fontsAdded: number
   fontsAlreadyPresent: number
   /** Settings the device did not already have. An existing preference is never
-   * replaced — see the restore rule above. */
+   * replaced, see the restore rule above. */
   settingsAdded: number
 }
 
@@ -142,7 +142,7 @@ export const restoreBackup = async (
 
   for (const font of backup.fonts) {
     /**
-     * Fonts carry no content hash, so identity is the family, weight and style —
+     * Fonts carry no content hash, so identity is the family, weight and style,
      * which is also what a `@font-face` rule keys on. Two rows differing only by
      * id would produce two identical faces and let the browser pick.
      */
@@ -239,7 +239,7 @@ export const restoreBackup = async (
 /**
  * Rewrites the asset ids a document references.
  *
- * Only needed for the rows that had to change id — a deduplicated image, or one
+ * Only needed for the rows that had to change id, a deduplicated image, or one
  * whose id was taken. Structured-cloned first so the backup object is left
  * untouched and a failed restore cannot leave a half-rewritten document behind.
  */

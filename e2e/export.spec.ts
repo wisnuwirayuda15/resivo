@@ -8,7 +8,7 @@ import type { Page } from '@playwright/test'
  * The PDF path.
  *
  * PDF is the one export that produces no file: it hands a document to the
- * browser to print. What is asserted here is *which* document — it used to be
+ * browser to print. What is asserted here is *which* document, it used to be
  * the live preview iframe, so the output depended on the editor's zoom, its
  * measuring pass and fonts held as object URLs. It is now the same
  * self-contained document the HTML export writes, printed in a frame of its own
@@ -22,7 +22,7 @@ const FRAME = '#resivo-print-document'
  *
  * The stub is not there to fake anything: `print()` in headless Chromium opens
  * no dialog and returns immediately, so without recording the call there is no
- * way to tell a print from a no-op — and without capturing `srcdoc` as the frame
+ * way to tell a print from a no-op, and without capturing `srcdoc` as the frame
  * appears, the document is gone before it can be read, since the frame is
  * removed as soon as the print is handed over.
  */
@@ -124,7 +124,7 @@ test('prints the exported document, not the preview', async ({ page }) => {
    *
    * Asserted on the markup rather than the stylesheet: the sheet is the
    * preview's own and legitimately carries rules for classes that are not in
-   * this document. What must be absent is the elements — the measuring pass's
+   * this document. What must be absent is the elements, the measuring pass's
    * container, and any editable run.
    */
   expect(markup).not.toContain('data-measure-flow')

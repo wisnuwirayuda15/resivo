@@ -8,8 +8,8 @@ import type { Page } from '@playwright/test'
  * The onboarding tour.
  *
  * This is the one spec that opts back in to it: `openEmptyApp` marks both tours
- * seen, because every other spec starts from an empty database — a brand-new
- * user — and an overlay with a cutout intercepts the clicks they then make.
+ * seen, because every other spec starts from an empty database (a brand-new
+ * user), and an overlay with a cutout intercepts the clicks they then make.
  */
 
 /** Forgets that either tour has been shown, and reloads into a fresh visit. */
@@ -59,7 +59,7 @@ test('runs a second tour the first time the editor is opened', async ({
   // Forgotten while already in the editor, so the reload lands back here.
   await forgetTours(page)
 
-  // Each tour runs where its anchors are — the editor's steps point at the
+  // Each tour runs where its anchors are, the editor's steps point at the
   // three panes, which only exist on this route.
   await expect(page.getByText('Markdown, and your own CSS')).toBeVisible({
     timeout: 20_000,
@@ -80,7 +80,7 @@ test('runs a second tour the first time the editor is opened', async ({
 test('can be started again from the application menu', async ({ page }) => {
   await openEmptyApp(page)
 
-  // Seen already — this is the path for someone who skipped it and changed
+  // Seen already, this is the path for someone who skipped it and changed
   // their mind, which is why the flag alone would be a dead end.
   await expect(page.getByText('Start here')).toBeHidden()
 

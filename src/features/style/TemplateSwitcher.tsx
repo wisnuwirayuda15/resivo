@@ -23,7 +23,7 @@ import type { DesignConfig, TemplateId } from '@/features/resume/model/document'
 /**
  * Choosing a template, from inside the editor.
  *
- * Switching never touches `content` — that is the whole point of keeping the
+ * Switching never touches `content`, that is the whole point of keeping the
  * template out of the document beyond its id. It does raise the question of what
  * happens to `design`, since a template ships its own token defaults:
  *
@@ -47,8 +47,8 @@ interface TemplateSwitcherProps {
  * `Box`, not `Text`: everything inside `.resivo-paper` is showing paper tokens,
  * and `Text` would paint the chrome's own font size and leading over the
  * specimen this exists to preview. The heading weight is the one value that
- * cannot be a utility class — it comes from the template's tokens at runtime, and
- * Tailwind can only emit classes it can see in the source — so it goes through
+ * cannot be a utility class (it comes from the template's tokens at runtime, and
+ * Tailwind can only emit classes it can see in the source), so it goes through
  * Mantine's `fw` style prop, which resolves a dynamic value at render.
  */
 const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
@@ -149,7 +149,7 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
               Cancel
             </Button>
             {/* Replacing is the destructive option, so keeping is the focused
-                default — a stray Enter must not discard styling work. */}
+                default, a stray Enter must not discard styling work. */}
             <Button onClick={() => commit(true)} variant="default">
               Use template defaults
             </Button>

@@ -9,7 +9,7 @@ import { templateList } from '@/features/templates/catalog'
  * The template gallery.
  *
  * Read-only: templates are chosen when creating a resume or switched from inside
- * the editor, so this view explains what each one is for — including how it
+ * the editor, so this view explains what each one is for, including how it
  * reads to an applicant tracking system, which is the whole reason these
  * layouts stay single-column.
  */
@@ -25,7 +25,7 @@ const TemplatesRoute: React.FC = () => (
       <Box className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
         {templateList.map((template) => (
           <Box key={template.id} className="flex flex-col gap-2">
-            {/* No `onSelect`, so the tile renders inert — this view describes,
+            {/* No `onSelect`, so the tile renders inert, this view describes,
                 it does not apply. */}
             <TemplateTile template={template} />
             <Text className="text-subtle px-1 text-[11px] leading-snug">

@@ -15,7 +15,7 @@ import type { ResumeRecord } from '../records'
  * Resume rows.
  *
  * Reads go through `migrateDocument`, so callers always receive a document at
- * the current format. Writes are plain `put`s — the whole document is one row,
+ * the current format. Writes are plain `put`s, the whole document is one row,
  * which is what lets autosave be a single write.
  */
 
@@ -62,7 +62,7 @@ export const listArchivedResumes = async (): Promise<Array<ResumeSummary>> => {
 }
 
 /** A group's active resumes in their manual order, straight off the compound
- * index — no JavaScript sort. */
+ * index, no JavaScript sort. */
 export const listResumesInGroup = async (
   groupId: string,
 ): Promise<Array<ResumeSummary>> => {
@@ -150,7 +150,7 @@ export const createResume = async (
  * Returns the row it wrote, rather than nothing. The caller needs to know what
  * landed, not what it asked for: `syncMeta` rewrites part of the document and
  * `updatedAt` is decided here, so a caller reconstructing the saved row would be
- * guessing at both. The query cache is updated from this — see
+ * guessing at both. The query cache is updated from this, see
  * `patchSavedResume`.
  */
 export const saveResumeDocument = async (

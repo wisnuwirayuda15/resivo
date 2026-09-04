@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { guessFromFilename } from './readFont'
 
 /**
- * The file-name guess is the only pure part of the font pipeline — reading a file
+ * The file-name guess is the only pure part of the font pipeline, reading a file
  * and validating it need a browser. It is worth testing on its own because it is
  * where a wrong answer is *plausible*: a font stored as weight 700 when it is
  * really 600 loads fine and prints subtly wrong.

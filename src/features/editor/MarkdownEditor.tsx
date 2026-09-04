@@ -16,7 +16,7 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * The document model stays the source of truth: this shows a serialization of
  * it, and typing is parsed straight back into it. What makes that work rather
- * than fight itself is two rules — the buffer is replaced from the model only
+ * than fight itself is two rules, the buffer is replaced from the model only
  * when the two have genuinely diverged, and never while the caret is in it. The
  * first stops every unrelated store change from rewriting the file; the second
  * is what stops half-typed Markdown from reformatting itself under the reader's
@@ -62,7 +62,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  /** What the model currently serializes to — the other half of the divergence
+  /** What the model currently serializes to, the other half of the divergence
    * check below. */
   const serialized = useMemo(() => serializeDocument(resume), [resume])
   const [value, setValue] = useState(serialized)
@@ -72,7 +72,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    *
    * `hasTextFocus()` is what the effect below actually decides on, because it
    * cannot be stale. This exists only so that *losing* focus re-runs that effect
-   * when the model itself has not changed — a state change is the only thing
+   * when the model itself has not changed, a state change is the only thing
    * that can. Reading it as the condition instead would reintroduce the bug it
    * is here to fix: Monaco does not always report a blur when focus leaves for
    * another document, and a `focused` stuck at `true` would then block every
@@ -94,7 +94,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
    * Replaces the buffer from the model, unless the reader is typing in it.
    *
    * The buffer diverges for two quite different reasons. The model may have
-   * changed elsewhere — undo, the style panel, an edit on the paper — and then
+   * changed elsewhere (undo, the style panel, an edit on the paper), and then
    * the buffer is simply out of date. Or the parse of what was typed serializes
    * differently from how it was written, which is the canonical form of the same
    * document.
@@ -124,7 +124,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   }, [focusTick, serialized])
 
   /**
-   * Runs after the child editor has applied the new `value` — child effects
+   * Runs after the child editor has applied the new `value`, child effects
    * commit before a parent's, which is what makes this ordering reliable rather
    * than a race against a frame.
    */
@@ -205,7 +205,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   /**
    * Parses what is in the buffer now, instead of when the timer would have.
    *
-   * Called on unmount — which is what switching to the CSS tab is — and on blur,
+   * Called on unmount (which is what switching to the CSS tab is), and on blur,
    * where it has to run *before* the buffer may be replaced from the model:
    * otherwise the replacement would be a serialization of a document that does
    * not yet include the last few keystrokes, and they would be erased.

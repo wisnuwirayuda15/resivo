@@ -67,8 +67,8 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
    * A resume that fails to load is not the same as one that is not there, and
    * saying "not found" about a document sitting in the database is the kind of
    * wrong answer that sends someone looking in the wrong place. `migrateDocument`
-   * refuses anything it cannot honestly repair — a document from a newer build,
-   * or one that no longer validates — and its message says which, so it is shown
+   * refuses anything it cannot honestly repair (a document from a newer build,
+   * or one that no longer validates), and its message says which, so it is shown
    * rather than flattened into a missing-file screen.
    */
   if (resume.isError) {

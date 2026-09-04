@@ -69,7 +69,7 @@ export const createSection = (
  * Starts with the four sections almost every resume has, each empty, rather
  * than a blank page: an empty section is a visible affordance ("add an entry"),
  * whereas a blank document gives the user nothing to click. Sample content is
- * deliberately not inserted — the user's document should never contain text
+ * deliberately not inserted, the user's document should never contain text
  * they did not write.
  */
 export const createEmptyDocument = (

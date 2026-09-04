@@ -2,7 +2,7 @@
  * Browser-environment guards.
  *
  * Resivo keeps TanStack Start's SSR shell, but every byte of user data lives in
- * IndexedDB — which does not exist on the server. Anything that touches the
+ * IndexedDB, which does not exist on the server. Anything that touches the
  * database, Monaco, the preview iframe or drag-and-drop must therefore be
  * reachable only from the client, and these guards are how that boundary is
  * enforced in code rather than by convention.
@@ -13,8 +13,8 @@ export const isBrowser = (): boolean => typeof window !== 'undefined'
 
 /**
  * IndexedDB is absent on the server, and can also be unavailable in the browser
- * — Firefox blocks it in private windows, and some embedded webviews disable it
- * — so availability is checked rather than inferred from `isBrowser()`.
+ * (Firefox blocks it in private windows, and some embedded webviews disable it),
+ * so availability is checked rather than inferred from `isBrowser()`.
  */
 export const hasIndexedDb = (): boolean => typeof indexedDB !== 'undefined'
 

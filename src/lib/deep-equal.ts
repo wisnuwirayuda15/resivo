@@ -3,7 +3,7 @@
  *
  * Written rather than compared as serialised JSON because key order differs
  * between an object this build constructs and the same object after a round trip
- * through IndexedDB or a backup file — a string comparison would report those as
+ * through IndexedDB or a backup file, a string comparison would report those as
  * different when they are not, which for the style panel means offering to reset
  * customisations the user never made.
  *

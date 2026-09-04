@@ -12,11 +12,11 @@ import type { ParseWarning } from '@/features/markdown/index'
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
- * Panel 1 — the code pane.
+ * Panel 1, the code pane.
  *
  * Monaco is loaded lazily and only here. It is by far the largest thing in the
  * bundle, and someone who only ever edits in the preview or the style panel
- * should never pay for it — so it is a separate chunk fetched when this pane
+ * should never pay for it, so it is a separate chunk fetched when this pane
  * first mounts, not part of the app's entry. Both tabs share that chunk, since
  * both are the same editor with a different language.
  */
@@ -61,7 +61,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
    * One count for whichever tab is not showing.
    *
    * A squiggle explains itself where it happens, so the strip carries only the
-   * number — and only the number belonging to the *other* tab would be useful,
+   * number, and only the number belonging to the *other* tab would be useful,
    * except that tracking which is which costs more than it tells the reader. The
    * count is therefore the total, and the tab it belongs to is one click away.
    */

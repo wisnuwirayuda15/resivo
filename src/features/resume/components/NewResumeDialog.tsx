@@ -31,7 +31,7 @@ import type { ResumeDocument, TemplateId } from '../model/document'
  * A Markdown file the dialog has read but not yet turned into a resume.
  *
  * The source text is kept rather than the parsed document, because the template
- * is chosen in this same dialog and the document is built from it — so the parse
+ * is chosen in this same dialog and the document is built from it, so the parse
  * is redone at submit against whatever template is selected by then. Parsing is
  * cheap; a stale `templateId` inside a stored document is not.
  */
@@ -127,8 +127,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   /**
    * Reads a Markdown file and parses it once, to report what came of it.
    *
-   * The file is not the resume yet — nothing is written until the dialog is
-   * submitted — so a file that turns out to be empty or unreadable costs
+   * The file is not the resume yet (nothing is written until the dialog is
+   * submitted), so a file that turns out to be empty or unreadable costs
    * nothing but a message.
    */
   const importFile = async (file: File | null) => {
@@ -173,7 +173,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 
   const submit = async () => {
     const created = await createResume.mutateAsync({
-      // An untitled resume is normal — the repository supplies the placeholder
+      // An untitled resume is normal, the repository supplies the placeholder
       // rather than this dialog insisting on a name up front.
       ...(title.trim() === '' ? {} : { title: title.trim() }),
       templateId,
@@ -221,7 +221,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
         <Group grow align="flex-start">
           <TextInput
             label="Name"
-            placeholder="Staff Engineer — 2026"
+            placeholder="Staff Engineer 2026"
             value={title}
             onChange={(event) => setTitle(event.currentTarget.value)}
             // Enter submits, since the template is already chosen by then.
@@ -265,7 +265,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
               ? 'Read with nothing left over.'
               : `Read. ${imported.warningCount} ${
                   imported.warningCount === 1 ? 'line' : 'lines'
-                } could not be typeset and are kept as source text — the editor points at each one.`}
+                } could not be typeset and are kept as source text, the editor points at each one.`}
           </Alert>
         )}
 

@@ -16,8 +16,8 @@ import type { SaveStatus } from './autosave'
  * the bridge between them.
  *
  * Undo is snapshot-based rather than patch-inversion. For a single-document
- * editor the snapshots are nearly free — Immer shares every untouched subtree by
- * reference, so an undo entry costs only the nodes that actually changed — and
+ * editor the snapshots are nearly free (Immer shares every untouched subtree by
+ * reference, so an undo entry costs only the nodes that actually changed) and
  * "restore this exact state" is far harder to get subtly wrong than "invert this
  * patch".
  */
@@ -29,7 +29,7 @@ export const UNDO_LIMIT = 100
  * How long consecutive same-key edits keep merging into one undo step.
  *
  * Without this, typing a sentence would cost forty undos to take back. Keyed
- * rather than purely time-based so switching field ends the run immediately —
+ * rather than purely time-based so switching field ends the run immediately,
  * undoing should never jump between two different places in the document.
  */
 export const COALESCE_WINDOW_MS = 700
@@ -63,7 +63,7 @@ export interface EditorState {
   load: (resumeId: string, document: ResumeDocument) => void
   close: () => void
   apply: (recipe: Recipe, options?: ApplyOptions) => void
-  /** Replaces the document wholesale — used by Markdown import, which
+  /** Replaces the document wholesale, used by Markdown import, which
    * reconstructs the tree rather than patching it. */
   replace: (document: ResumeDocument, options?: ApplyOptions) => void
   undo: () => void
@@ -114,7 +114,7 @@ export const createEditorStore = (): UseBoundStore<StoreApi<EditorState>> =>
 
       const next = produce(document, recipe)
 
-      // A recipe that changed nothing must not create an undo step — Immer
+      // A recipe that changed nothing must not create an undo step, Immer
       // returns the same reference, which makes that cheap to detect.
       if (next === document) {
         return
@@ -221,7 +221,7 @@ const pushHistory = (
   return {
     document: next,
     past,
-    // Any new edit invalidates the redo branch — standard editor behaviour.
+    // Any new edit invalidates the redo branch, standard editor behaviour.
     future: [],
     coalesceKey: coalesce ?? null,
     coalesceAt: coalesce === undefined ? 0 : now,

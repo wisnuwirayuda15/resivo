@@ -43,7 +43,7 @@ import type {
 } from '@/features/resume/model/document'
 
 /**
- * The default renderers — the resume every template starts from.
+ * The default renderers, the resume every template starts from.
  *
  * A template supplies only the pieces it wants to change; `resolveTemplate`
  * fills the rest from here. Almost all visual difference between templates is
@@ -54,17 +54,17 @@ import type {
  * Tailwind utility: this markup is serialised into the iframe and, later, into
  * the HTML export, neither of which carries the app's stylesheets. The only
  * inline styles are per-block values out of the document that no class could
- * name — an image's width, a table column's alignment.
+ * name, an image's width, a table column's alignment.
  *
  * Every run of text goes through `EditableText`, which is what makes the paper
  * the editing surface. Outside `edit` mode that component renders exactly what
- * `InlineTextView` renders — so this file has one markup, not one per mode, and
+ * `InlineTextView` renders, so this file has one markup, not one per mode, and
  * an export cannot accidentally carry editing chrome.
  */
 
 /**
  * Wires a field to the store, or returns `undefined` when there is no store to
- * write to — which is what makes the field non-editable in view and print.
+ * write to, which is what makes the field non-editable in view and print.
  */
 const commitWith = (
   context: RenderContext,
@@ -86,7 +86,7 @@ const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
       {/**
        * Rendered only once the blob resolves, and never as a reserved box. The
        * avatar's size is a style token, so an empty box of exactly that size
-       * would be indistinguishable from a photograph that failed — and drawing
+       * would be indistinguishable from a photograph that failed, and drawing
        * nothing costs nothing here, because the flex row simply closes up and
        * re-opens when the image arrives, which re-paginates anyway.
        */}
@@ -174,8 +174,8 @@ const DefaultSectionHeading: React.FC<SectionHeadingProps> = ({
   /**
    * An untitled section draws no heading and no rule.
    *
-   * This is where content that arrived above the first heading lives — pasted
-   * text, usually — and giving it an empty heading row would print a rule with
+   * This is where content that arrived above the first heading lives (pasted
+   * text, usually), and giving it an empty heading row would print a rule with
    * nothing over it. Titling it is done in the Markdown pane, by writing the
    * heading the paste did not have.
    */
@@ -229,8 +229,8 @@ const Paragraph: React.FC<BlockViewProps<ParagraphBlock>> = ({
 /**
  * A list, at any depth.
  *
- * Items carry no id in the model — they are positions in an array, replaced
- * wholesale on edit — so the path down to an item is its identity, both as the
+ * Items carry no id in the model (they are positions in an array, replaced
+ * wholesale on edit), so the path down to an item is its identity, both as the
  * React key and as what the mutation is told to write.
  *
  * A task list renders its checkbox as text rather than an `<input>`: this markup
@@ -309,7 +309,7 @@ const HEADING_TAGS = { 3: 'h3', 4: 'h4', 5: 'h5', 6: 'h6' } as const
 /**
  * A subheading inside a section.
  *
- * The level comes from the document, so the element does too — a resume read by
+ * The level comes from the document, so the element does too, a resume read by
  * a screen reader or an applicant tracking system should have the outline its
  * author wrote, not one flattened to a single tag.
  */
@@ -457,7 +457,7 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
         {dates === '' && block.location === undefined ? null : (
           <div className="rp-entry-meta">
             {/**
-             * The dates are the one run of text on the paper that is *derived* —
+             * The dates are the one run of text on the paper that is *derived*,
              * `formatDateRange` turns two ISO strings into whatever the locale
              * writes. Editing the rendered string would mean parsing prose back
              * into dates, and a resume that silently misreads "Mar 2019" is worse
@@ -519,7 +519,7 @@ const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
     {block.tags.map((tag, index) => (
       <span className="rp-tag" key={`${tag}-${index}`}>
         {/* A tag is a plain string in the model, so whatever formatting is typed
-            into it is flattened on commit — the chip is a keyword, not prose. */}
+            into it is flattened on commit, the chip is a keyword, not prose. */}
         <EditableText
           context={context}
           label="tag"
@@ -542,7 +542,7 @@ const Divider: React.FC = () => <div className="rp-divider" />
  * caption painted by an absolutely positioned pseudo-element. That is the whole
  * design: the paginator measures this item like any other, and if the marker
  * occupied space the measured height would differ from the printed one. It is
- * also why the marker is not hidden in print — there is nothing to hide, only a
+ * also why the marker is not hidden in print, there is nothing to hide, only a
  * rule that `@media print` stops painting.
  *
  * `aria-hidden` because a screen reader gets nothing from it: the break is a
@@ -576,7 +576,7 @@ const IconLabel: React.FC<BlockViewProps<IconLabelBlock>> = ({
  * A referenced image.
  *
  * Three states, drawn differently on purpose. Resolved, it is an `<img>` given
- * its intrinsic `aspect-ratio` from the stored record — so the box is the right
+ * its intrinsic `aspect-ratio` from the stored record, so the box is the right
  * height before a single byte is decoded, and the page breaks around it do not
  * move when it paints. Absent from the map, the blob is still being read.
  * Mapped to `null`, the row is gone: that one never resolves, so it says so

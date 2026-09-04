@@ -3,12 +3,12 @@ import { SECTION_KINDS } from '@/features/resume/model/document'
 import type { SectionKind } from '@/features/resume/model/document'
 
 /**
- * Resivo-Markdown — the shared vocabulary of the codec.
+ * Resivo-Markdown, the shared vocabulary of the codec.
  *
  * The format is a small, deliberately boring subset of CommonMark plus
  * directives (`remark-directive`), because a resume has structure that headings
  * and lists cannot express. An entry has a title, an employer, a location and a
- * date range; recovering those from `### Role — Employer, London (2021–2024)`
+ * date range; recovering those from `### Role, Employer, London (2021-2024)`
  * means guessing at punctuation, and guessing is what makes a round trip lossy.
  *
  * The three directive forms, as `remark-directive` defines them:
@@ -27,7 +27,7 @@ import type { SectionKind } from '@/features/resume/model/document'
 /** Container directive: one structured entry. */
 export const ENTRY_DIRECTIVE = 'entry'
 
-/** Leaf directives — block level, one line each. */
+/** Leaf directives, block level, one line each. */
 export const CONTACT_DIRECTIVE = 'contact'
 export const TAGS_DIRECTIVE = 'tags'
 export const LABEL_DIRECTIVE = 'label'
@@ -44,7 +44,7 @@ export const TAG_SEPARATOR = ', '
 /**
  * Heading text to section kind.
  *
- * Only consulted when there is no previous document to match against — that is,
+ * Only consulted when there is no previous document to match against, that is,
  * on a first parse or an import. While editing, a section keeps the kind it
  * already had even if its heading is renamed, because the heading is a label and
  * the kind is what templates key off.

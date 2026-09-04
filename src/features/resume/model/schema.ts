@@ -21,8 +21,8 @@ import type {
 /**
  * Runtime mirror of the document model.
  *
- * Every document that enters the app from outside — a JSON backup, an imported
- * file, a record written by an older build — is parsed through this before it is
+ * Every document that enters the app from outside (a JSON backup, an imported
+ * file, a record written by an older build) is parsed through this before it is
  * trusted. In-memory edits are already type-checked, so the hot editing path
  * does not validate.
  *
@@ -92,7 +92,7 @@ const dateRangeSchema = z.object({
 
 /**
  * A list item nests a whole list, so like `link` this has to be lazy. The depth
- * is bounded by the Markdown parser rather than here — mdast will not produce a
+ * is bounded by the Markdown parser rather than here, mdast will not produce a
  * list deeper than the source is indented.
  */
 const listItemSchema: z.ZodType<ListItem> = z.lazy(() =>

@@ -18,7 +18,7 @@ import type {
 
 /**
  * The codec's contract is a round trip, so nearly every test here is the same
- * shape: build a document, write it, read it back, and compare the tree — not
+ * shape: build a document, write it, read it back, and compare the tree, not
  * the text. Comparing text would only prove the serializer is consistent with
  * itself.
  */
@@ -294,7 +294,7 @@ describe('round trip', () => {
         {
           id: 'b1',
           kind: 'paragraph',
-          text: text('Shipped at 09:30 — see :icon[trap]{name=star}'),
+          text: text('Shipped at 09:30, see :icon[trap]{name=star}'),
         },
       ]),
     ])
@@ -302,7 +302,7 @@ describe('round trip', () => {
     const [block] = roundTrip(document).content.sections[0]?.blocks ?? []
 
     expect(block?.kind === 'paragraph' ? plainText(block.text) : '').toBe(
-      'Shipped at 09:30 — see :icon[trap]{name=star}',
+      'Shipped at 09:30, see :icon[trap]{name=star}',
     )
   })
 })
@@ -352,7 +352,7 @@ describe('serializing', () => {
  *
  * Each of these used to be kept as source text and printed as-is; each now has a
  * block in the model. The test that matters for all of them is the same one:
- * parse, write, parse again, and check the second text equals the first — a
+ * parse, write, parse again, and check the second text equals the first, a
  * construct that survives one round trip but drifts on the next is not
  * supported, it is merely tolerated once.
  */
@@ -379,7 +379,7 @@ describe('the rest of Markdown', () => {
   }
 
   /**
-   * `written` is given where the canonical form differs from the input — a
+   * `written` is given where the canonical form differs from the input, a
    * table's delimiter row is written at its minimum width rather than padded to
    * the column. The construct still round-trips; it is simply normalized on the
    * way out, which is what every other block does too.
@@ -519,7 +519,7 @@ describe('constructs the model still cannot represent', () => {
  * Where the section boundary is, and what happens to text that arrives before
  * one. Both used to lose content: a document whose headings were all one level
  * too deep had no sections at all, and anything above the first section was
- * warned about and then dropped — which erased it from the file, because the
+ * warned about and then dropped, which erased it from the file, because the
  * editor's buffer is a serialization of the model.
  */
 describe('headings and content with nowhere to go', () => {
@@ -599,7 +599,7 @@ describe('headings and content with nowhere to go', () => {
     /**
      * Escapes are stripped before comparing.
      *
-     * The writer escapes what would otherwise be read back as markup — an email
+     * The writer escapes what would otherwise be read back as markup, an email
      * becomes `ada\@example.com`, because unescaped it is a GFM autolink rather
      * than the text someone typed. That backslash is not content, and the point
      * of this test is content: no line of the paste is missing.

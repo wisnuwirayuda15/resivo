@@ -11,7 +11,7 @@ import type { ResumeDocument } from '@/features/resume/model/document'
 /**
  * The HTML export.
  *
- * Pure and synchronous — assets arrive already inlined — so it can be tested
+ * Pure and synchronous (assets arrive already inlined), so it can be tested
  * without a database, which is the reason for that split. The properties worth
  * asserting are the promises the format makes: one file, no network, the same
  * page breaks as the preview, and no trace of the editor.
@@ -141,8 +141,8 @@ describe('exportHtml', () => {
 
   /**
    * Export uses the breaks the preview measured. Recomputing them here is
-   * impossible — pagination is a measurement and there is nothing to measure in
-   * a string — so the test is that they are honoured exactly.
+   * impossible (pagination is a measurement and there is nothing to measure in
+   * a string), so the test is that they are honoured exactly.
    */
   it('lays out the pages it is given', () => {
     const html = render({

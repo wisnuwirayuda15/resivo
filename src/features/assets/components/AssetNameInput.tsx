@@ -11,7 +11,7 @@ interface AssetNameInputProps {
  * Renames an asset, on commit rather than on every keystroke.
  *
  * The inspector used to call the rename mutation from `onChange`, which wrote a
- * row to IndexedDB and invalidated every asset query once per character typed —
+ * row to IndexedDB and invalidated every asset query once per character typed,
  * and the invalidation reset the field from the server value mid-word. This
  * holds the draft locally and commits on blur or Enter, which is also what makes
  * Escape able to mean "never mind".

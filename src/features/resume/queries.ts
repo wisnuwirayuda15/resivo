@@ -9,8 +9,8 @@ import type { TemplateId } from './model/document'
 /**
  * Query bindings over the resume and group repositories.
  *
- * TanStack Query owns the *persistent* side of state — the library list, groups,
- * the loaded record — because it gives caching, invalidation and loading/error
+ * TanStack Query owns the *persistent* side of state (the library list, groups,
+ * the loaded record) because it gives caching, invalidation and loading/error
  * states for free. The document being actively edited does NOT live here: it is
  * mutated on every keystroke, which would thrash this cache and re-render the
  * library. That belongs to the editor's Zustand store, which writes
@@ -57,7 +57,7 @@ export const useResume = (id: string | undefined) =>
      * `null`, never `undefined`, for a resume that is not there.
      *
      * TanStack Query rejects an `undefined` result as a programming error and
-     * turns it into a failed query — which would report a deleted resume as a
+     * turns it into a failed query, which would report a deleted resume as a
      * document that could not be read, and put its own internal message on
      * screen. `null` is a value, so "not found" stays distinguishable from
      * "broken".
@@ -72,7 +72,7 @@ export const useResume = (id: string | undefined) =>
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     /**
-     * A local read either works or fails for a structural reason — a document
+     * A local read either works or fails for a structural reason, a document
      * from a newer build, or one that no longer validates. There is no flaky
      * network to ride out, so retrying just delays the error: during the backoff
      * the query is neither loading nor failed, and the UI shows "not found"
@@ -137,10 +137,10 @@ export const useCreateResume = () => {
  *
  * The **detail** row has to be written too, and used not to be. The reasoning
  * for leaving it alone was that the editor store already holds the newer
- * document — true, and only true while the editor is open. On leaving, the store
+ * document, true, and only true while the editor is open. On leaving, the store
  * is emptied and this key still held the document as it was when the editor
  * opened; since it is `staleTime: Infinity`, walking back in served that. The
- * edits were in IndexedDB and invisible, which reads as "it did not save" — and
+ * edits were in IndexedDB and invisible, which reads as "it did not save", and
  * the next keystroke would autosave the stale document over the real one. So
  * this is data loss, not a display bug, and the whole record is written here.
  *

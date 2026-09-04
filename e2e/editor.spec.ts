@@ -18,7 +18,7 @@ import {
  *
  * What these cover that a unit test cannot: a Monaco editor that has actually
  * laid itself out, a preview iframe that has actually paginated, and an edit made
- * by clicking on the paper — which only exists as a `contenteditable` inside
+ * by clicking on the paper, which only exists as a `contenteditable` inside
  * another document, reached through a React portal.
  */
 
@@ -127,7 +127,7 @@ test('edits text on the paper, and the Markdown follows', async ({ page }) => {
     .toMatch(/very first algorithm/)
 
   // The model is the source of truth, so the Markdown pane must show the edit
-  // too — this is the assertion that the paper wrote to the document and not
+  // too, this is the assertion that the paper wrote to the document and not
   // just to the DOM.
   await expect
     .poll(() => markdownPaneText(page), { timeout: 15_000 })
@@ -147,7 +147,7 @@ test('picks a section icon from the full catalog', async ({ page }) => {
   const search = dialog.getByRole('textbox').first()
   await search.fill('star')
 
-  // The grid is a listbox of options, virtualized — so what matters is that a
+  // The grid is a listbox of options, virtualized, so what matters is that a
   // match is rendered at all, not how many.
   const first = dialog.getByRole('option', { name: /star/i }).first()
   await expect(first).toBeVisible({ timeout: 20_000 })
@@ -156,7 +156,7 @@ test('picks a section icon from the full catalog', async ({ page }) => {
   await expect(dialog).toBeHidden()
 
   // An icon is an SVG on the paper, and the renderer stamps its name onto the
-  // element — which is also how an edited run keeps it.
+  // element, which is also how an edited run keeps it.
   await expectPaperReady(page)
   await expect(
     paper(page).locator('[data-paged] [data-icon-name*="star"]').first(),
@@ -182,7 +182,7 @@ test('reports Markdown it cannot typeset, without losing it', async ({
  *
  * The assertion that matters is the copy, not the prose: the prompt exists so
  * someone can hand the whole format to a language model in one click, and
- * Mantine only switches the label to "Copied" once `writeText` has resolved —
+ * Mantine only switches the label to "Copied" once `writeText` has resolved,
  * so the label is proof the clipboard write happened, without the test needing
  * clipboard read permission.
  */
@@ -237,7 +237,7 @@ test('the guide explains the format, and hands it over', async ({ page }) => {
  *
  * A regression test with a specific shape in mind. Autosave wrote to IndexedDB
  * and nothing wrote the saved row back into the query cache, on the reasoning
- * that the editor store held the newer document — true only while the editor is
+ * that the editor store held the newer document, true only while the editor is
  * open. Once it closed, the detail key still held the document as it was on
  * entry, and it is `staleTime: Infinity`, so walking back in served that. The
  * edits were on disk and invisible, and the next keystroke would have saved the
@@ -277,7 +277,7 @@ test('an edit survives leaving the editor and coming back', async ({
  * Dragging a pane divider across the preview.
  *
  * A drag is tracked by listeners on the app's document, and the preview is
- * another document — so once the cursor crossed into the paper the moves went to
+ * another document, so once the cursor crossed into the paper the moves went to
  * the iframe and the handle stopped following. Since the preview is the pane in
  * the middle, that was most of any drag: it felt like the divider was catching
  * on something.
@@ -337,6 +337,6 @@ test('a pane divider keeps following the pointer over the preview', async ({
   // The whole 120px, not the few pixels before the cursor reached the paper.
   expect(await width()).toBeGreaterThan(before + 110)
 
-  // And the frame is clickable again — the paper is an editing surface.
+  // And the frame is clickable again, the paper is an editing surface.
   await expect(frame).toHaveCSS('pointer-events', 'auto')
 })

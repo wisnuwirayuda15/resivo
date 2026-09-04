@@ -7,7 +7,7 @@ import type { ReactNode } from 'react'
 interface EmptyStateProps {
   icon: string
   title: string
-  /** One or two sentences saying what to do next — never just "nothing here". */
+  /** One or two sentences saying what to do next, never just "nothing here". */
   body: string
   action?: ReactNode
 }

@@ -20,7 +20,7 @@ describe('template registry', () => {
 
   /**
    * The whole registry shares one stylesheet, so a delta written without its
-   * `[data-template=...]` scope would restyle all four templates at once — and
+   * `[data-template=...]` scope would restyle all four templates at once, and
    * because the paginator measures what these rules produce, it would move page
    * breaks in resumes the author never opened.
    */
@@ -32,7 +32,7 @@ describe('template registry', () => {
       for (const other of others) {
         // `paper.css` declares a token scope for every template, so the other
         // ids legitimately appear. What must not appear is a rule from another
-        // template's delta — those all carry `.rp-` element selectors.
+        // template's delta, those all carry `.rp-` element selectors.
         expect(css).not.toMatch(
           new RegExp(`\\[data-template='${other}'\\] \\.rp-`),
         )

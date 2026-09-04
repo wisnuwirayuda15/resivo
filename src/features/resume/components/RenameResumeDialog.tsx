@@ -19,7 +19,7 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
   const update = useUpdateResume()
 
   // Seed the field whenever a different resume is opened, rather than deriving
-  // it during render — the user must be able to edit it freely once it is open.
+  // it during render, the user must be able to edit it freely once it is open.
   useEffect(() => {
     if (resume !== undefined) {
       setTitle(resume.title)

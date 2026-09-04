@@ -11,7 +11,7 @@ import type { QueryClient } from '@tanstack/react-query'
 /**
  * Query bindings over the image and font repositories.
  *
- * Summaries only — never blobs. A gallery of fifty photographs would be fifty
+ * Summaries only, never blobs. A gallery of fifty photographs would be fifty
  * megabytes held in a query cache that has no idea it is holding them; the bytes
  * are fetched one at a time, through the object-URL cache, by whatever is
  * actually drawing them.
@@ -29,7 +29,7 @@ export const assetKeys = {
 
 /**
  * "Unused" is derived from every resume, so it goes stale when any document is
- * saved — not only when an asset changes. Invalidating both lists together keeps
+ * saved, not only when an asset changes. Invalidating both lists together keeps
  * the badge honest instead of leaving it to be noticed later.
  */
 const invalidateAssets = async (client: QueryClient): Promise<void> => {
@@ -61,7 +61,7 @@ export const useUnusedFonts = () =>
  * How much of the device's storage the assets take.
  *
  * Summed in the repositories rather than from the summary lists, because that is
- * the only place the whole table is walked — and `totalImageBytes` has carried
+ * the only place the whole table is walked, and `totalImageBytes` has carried
  * the comment "for the settings view" since it was written, with no settings
  * view to call it. Under the `assets` key prefix, so an upload or a deletion
  * invalidates it along with everything else.
@@ -87,7 +87,7 @@ export const useAssetUsage = () =>
  * Reads and validates the file, then stores it.
  *
  * Validation is part of the mutation rather than of the component, so every
- * upload path — button, drop zone, and whatever a later paste handler adds —
+ * upload path (button, drop zone, and whatever a later paste handler adds)
  * rejects the same files with the same message.
  */
 export const useAddImage = () => {

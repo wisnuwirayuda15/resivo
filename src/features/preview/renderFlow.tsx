@@ -13,7 +13,7 @@ import type {
  * This is the template renderer: the one place that maps `documentFlow`'s items
  * onto a template's three components. It is deliberately separate from the
  * paginated view, because the same mapping has to serve both the on-screen
- * preview and the HTML export — and a second implementation for export would be
+ * preview and the HTML export, and a second implementation for export would be
  * a second thing that could disagree with what was measured.
  *
  * It renders each item exactly once. The preview places those same element

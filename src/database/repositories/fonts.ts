@@ -54,7 +54,7 @@ export const deleteFont = async (id: string): Promise<void> => {
  * Fonts no resume references.
  *
  * Deleting a font that IS referenced would silently change how a resume prints,
- * so the caller is expected to warn first — this is what tells it whether to.
+ * so the caller is expected to warn first, this is what tells it whether to.
  */
 export const listUnusedFonts = async (): Promise<Array<FontSummary>> => {
   const [fonts, referenced] = await Promise.all([

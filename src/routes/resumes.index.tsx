@@ -29,8 +29,8 @@ const searchSchema = z.object({
 /**
  * The sort options, once.
  *
- * Two controls offer them — a select where the row has room and a menu where it
- * does not — and a list that lived in only one of them would be a list that
+ * Two controls offer them (a select where the row has room and a menu where it
+ * does not), and a list that lived in only one of them would be a list that
  * could differ between widths.
  */
 const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
@@ -92,7 +92,7 @@ const LibraryRoute: React.FC = () => {
           {/* The same three options, in the shape each width has room for.
 
               A 132px select where the row can afford one, and a menu behind a
-              24px glyph where it cannot — rather than no sorting at all on a
+              24px glyph where it cannot, rather than no sorting at all on a
               phone, which is what hiding it amounted to. Two controls rather
               than one because `visibleFrom` is pure CSS and needs no media
               query in a header the server renders; only one of them is ever
@@ -144,7 +144,7 @@ const LibraryRoute: React.FC = () => {
 
                 The icon is a child rather than a `leftSection`, because a
                 section keeps its trailing margin once the label beside it is
-                hidden — which left the plus a few pixels left of centre and
+                hidden, which left the plus a few pixels left of centre and
                 looking out of line with everything else in the row.
                 `aria-label` is what keeps the button named either way. */}
             <Button

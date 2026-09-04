@@ -36,7 +36,7 @@ const megabytes = (bytes: number): string =>
  *
  * `createImageBitmap` both measures and decodes, so a file that is named like an
  * image but is not one fails here rather than later as a broken box on the
- * paper. The bitmap is closed immediately — it holds decoded pixels, which for a
+ * paper. The bitmap is closed immediately, it holds decoded pixels, which for a
  * large photo is far more memory than the file itself.
  */
 const measure = async (
@@ -71,7 +71,7 @@ export const readImageFile = async (file: File): Promise<AddImageInput> => {
   if (file.size > MAX_IMAGE_BYTES) {
     throw new AssetRejected(
       `That image is ${megabytes(file.size)}. The limit is ` +
-        `${megabytes(MAX_IMAGE_BYTES)} — export a smaller copy, since a resume ` +
+        `${megabytes(MAX_IMAGE_BYTES)}, export a smaller copy, since a resume ` +
         'prints it a few inches wide at most.',
     )
   }

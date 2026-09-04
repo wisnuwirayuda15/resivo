@@ -35,7 +35,7 @@ interface GroupRowProps {
  * near the edge of the icon would navigate instead of opening the menu.
  *
  * Renaming and deleting were in the repository from the start and had no way in.
- * Deleting is confirmed, but not because it is dangerous — `deleteGroup` moves
+ * Deleting is confirmed, but not because it is dangerous, `deleteGroup` moves
  * the resumes out rather than deleting them, and the dialog says so. What it is
  * really confirming is that the user meant the folder and not its contents.
  */

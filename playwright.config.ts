@@ -5,13 +5,13 @@ import { defineConfig, devices } from '@playwright/test'
  *
  * These tests exist for the part of Resivo the unit tests cannot reach. The
  * model, the codecs, the paginator and the sanitizer are pure and covered; what
- * was never covered is everything that only exists in a browser — a Mantine
+ * was never covered is everything that only exists in a browser, a Mantine
  * modal, a Monaco editor laying itself out, the preview iframe, a drag on the
  * paper, IndexedDB surviving a reload.
  *
  * Chromium only, deliberately. The point here is the workflow, not browser
- * differences, and print-to-PDF — the one place where browsers genuinely differ
- * for this app — is the browser's own dialog and out of reach either way.
+ * differences, and print-to-PDF (the one place where browsers genuinely differ
+ * for this app) is the browser's own dialog and out of reach either way.
  *
  * The dev server is used rather than a production build: it is what the tests
  * are usually run against while working, and the difference between the two is

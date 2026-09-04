@@ -20,7 +20,7 @@ import type { Monaco } from '@monaco-editor/react'
  * What it does not do is sanitize on the way in. The document keeps the source
  * verbatim and the preview sanitizes on the way out, so tightening the rules
  * later applies to every existing resume rather than only to what is edited
- * afterwards — and a rule the user is midway through typing is not silently
+ * afterwards, and a rule the user is midway through typing is not silently
  * rewritten under the caret.
  */
 
@@ -67,7 +67,7 @@ export const CssEditor: React.FC<CssEditorProps> = ({
    *
    * Monaco already flags syntax; what it cannot know is which valid CSS this
    * preview refuses and why. Those are the messages worth showing, because a
-   * refused rule is otherwise invisible — the paper simply does not change.
+   * refused rule is otherwise invisible, the paper simply does not change.
    */
   useEffect(() => {
     const monaco = monacoRef.current

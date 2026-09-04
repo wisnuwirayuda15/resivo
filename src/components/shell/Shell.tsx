@@ -32,7 +32,7 @@ interface ShellProps {
  * beside it, which is the design system's arrangement: the wordmark sits at the
  * top of the sidebar, and the application bar starts where the sidebar ends.
  *
- * `padding={0}` because each view owns its own padding — the design system uses
+ * `padding={0}` because each view owns its own padding, the design system uses
  * 24px in content views but none in the editor, which fills the viewport edge to
  * edge. The prop still has to be set explicitly, since `AppShell` uses it to
  * compute section offsets.
@@ -59,7 +59,7 @@ export const Shell: React.FC<ShellProps> = ({
    * A counter rather than a boolean.
    *
    * The tour starts on `started` going true, so asking for it a second time
-   * needs an edge to fire on — and by then the flag from the first run is
+   * needs an edge to fire on, and by then the flag from the first run is
    * already set.
    */
   const [tourRequests, setTourRequests] = useState(0)
@@ -77,7 +77,7 @@ export const Shell: React.FC<ShellProps> = ({
    * Read lazily rather than in an effect, and safe to: nothing the server
    * renders depends on it. The width is a CSS variable that a script in the
    * document head has already set, the toggle's label does not change with the
-   * state, and the sidebar itself is client-only — so this can be the stored
+   * state, and the sidebar itself is client-only, so this can be the stored
    * value on the very first client render without contradicting the markup it
    * is hydrating.
    */
@@ -95,7 +95,7 @@ export const Shell: React.FC<ShellProps> = ({
    * The shortcut every editor with a sidebar has.
    *
    * Mantine's default `tagsToIgnore` keeps it out of the Markdown and CSS
-   * panes, whose editable surface is a `textarea` — the same exclusion the undo
+   * panes, whose editable surface is a `textarea`, the same exclusion the undo
    * shortcut relies on. It also cancels the browser's own binding, which matters
    * on Firefox, where Ctrl+B opens the bookmarks sidebar.
    */
@@ -128,7 +128,7 @@ export const Shell: React.FC<ShellProps> = ({
         {/* Tapping the page closes the navbar.
 
             Below the breakpoint the navbar is a full-width sheet over the
-            content, and Mantine draws nothing behind it — so a tap outside it
+            content, and Mantine draws nothing behind it, so a tap outside it
             was swallowed by the sheet and the only way back was the burger. A
             scrim is both halves of the fix: it takes the tap, and it says the
             thing behind it is not available. Under the navbar and header in the
@@ -151,7 +151,7 @@ export const Shell: React.FC<ShellProps> = ({
         {/* A drawer, not the whole screen.
 
             Mantine forces the navbar to 100% width below its breakpoint, which
-            left nothing beside it to tap and put it over the header — so the
+            left nothing beside it to tap and put it over the header, so the
             burger that opened it was underneath it, and the only way out was to
             navigate somewhere. A Tailwind utility wins over that rule because
             the utilities layer comes after Mantine's, with no `!important`. */}

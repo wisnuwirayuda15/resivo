@@ -27,7 +27,7 @@ body {
  *
  * Unlayered CSS beats every layered rule regardless of specificity, so an
  * unlayered `a { color }` was overriding both Tailwind's utilities and Mantine's
- * own components. That was not a subtlety — it was visibly wrong in three
+ * own components. That was not a subtlety, it was visibly wrong in three
  * places. Every sidebar row is a link, so all of them rendered in link teal
  * instead of `--text-muted`, while "New group", which is a button, was correctly
  * muted: one list, two colours. "About Resivo" was teal among black menu items,
@@ -58,7 +58,7 @@ pre {
   font-family: var(--font-mono);
 }
 
-/* Focus is always visible — keyboard is a first-class input. */
+/* Focus is always visible, keyboard is a first-class input. */
 :focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
@@ -86,7 +86,7 @@ pre {
 }
 
 /**
- * Nothing bounces, spins decoratively, or springs — and when the user asks for
+ * Nothing bounces, spins decoratively, or springs, and when the user asks for
  * less motion, every duration goes to zero rather than being merely shortened.
  */
 @media (prefers-reduced-motion: reduce) {
@@ -106,13 +106,13 @@ pre {
  *
  * `AppShell` is told `width: var(--sidebar-width)`, which puts the indirection
  * inside its own inline `--app-shell-navbar-width`. Switching this therefore
- * moves the sidebar and the content column together with no re-render — which
+ * moves the sidebar and the content column together with no re-render, which
  * is what lets the script in the document head restore a collapsed sidebar
  * instead of React jumping it sideways after the fact.
  *
  * There is deliberately no breakpoint here. Below its own `navbar.breakpoint`
  * `AppShell` sets `--app-shell-navbar-width: 100%` itself, so the overlay the
- * burger opens is full width whatever this says — and an overlay has two states
+ * burger opens is full width whatever this says, and an overlay has two states
  * rather than three anyway. What does need the breakpoint is the rail's
  * *contents*, since those are React's to choose; `Sidebar.tsx` has it.
  */

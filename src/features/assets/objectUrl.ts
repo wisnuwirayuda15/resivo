@@ -2,7 +2,7 @@
  * Object URLs for stored blobs, reference-counted.
  *
  * `URL.createObjectURL` allocates for the lifetime of the document, not of the
- * element pointing at it — an image gallery that made a URL per render would
+ * element pointing at it, an image gallery that made a URL per render would
  * hold every version of every blob it ever showed until the tab closed. So each
  * blob gets exactly one URL, shared by everything that asks, and revoked when the
  * last holder lets go.

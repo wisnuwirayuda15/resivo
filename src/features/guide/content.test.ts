@@ -18,7 +18,7 @@ import { AI_PROMPT, GUIDE, guideMarkdown } from './content'
  * The guide has to be true.
  *
  * A syntax guide's failure mode is not being badly written, it is documenting
- * syntax the parser rejects — and nothing about writing prose would catch that.
+ * syntax the parser rejects, and nothing about writing prose would catch that.
  * So every snippet here goes through the real codec and the real sanitizer, and
  * a warning is a failure: the parser reports one for anything it could not
  * represent, which is exactly what a wrong example produces.
@@ -40,7 +40,7 @@ const snippets = GUIDE.flatMap((chapter) =>
 /**
  * A snippet is an excerpt, so it is given the one thing a document must have.
  *
- * Only when it does not already open with the name — the first snippet is a
+ * Only when it does not already open with the name, the first snippet is a
  * whole file, and a second H1 would make it a document with a heading in it.
  */
 const asDocument = (code: string): string =>

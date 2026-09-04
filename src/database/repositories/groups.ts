@@ -5,7 +5,7 @@ import { UNGROUPED } from '../records'
 
 import type { GroupRecord } from '../records'
 
-/** Resume groups — the user's own folders. */
+/** Resume groups, the user's own folders. */
 
 /** In manual order, straight off the `order` index. */
 export const listGroups = async (): Promise<Array<GroupRecord>> =>

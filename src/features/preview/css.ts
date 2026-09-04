@@ -18,15 +18,15 @@ import type {
  * no colour scheme, so the paper cannot inherit the app's dark mode.
  *
  * Precedence is expressed with cascade layers rather than selector weight or
- * `!important`, which is what lets three independent authors — the template, the
- * style panel, and the user — each override the one below without fighting:
+ * `!important`, which is what lets three independent authors (the template, the
+ * style panel, and the user) each override the one below without fighting:
  *
  *   reset     the iframe's own normalisation, weakest of all
  *   template  paper tokens, shared element styles, the template's delta
  *   tokens    the document's DesignConfig, as `--paper-*` overrides
  *   custom    the user's CSS (phase 8, with its sanitizer)
  *
- * Page geometry is deliberately *unlayered* and therefore above all of them —
+ * Page geometry is deliberately *unlayered* and therefore above all of them,
  * see the note in `frame.css`.
  */
 
@@ -50,7 +50,7 @@ export const PAGE_DIMENSIONS: Record<
  * through a JSON backup. The Zod schema already rejects the obvious attacks on
  * import, but this is where the value becomes CSS text, so it validates again
  * rather than trusting that it was checked upstream. Anything unrecognised falls
- * back instead of being emitted — a wrong colour is a visible, reportable bug;
+ * back instead of being emitted, a wrong colour is a visible, reportable bug;
  * an injected declaration is not.
  */
 const COLOR_PATTERN =
@@ -105,7 +105,7 @@ const AVATAR_RADIUS: Record<DesignConfig['image']['avatarShape'], string> = {
 /**
  * The print page box.
  *
- * Zero margin because the page's own padding is the resume's margin — the same
+ * Zero margin because the page's own padding is the resume's margin, the same
  * padding the paginator measured against. Letting `@page` add its own would make
  * the printed content area smaller than the one the breaks were computed for,
  * which is exactly the preview/print divergence this engine exists to prevent.
@@ -211,15 +211,15 @@ export interface StylesheetInput {
   /**
    * `@font-face` rules for the uploaded families this document uses, built by
    * `features/assets/fontFaces`. Passed in rather than built here because the
-   * URLs inside them have lifetimes — object URLs in the preview, `data:` URLs
-   * in an export — and this function is pure.
+   * URLs inside them have lifetimes (object URLs in the preview, `data:` URLs
+   * in an export), and this function is pure.
    */
   fontFaces?: string
   /**
    * Include the editing chrome's rules.
    *
    * Off by default, and off for every export, so a file nobody can edit does not
-   * carry styles for a drag handle it will never show — and "the export contains
+   * carry styles for a drag handle it will never show, and "the export contains
    * nothing from the editor" is a property of the whole file rather than of its
    * body.
    */
@@ -229,13 +229,13 @@ export interface StylesheetInput {
 /**
  * The complete stylesheet for one preview.
  *
- * The layer statement comes first — it is what establishes the order, and a
+ * The layer statement comes first, it is what establishes the order, and a
  * layer used before it is declared would sort itself by first appearance
  * instead.
  *
  * `custom` is last and therefore wins over the template and the style panel,
  * which is the point of it. It still cannot reach the page geometry, because
- * that is unlayered and unlayered beats every layer — so a user stylesheet can
+ * that is unlayered and unlayered beats every layer, so a user stylesheet can
  * restyle the resume but not break the pagination it was measured against.
  */
 export const previewStylesheet = ({
@@ -250,7 +250,7 @@ export const previewStylesheet = ({
     pageRule(design.paper.size),
     /**
      * Unlayered and before everything else. `@font-face` is not a style rule, so
-     * no layer can override it — but a face has to be declared before the rule
+     * no layer can override it, but a face has to be declared before the rule
      * that names it is resolved, and the token layer names it.
      */
     ...(fontFaces === undefined || fontFaces.trim() === '' ? [] : [fontFaces]),

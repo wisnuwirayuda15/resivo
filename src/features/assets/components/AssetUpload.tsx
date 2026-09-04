@@ -42,8 +42,8 @@ export const AssetUpload: React.FC<AssetUploadProps> = ({
 /**
  * Why the last upload was refused.
  *
- * Validation lives in the mutation — the browser's own image decoder and font
- * parser do it — so the only place a rejection can be explained is next to the
+ * Validation lives in the mutation (the browser's own image decoder and font
+ * parser do it), so the only place a rejection can be explained is next to the
  * control that started it.
  */
 export const UploadError: React.FC<{ error: unknown; className?: string }> = ({

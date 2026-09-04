@@ -46,7 +46,7 @@ interface SidebarProps {
  * the burger and closed by a tap, and a third state between those two is not a
  * state anyone asked for.
  *
- * The width takes care of itself — `AppShell` sets the navbar to 100% below its
+ * The width takes care of itself, `AppShell` sets the navbar to 100% below its
  * own breakpoint regardless of `--sidebar-width`. This decides the part React
  * owns: whether the rows are icons or icons with labels.
  */
@@ -71,8 +71,8 @@ const PERMANENT = '(min-width: 48em)'
  *  - **New group.** It follows the groups, and it is in the command palette.
  *
  * What does move rather than disappear is "New resume": it is the one action a
- * new user needs, so on the rail it leaves the header — where there is no room
- * beside the mark — and becomes the first row of the list.
+ * new user needs, so on the rail it leaves the header (where there is no room
+ * beside the mark), and becomes the first row of the list.
  */
 export const Sidebar: React.FC<SidebarProps> = ({
   onNewResume,
@@ -175,7 +175,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               />
             ))}
 
-            {/* Only worth showing once at least one group exists — otherwise
+            {/* Only worth showing once at least one group exists, otherwise
                 every resume is ungrouped and the row is just a second "all". */}
             {hasGroups && ungroupedCount !== undefined ? (
               <Link

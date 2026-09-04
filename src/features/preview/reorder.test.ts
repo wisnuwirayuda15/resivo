@@ -138,7 +138,7 @@ describe('moveRecipe', () => {
   })
 
   /**
-   * The refusals. Each returns `null` so the caller leaves the document alone —
+   * The refusals. Each returns `null` so the caller leaves the document alone,
    * a drop that does nothing is recoverable, one that does something almost
    * right is not.
    */
@@ -257,7 +257,7 @@ describe('stepRecipe', () => {
   })
 
   /** A hidden section is not in the flow, so stepping over it must not stop at
-   * it — the user cannot see it and would read the refusal as a bug. */
+   * it, the user cannot see it and would read the refusal as a bug. */
   it('steps past a hidden section', () => {
     const document = produce(
       build([

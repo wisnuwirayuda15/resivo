@@ -12,7 +12,7 @@ import type { editor } from 'monaco-editor'
  * reason this file exists rather than the options living at the call site.
  *
  * **No CDN.** `@monaco-editor/react` loads Monaco from jsDelivr by default,
- * which would make the editor — the core of the product — unusable offline and
+ * which would make the editor (the core of the product) unusable offline and
  * would tell a third party every time someone opened a resume. `loader.config`
  * hands it the bundled copy instead, so nothing leaves the machine.
  *
@@ -35,8 +35,8 @@ declare global {
 if (typeof window !== 'undefined') {
   window.MonacoEnvironment = {
     getWorker: (_workerId, label) =>
-      // Markdown needs no worker of its own — it is tokenised in the main
-      // thread — so anything that is not CSS gets the generic editor worker.
+      // Markdown needs no worker of its own (it is tokenised in the main
+      // thread), so anything that is not CSS gets the generic editor worker.
       label === 'css' || label === 'scss' || label === 'less'
         ? new cssWorker()
         : new editorWorker(),

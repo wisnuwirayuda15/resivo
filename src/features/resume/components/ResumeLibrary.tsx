@@ -45,7 +45,7 @@ const compare = (sort: SortKey) => (a: ResumeSummary, b: ResumeSummary) => {
  *
  * Search and sort run in memory rather than as database queries: the library is
  * a personal collection, and filtering a few dozen already-loaded summaries is
- * faster than a round trip — while keeping the search field instant as the user
+ * faster than a round trip, while keeping the search field instant as the user
  * types.
  */
 export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
@@ -131,8 +131,8 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
         onClose={() => setRenaming(undefined)}
       />
 
-      {/* Deleting is irreversible and local — there is no server-side copy to
-          recover from — so it always asks first and names what will go. */}
+      {/* Deleting is irreversible and local (there is no server-side copy to
+          recover from), so it always asks first and names what will go. */}
       <ConfirmDialog
         opened={deleting !== undefined}
         title={`Delete "${deleting?.title ?? ''}"?`}

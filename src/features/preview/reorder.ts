@@ -3,8 +3,8 @@
  *
  * Kept apart from the components because this is the part that can be wrong in a
  * way nobody notices: dropping a block one place further than intended, or
- * silently moving it into the wrong section. It is pure — flow items in, a recipe
- * out — so every case has a test rather than a demonstration.
+ * silently moving it into the wrong section. It is pure (flow items in, a recipe
+ * out), so every case has a test rather than a demonstration.
  */
 
 import {
@@ -27,8 +27,8 @@ export interface MoveSubject {
 /**
  * Whether an item can be reordered at all.
  *
- * The header cannot: there is one, and it is first. Everything else — a section
- * heading, or a block — has a place in a list.
+ * The header cannot: there is one, and it is first. Everything else (a section
+ * heading, or a block) has a place in a list.
  */
 export const isMovable = (item: FlowItem): boolean => item.type !== 'header'
 
@@ -172,7 +172,7 @@ export const stepRecipe = (
 
     /**
      * A block moving up past its own section's heading has reached the top of
-     * the section. The heading is a valid target — it means "the top" — but only
+     * the section. The heading is a valid target (it means "the top"), but only
      * for a block, and only once.
      */
     if (wanted === 'block' && candidate.type === 'sectionHeading') {

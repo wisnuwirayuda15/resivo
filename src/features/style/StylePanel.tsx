@@ -23,7 +23,7 @@ import type {
 } from '@/features/resume/model/document'
 
 /**
- * The Style tab — the whole `DesignConfig`, one control per token.
+ * The Style tab, the whole `DesignConfig`, one control per token.
  *
  * Every control goes through `patchDesign`, so a style change is an ordinary
  * document edit: it is undoable, it autosaves, and the preview re-renders from
@@ -34,16 +34,16 @@ import type {
 /**
  * A built-in family, or `custom:<row id>` for an uploaded one.
  *
- * The id, not the family name: two uploads can legitimately share a family — a
- * regular and an italic of the same face — and selecting one has to mean one
+ * The id, not the family name: two uploads can legitimately share a family (a
+ * regular and an italic of the same face), and selecting one has to mean one
  * row, because that row is what the `@font-face` rule is built from.
  */
 type FontKey = 'serif' | 'sans' | 'mono' | `custom:${string}`
 
 interface StylePanelProps {
   design: DesignConfig
-  /** The document's BCP 47 tag. Not part of `DesignConfig` — it changes what the
-   * dates say, not how they look — but this panel is where a document-wide
+  /** The document's BCP 47 tag. Not part of `DesignConfig` (it changes what the
+   * dates say, not how they look), but this panel is where a document-wide
    * setting belongs. */
   locale: string
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void
@@ -80,8 +80,8 @@ const BUILTIN_OPTIONS: Array<{ value: FontKey; label: string }> = [
  * the document has been through JSON by the time it comes back from IndexedDB
  * and object identity is gone.
  *
- * A reference to a font that is no longer stored — deleted, or a backup restored
- * on another device — falls back to serif in the *control only*. The document
+ * A reference to a font that is no longer stored (deleted, or a backup restored
+ * on another device) falls back to serif in the *control only*. The document
  * keeps its real value, so opening this panel cannot quietly rewrite a font the
  * user chose, and the preview still shows the fallback face the browser picks.
  */
@@ -155,8 +155,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
 }) => {
   /**
    * Uploaded fonts join the same two selects rather than getting a list of their
-   * own: from the user's side there is one decision — what this resume is set in
-   * — and where the file came from is not part of it.
+   * own: from the user's side there is one decision (what this resume is set in),
+   * and where the file came from is not part of it.
    */
   const { data: storedFonts } = useFonts()
   const fonts = storedFonts ?? []
@@ -178,7 +178,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
    * Dragging a slider or holding a stepper produces a stream of edits.
    * Coalescing them under one key per control collapses the stream into a single
    * undo step, so undo takes back "the size change" rather than one increment of
-   * it. Discrete controls — a switch, a select — pass no key and stay their own
+   * it. Discrete controls (a switch, a select) pass no key and stay their own
    * step.
    */
   const patch = (
@@ -248,7 +248,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
 
         <NumberField
-          hint="Points, not pixels — a resume is a print document."
+          hint="Points, not pixels, a resume is a print document."
           label="Body size"
           max={24}
           min={6}

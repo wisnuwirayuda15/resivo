@@ -11,7 +11,7 @@ import {
 /**
  * The editor on a screen that cannot hold three panes.
  *
- * The pane minimums add up to 888px, plus two handles and a 232px sidebar — so
+ * The pane minimums add up to 888px, plus two handles and a 232px sidebar, so
  * three panes need a 1122px viewport before the layout is even usable. There was
  * no breakpoint anywhere in the app, so below that the editor overflowed
  * sideways and the paper was pushed off the screen.
@@ -102,7 +102,7 @@ test('ignores a collapsed sidebar where the sidebar is an overlay', async ({
   ).toBeHidden()
   await page.getByRole('button', { name: 'Toggle navigation' }).click()
 
-  // A drawer, with its labels back — not the rail the stored preference still
+  // A drawer, with its labels back, not the rail the stored preference still
   // asks for, and not the whole viewport either: a drawer with no page beside
   // it leaves nothing to tap to dismiss it.
   const width = await page
@@ -121,8 +121,8 @@ const PHONE = { width: 375, height: 812 }
  * The 900px case above only exercises the pane fallback. At 375 the row of
  * controls over the paper is the thing that did not fit: the page dimensions,
  * both segmented controls and four zoom buttons in one 38px strip made that
- * header 433px wide, and since nothing there scrolls it took the whole editor —
- * and the document — with it.
+ * header 433px wide, and since nothing there scrolls it took the whole editor (
+ * and the document) with it.
  */
 test('fits a phone, with nothing pushed off the side', async ({ page }) => {
   test.slow()
@@ -180,7 +180,7 @@ test('fits a phone, with nothing pushed off the side', async ({ page }) => {
  * The navbar on a phone is a drawer.
  *
  * Mantine gives it the full viewport width below the breakpoint, which put it
- * over the header — so the burger that opened it was underneath it, and with no
+ * over the header, so the burger that opened it was underneath it, and with no
  * scrim and nothing beside it to tap, the only way out was to navigate
  * somewhere. Opening the menu to look at it was a one-way trip.
  */
@@ -209,7 +209,7 @@ test('the navbar drawer closes when the page beside it is tapped', async ({
  * The tour, on the screen where it had the least room to work.
  *
  * Two things were wrong at phone width. The popover renders at a fixed 374px,
- * so on a 375px screen the text was clipped and "Next" sat off the right edge —
+ * so on a 375px screen the text was clipped and "Next" sat off the right edge,
  * a tour that could be started and not finished. And two of the library's steps
  * point at rows in the sidebar, which is a drawer here: the tour dimmed the app,
  * highlighted nothing, and left nothing on screen to go on with.
@@ -235,7 +235,7 @@ test('the tour can be walked through on a phone', async ({ page }) => {
    *
    * This is what the first attempt at the fix missed. Capping the content left
    * the dropdown around it 369px wide and placed for that width, so its right
-   * edge — the last stepper dot with it — was 10px outside a 375px viewport
+   * edge (the last stepper dot with it) was 10px outside a 375px viewport
    * while the content it held measured as being on screen.
    */
   const card = page
@@ -246,7 +246,7 @@ test('the tour can be walked through on a phone', async ({ page }) => {
   await expect(page.getByText('Start here')).toBeVisible({ timeout: 20_000 })
 
   // Inside the viewport at every step, and pointing at something visible at
-  // every step — the two halves of "it works here at all".
+  // every step, the two halves of "it works here at all".
   for (const heading of [
     'Images and fonts are shared',
     'This is the important one',
@@ -279,7 +279,7 @@ test('the tour can be walked through on a phone', async ({ page }) => {
  * It was gated off below 1200px, because four of its six steps pointed at panes
  * that are not mounted there: one pane shows at a time and `keepMounted={false}`
  * keeps the other two out of the document. The gate meant a phone user was
- * never shown the editor — and the two anchors that did exist were full-height
+ * never shown the editor, and the two anchors that did exist were full-height
  * columns, beside which a popover has nowhere to go.
  *
  * Both halves are fixed here: the tour asks for the tab each step needs, and

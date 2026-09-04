@@ -14,7 +14,7 @@ import type { ImageRecord } from '../records'
  * be revoked, which is a concern of the component tree rather than of storage.
  */
 
-/** Metadata only — never loads blobs. Lets the gallery list hundreds of images
+/** Metadata only, never loads blobs. Lets the gallery list hundreds of images
  * without pulling their bytes into memory. */
 export type ImageSummary = Omit<ImageRecord, 'blob'>
 

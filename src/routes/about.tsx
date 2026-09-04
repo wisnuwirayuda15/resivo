@@ -38,7 +38,7 @@ const AboutRoute: React.FC = () => (
           <Link className="text-accent hover:underline" to="/settings">
             Settings
           </Link>{' '}
-          is the only thing that survives a cleared browser or a lost machine —
+          is the only thing that survives a cleared browser or a lost machine,
           it is worth writing one now rather than the first time it matters.
         </Text>
       </Box>
@@ -50,7 +50,7 @@ const AboutRoute: React.FC = () => (
           the style panel. All three write to the same model, which is what
           keeps a single undo history coherent across them. The preview is a
           document of its own rather than a styled box in the app, so what you
-          are looking at is what a PDF export prints — page breaks are measured
+          are looking at is what a PDF export prints, page breaks are measured
           from the real thing rather than guessed.
         </Text>
       </Box>
@@ -60,7 +60,7 @@ const AboutRoute: React.FC = () => (
           Exports and imports
         </Text>
         <Text className="text-muted mt-1.5 text-[13px] leading-normal">
-          HTML is a single file with no external reference of any kind — images,
+          HTML is a single file with no external reference of any kind, images,
           uploaded fonts and the bundled typefaces are all inlined, so it opens
           on a machine that has never seen Resivo. PDF is that same file,
           printed. Markdown round-trips: what the app cannot typeset is kept

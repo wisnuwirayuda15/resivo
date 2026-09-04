@@ -10,8 +10,8 @@ import type { RenderContext } from './types'
  * One editable field on the paper.
  *
  * Field-level, not a document-wide `contentEditable`. A single editable root
- * would let the browser restructure the whole resume — merging paragraphs,
- * splitting entries, inventing `<div>`s — and every one of those would have to
+ * would let the browser restructure the whole resume (merging paragraphs,
+ * splitting entries, inventing `<div>`s), and every one of those would have to
  * be diffed back into a typed model. Here the browser can only edit *inside* one
  * field, so the shape of the document is never in question and only its text is.
  *
@@ -44,7 +44,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
    * branches below.
    *
    * Both render a `span`, so without a changing key React reconciles them in
-   * place — and the DOM it would patch is not the DOM it last rendered, because
+   * place, and the DOM it would patch is not the DOM it last rendered, because
    * the browser has been writing into it. Diffing the old virtual children
    * against the new ones then lands the patches on nodes that have moved.
    * Changing the key forces a fresh element rendered from the model.
@@ -77,7 +77,7 @@ export const EditableText: React.FC<EditableTextProps> = ({
         data-editable
         key={generation}
         onClick={(event) => {
-          // The paper's own chrome — a drag handle, a link — must keep its click.
+          // The paper's own chrome (a drag handle, a link) must keep its click.
           event.stopPropagation()
           setEditing(true)
         }}

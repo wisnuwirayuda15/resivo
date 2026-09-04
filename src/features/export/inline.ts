@@ -3,7 +3,7 @@
  *
  * The preview hands the renderer object URLs, which live only as long as the tab
  * that made them. An exported file has to survive being emailed, so the same
- * fields are filled with `data:` URLs instead — see `exportHtml`, which cannot
+ * fields are filled with `data:` URLs instead, see `exportHtml`, which cannot
  * tell the difference.
  *
  * Base64 costs a third more bytes than the blob. That is the price of a single
@@ -23,7 +23,7 @@ import type { ImageMap } from '@/features/assets/useAssetUrls'
  * Not `FileReader`: that is an event-based browser API, and this runs in an
  * export path worth testing without one. `btoa` needs a binary string, and the
  * string is built in 32KB chunks because spreading a multi-megabyte array into
- * `String.fromCharCode` exceeds the argument limit — a photograph is exactly
+ * `String.fromCharCode` exceeds the argument limit, a photograph is exactly
  * large enough for that to matter.
  */
 export const blobToDataUrl = async (blob: Blob): Promise<string> => {
@@ -44,7 +44,7 @@ export const blobToDataUrl = async (blob: Blob): Promise<string> => {
 /**
  * The images a document references, as `data:` URLs.
  *
- * A row that is gone maps to `null`, exactly as in the preview — so an export of
+ * A row that is gone maps to `null`, exactly as in the preview, so an export of
  * a resume with a missing image produces the same visible placeholder the user
  * was already looking at, rather than silently dropping the figure.
  */
@@ -95,7 +95,7 @@ export const inlineFonts = async (
  * The bundled typefaces, inlined.
  *
  * Without this an exported file falls back to the reader's system serif, and a
- * resume typeset in Source Serif arrives in Times — which changes the line
+ * resume typeset in Source Serif arrives in Times, which changes the line
  * breaks and therefore the pages, in a document whose whole purpose is to look
  * like the one that was laid out.
  *
@@ -106,7 +106,7 @@ export const inlineFonts = async (
  * The stylesheet arrives through `?inline`, as text, rather than being fetched
  * from its own URL. Fetching it was a dev-only trap: Vite serves a CSS file as a
  * JavaScript module in development, so what came back was a `/@vite/client`
- * import with the `@font-face` rules inside a string literal — which is not CSS,
+ * import with the `@font-face` rules inside a string literal, which is not CSS,
  * and left every exported document in the reader's system serif while the
  * production build was fine. `?inline` is the processed CSS in both modes, with
  * the asset URLs already rewritten.
@@ -139,7 +139,7 @@ export const inlineBuiltinFonts = async (): Promise<string> => {
       } catch {
         // A face that cannot be fetched is left as it was: the export then
         // carries a relative URL that resolves to nothing, and the browser falls
-        // back — which is worse than inlining it and better than no file at all.
+        // back, which is worse than inlining it and better than no file at all.
       }
     }),
   )

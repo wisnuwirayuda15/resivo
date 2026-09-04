@@ -8,7 +8,7 @@ import type { FlowMetric } from './paginate'
  * The paginator is the one piece of the preview engine whose correctness cannot
  * be eyeballed: a break one item too early looks exactly like a break that is
  * right. So it takes numbers and returns ids, and these cover the cases a real
- * resume hits — a section that runs over, a heading that would be orphaned, an
+ * resume hits, a section that runs over, a heading that would be orphaned, an
  * entry too tall for any page, and a page that fills to the last fraction of a
  * pixel.
  */
@@ -85,7 +85,7 @@ describe('paginate', () => {
   it('drops an item leading space when it lands at the top of a page', () => {
     // `b` is 60 tall including 10 of space above it. Following `a` it does not
     // fit; alone at the top of page two it occupies only 50, which leaves room
-    // for `c` — whose own 10 of space is kept, because it is not first.
+    // for `c`, whose own 10 of space is kept, because it is not first.
     const pages = paginate(
       [
         item('a', 50),
@@ -120,7 +120,7 @@ describe('paginate', () => {
 
   it('does not strand a heading when the block after it fits on no page at all', () => {
     // Honouring keep-with-next here would break before the heading and again
-    // after it, leaving the heading alone on a near-empty page — the exact
+    // after it, leaving the heading alone on a near-empty page, the exact
     // orphan the rule exists to prevent.
     const items = [
       item('filler', 30),
@@ -157,8 +157,8 @@ describe('paginate', () => {
   it('gives an item taller than the page its own page and carries on', () => {
     const items = [item('a', 30), item('huge', 250), item('c', 30)]
 
-    // The oversized item is not split — items are atomic, which is what gives
-    // entries their break-inside behaviour — so it overflows a page of its own.
+    // The oversized item is not split (items are atomic, which is what gives
+    // entries their break-inside behaviour), so it overflows a page of its own.
     expect(paginate(items, PAGE)).toEqual([['a'], ['huge'], ['c']])
   })
 

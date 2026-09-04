@@ -32,7 +32,7 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  * Below `WIDE` the three become one, chosen by a tab strip. That is not a
  * preference: the minimums below add up to 888px of panes, plus two handles and
  * a 232px sidebar, so three panes need a 1122px viewport before anything is
- * even usable — and there was no fallback at all, so on a phone the editor
+ * even usable, and there was no fallback at all, so on a phone the editor
  * simply overflowed sideways.
  */
 
@@ -57,7 +57,7 @@ const WIDE = '(min-width: 1200px)'
  * preview's own control row, which was clipped there. Twenty pixels off this
  * gives it 278 and the row fits.
  *
- * It does not make the preview reach its declared 340px minimum at that width —
+ * It does not make the preview reach its declared 340px minimum at that width,
  * `Splitter` applies a pane's minimum while dragging, not when handing out the
  * space left over at mount. That is worth knowing and is not this constant's job
  * to fix.
@@ -80,7 +80,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 }) => {
   /**
    * Read once, lazily, rather than in an effect. This only ever mounts inside a
-   * client-only boundary, so `localStorage` is there — and restoring in an
+   * client-only boundary, so `localStorage` is there, and restoring in an
    * effect would show the default layout for a frame and then jump.
    */
   const [sizes, setSizes] = useState<Array<PaneSize>>(
@@ -112,7 +112,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
 
   /**
    * Read during the first render rather than in an effect. This only mounts
-   * inside a client-only boundary, so `matchMedia` is there — and deciding in
+   * inside a client-only boundary, so `matchMedia` is there, and deciding in
    * an effect would paint the wrong layout for a frame, which on a narrow screen
    * means a horizontal overflow appearing and vanishing.
    */
@@ -123,7 +123,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    *
    * Every edit from the text pane is one `replace` under a single coalesce key,
    * so a sentence typed in the editor collapses to one undo step rather than
-   * one per debounce window — the same treatment the style panel's sliders get.
+   * one per debounce window, the same treatment the style panel's sliders get.
    */
   const handleSourceChange = useCallback(
     (source: string) => {
@@ -248,7 +248,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
        * The iframe stops taking the pointer while a handle is being dragged.
        *
        * A drag is tracked by listeners on *this* document, and a pointer over
-       * the preview is a pointer over another one — the iframe's — so the moves
+       * the preview is a pointer over another one (the iframe's), so the moves
        * never arrived and the handle stuck the instant the cursor crossed into
        * the paper. Which is most of a drag, since the preview is the pane in the
        * middle. `pointer-events: none` for the duration hands those moves back

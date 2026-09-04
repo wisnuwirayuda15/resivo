@@ -12,7 +12,7 @@ import type {
 } from './records'
 
 /**
- * The local database — the only place user data lives.
+ * The local database, the only place user data lives.
  *
  * Resivo keeps TanStack Start's SSR shell, but IndexedDB does not exist on the
  * server, so this module must never open a connection at import time. `getDb()`
@@ -36,7 +36,7 @@ class ResivoDB extends Dexie {
     /**
      * Schema v1.
      *
-     * Only indexed fields are listed — Dexie stores the rest of each row
+     * Only indexed fields are listed, Dexie stores the rest of each row
      * untouched, which is what keeps the inline `document` and the image/font
      * `blob` off the index and out of every query's way.
      *
@@ -65,7 +65,7 @@ let instance: ResivoDB | undefined
 export const getDb = (): ResivoDB => {
   if (!hasIndexedDb()) {
     throw new Error(
-      'IndexedDB is unavailable. The Resivo database is browser-only — reach it ' +
+      'IndexedDB is unavailable. The Resivo database is browser-only, reach it ' +
         'from a client-only boundary, and note that private browsing windows may ' +
         'block it entirely.',
     )

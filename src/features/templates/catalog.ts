@@ -13,7 +13,7 @@ import type { SectionKind, TemplateId } from '@/features/resume/model/document'
 export interface TemplateMeta {
   id: TemplateId
   name: string
-  /** One sentence — the design system's rule for dialog and card subtitles. */
+  /** One sentence, the design system's rule for dialog and card subtitles. */
   description: string
   /** Sections the template renders with dedicated layout. Anything else falls
    * back to the generic section renderer. */

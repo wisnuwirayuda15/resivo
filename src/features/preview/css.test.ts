@@ -7,7 +7,7 @@ import { LAYER_ORDER, designVars, pageRule, previewStylesheet } from './css'
 import type { DesignConfig } from '@/features/resume/model/document'
 
 /**
- * The stylesheet is text, so it is testable as text — which is the point of
+ * The stylesheet is text, so it is testable as text, which is the point of
  * building it in a pure function rather than mutating style rules in place.
  *
  * Two things are being protected here: the derived type ramp (change it and every
@@ -92,7 +92,7 @@ describe('designVars', () => {
     // declaration or open a new rule is gone.
     expect(value).toMatch(/^'[^'"\\;{}<>]*', var\(--font-serif\)$/)
     expect(value).toContain('Font')
-    // One rule block in, one rule block out — the injected `}` did not survive.
+    // One rule block in, one rule block out, the injected `}` did not survive.
     expect(css.match(/}/g)).toHaveLength(1)
   })
 
@@ -179,7 +179,7 @@ describe('previewStylesheet', () => {
   })
 
   it('includes the paper tokens, the shared element styles and the template', () => {
-    // Proves the raw CSS imports actually resolve — a broken one would leave the
+    // Proves the raw CSS imports actually resolve, a broken one would leave the
     // paper unstyled but the app perfectly fine, which is a nasty thing to
     // discover late.
     expect(css).toContain('--paper-accent: #0e7c76')

@@ -1,4 +1,4 @@
-# Resivo — Resume Builder Implementation Plan
+# Resivo, Resume Builder Implementation Plan
 
 ## Role
 
@@ -364,18 +364,18 @@ The custom CSS must not accidentally affect the surrounding Resivo application U
 
 The main editor should contain three panels.
 
-### Panel 1 — Code Editor
+### Panel 1: Code Editor
 
 Tabbed interface:
 
 - Markdown
 - CSS
 
-### Panel 2 — Resume Preview
+### Panel 2: Resume Preview
 
 Realtime rendered resume.
 
-### Panel 3 — Style Configuration
+### Panel 3: Style Configuration
 
 Visual controls for styling.
 

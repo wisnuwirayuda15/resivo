@@ -9,7 +9,7 @@ import type { FontSummary, ImageSummary } from '@/database/index'
  *
  * Both say what breaks, not just that the action cannot be undone: a resume
  * still pointing at a deleted image shows a missing-image box, and one set in a
- * deleted font prints in a fallback face — which moves its page breaks. Nothing
+ * deleted font prints in a fallback face, which moves its page breaks. Nothing
  * here is deleted automatically for the same reason, since an asset can be
  * unreferenced simply because it has not been placed yet.
  */

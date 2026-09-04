@@ -19,7 +19,7 @@ import type { RenderContext } from '@/features/templates/renderer/types'
  * which is what makes "the export looks like the preview" true by construction
  * rather than by comparison. Nothing here re-implements a template.
  *
- * Everything external is inlined by the caller before it gets here — images and
+ * Everything external is inlined by the caller before it gets here, images and
  * fonts arrive as `data:` URLs through exactly the fields the preview fills with
  * object URLs. So this function has no idea whether it is producing a preview or
  * a file, and cannot get it half right.
@@ -33,7 +33,7 @@ export interface HtmlExportInput {
   /** Custom fonts as `data:` URLs. */
   fonts: ReadonlyArray<FontSource>
   /**
-   * The bundled typefaces, already inlined — see `inlineBuiltinFonts`.
+   * The bundled typefaces, already inlined, see `inlineBuiltinFonts`.
    *
    * Without them the file falls back to the reader's system serif, which changes
    * the line breaks and therefore the pages of a document whose only job is to
@@ -78,7 +78,7 @@ export const exportHtml = ({
 
   /**
    * `print` mode, and no `apply`. Two independent reasons the output cannot
-   * carry editing chrome — the mode says what this is for, and there is no store
+   * carry editing chrome, the mode says what this is for, and there is no store
    * for a field to write to even if one tried.
    */
   const context: RenderContext = {
@@ -129,7 +129,7 @@ export const exportHtml = ({
 
   /**
    * `rp-root` and `rp-pages` are kept so the exported file uses the same layout
-   * rules as the preview, minus the zoom — which is a screen affordance and has
+   * rules as the preview, minus the zoom, which is a screen affordance and has
    * no meaning in a file someone opens to read or print.
    */
   return `<!doctype html>

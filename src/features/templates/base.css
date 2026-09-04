@@ -1,5 +1,5 @@
 /**
- * Shared paper element styles — the look every template starts from.
+ * Shared paper element styles, the look every template starts from.
  *
  * Loaded as text (`?raw`) and injected into the preview iframe inside
  * `@layer template`, immediately after `paper.css`. A template's own `baseCss`
@@ -7,9 +7,9 @@
  *
  * The division of labour:
  *
- *   paper.css   — the `--paper-*` token values, per template scope
- *   this file   — how the resume's elements use those tokens
- *   baseCss     — the deltas that make one template look unlike another
+ *   paper.css (the `--paper-*` token values, per template scope
+ *   this file) how the resume's elements use those tokens
+ *   baseCss, the deltas that make one template look unlike another
  *
  * Class names are `rp-` prefixed and live only inside the iframe, so they never
  * meet the app's Tailwind utilities.
@@ -18,13 +18,13 @@
  * does not. They are defaults, not the real values: the style panel writes the
  * document's `DesignConfig` into `@layer tokens`, which overrides all of them.
  * Keeping them here means the paper still renders correctly with no tokens layer
- * at all — which is what the in-app miniatures rely on.
+ * at all, which is what the in-app miniatures rely on.
  */
 .resivo-paper {
   --paper-fw-body: 400;
   --paper-fw-head: 600;
 
-  /* Derived from the body size and the modular scale — see `designVars`. */
+  /* Derived from the body size and the modular scale, see `designVars`. */
   --paper-fs-headline: 12.6pt;
   --paper-fs-section: 12.6pt;
   --paper-fs-small: 9.7pt;
@@ -139,7 +139,7 @@
 }
 
 /* The gap under a heading belongs to the heading, not to the block that happens
-   to follow it — otherwise a heading that lands last on a page carries trailing
+   to follow it, otherwise a heading that lands last on a page carries trailing
    space onto the fold. */
 .rp-section {
   padding-bottom: var(--paper-space-heading);
@@ -205,7 +205,7 @@
   margin-top: 0.06em;
 }
 
-/* Second level is a hollow marker, third a square — the same convention print
+/* Second level is a hollow marker, third a square, the same convention print
    has used for a century, and it survives being photocopied or ATS-parsed. */
 .rp-list .rp-list:not(.rp-list-ordered) {
   list-style: circle;
@@ -346,7 +346,7 @@
 /**
  * Markdown this model does not represent, kept verbatim.
  *
- * Shown as what it is — source text — rather than dressed up as prose, so it is
+ * Shown as what it is (source text) rather than dressed up as prose, so it is
  * obvious that it round-trips untouched and equally obvious that it is not
  * really typeset yet.
  */
@@ -366,7 +366,7 @@
 }
 
 /* The height comes from the `aspect-ratio` the renderer sets from the stored
-   intrinsic size — so the box is correct before the bytes decode, and the page
+   intrinsic size, so the box is correct before the bytes decode, and the page
    breaks around it do not move when they do. */
 .rp-image {
   display: block;

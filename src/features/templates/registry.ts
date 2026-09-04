@@ -8,7 +8,7 @@ import type { TemplateComponents } from './renderer/types'
 /**
  * The template registry.
  *
- * A template is bundled, versioned code — never a database row. Only its `id` is
+ * A template is bundled, versioned code, never a database row. Only its `id` is
  * persisted, so a resume saved today keeps rendering when the template's markup
  * or CSS is improved tomorrow. Adding one means dropping a module in here and
  * registering it; the document model never learns anything about a template's
@@ -41,7 +41,7 @@ export interface ResumeTemplate {
 }
 
 /**
- * Classic — the traditional single-column serif resume, and the default.
+ * Classic, the traditional single-column serif resume, and the default.
  *
  * Its one structural departure from the shared baseline is the centred header,
  * which is the convention the format is recognised by.
@@ -63,7 +63,7 @@ const classic: ResumeTemplate = {
 }
 
 /**
- * Modern — clean contemporary sans.
+ * Modern, clean contemporary sans.
  *
  * The rule moves from under the heading to beside it, filling the line, and the
  * heading drops the uppercase tracking. Both are the same two elements the
@@ -71,7 +71,7 @@ const classic: ResumeTemplate = {
  * rule takes the leftover width.
  *
  * The heading stays literal text either way, which is what an applicant tracking
- * system reads — a decorative rule beside it changes nothing about parsing.
+ * system reads, a decorative rule beside it changes nothing about parsing.
  */
 const modern: ResumeTemplate = {
   id: 'modern',
@@ -101,7 +101,7 @@ const modern: ResumeTemplate = {
 }
 
 /**
- * Technical — denser, with monospace headings.
+ * Technical, denser, with monospace headings.
  *
  * Dates and locations move to the monospace face with tabular figures so the
  * right-hand column of a long history lines up digit for digit. Square markers
@@ -129,7 +129,7 @@ const technical: ResumeTemplate = {
 }
 
 /**
- * Editorial — serif throughout, hierarchy from type size rather than rules.
+ * Editorial, serif throughout, hierarchy from type size rather than rules.
  *
  * Dividers are off in this template's defaults, so the section heading has to
  * carry the separation on its own: it is set larger, in the accent, without the

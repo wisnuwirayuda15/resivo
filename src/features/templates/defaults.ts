@@ -9,7 +9,7 @@ import type {
 /**
  * Default style tokens per template.
  *
- * These mirror the `.resivo-paper[data-template=...]` scopes in `paper.css` —
+ * These mirror the `.resivo-paper[data-template=...]` scopes in `paper.css`,
  * that file is what the preview iframe loads, and this is the same baseline
  * expressed as data so the style panel has something to bind to and the
  * document has something to store.
@@ -28,7 +28,7 @@ const MONO: FontRef = { family: 'JetBrains Mono Variable', source: 'builtin' }
  * The same three, as an addressable set.
  *
  * The style panel offers exactly these until the font library arrives, and it
- * has to offer the same objects a template seeds — otherwise picking "the font
+ * has to offer the same objects a template seeds, otherwise picking "the font
  * it already has" would register as a customisation.
  */
 export const BUILTIN_FONTS: Record<'serif' | 'sans' | 'mono', FontRef> = {
@@ -73,7 +73,7 @@ const base = (): DesignConfig => ({
 })
 
 /**
- * Deep-clones so callers can freely mutate the document they are handed — a
+ * Deep-clones so callers can freely mutate the document they are handed, a
  * shared nested object would otherwise leak edits across resumes.
  */
 export const templateDefaults = (templateId: TemplateId): DesignConfig => {
@@ -101,11 +101,11 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
       break
 
     case 'editorial':
-      // Serif throughout, larger name, red accent, no dividers — the hierarchy
+      // Serif throughout, larger name, red accent, no dividers: the hierarchy
       // is carried by type size instead of rules.
       //
       // The whole type ramp is derived from `baseSize` and `scale` (the name is
-      // four steps up — see `preview/css.ts`), so the larger name is expressed
+      // four steps up, see `preview/css.ts`), so the larger name is expressed
       // as a wider scale rather than as a one-off size. 1.255 puts the 10.5pt
       // body at the 26pt name the design system specifies for this template.
       design.typography.scale = 1.255
@@ -122,13 +122,13 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
  * Whether a document's style tokens are still exactly what its template seeded.
  *
  * This is the question behind "keep your customisations?" on a template switch.
- * Asking it when the answer is no — when nothing has been touched — trains the
+ * Asking it when the answer is no (when nothing has been touched) trains the
  * user to dismiss the dialog, so the switch is silent in that case and only
  * prompts when there is something real to lose.
  *
  * Paper size is excluded deliberately. It is chosen from the preview toolbar
  * rather than the style panel, it is a property of the printer and not of the
- * design, and no template seeds anything but Letter — so counting a switch to A4
+ * design, and no template seeds anything but Letter, so counting a switch to A4
  * as "customised" would make the prompt appear for a choice the user does not
  * think of as styling.
  */

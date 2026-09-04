@@ -2,7 +2,7 @@
  * Remembering how wide the editor's panels were.
  *
  * A pane width is a UI preference, not part of the resume, so it lives in
- * `localStorage` and never in the document — otherwise dragging a splitter would
+ * `localStorage` and never in the document, otherwise dragging a splitter would
  * dirty the resume and cost an undo step.
  *
  * Stored per pane count. The editor grows a third pane when the Markdown and CSS
@@ -37,7 +37,7 @@ const isPaneSize = (value: unknown): value is PaneSize =>
  * Everything about the stored value is treated as untrusted: it may have been
  * written by an older build, hand-edited, or left behind by a layout that no
  * longer exists. A `null` means "use the defaults", which is always a correct
- * answer — so nothing here throws.
+ * answer, so nothing here throws.
  */
 export const readPaneSizes = (paneCount: number): Array<PaneSize> | null => {
   if (typeof localStorage === 'undefined') {

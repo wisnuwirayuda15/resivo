@@ -172,7 +172,7 @@ export const ICON_REGISTRY: Record<string, PhosphorIcon> = {
   'text-h': TextHIcon,
   image: ImageIcon,
 
-  // Resume content — contact rows and section headings
+  // Resume content, contact rows and section headings
   'envelope-simple': EnvelopeSimpleIcon,
   envelope: EnvelopeIcon,
   phone: PhoneIcon,

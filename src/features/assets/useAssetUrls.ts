@@ -15,14 +15,14 @@ import type { ResolvedImage } from './objectUrl'
  *
  * Written as "a set" rather than "one" on purpose. The paper needs every image
  * it references at once, and one hook per image would mean the number of hooks a
- * component calls depends on the document — which React does not allow.
+ * component calls depends on the document, which React does not allow.
  *
  * The identity of the returned map changes only when its contents do, because the
  * paginator compares it by reference: a new map on every render would re-measure
  * the whole document on every keystroke.
  */
 
-/** `null` for an id whose row is gone — see `ImageMap`. */
+/** `null` for an id whose row is gone, see `ImageMap`. */
 export type ImageMap = ReadonlyMap<string, ResolvedImage | null>
 
 const EMPTY_IMAGES: ImageMap = new Map()

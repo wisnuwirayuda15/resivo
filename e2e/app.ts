@@ -5,8 +5,8 @@ import type { Page } from '@playwright/test'
 /**
  * Shared moves for the end-to-end specs.
  *
- * Everything here is expressed the way a person would describe it — "make a
- * resume called X", "open the style panel" — so a spec reads as a workflow and
+ * Everything here is expressed the way a person would describe it ("make a
+ * resume called X", "open the style panel"), so a spec reads as a workflow and
  * not as a list of selectors. When the markup moves, one of these breaks rather
  * than every test.
  *
@@ -34,7 +34,7 @@ export const PNG_2X2 =
  *
  * Deleting before the app loads matters: Dexie opens its connection on the first
  * query, and deleting a database with an open connection blocks until that
- * connection closes — which, in a page that is still running, is never.
+ * connection closes, which, in a page that is still running, is never.
  */
 export const openEmptyApp = async (page: Page): Promise<void> => {
   // The library, not '/': that is the landing page now, and every spec here
@@ -44,8 +44,8 @@ export const openEmptyApp = async (page: Page): Promise<void> => {
   /**
    * Marked as a returning user, unless a spec asks otherwise.
    *
-   * Every spec here starts from a deleted database — that is, as a brand-new
-   * user — and the onboarding tour opens over the app for exactly those. It is
+   * Every spec here starts from a deleted database (that is, as a brand-new
+   * user), and the onboarding tour opens over the app for exactly those. It is
    * an overlay with a cutout, so it intercepts the clicks every other spec then
    * makes. `e2e/onboarding.spec.ts` is the one that opts back in.
    */
@@ -86,7 +86,7 @@ export const createResume = async (
    * The app bar's, not the sidebar's and not the empty state's.
    *
    * Three buttons carry this name. The sidebar's is translated off screen below
-   * the navbar's breakpoint — visible to a locator, unclickable to a pointer —
+   * the navbar's breakpoint, visible to a locator, unclickable to a pointer,
    * and the empty state's is gone the moment the library has anything in it.
    * The one in the bar is on screen at every width and whatever the library
    * holds.
@@ -144,7 +144,7 @@ export const typeMarkdown = async (
    * The delay is load-bearing. Do not set it to zero.
    *
    * Monaco reads its hidden textarea on a schedule rather than per keystroke, and
-   * CDP with no delay delivers keys faster than any human can — fast enough that
+   * CDP with no delay delivers keys faster than any human can, fast enough that
    * Monaco drops some. Measured on this app: at `delay: 0` a 60-character line
    * arrives as `#a Lo…Wrote thm.`, at 15ms and at 40ms it arrives intact. So a
    * zero delay does not test the app, it tests the editor's input queue.
@@ -164,7 +164,7 @@ const MIDDLE_DOT = String.fromCharCode(0x00b7)
  * render text as text: a space becomes a no-break space, and whitespace it
  * chooses to make visible becomes a middle dot. Both look exactly like a space
  * in a terminal, so a pattern written with ordinary spaces silently never
- * matches — which reads as "the pane did not update" when it did.
+ * matches, which reads as "the pane did not update" when it did.
  */
 export const markdownPaneText = async (page: Page): Promise<string> => {
   const lines = await page.evaluate(() =>
@@ -210,7 +210,7 @@ export const openEditorPane = async (
  *
  * Mantine leaves a closed dropdown in the DOM, so once two menus have been
  * opened a page-wide search for a menu item finds items in both. A submenu is
- * its own dropdown too, and opens after its parent — hence `last`.
+ * its own dropdown too, and opens after its parent, hence `last`.
  */
 export const visibleMenu = (page: Page) =>
   page.locator('[role="menu"]:visible').last()

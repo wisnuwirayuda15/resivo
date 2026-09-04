@@ -17,7 +17,7 @@ interface RelativeTimeProps {
  * A timestamp rendered as "2 hours ago", safely under SSR.
  *
  * "Time ago" is computed from the clock at render, so the server and the browser
- * will disagree — by the network round trip at least, and by far more if the
+ * will disagree, by the network round trip at least, and by far more if the
  * machine clocks differ. Rendering it directly is therefore a guaranteed
  * hydration mismatch, and one that only shows up once the component is used
  * outside a client-only boundary.

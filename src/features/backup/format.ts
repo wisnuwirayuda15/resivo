@@ -6,7 +6,7 @@ import { documentSchema } from '@/features/resume/model/index'
  * The backup file's shape.
  *
  * A backup is the user's only copy. Everything lives on this device, so there is
- * no server-side snapshot to fall back on if a restore goes wrong — which is why
+ * no server-side snapshot to fall back on if a restore goes wrong, which is why
  * this file is validated as strictly as a stored document, and why a restore
  * never overwrites.
  *
@@ -55,7 +55,7 @@ const resumeSchema = z.object({
   archivedAt: z.number(),
   /**
    * Validated with the same schema the database uses. A backup written by an
-   * older build therefore fails here rather than half-restoring — the document
+   * older build therefore fails here rather than half-restoring, the document
    * migrations run on read, and this is a write.
    */
   document: documentSchema,
@@ -94,7 +94,7 @@ export const backupSchema = z.object({
   /**
    * Optional, and it has to be: every backup written before settings were
    * carried has no such key, and those files must still restore. The version
-   * number is unchanged for the same reason — nothing about an older file became
+   * number is unchanged for the same reason, nothing about an older file became
    * invalid.
    */
   settings: z.array(settingSchema).optional(),
@@ -110,8 +110,8 @@ export class BackupRejected extends Error {}
 /**
  * Parses and validates a backup file.
  *
- * Every failure is a sentence the user can act on, because the alternative — a
- * Zod path dumped on screen — tells someone restoring their only copy nothing
+ * Every failure is a sentence the user can act on, because the alternative (a
+ * Zod path dumped on screen) tells someone restoring their only copy nothing
  * about what to do next.
  */
 export const parseBackup = (text: string): Backup => {
@@ -139,7 +139,7 @@ export const parseBackup = (text: string): Backup => {
   if (typeof version === 'number' && version > BACKUP_VERSION) {
     throw new BackupRejected(
       `That backup was written by a newer version of Resivo (format ${version}, ` +
-        `this build reads ${BACKUP_VERSION}). Update before restoring it — ` +
+        `this build reads ${BACKUP_VERSION}). Update before restoring it, ` +
         'restoring it here could lose part of it.',
     )
   }

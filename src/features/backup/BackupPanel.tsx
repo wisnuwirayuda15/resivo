@@ -138,7 +138,7 @@ export const BackupPanel: React.FC = () => {
         <Text className="text-body text-[14px] font-medium">Back up</Text>
         <Text className="text-muted mt-1 text-[13px]">
           Writes every resume, group, image and font on this device to one JSON
-          file. Nothing is sent anywhere — the file is saved by your browser.
+          file. Nothing is sent anywhere, the file is saved by your browser.
         </Text>
 
         <Button

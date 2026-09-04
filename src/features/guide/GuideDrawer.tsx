@@ -22,7 +22,7 @@ import type { GuideSection } from './content'
 import type { ReactNode } from 'react'
 
 /**
- * How to write a resume here — the Markdown, and the styling.
+ * How to write a resume here, the Markdown, and the styling.
  *
  * A drawer rather than a fourth pane. The three panes are already at their
  * minimums on a 1200px screen, and this is something read once and then
@@ -31,7 +31,7 @@ import type { ReactNode } from 'react'
  *
  * The two copy buttons at the top are the point, not a convenience. Writing a
  * resume by asking a model for one is how a lot of people will actually do it,
- * and a model cannot see this panel — so the prompt states the whole format,
+ * and a model cannot see this panel, so the prompt states the whole format,
  * including what never to emit, and goes to the clipboard in one click. The
  * second button copies the guide itself, for pasting into a conversation that
  * has already started.
@@ -154,7 +154,7 @@ export const GuideDrawer: React.FC<GuideDrawerProps> = ({
     title="Writing guide"
   >
     {/* Around the content rather than the app: the adapter carries the
-        highlighter, and this drawer is the only place code is highlighted —
+        highlighter, and this drawer is the only place code is highlighted,
         so it stays inside the chunk that is only fetched when the guide is
         opened. */}
     <CodeHighlightAdapterProvider adapter={guideHighlighter}>

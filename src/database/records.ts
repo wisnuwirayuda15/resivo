@@ -11,8 +11,8 @@ import type { ResumeDocument } from '@/features/resume/model/document'
 /**
  * "Not in a group".
  *
- * IndexedDB cannot index `null` or `undefined` — a row with a null key is simply
- * absent from that index — so the ungrouped state is an empty string rather than
+ * IndexedDB cannot index `null` or `undefined` (a row with a null key is simply
+ * absent from that index), so the ungrouped state is an empty string rather than
  * `null`. That keeps both the `groupId` index and the `[groupId+order]` compound
  * index able to see every resume.
  */
@@ -26,7 +26,7 @@ export const NOT_ARCHIVED = 0
 
 export interface ResumeRecord {
   id: string
-  /** Group id, or `UNGROUPED`. Never null — see `UNGROUPED`. */
+  /** Group id, or `UNGROUPED`. Never null, see `UNGROUPED`. */
   groupId: string
   /** Editable name, independent of the resume's own header. */
   title: string
@@ -63,7 +63,7 @@ export interface ImageRecord {
   height: number
   /** Bytes. Denormalized so the gallery can total usage without reading blobs. */
   size: number
-  /** SHA-256 of the bytes — dedupes re-uploads and detects duplicates on
+  /** SHA-256 of the bytes, dedupes re-uploads and detects duplicates on
    * import, independent of id. */
   hash: string
   createdAt: number

@@ -18,8 +18,8 @@ import type {
 /**
  * Typed edits to the document.
  *
- * Every editing surface — the visual editor, the style panel, the template
- * picker, the Markdown codec — funnels through these rather than mutating the
+ * Every editing surface (the visual editor, the style panel, the template
+ * picker, the Markdown codec) funnels through these rather than mutating the
  * document directly. That is what keeps a single undo history meaningful: one
  * call here is one user-visible change, whatever produced it.
  *
@@ -58,7 +58,7 @@ const moveWithin = <T>(items: Array<T>, from: number, to: number): void => {
  * The document's language tag.
  *
  * Affects date formatting and the exported `<html lang>`, not the text of the
- * resume — the model has always carried it and nothing could change it, so every
+ * resume, the model has always carried it and nothing could change it, so every
  * document was permanently `en` and every date range could only ever render in
  * English.
  */
@@ -120,7 +120,7 @@ export const updateContactLabel =
  * The icon beside a contact.
  *
  * The renderer has drawn `contact.icon` since it was written, and no recipe set
- * it — so the field could only arrive through a Markdown directive.
+ * it, so the field could only arrive through a Markdown directive.
  */
 export const setContactIcon =
   (contactId: string, icon: IconRef | undefined): Recipe =>
@@ -238,7 +238,7 @@ export const setSectionHidden =
  * Sets or clears a section's icon.
  *
  * Stored as an `IconRef` rather than a component or a glyph, so a resume saved
- * today keeps rendering if the icon set is replaced — and so the Markdown codec
+ * today keeps rendering if the icon set is replaced, and so the Markdown codec
  * has a name to write.
  */
 export const setSectionIcon =
@@ -261,7 +261,7 @@ export const setSectionIcon =
  * Whether the section starts on a fresh sheet.
  *
  * `auto` deletes the key rather than storing the word, so a document carries a
- * `style` object only when something in it is actually overridden — and a
+ * `style` object only when something in it is actually overridden, and a
  * Markdown round trip, which has no syntax for section style, does not have to
  * preserve a field that says "default".
  */
@@ -376,7 +376,7 @@ export const moveBlockToSection =
  * How wide an image block draws, as a percentage of the content column.
  *
  * `undefined` means full width, which is what the figure gets with no inline
- * width at all — so clearing it removes the property rather than writing 100.
+ * width at all, so clearing it removes the property rather than writing 100.
  * The model, the Markdown codec and the renderer have all supported this from
  * the start; nothing set it, so every image inserted from the panel was full
  * width for ever.
@@ -409,7 +409,7 @@ export const setImageWidth =
  * Replaces the text of whichever field a block exposes.
  *
  * The visual editor edits one field at a time, so this takes the block kind's
- * text-bearing path rather than a whole replacement block — that keeps the
+ * text-bearing path rather than a whole replacement block, that keeps the
  * write-back small and the undo step precise.
  */
 export const setBlockText =
@@ -453,7 +453,7 @@ export const setBlockText =
 /**
  * One item of a list, at any nesting depth.
  *
- * The path is one index per level, outermost first — `[2, 0]` is the first
+ * The path is one index per level, outermost first, `[2, 0]` is the first
  * sub-item of the third item. Items carry no id in the model, so position is
  * their identity, and a path is what a position means once lists can nest.
  */
@@ -507,7 +507,7 @@ export const setQuoteParagraph =
  * One cell of a table.
  *
  * `row` is `-1` for the header, because GFM keeps the header outside the body
- * and so does the model — and a sentinel reads better at the call site than a
+ * and so does the model, and a sentinel reads better at the call site than a
  * second recipe that differs in one line.
  */
 export const setTableCell =
@@ -595,7 +595,7 @@ export const setEntryBullet =
 /**
  * One tag.
  *
- * Tags are plain strings, not rich text, so this takes a string — and an emptied
+ * Tags are plain strings, not rich text, so this takes a string, and an emptied
  * tag is removed rather than left as a blank chip, which is what the user means
  * when they clear one.
  */
@@ -652,7 +652,7 @@ export const patchDesign =
       const current = draft.design[group]
 
       if (current === undefined) {
-        // A group that did not exist when this document was written —
+        // A group that did not exist when this document was written,
         // `pagination`, so far. Assigning it is what makes an old document
         // settable without a migration that touches every row.
         Object.assign(draft.design, { [group]: { ...values } })
@@ -670,7 +670,7 @@ export type DeepPartial<T> = {
 /**
  * Switches template.
  *
- * `resetDesign` is the caller's answer to "keep my customisations?" — the
+ * `resetDesign` is the caller's answer to "keep my customisations?", the
  * template's own tokens are only imposed when the user says yes, because
  * silently discarding their styling would be destructive.
  */

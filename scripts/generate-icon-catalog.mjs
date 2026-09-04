@@ -5,18 +5,18 @@ import { icons } from '@phosphor-icons/core'
  * Generates the icon catalog: one search index and one glyph file per weight.
  *
  * Run with `bun run generate-icons`. The output is committed, so the repo builds
- * without this script having to run — codegen in the build would make a clean
+ * without this script having to run, codegen in the build would make a clean
  * checkout depend on a dev dependency being present and on this script still
  * working against whatever Phosphor version resolved.
  *
  * The split is the point. Every icon exists in six weights, and a document that
- * asks for `duotone` needs different markup from one that asks for `regular` —
+ * asks for `duotone` needs different markup from one that asks for `regular`,
  * so the glyphs cannot be shared. Emitting them as one file would mean shipping
  * all six weights to read one of them; emitting the search terms into each of
  * the six would repeat the same words six times. Hence:
  *
  *   catalog.gen.ts        names and search terms, weight-independent, ~1/6 the
- *                         size of a glyph file — this is what the picker's
+ *                         size of a glyph file, this is what the picker's
  *                         search runs against
  *
  *   glyphs.<weight>.gen.ts  name and markup for one weight, fetched only when
@@ -40,7 +40,7 @@ const WEIGHTS = ['thin', 'light', 'regular', 'bold', 'fill', 'duotone']
 const OUT_DIR = 'src/features/icons'
 
 /** The drawable children of an icon's SVG. The assets are machine-generated and
- * uniformly shaped — a single line, self-closing shapes, no nesting — so the
+ * uniformly shaped (a single line, self-closing shapes, no nesting), so the
  * children can be lifted out directly. Attributes are kept verbatim, which is
  * what carries duotone's `opacity` on its backing shape. */
 const SHAPES = /<(?:path|circle|rect|line|polyline|polygon|ellipse)\b[^>]*\/>/g
@@ -87,13 +87,13 @@ const index = icons.map((icon) => {
 emit(
   `${OUT_DIR}/catalog.gen.ts`,
   `/**
- * GENERATED — do not edit. Run \\\`bun run generate-icons\\\` to rebuild.
+ * GENERATED. Do not edit. Run \\\`bun run generate-icons\\\` to rebuild.
  *
  * Source: @phosphor-icons/core.
  * ${index.length} icons, searchable by name and by tag.
  *
  * Names and search terms only. The markup lives in \\\`glyphs.<weight>.gen.ts\\\`,
- * one file per weight — see \\\`scripts/generate-icon-catalog.mjs\\\` for why, and
+ * one file per weight, see \\\`scripts/generate-icon-catalog.mjs\\\` for why, and
  * \\\`catalog.ts\\\` for the reader.
  */`,
   { name: 'ICON_INDEX_SOURCE', lines: index },
@@ -127,13 +127,13 @@ for (const weight of WEIGHTS) {
   emit(
     `${OUT_DIR}/glyphs.${weight}.gen.ts`,
     `/**
- * GENERATED — do not edit. Run \\\`bun run generate-icons\\\` to rebuild.
+ * GENERATED. Do not edit. Run \\\`bun run generate-icons\\\` to rebuild.
  *
  * Source: @phosphor-icons/core, ${weight} weight.
  * ${glyphs.length} glyphs.
  *
  * One record per line: name, SVG body. Loaded only when something renders in
- * this weight — see \\\`catalog.ts\\\`.
+ * this weight, see \\\`catalog.ts\\\`.
  */`,
     { name: 'GLYPH_SOURCE', lines: glyphs },
   )

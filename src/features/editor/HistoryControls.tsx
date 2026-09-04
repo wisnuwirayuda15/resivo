@@ -13,7 +13,7 @@ import type { ComponentProps } from 'react'
 /**
  * Undo and redo for the document.
  *
- * The store has kept a history since the editor existed — one entry per change,
+ * The store has kept a history since the editor existed, one entry per change,
  * with consecutive edits under the same coalesce key merged so a typed sentence
  * is one step. Nothing reached it: there was no button and no shortcut, which
  * made every slider in the style panel and every edit on the paper a one-way
@@ -21,7 +21,7 @@ import type { ComponentProps } from 'react'
  *
  * This is deliberately the document's history, not a text buffer's. Monaco keeps
  * its own undo stack for the pane it owns, and the keyboard shortcut is left to
- * it while the caret is in it — see `useDocumentHistoryShortcuts`. The buttons
+ * it while the caret is in it, see `useDocumentHistoryShortcuts`. The buttons
  * always act on the document, whatever has focus.
  */
 
@@ -34,7 +34,7 @@ interface HistoryButtonProps extends ComponentProps<'button'> {
  * Same contract as the app bar's `BarButton`, and for the same reason: Tooltip
  * clones its child and injects the props that make it open, so a button that
  * declares only its own four props drops them and never shows a tooltip. The
- * injected `className` is empty here — the classes live inside the component —
+ * injected `className` is empty here, the classes live inside the component,
  * so it is merged rather than spread over.
  */
 const HistoryButton = ({
@@ -71,7 +71,7 @@ export const HistoryControls: React.FC = () => {
   const modifier = useOs() === 'macos' ? '⌘' : 'Ctrl+'
 
   return (
-    /* One control group, and the tour points at the pair — each button is a
+    /* One control group, and the tour points at the pair, each button is a
        Tooltip child, and Tooltip works by cloning what it wraps. */
     <OnboardingTour.Target id={TOUR_TARGET_IDS.history}>
       <Box className="flex items-center gap-0.5">

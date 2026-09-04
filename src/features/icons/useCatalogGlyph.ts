@@ -15,7 +15,7 @@ import type { IconWeight } from '@/features/resume/model/document'
  * icon and a render pass per subscription.
  *
  * Returns `undefined` while the weight is in flight, and for a name no build
- * carries. The caller reserves the space in both cases — see `IconRenderer`.
+ * carries. The caller reserves the space in both cases, see `IconRenderer`.
  */
 export const useCatalogGlyph = (
   name: string | undefined,
@@ -31,7 +31,7 @@ export const useCatalogGlyph = (
     onIconCatalogLoaded,
     () => (name === undefined ? undefined : loadedGlyphs(weight)?.get(name)),
     // On the server no glyphs are ever loaded, so the markup rendered there is
-    // the reserved box — which is what hydration then matches.
+    // the reserved box, which is what hydration then matches.
     () => undefined,
   )
 }

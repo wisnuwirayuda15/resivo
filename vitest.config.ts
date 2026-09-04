@@ -10,7 +10,7 @@ const src = fileURLToPath(new URL('./src', import.meta.url))
  * Test config, kept separate from `vite.config.ts`.
  *
  * The app's Vite config loads TanStack Start, Nitro, Tailwind and the React
- * Compiler — none of which the unit tests need, and Nitro in particular fights
+ * Compiler, none of which the unit tests need, and Nitro in particular fights
  * the test runner. The model, codecs, paginator and export adapters are all
  * pure, so they run against plain esbuild transforms.
  *

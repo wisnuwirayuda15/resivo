@@ -1,8 +1,8 @@
 /**
  * Token colours for highlighted code.
  *
- * `@mantine/code-highlight` draws the block — background, radius, the copy
- * button — but the colours inside it come from the highlighter, and
+ * `@mantine/code-highlight` draws the block (background, radius, the copy
+ * button), but the colours inside it come from the highlighter, and
  * `highlight.js` ships them as separate theme stylesheets. None of those is
  * usable here: each is a complete palette of its own, so `atom-one-dark` inside
  * the app's light scheme is a black rectangle, and every theme picks its own

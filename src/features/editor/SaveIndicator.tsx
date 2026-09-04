@@ -18,7 +18,7 @@ import type { SaveStatus } from './autosave'
  *
  * Reads the store directly rather than taking a prop. The status changes on
  * every burst of typing, and threading it through the route would re-render the
- * editor — Monaco, the iframe, the inspector — twice per save. A Zustand
+ * editor (Monaco, the iframe, the inspector) twice per save. A Zustand
  * selector re-renders this and nothing else.
  */
 
@@ -47,7 +47,7 @@ const REPORTS: Record<SaveStatus, Report> = {
     icon: 'warning-circle',
     label: 'Not saved',
     detail:
-      'The last write failed, and this resume is not on disk. Your edits are still on screen — export a copy before closing the tab.',
+      'The last write failed, and this resume is not on disk. Your edits are still on screen, export a copy before closing the tab.',
     className: 'text-[var(--danger-text)]',
   },
 }

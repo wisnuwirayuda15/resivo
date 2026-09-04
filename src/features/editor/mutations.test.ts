@@ -62,7 +62,7 @@ describe('header edits', () => {
     )
 
     // Both clear by deleting the key, so the document never carries a field
-    // holding `undefined` — which the schema would reject on the way to disk.
+    // holding `undefined`, which the schema would reject on the way to disk.
     const cleared = apply(
       decorated,
       edit.setContactIcon(id, undefined),

@@ -46,13 +46,13 @@ import type {
  * character of Markdown itself.
  *
  * It was a hand-rolled string emitter until it had to grow tables, fences and
- * nested lists — at which point it was reimplementing, less well, the escaping
+ * nested lists, at which point it was reimplementing, less well, the escaping
  * rules, fence-length arithmetic, cell padding and list indentation that the
  * `mdast` writer already has. The parser has always been `mdast`; making the
  * writer `mdast` too means one library defines what round-trips, in both
  * directions, rather than two implementations that agree until they do not.
  *
- * The output still has to be byte-stable — the editor shows it, autosave stores
+ * The output still has to be byte-stable, the editor shows it, autosave stores
  * the model, and a reparse has to produce the same tree, so the same document
  * must always produce the same bytes down to blank lines. `toMarkdown` is
  * deterministic given its options, so stability comes from pinning the options
@@ -82,7 +82,7 @@ const WRITER: ToMarkdownOptions = {
   strong: '*',
   rule: '-',
   // Content one space after the marker, so a nested list is indented by exactly
-  // the width of its parent's marker — which is what makes it a sublist rather
+  // the width of its parent's marker, which is what makes it a sublist rather
   // than a new list.
   listItemIndent: 'one',
   // Never indented code: four spaces of indentation is indistinguishable from a
@@ -119,7 +119,7 @@ const WRITER: ToMarkdownOptions = {
 /**
  * Marks are applied in a fixed order, outermost first.
  *
- * `code` is innermost because its content is literal — anything wrapped inside a
+ * `code` is innermost because its content is literal, anything wrapped inside a
  * code span stops being markup. The rest have no meaning to their order, so
  * fixing it is what makes the output stable: the model stores a set, and a set
  * has no order to preserve.
@@ -139,7 +139,7 @@ const WRAPPERS: Record<
  * A directive attribute holding text.
  *
  * Flattened, not serialized: an attribute's value is literal text in the source,
- * so writing Markdown into one would mean the reader had to parse it back out —
+ * so writing Markdown into one would mean the reader had to parse it back out,
  * and `parse` deliberately does not, because an entry title of `**Lead**` is a
  * title containing asterisks. Whatever quoting the value needs is
  * `directiveToMarkdown`'s job, which is the same library that reads it.
@@ -377,7 +377,7 @@ const blockNode = (block: Block): RootContent => {
  * A section's heading is always `##`, whatever depth the source used.
  *
  * The parser takes the shallowest heading in the file as the section level, so a
- * document written with `###` headings is understood — and then normalized here,
+ * document written with `###` headings is understood, and then normalized here,
  * once, on the first save. Writing the original depth back instead would mean
  * storing it in the document, and a heading level is not a fact about a resume.
  *
@@ -390,8 +390,8 @@ const sectionHeading = (section: Section): Heading => {
   return {
     type: 'heading',
     depth: 2,
-    // An untitled section — where content that arrived before any heading lives
-    // — is a bare `##`, which reads back as the same empty title.
+    // An untitled section (where content that arrived before any heading lives)
+    // is a bare `##`, which reads back as the same empty title.
     children: title === '' ? [] : [{ type: 'text', value: title }],
   }
 }

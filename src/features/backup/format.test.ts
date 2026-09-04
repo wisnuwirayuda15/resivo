@@ -14,7 +14,7 @@ import {
  *
  * The one place in the app where the input is a file the user believes contains
  * their only copy. Every rejection therefore has to say what is wrong in a
- * sentence, and — more importantly — has to happen *before* anything is written.
+ * sentence, and (more importantly) has to happen *before* anything is written.
  */
 
 const valid = () => ({

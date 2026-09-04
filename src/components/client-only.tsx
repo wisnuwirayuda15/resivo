@@ -13,7 +13,7 @@ interface ClientOnlyProps {
  * Defers rendering until after hydration.
  *
  * Resivo keeps TanStack Start's SSR shell, but all user data lives in IndexedDB
- * and the editor depends on Monaco, an iframe and pointer measurement — none of
+ * and the editor depends on Monaco, an iframe and pointer measurement, none of
  * which exist on the server. Anything reading the database or touching `window`
  * belongs inside one of these.
  *

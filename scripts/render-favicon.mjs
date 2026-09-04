@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path'
  * reason the icon catalog is: a clean checkout should build without a dev
  * dependency having to resolve and a script having to still work.
  *
- * The SVG is the source of truth and the only file to edit — these exist purely
+ * The SVG is the source of truth and the only file to edit, these exist purely
  * because two consumers cannot read it. Safari has never honoured an SVG
  * favicon, and `apple-touch-icon` is a bitmap by specification, so a home-screen
  * shortcut with no PNG gets a screenshot of the page instead of the mark.

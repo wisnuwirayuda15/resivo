@@ -18,7 +18,7 @@ interface FontCardProps {
  * One uploaded font.
  *
  * The family name is set in its own face, which is the only preview that tells
- * you anything — and proof the file loaded at all.
+ * you anything, and proof the file loaded at all.
  */
 export const FontCard: React.FC<FontCardProps> = ({
   font,

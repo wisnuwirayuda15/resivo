@@ -8,7 +8,7 @@ import markdown from 'highlight.js/lib/languages/markdown'
  *
  * `highlight.js` rather than Shiki, which is the other adapter Mantine ships.
  * Shiki is a WASM engine that loads grammars and themes at runtime, and this
- * needs two grammars for a handful of static snippets — so it would be a large
+ * needs two grammars for a handful of static snippets, so it would be a large
  * asynchronous dependency to colour thirty lines of example code.
  *
  * Built from `highlight.js/lib/core` with exactly the two languages registered,

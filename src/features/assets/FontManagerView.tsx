@@ -16,7 +16,7 @@ import type { FontSummary } from '@/database/index'
  * Uploaded fonts, as a page of its own.
  *
  * Like the image route, this one used to be a hardcoded empty state that never
- * read the database. There is no assignment here — which face a resume is set in
+ * read the database. There is no assignment here, which face a resume is set in
  * belongs to that resume, and is chosen in its style inspector. This page is
  * about the files: what is stored, what it costs, and what nothing uses.
  */
@@ -37,7 +37,7 @@ export const FontManagerView: React.FC = () => {
       <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
         Resivo ships with Instrument Sans, JetBrains Mono and Source Serif 4,
         which need no upload. Add a WOFF2, WOFF, TrueType or OpenType file to
-        use your own — the browser&rsquo;s own font parser validates it on
+        use your own, the browser&rsquo;s own font parser validates it on
         upload, so a bad file is refused rather than silently falling back, and
         the face is embedded into an HTML export.
       </Text>

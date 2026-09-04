@@ -14,7 +14,7 @@ export interface MoveDestination {
  *
  * "Ungrouped" is a destination like any other rather than a separate action:
  * taking a resume out of a folder is the same gesture as putting it in one. It
- * is prepended here because it is not a row in the groups table — `UNGROUPED` is
+ * is prepended here because it is not a row in the groups table, `UNGROUPED` is
  * the empty string.
  *
  * The group the resume is already in is left out, so the menu never offers a

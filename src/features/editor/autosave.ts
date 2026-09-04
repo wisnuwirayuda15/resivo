@@ -24,7 +24,7 @@ export type SaveFn = (document: ResumeDocument) => Promise<void>
  * What the indicator in the header reports.
  *
  * Three states, not four. 'saved' is the resting state and the one a freshly
- * loaded document is in — it came from the database, so it is saved. 'saving'
+ * loaded document is in, it came from the database, so it is saved. 'saving'
  * covers both the debounce window and the write itself: they are 600ms and a
  * few milliseconds apart, and splitting them would put a distinction on screen
  * that nobody can act on. 'error' persists until a later write succeeds,
@@ -39,7 +39,7 @@ export interface Autosave {
    * pending. Resolves once the write has settled. */
   flush: () => Promise<void>
   /** Cancels pending work without writing. For teardown after an explicit
-   * discard — not for normal unmount, which should flush. */
+   * discard, not for normal unmount, which should flush. */
   cancel: () => void
   hasPending: () => boolean
   /** The current state, for a caller that missed the transitions. */
@@ -111,7 +111,7 @@ export const createAutosave = ({
    *
    * Reading `pending` inside the queued callback instead would be a race: the
    * callback does not run until a later microtask, by which time a newer
-   * `schedule()` may have replaced `pending` — so one write would persist the
+   * `schedule()` may have replaced `pending`, so one write would persist the
    * newer document and the next would find nothing to do, silently collapsing
    * two distinct saves into one.
    */

@@ -22,7 +22,7 @@ import type { ComponentProps, ReactElement, ReactNode } from 'react'
  * `collapsed` is the rail: the label and the count go, the icon centres, and the
  * label moves into a tooltip. It is the row's own concern rather than a wrapper's
  * because a 26px row centred inside a 60px rail is a different row, not the same
- * row clipped — a clipped one would put its icon 10px from the left edge and
+ * row clipped, a clipped one would put its icon 10px from the left edge and
  * hide the rest.
  */
 export const navItemClassName = (active = false, collapsed = false): string =>
@@ -79,7 +79,7 @@ export const NavItemContent: React.FC<NavItemContentProps> = ({
  *
  * A function returning an element rather than a component, so the expanded case
  * hands back the row *itself*. A component would have to return a fragment
- * there, and `OnboardingTour.Target` reaches for its child element — a fragment
+ * there, and `OnboardingTour.Target` reaches for its child element, a fragment
  * is not one, and the tour's step for the Images row then had nothing to point
  * at. It failed silently, as a step with no anchor does.
  */
@@ -108,7 +108,7 @@ type NavLinkProps = NavItemContentProps &
  *
  * `tourId` opts the row in as an onboarding-tour anchor. It is a prop rather
  * than a spread of the rest, because these components deliberately do not
- * forward arbitrary props — a nav row is not a generic element.
+ * forward arbitrary props, a nav row is not a generic element.
  */
 export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
   icon,
@@ -128,7 +128,7 @@ export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
       onClick={onNavigate}
       className={navItemClassName(active, collapsed)}
       // Named explicitly on the rail, where the only thing left in the row is
-      // a glyph and a tooltip — which a screen reader never reads.
+      // a glyph and a tooltip, which a screen reader never reads.
       aria-label={collapsed ? label : undefined}
       // Driven by the caller rather than by `activeProps`: several rows share one
       // route and differ only by their search params.

@@ -13,8 +13,8 @@ import {
 /**
  * The parts of the document model that had no way in.
  *
- * Each of these was complete underneath — model, schema, Markdown codec,
- * renderer — and unreachable from any control, so the only proof that a control
+ * Each of these was complete underneath (model, schema, Markdown codec,
+ * renderer), and unreachable from any control, so the only proof that a control
  * now exists is that the paper changes when it is used.
  */
 
@@ -27,7 +27,7 @@ test('adds and removes a header contact', async ({ page }) => {
   await openInspectorTab(page, 'Sections')
 
   // A new document has no contacts, and the renderer draws nothing for an empty
-  // list — so before this control existed there was no affordance at all.
+  // list, so before this control existed there was no affordance at all.
   await page.getByRole('button', { name: 'Add contact' }).click()
 
   await page.getByLabel('Label of contact 1').fill('ada@example.com')
@@ -71,11 +71,11 @@ test('sets how wide an image draws', async ({ page }) => {
   const figure = paper(page).locator('[data-paged] .rp-figure').first()
   await expect(figure).toBeVisible({ timeout: 15_000 })
 
-  // Inserted with no width, which is full width — the state every image was
+  // Inserted with no width, which is full width, the state every image was
   // stuck in before this control existed.
   await expect(figure).not.toHaveAttribute('style', /width/)
 
-  // The width control is chrome, so it only exists in Visual mode — and chrome
+  // The width control is chrome, so it only exists in Visual mode, and chrome
   // is rendered in the paged pass alone, which is why it cannot move a break.
   await page
     .locator('label')

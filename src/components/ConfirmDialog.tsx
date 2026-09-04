@@ -18,7 +18,7 @@ interface ConfirmDialogProps {
  * Confirmation for actions that cannot be undone.
  *
  * Resivo stores everything locally, so there is no server-side copy to recover a
- * deletion from — which is exactly why the destructive path is a deliberate,
+ * deletion from, which is exactly why the destructive path is a deliberate,
  * named confirmation rather than an undo toast.
  */
 export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({

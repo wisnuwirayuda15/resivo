@@ -7,7 +7,7 @@ import type { Page } from '@playwright/test'
 /**
  * The library's own actions.
  *
- * Every one of these is a Mantine overlay — a menu, a submenu, a modal — which
+ * Every one of these is a Mantine overlay (a menu, a submenu, a modal) which
  * is exactly the part of the app no unit test can reach. They are grouped here
  * because they share one setup: a resume, and a group to move it into.
  */
@@ -26,7 +26,7 @@ const createGroup = async (page: Page, name: string) => {
 }
 
 /** Opens a card's menu, hovers "Move to", and picks a destination from the
- * submenu — which is a dropdown of its own, not part of the parent's. */
+ * submenu, which is a dropdown of its own, not part of the parent's. */
 const moveTo = async (page: Page, title: string, destination: string) => {
   const menu = await cardMenu(page, title)
   await menu.getByRole('menuitem', { name: 'Move to' }).hover()

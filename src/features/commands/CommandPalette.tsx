@@ -7,7 +7,7 @@ import { Icon } from '@/features/icons/IconRenderer'
 import type { SpotlightActionGroupData } from '@mantine/spotlight'
 
 /**
- * The command palette — `Ctrl/Cmd+K`.
+ * The command palette, `Ctrl/Cmd+K`.
  *
  * PRD 21 asks for "command actions" and there were none: every destination was
  * reachable only from the sidebar, and two of the app's own commands lived in a
@@ -16,13 +16,13 @@ import type { SpotlightActionGroupData } from '@mantine/spotlight'
  *
  * Built on `@mantine/spotlight` rather than by hand. It is first-party, pinned
  * to the same 9.5.1 as the rest of Mantine, so it adds no new vendor and
- * inherits the theme, the modal behaviour and the focus handling already in use
- * — and what it provides is the fiddly part: a filtered, keyboard-driven list
+ * inherits the theme, the modal behaviour and the focus handling already in use,
+ * and what it provides is the fiddly part: a filtered, keyboard-driven list
  * with the roving focus and screen-reader semantics that a `div` of buttons
  * takes a long time to get right.
  *
  * The default `tagsToIgnore` is what keeps `mod+K` out of the code panes, whose
- * editable surface is a `textarea` — the same reason the undo shortcut leaves
+ * editable surface is a `textarea`, the same reason the undo shortcut leaves
  * Monaco alone. The paper needs no exclusion: it is a document of its own, and a
  * keydown inside it never reaches this one.
  */

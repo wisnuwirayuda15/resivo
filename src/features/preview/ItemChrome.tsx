@@ -12,7 +12,7 @@ import { useSortable } from '@dnd-kit/sortable'
  * reason, belt to that braces: even if it did appear in a measured tree, it
  * would contribute no height.
  *
- * No Mantine and no Tailwind — this renders inside the preview iframe, which
+ * No Mantine and no Tailwind, this renders inside the preview iframe, which
  * loads neither. Everything it needs is in `frame.css`.
  */
 
@@ -20,19 +20,19 @@ interface ItemChromeProps {
   id: string
   /** Disabled for the header, which has nowhere to move to. */
   movable: boolean
-  /** `null` when the move is impossible — first item, last item, nothing of its
+  /** `null` when the move is impossible, first item, last item, nothing of its
    * kind in that direction. The button is rendered disabled rather than removed,
    * so the row of controls does not change width as an item moves. */
   onMoveUp?: (() => void) | null
   onMoveDown?: (() => void) | null
   onRemove?: () => void
   /**
-   * Controls for what this particular item is — an image's width, so far.
+   * Controls for what this particular item is, an image's width, so far.
    *
    * Rendered on a second row of the chrome rather than beside the buttons: the
    * chrome sits in the page's margin, and growing it sideways would eventually
    * run off the paper, whereas growing it downwards costs nothing. It is inside
-   * the chrome for the reason the chrome exists — the measuring pass does not
+   * the chrome for the reason the chrome exists, the measuring pass does not
    * render any of this, so no control here can move a page break.
    */
   extra?: React.ReactNode
@@ -65,7 +65,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
    * The items of one section can be split across two page boxes, so the
    * "translate everything below the gap downwards" animation a sorting strategy
    * produces would slide content off one page and not onto the next. The drop
-   * position is shown with a rule instead — see `[data-over]` in `frame.css`.
+   * position is shown with a rule instead, see `[data-over]` in `frame.css`.
    */
   return (
     <div

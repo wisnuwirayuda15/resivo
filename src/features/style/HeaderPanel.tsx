@@ -26,7 +26,7 @@ import type { ContactItem, HeaderBlock } from '@/features/resume/model/document'
  * measuring pass is what decides where pages break, and the only editing chrome
  * allowed into that tree is absolutely positioned and contributes no height. An
  * add or delete button sitting inline among the contacts would be in the flow,
- * so switching the editor on would move a page break — the one thing the preview
+ * so switching the editor on would move a page break, the one thing the preview
  * guarantees it never does.
  *
  * The consequence before this existed: `addContact` and `removeContact` had been
@@ -52,7 +52,7 @@ const ContactRow: React.FC<{
   const [linking, setLinking] = useState(contact.href !== undefined)
 
   // Named by position, because a contact has no name of its own and an empty
-  // one has no text either — "Delete contact" on four identical rows tells a
+  // one has no text either, "Delete contact" on four identical rows tells a
   // screen reader nothing about which.
   const named = `contact ${index + 1}`
 
@@ -181,7 +181,7 @@ export const HeaderPanel: React.FC<HeaderPanelProps> = ({ header, apply }) => (
   <ControlGroup title="Contacts">
     {header.contacts.length === 0 ? (
       <Text className="text-muted text-[12px]">
-        Email, phone, a link — whatever belongs under your name. They print as
+        Email, phone, a link, whatever belongs under your name. They print as
         one line, separated by the template.
       </Text>
     ) : (

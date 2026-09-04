@@ -3,14 +3,14 @@
  *
  * The iframe carries no app stylesheet, so a font the user uploaded has to be
  * declared inside it. The same text, with `data:` URLs instead of object URLs, is
- * what makes an exported HTML file self-contained — hence one builder taking the
+ * what makes an exported HTML file self-contained, hence one builder taking the
  * source as an argument rather than two that could drift apart.
  */
 
 import type { FontSummary } from '@/database/repositories/fonts'
 import type { FontRecord } from '@/database/records'
 
-/** The `format()` hint. Wrong hints are not ignored — a browser will refuse a
+/** The `format()` hint. Wrong hints are not ignored, a browser will refuse a
  * face whose declared format does not match its bytes. */
 const FORMAT_HINTS: Record<FontRecord['format'], string> = {
   woff2: 'woff2',

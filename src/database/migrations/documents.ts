@@ -3,7 +3,7 @@ import { DOCUMENT_VERSION, documentSchema } from '@/features/resume/model/index'
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
- * Document content migrations — the second versioning axis.
+ * Document content migrations, the second versioning axis.
  *
  * There are deliberately two:
  *
@@ -12,8 +12,8 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * They are independent because they change at very different rates. The content
  * shape will move often as sections and block kinds are added; the table layout
- * will barely move at all. Coupling them would force a full database upgrade —
- * and a rewrite of every row — for what is really a per-document concern.
+ * will barely move at all. Coupling them would force a full database upgrade (
+ * and a rewrite of every row) for what is really a per-document concern.
  *
  * So these run lazily, on read. A document is migrated when it is loaded, and
  * the upgraded shape is persisted on the next save. Nothing rewrites the whole
@@ -27,7 +27,7 @@ type Migrator = (document: Record<string, unknown>) => Record<string, unknown>
 /**
  * v1 to v2: a bullet list's items became objects.
  *
- * v1 stored each item as an `InlineText` — an array of inline nodes. v2 wraps
+ * v1 stored each item as an `InlineText`, an array of inline nodes. v2 wraps
  * that in `{ text }` so an item can also carry a checkbox and a nested list.
  * The two are told apart by shape, which is safe because an item was never
  * anything but an array before and is never an array now.
@@ -58,7 +58,7 @@ const v1ToV2: Migrator = (input) => {
 
 /**
  * Keyed by the version being migrated FROM. To add a migration, bump
- * `DOCUMENT_VERSION` and add the entry for the previous version — the runner
+ * `DOCUMENT_VERSION` and add the entry for the previous version, the runner
  * then walks every step in order.
  */
 const migrators: Record<number, Migrator> = { 1: v1ToV2 }
@@ -72,7 +72,7 @@ export interface MigrationResult {
 /**
  * Brings a stored document up to the current version and validates it.
  *
- * Throws on anything it cannot honestly repair — a document from a newer build,
+ * Throws on anything it cannot honestly repair, a document from a newer build,
  * a missing migration step, or content that fails validation after migrating.
  * Guessing at an unknown shape risks silently mangling the user's resume, so the
  * caller is expected to surface the error instead.

@@ -3,7 +3,7 @@
  *
  * The inverse of `InlineTextView`, and only of that: it understands exactly the
  * elements that renderer emits, because the DOM it reads is the DOM that
- * renderer wrote — plus whatever a browser inserted while the user typed into it
+ * renderer wrote, plus whatever a browser inserted while the user typed into it
  * (`<br>`, a stray `<div>`, a pasted `<b>`).
  *
  * Anything unrecognised contributes its text and loses its formatting rather
@@ -37,7 +37,7 @@ const MARK_TAGS: Record<string, Mark> = {
  * Marks in the model's own order.
  *
  * Sorted rather than kept in the order the DOM nested them, so the same
- * formatting always produces the same node — otherwise a field that was never
+ * formatting always produces the same node, otherwise a field that was never
  * touched could serialise differently after a round trip and register as an
  * edit.
  */
@@ -106,7 +106,7 @@ const walk = (node: Node, marks: ReadonlySet<Mark>): InlineText => {
   if (element.tagName === 'BR') {
     /**
      * A line break becomes a space, not a newline. These are single-line fields
-     * in a print document — a heading that wraps does so because the column is
+     * in a print document, a heading that wraps does so because the column is
      * that wide, and a hard break inside one would survive into the PDF as a
      * gap the user cannot see the cause of.
      */
@@ -123,8 +123,8 @@ const walk = (node: Node, marks: ReadonlySet<Mark>): InlineText => {
 
   /**
    * An icon is a node in the model, not text, and it has no textual form to
-   * recover from the DOM. It is left alone by the editing surface — see
-   * `EditableText` — and read back here from the attribute the renderer wrote.
+   * recover from the DOM. It is left alone by the editing surface (see
+   * `EditableText`), and read back here from the attribute the renderer wrote.
    */
   const iconName = element.getAttribute('data-icon-name')
 
@@ -160,7 +160,7 @@ const walk = (node: Node, marks: ReadonlySet<Mark>): InlineText => {
  * The `InlineText` an element's contents represent.
  *
  * Round-trips `InlineTextView`'s output: rendering the result again produces the
- * same DOM. That is asserted rather than assumed — see `domInline.test.ts`.
+ * same DOM. That is asserted rather than assumed, see `domInline.test.ts`.
  */
 export const domToInline = (element: Element): InlineText =>
   collapse(

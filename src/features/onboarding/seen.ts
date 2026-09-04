@@ -8,7 +8,7 @@
  * has already dismissed it or delay it for someone who has not.
  *
  * A missing or unreadable value means "not seen", which is the safe direction:
- * a private window shows the tour again, which is right — it is a new device as
+ * a private window shows the tour again, which is right, it is a new device as
  * far as this app is concerned.
  */
 

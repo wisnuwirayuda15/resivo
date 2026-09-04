@@ -10,7 +10,7 @@ import type { Page } from '@playwright/test'
  * These exist because the routes used to be hardcoded empty states that never
  * read the database: they said "No images yet" to someone who had just uploaded
  * one through the editor. So the assertion that matters here is not that the
- * page renders — it always did — but that what it shows came out of IndexedDB.
+ * page renders (it always did), but that what it shows came out of IndexedDB.
  */
 
 const uploadImage = async (page: Page, name: string) => {
@@ -44,7 +44,7 @@ test('an image uploaded in the editor shows up on the Images page', async ({
   await expect(page.getByText('No images yet')).toBeHidden()
   // The upload strips the extension: a stored asset is named, not a file path.
   await expect(page.getByLabel('Name of portrait')).toHaveValue('portrait')
-  // 2x2 pixels, and unplaced — so the page reports its dimensions and that
+  // 2x2 pixels, and unplaced, so the page reports its dimensions and that
   // nothing refers to it.
   await expect(page.getByText(/2×2/)).toBeVisible()
   await expect(page.getByText(/1 unused/)).toBeVisible()
@@ -87,7 +87,7 @@ test('the Fonts page reports the store rather than assuming it is empty', async 
 
   await page.getByRole('link', { name: 'Fonts' }).click()
 
-  // The empty state is right here — but so is a count read from the database,
+  // The empty state is right here, but so is a count read from the database,
   // which the stub had no way to produce.
   await expect(page.getByText('No custom fonts')).toBeVisible()
   await expect(page.getByText(/0 stored/)).toBeVisible()

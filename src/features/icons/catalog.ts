@@ -5,11 +5,11 @@
  * Loaded lazily, and in two independent pieces, because the two have different
  * shapes:
  *
- *   the index — names and search terms, ~110KB, weight-independent. The picker's
+ *   the index, names and search terms, ~110KB, weight-independent. The picker's
  *   search runs against this and nothing else, so typing is never waiting on
  *   markup.
  *
- *   the glyphs — one file per weight, ~600-800KB each. Fetched only for a weight
+ *   the glyphs, one file per weight, ~600-800KB each. Fetched only for a weight
  *   something actually renders in. A document that stays on the default pays for
  *   one of the six; the other five are not deferred, they are never fetched.
  *
@@ -86,8 +86,8 @@ const GLYPH_IMPORTS: Record<
   duotone: () => import('./glyphs.duotone.gen'),
 }
 
-/** Notified when the index or any weight arrives, so anything already rendered —
- * the paper, above all — can draw the glyphs it had to leave as reserved
+/** Notified when the index or any weight arrives, so anything already rendered (
+ * the paper, above all) can draw the glyphs it had to leave as reserved
  * space. */
 const listeners = new Set<() => void>()
 
@@ -211,7 +211,7 @@ export const scoreIcon = (entry: IconEntry, query: string): number => {
   /**
    * A whole tag ranks above a name the query merely appears *inside*, which is
    * the one ordering here that took a real result to get right: for "mail",
-   * `envelope` — tagged "mail" — is what someone wants, and `voicemail` is not,
+   * `envelope` (tagged "mail") is what someone wants, and `voicemail` is not,
    * even though the latter matches its own name.
    */
   if (terms.split(' ').some((term) => term === needle)) {
@@ -233,7 +233,7 @@ export const scoreIcon = (entry: IconEntry, query: string): number => {
  * Whether every character of `needle` appears in `haystack` in order.
  *
  * The last resort, and the reason a typo still finds something: "envlp" reaches
- * "envelope". Deliberately unscored beyond a flat 100 — ranking scattered
+ * "envelope". Deliberately unscored beyond a flat 100, ranking scattered
  * matches against each other produces confident nonsense.
  */
 const isSubsequence = (needle: string, haystack: string): boolean => {
@@ -260,7 +260,7 @@ const isSubsequence = (needle: string, haystack: string): boolean => {
  * alphabetically buried `trash` behind `backspace` and `calendar-minus`. The
  * shorter name is the more generic icon, and the generic one is what someone
  * typing a single word is after. Alphabetical order is the final tie-break so
- * the same query always produces the same grid — otherwise the icon under the
+ * the same query always produces the same grid, otherwise the icon under the
  * cursor moves between renders.
  */
 export const searchIcons = (

@@ -30,7 +30,7 @@ import type {
  * the well the paper floats in.
  *
  * The well's colour belongs to the app theme and is painted here, not in the
- * iframe — the iframe's body is transparent so this shows through. That division
+ * iframe, the iframe's body is transparent so this shows through. That division
  * is the reason the paper can stay light while the surrounding chrome goes dark.
  */
 
@@ -51,7 +51,7 @@ const WELL_PADDING = 40
 /**
  * The narrowest pane that can hold the whole control row.
  *
- * Measured, not chosen: the row needs 538px at its shortest — one page, Letter —
+ * Measured, not chosen: the row needs 538px at its shortest (one page, Letter),
  * and grows with the page count's digits, so this is that with room for the
  * count to reach three figures.
  */
@@ -65,7 +65,7 @@ interface PreviewPaneProps {
   onPaperSizeChange?: (size: PaperSize) => void
   /**
    * How an edit from the paper reaches the store. Its presence is what makes
-   * Visual mode available at all — without it the toggle would offer a mode that
+   * Visual mode available at all, without it the toggle would offer a mode that
    * cannot write.
    */
   apply?: (recipe: Recipe) => void
@@ -97,7 +97,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   /**
    * Read, not Visual, by default.
    *
-   * The paper is what the user is judging — whether it fits, whether it reads —
+   * The paper is what the user is judging, whether it fits, whether it reads,
    * and edit chrome sits on top of exactly the thing being judged. Editing is a
    * mode you ask for.
    */
@@ -108,7 +108,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
    *
    * Reported by the frame rather than recomputed here, because they are a fact
    * about the rendered document: what an export contains should be what the user
-   * can see, and pagination is a measurement — there is nothing to measure in a
+   * can see, and pagination is a measurement, there is nothing to measure in a
    * string. Both file exports and the print reuse these.
    */
   const [pages, setPages] = useState<ReadonlyArray<ReadonlyArray<string>>>()
@@ -174,7 +174,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
    *
    * Measured from the pane rather than asked of the viewport, because the pane
    * is what the row has to fit in and the two part company in both directions.
-   * At a 768px viewport — an iPad held upright — the permanent sidebar leaves
+   * At a 768px viewport (an iPad held upright) the permanent sidebar leaves
    * this pane 536px and the full row wants 538. In the other direction, three
    * panes at 1200px leave the preview 258px, so a viewport that is "wide" by
    * any breakpoint still cannot show the row. Both were clipped; one number
@@ -216,7 +216,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
         </UnstyledButton>
       </Tooltip>
 
-      {/* Monospace, because it is a number that changes in place — the design
+      {/* Monospace, because it is a number that changes in place, the design
           system's rule for every numeric readout. */}
       <Text
         span

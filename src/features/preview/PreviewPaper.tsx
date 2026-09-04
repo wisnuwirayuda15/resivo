@@ -54,21 +54,21 @@ import type {
  * Two passes. The first lays every flow item out in one continuous column at the
  * exact page width and measures it; the second distributes those items into page
  * boxes using the breaks the paginator chose. Both passes render the *same React
- * elements* — they are built once and placed twice — which is what guarantees
+ * elements* (they are built once and placed twice), which is what guarantees
  * that what was measured is what appears.
  *
  * Plain `div`s and one inline style, unlike the rest of the app. Everything here
  * is portalled into the iframe, which loads no Mantine stylesheet and no
  * Tailwind, so `Box` would render a class with nothing behind it; the only rules
  * that reach this document are the ones `previewStylesheet` injects. The zoom is
- * inline because it is a live value and because `zoom` — unlike `transform` —
+ * inline because it is a live value and because `zoom`, unlike `transform`,
  * participates in layout, which is the whole reason it is used here.
  */
 
 interface PreviewPaperProps {
   document: ResumeDocument
   /**
-   * Bumped each time the iframe loads more typefaces. Not a rendering concern —
+   * Bumped each time the iframe loads more typefaces. Not a rendering concern,
    * it is part of the pagination key, because heights measured against a
    * fallback face are wrong and must be discarded once the real face lands.
    */
@@ -81,7 +81,7 @@ interface PreviewPaperProps {
   images: ImageMap
   /**
    * `edit` mounts the editing chrome and makes every field writable. The
-   * measuring pass ignores it entirely — see below — so switching modes cannot
+   * measuring pass ignores it entirely (see below), so switching modes cannot
    * move a page break.
    */
   mode: RenderMode
@@ -96,7 +96,7 @@ interface PreviewPaperProps {
    *
    * Published rather than kept private because HTML export needs the breaks the
    * user is looking at. Pagination is a measurement, and there is nothing to
-   * measure in a string — so export reuses this instead of estimating.
+   * measure in a string, so export reuses this instead of estimating.
    */
   onPaginated?: (pages: Array<Array<string>>) => void
 }
@@ -107,7 +107,7 @@ interface PaginationKey {
   design: DesignConfig
   templateId: TemplateId
   fontEpoch: number
-  /** Bumped when the icon catalog arrives — see below. */
+  /** Bumped when the icon catalog arrives, see below. */
   glyphEpoch: number
   /**
    * An image landing changes the height of whatever holds it, so the breaks
@@ -115,7 +115,7 @@ interface PaginationKey {
    * `useImageUrls` returns a map that only changes when its contents do.
    */
   images: ImageMap
-  /** Whether the frame has been laid out yet — see the observer below. */
+  /** Whether the frame has been laid out yet, see the observer below. */
   laidOut: boolean
 }
 
@@ -126,8 +126,8 @@ interface PaginationResult extends PaginationKey {
 /**
  * Reads the measuring pass.
  *
- * Returns `null` when the numbers cannot be trusted — the iframe not laid out
- * yet, or a DOM that does not line up with the item list — so the caller leaves
+ * Returns `null` when the numbers cannot be trusted (the iframe not laid out
+ * yet, or a DOM that does not line up with the item list), so the caller leaves
  * the previous pagination in place rather than committing to a wrong one.
  */
 const readMetrics = (
@@ -140,7 +140,7 @@ const readMetrics = (
     return null
   }
 
-  // DOM order matches item order, so the index is the join — no attribute
+  // DOM order matches item order, so the index is the join, no attribute
   // selector, and no escaping of ids that contain a colon.
   const nodes = Array.from(
     root.querySelectorAll<HTMLElement>('[data-measure-flow] > [data-flow-id]'),
@@ -245,7 +245,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   const [paged, setPaged] = useState<PaginationResult | null>(null)
 
   /**
-   * Whether the root has been laid out at all — not how wide it is.
+   * Whether the root has been laid out at all, not how wide it is.
    *
    * The page box is a fixed physical size, so the container's width cannot
    * change what the paginator measures. What it can do is be zero, before the
@@ -256,7 +256,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * sets the zoom, `zoom` participates in layout inside the frame, so the
    * frame's own scrollbar appears or disappears, which changes this element's
    * width by the width of a scrollbar, which re-ran a pagination that could only
-   * produce the same pages — and each pass could move the scrollbar again. Most
+   * produce the same pages, and each pass could move the scrollbar again. Most
    * geometries settled after a few rounds; at the wrong one it never settled,
    * and React stops a chain of nested updates at 50 with "Maximum update depth
    * exceeded". Repeatedly collapsing the sidebar is a way to walk the zoom
@@ -278,7 +278,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
      * One transition, false to true, and never back.
      *
      * A width of zero after the first layout means the pane was hidden, not that
-     * the pagination became invalid — and going back would throw away pages that
+     * the pagination became invalid, and going back would throw away pages that
      * are still correct only to compute them again on the way in.
      */
     const observer = new ResizeObserver((entries) => {
@@ -382,7 +382,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    *
    * Returned as a callback-or-null rather than a boolean plus a handler, so the
    * button renders disabled from the same fact that would make the move a
-   * no-op — the two cannot disagree.
+   * no-op, the two cannot disagree.
    */
   const step = (item: FlowItem, direction: -1 | 1) => {
     if (apply === undefined) {
@@ -469,7 +469,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
 
     return (
       <>
-        {/* Not offered on a break itself — two in a row means a blank page,
+        {/* Not offered on a break itself, two in a row means a blank page,
             which nobody reaches for from this button. Deleting one is the
             chrome's own × above. */}
         {isBreak ? null : (
@@ -547,7 +547,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   }
 
   /**
-   * The pages, and — while editing — the drag context around them.
+   * The pages, and (while editing) the drag context around them.
    *
    * The context wraps only the paged pass. The measuring pass has no draggables
    * in it, which is what keeps drag measurement from seeing two copies of every

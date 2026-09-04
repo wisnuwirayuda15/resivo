@@ -1,7 +1,7 @@
 /**
  * Printing, from a document built for printing.
  *
- * PDF export used to be `previewIframe.contentWindow.print()` — the live preview,
+ * PDF export used to be `previewIframe.contentWindow.print()`, the live preview,
  * printed where it stood. That made the output depend on the state of the app at
  * that moment: the zoom (neutralised by an `!important`, but still coupled), the
  * measuring pass (hidden by a print rule, but still in the document), the
@@ -12,8 +12,8 @@
  * HTML export writes, with the typefaces and images inlined as `data:` URLs and
  * the measured page breaks already baked into page boxes. It is written into a
  * frame of its own, printed, and thrown away. What is printed is therefore
- * exactly what "Export → HTML" would have handed the user — one artefact, two
- * destinations — and nothing about the editor's current state can reach it.
+ * exactly what "Export → HTML" would have handed the user (one artefact, two
+ * destinations), and nothing about the editor's current state can reach it.
  *
  * What this does *not* do is replace the browser's print engine, and no
  * client-side library can. A PDF built by a library either rasterises the page,
@@ -43,7 +43,7 @@ const removeFrame = (): void => {
  * Prints one self-contained HTML document.
  *
  * Resolves once the print has been handed to the browser and the frame is gone.
- * Rejects only if the document could not be prepared — a dialog the user
+ * Rejects only if the document could not be prepared, a dialog the user
  * cancels is not a failure, and there is no way to tell the two apart from here.
  */
 export const printExportHtml = async (html: string): Promise<void> => {
@@ -60,7 +60,7 @@ export const printExportHtml = async (html: string): Promise<void> => {
    *
    * A frame that is not laid out has no layout to print. Written as inline text
    * because this element is created imperatively, outside React and outside
-   * Tailwind's reach — everything the app renders uses classes.
+   * Tailwind's reach, everything the app renders uses classes.
    */
   frame.style.cssText =
     'position:fixed;left:-10000px;top:0;width:1024px;height:1400px;border:0'
@@ -68,7 +68,7 @@ export const printExportHtml = async (html: string): Promise<void> => {
   /**
    * Not sandboxed, deliberately. The document is one this app just wrote and
    * contains no script, and a sandbox without `allow-modals` is refused
-   * `print()` — which is the only thing the frame exists for.
+   * `print()`, which is the only thing the frame exists for.
    */
   frame.srcdoc = html
 
@@ -95,7 +95,7 @@ export const printExportHtml = async (html: string): Promise<void> => {
      * Fonts before the dialog.
      *
      * The faces are `data:` URLs in this document, so they resolve without a
-     * network — but they still resolve asynchronously, and a face that lands
+     * network, but they still resolve asynchronously, and a face that lands
      * after the print has been captured is a résumé printed in a fallback, with
      * different line breaks from the one on screen.
      */

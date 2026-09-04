@@ -13,7 +13,7 @@
  * `--font-sans` / `--font-mono` are already emitted by tailwind-preset-mantine
  * (they alias the Mantine font families, which `theme.ts` sets to these two).
  * `--font-serif` has no Mantine equivalent because the app chrome never uses a
- * serif — it exists purely for `.resivo-paper`.
+ * serif, it exists purely for `.resivo-paper`.
  */
 @import '@fontsource-variable/instrument-sans';
 @import '@fontsource-variable/jetbrains-mono';

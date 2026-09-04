@@ -119,7 +119,7 @@ describe('documentFlow', () => {
   })
 })
 
-describe('documentFlow — forced breaks', () => {
+describe('documentFlow, forced breaks', () => {
   const pageBreak = (id: string): Block => ({ id, kind: 'pageBreak' })
 
   it('marks the item after a page break, not the break itself', () => {
@@ -136,7 +136,7 @@ describe('documentFlow — forced breaks', () => {
     const items = documentFlow(document)
     const byId = new Map(items.map((item) => [item.id, item]))
 
-    // The break is in the flow like anything else — it has to be, or it could
+    // The break is in the flow like anything else, it has to be, or it could
     // not be seen, moved or deleted on the paper.
     expect(byId.get('block:pb1')?.breakBefore).toBeUndefined()
     expect(byId.get('block:b2')?.breakBefore).toBe(true)
@@ -173,7 +173,7 @@ describe('documentFlow — forced breaks', () => {
 
   it("moves a break before a section's first block onto its heading", () => {
     // Otherwise the break lands between heading and content and strands the
-    // heading at the foot of the previous page — the orphan `keepWithNext`
+    // heading at the foot of the previous page, the orphan `keepWithNext`
     // exists to prevent, produced by the control meant to tidy the pages.
     const document = withHeader(createEmptyDocument())
     const projects = createSection('projects', 'Projects', [

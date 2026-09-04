@@ -10,7 +10,7 @@ import { useArchivedResumes } from '@/features/resume/queries'
  * Archived resumes.
  *
  * A separate route rather than a filter on the library, because archiving is
- * about getting something out of the way — mixing the two views back together
+ * about getting something out of the way, mixing the two views back together
  * would defeat the point.
  */
 const ArchiveRoute: React.FC = () => {

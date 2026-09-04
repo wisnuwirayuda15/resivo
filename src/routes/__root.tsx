@@ -29,7 +29,7 @@ interface MyRouterContext {
  * Last-resort error screen.
  *
  * Without one, an error that escapes a route renders TanStack's bare fallback,
- * which tells the user nothing and — worse for debugging — makes a render error
+ * which tells the user nothing and (worse for debugging) makes a render error
  * indistinguishable from a blank page. Names what failed and offers the way back,
  * per the design system's rule for errors: no error code in the primary line, no
  * apology.
@@ -44,7 +44,7 @@ const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => (
         <Box className="flex flex-col items-center gap-3">
           <Button onClick={() => window.location.reload()}>Reload</Button>
           {/* The message is for the user's bug report, so it is shown rather
-              than swallowed — but kept out of the primary line. */}
+              than swallowed, but kept out of the primary line. */}
           <Text
             className="text-subtle max-w-[60ch] text-[11px] break-words"
             component="code"
@@ -97,7 +97,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
        * The SVG is the real one and every current browser prefers it. The 32px
        * PNG is there for Safari, which has never honoured an SVG favicon, and
        * `apple-touch-icon` for a home-screen shortcut, which is a bitmap by
-       * specification — without it iOS uses a screenshot of the page. All three
+       * specification, without it iOS uses a screenshot of the page. All three
        * are the same drawing; `bun run generate-favicon` writes the PNGs from
        * the SVG.
        */

@@ -35,12 +35,12 @@ import type {
 } from '@/features/resume/model/document'
 
 /**
- * The Sections tab — the document's outline, with the header above it.
+ * The Sections tab, the document's outline, with the header above it.
  *
  * Reordering here is by explicit move, not by drag: dnd-kit and the in-preview
  * drag handles arrive with the visual editor, and this list has to be usable from
  * the keyboard regardless of whether that ever lands. When drag does arrive it
- * becomes a second way to do what these buttons already do, not a replacement —
+ * becomes a second way to do what these buttons already do, not a replacement,
  * both dispatch `moveSection`.
  */
 
@@ -262,7 +262,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
   return (
     <Box>
       {/* The header first, because it is first on the paper. Its contacts are
-          edited here for a structural reason — see `HeaderPanel`. */}
+          edited here for a structural reason, see `HeaderPanel`. */}
       <HeaderPanel apply={apply} header={content.header} />
 
       <ul className="list-none">
@@ -300,7 +300,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
       </Box>
 
       {/* Deleting takes its blocks with it, so it is confirmed rather than
-          undo-only — undo is a keystroke away but not obvious mid-edit. Hiding
+          undo-only, undo is a keystroke away but not obvious mid-edit. Hiding
           is the reversible option, and it is one click on the same row. */}
       <ConfirmDialog
         confirmLabel="Delete section"

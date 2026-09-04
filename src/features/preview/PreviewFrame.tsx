@@ -29,13 +29,13 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *    "the PDF matches the preview" true by construction rather than by effort.
  *
  * React renders into it by portal, so there is one component tree and one
- * renderer — the app's — rather than a second React root to keep in step. The
+ * renderer (the app's) rather than a second React root to keep in step. The
  * iframe is sandboxed all the same: no script inside it can ever run, whatever a
  * future custom stylesheet tries to smuggle in.
  */
 
 /**
- * A fixed, empty document. Constant so the iframe loads exactly once — a
+ * A fixed, empty document. Constant so the iframe loads exactly once, a
  * changing `srcDoc` would reload the frame and throw away the portal on every
  * edit.
  */
@@ -58,7 +58,7 @@ interface PreviewFrameProps {
   /**
    * Handed a function that prints the iframe.
    *
-   * PDF export is the browser printing *this* document — not a second renderer
+   * PDF export is the browser printing *this* document, not a second renderer
    * producing something that ought to match it. That is what makes "the PDF is
    * the preview" true rather than aspirational, and it is why the print handle
    * comes from here instead of from a separate route.
@@ -83,7 +83,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
    * Incremented every time the iframe finishes loading a batch of faces.
    *
    * A boolean would not do. `fonts.ready` on a document that has not yet asked
-   * for a face resolves immediately — the paper would be measured against
+   * for a face resolves immediately, the paper would be measured against
    * fallback metrics and, since the promise only settles once, never measured
    * again. A counter makes every arrival re-paginate.
    */
@@ -92,7 +92,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   /**
    * Only the assets this document names. Holding every uploaded image would mean
    * a gallery's worth of blobs alive for as long as the editor is open, and
-   * every declared face delaying the first paint — see `font-display: block`.
+   * every declared face delaying the first paint, see `font-display: block`.
    */
   const imageIds = useMemo(() => documentImageIds(resume), [resume])
   const fontIds = useMemo(() => documentFontIds(resume), [resume])
@@ -104,7 +104,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   /**
    * A face needs both halves: the row, for its family and weight, and the blob
    * URL. They arrive from different reads, so a font contributes nothing until
-   * both are here — and when the second lands, `loadingdone` bumps `fontEpoch`
+   * both are here, and when the second lands, `loadingdone` bumps `fontEpoch`
    * and the paper re-paginates against the real metrics.
    */
   const fontFaces = useMemo(

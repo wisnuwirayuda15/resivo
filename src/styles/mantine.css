@@ -20,7 +20,7 @@
  *
  * The package caps its dropdown at 400px, which was wrong at both ends. On a
  * phone that produced a 369px dropdown placed 16px from the left edge, so its
- * right 10px — and the last stepper dot with it — sat outside a 375px viewport.
+ * right 10px (and the last stepper dot with it) sat outside a 375px viewport.
  * On a desktop 400px is a narrow measure for paragraphs this long, which is
  * what made the card read as cramped on the very screen with room to spare.
  *
@@ -30,7 +30,7 @@
  *
  * The cap belongs on the dropdown rather than on the card inside it. The
  * dropdown is what the positioner measures, so capping only the card left the
- * dropdown placed for a width it no longer had — which is how the overflow
+ * dropdown placed for a width it no longer had, which is how the overflow
  * survived the first attempt at this.
  *
  * In the `components` layer, above the package's own `mantine-onboarding-tour`

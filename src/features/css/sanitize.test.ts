@@ -5,7 +5,7 @@ import { sanitizeCss } from './sanitize'
 /**
  * The sanitizer is a boundary, so these tests are mostly adversarial: each one
  * is an attempt to get something past it. The two properties that matter are
- * that nothing forbidden survives, and that the output's braces balance — the
+ * that nothing forbidden survives, and that the output's braces balance, the
  * second because the caller wraps this text in `@layer custom { … }`, and an
  * early `}` would drop the rest into the unlayered origin, above the page
  * geometry.
@@ -217,7 +217,7 @@ describe('breaking out of the layer', () => {
 
   /**
    * A stray brace is a typo, not an attack, and discarding the rest of someone's
-   * stylesheet over one would be hostile — a browser keeps going too. What the
+   * stylesheet over one would be hostile, a browser keeps going too. What the
    * balancing guarantees is that the recovered rules stay *inside* `@layer
    * custom`, not that they are thrown away.
    */
@@ -295,7 +295,7 @@ describe('reporting', () => {
   it('reports a declaration with no value', () => {
     const { css, warnings } = sanitizeCss('.a { color: ; font-size: 9pt }')
 
-    // The rest of the block survives — one broken declaration is a typo, not a
+    // The rest of the block survives, one broken declaration is a typo, not a
     // reason to drop the rule around it.
     expect(css).toBe('.a { font-size: 9pt }')
     expect(warnings[0]?.message).toContain('property: value')

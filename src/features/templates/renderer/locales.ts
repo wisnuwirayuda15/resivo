@@ -6,7 +6,7 @@
  * only render in English. This is the list the style panel offers.
  *
  * It is deliberately not "every locale the browser knows". A resume renders one
- * word this app has to supply itself — the "present" of an ongoing role — and a
+ * word this app has to supply itself (the "present" of an ongoing role), and a
  * document set to a language whose word is missing would print English inside an
  * otherwise translated line. So the offered list is exactly the set with a
  * checked word, and adding a language means adding its word here.

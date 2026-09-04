@@ -34,7 +34,7 @@ export const useAutosave = (
        * The cache is updated from the row the repository wrote, inside `save`,
        * rather than from the document that was handed in. `saveResumeDocument`
        * decides `updatedAt` and rewrites part of the document, so the caller's
-       * copy is not what is on disk — and it is the copy on disk that the editor
+       * copy is not what is on disk, and it is the copy on disk that the editor
        * reads when someone walks back in.
        */
       save: async (document) => {

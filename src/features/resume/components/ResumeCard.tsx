@@ -27,7 +27,7 @@ interface ResumeCardProps {
  *
  * Media-first: a sunken well holds a paper miniature, with a metadata row
  * underneath. The miniature shows the resume's actual template colours without
- * rendering — or storing a thumbnail of — the real document.
+ * rendering (or storing a thumbnail of) the real document.
  */
 export const ResumeCard: React.FC<ResumeCardProps> = ({
   resume,
@@ -44,7 +44,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
   const destinations = moveDestinations(groups, resume.groupId)
 
   return (
-    // Only colour and shadow cross-fade — never layout properties, which
+    // Only colour and shadow cross-fade, never layout properties, which
     // `transition-all` would also animate.
     <Box className="group border-line-soft bg-surface rounded-card hover:border-line duration-fast ease-standard relative border shadow-xs transition-[border-color,box-shadow] hover:shadow-md">
       <Link
@@ -88,7 +88,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             </Tooltip>
           </Menu.Target>
           {/* Named. There is one of these on every card, and an unnamed menu is
-              announced as just "menu" — which says nothing about which resume is
+              announced as just "menu", which says nothing about which resume is
               about to be archived. */}
           <Menu.Dropdown aria-label={`Actions for ${resume.title}`}>
             <Menu.Item

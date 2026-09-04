@@ -26,11 +26,11 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * It adds exactly one thing: a `span.rp-editable` around each run of text. A
  * `span` is an inline box with no layout of its own, and `frame.css` gives it
- * only `outline`, `background` and `cursor` — none of which can change a height.
+ * only `outline`, `background` and `cursor`, none of which can change a height.
  * This test holds the structural half: unwrap those spans and the markup is
  * identical to view mode.
  *
- * The editing chrome — handles, drop rules — is not covered here because it is
+ * The editing chrome (handles, drop rules) is not covered here because it is
  * not rendered here. It lives in the paged pass only, which is never measured.
  */
 
@@ -39,7 +39,7 @@ const sample = (): ResumeDocument =>
     draft.content.header.name = [{ type: 'text', text: 'Avery Chen' }]
     draft.content.header.headline = [
       { type: 'text', text: 'Staff engineer' },
-      { type: 'text', text: ' — infra', marks: ['italic'] },
+      { type: 'text', text: ' - infra', marks: ['italic'] },
     ]
     draft.content.header.contacts = [
       {
@@ -153,7 +153,7 @@ const markup = (
 }
 
 /** Replaces each `span.rp-editable` with its own children, leaving everything
- * else — including any other span — exactly as it was. */
+ * else (including any other span) exactly as it was. */
 const unwrapEditable = (html: string): string => {
   const host = document.createElement('div')
 
@@ -201,7 +201,7 @@ describe('edit mode markup', () => {
 
   /**
    * Edit mode with no way to write is not edit mode. This is what keeps an
-   * export — which renders with no `apply` — free of editing markup even if it
+   * export (which renders with no `apply`) free of editing markup even if it
    * asked for the wrong mode.
    */
   it('renders view markup for edit mode with no way to write', () => {

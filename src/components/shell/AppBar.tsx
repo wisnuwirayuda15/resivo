@@ -46,8 +46,8 @@ interface BarButtonProps extends ComponentProps<'button'> {
  * those renders fine but never opens anything.
  *
  * `className` has to be pulled out of that spread and merged, not spread over.
- * Tooltip clones its child with `className: cx(ownClassName, childProps.className)`
- * — and this button's classes are inside the component, not on the element
+ * Tooltip clones its child with `className: cx(ownClassName, childProps.className)`,
+ * and this button's classes are inside the component, not on the element
  * Tooltip can see, so what it injects is empty. Spreading it last therefore
  * erased every class here: both header buttons rendered as bare 16px glyphs with
  * no hit area and no hover, which is what made the row look like floating icons.
@@ -76,7 +76,7 @@ const BarButton = ({
 /**
  * Contents of the application bar.
  *
- * Fills `AppShell.Header` rather than positioning itself — the shell owns the
+ * Fills `AppShell.Header` rather than positioning itself, the shell owns the
  * height (`--spacing-toolbar`), the fixed placement and the bottom border. This
  * is only the row of controls inside it.
  */
@@ -101,7 +101,7 @@ export const AppBar: React.FC<AppBarProps> = ({
       {/* The same slot as the burger, and the two never both appear: below the
           navbar's breakpoint the sidebar is an overlay, which the burger shows
           and hides, and there is no rail to collapse it to. The label does not
-          change with the state — a control that renames itself is one the
+          change with the state, a control that renames itself is one the
           server cannot render, and "Toggle" is what the burger says too. */}
       <Box className="flex items-center" visibleFrom="sm">
         <Tooltip label="Toggle sidebar">
@@ -128,7 +128,7 @@ export const AppBar: React.FC<AppBarProps> = ({
 
       {/* The divider separates the route's own controls from the shared ones,
           and reads as a divider only if it is a clear majority of a control's
-          height — 18px against the 30px the design system uses. Gone on a phone,
+          height, 18px against the 30px the design system uses. Gone on a phone,
           where the theme toggle has stepped out and it would be separating the
           menu from nothing. */}
       <Box className="bg-line mx-1 hidden h-[18px] w-px sm:block" />
@@ -139,7 +139,7 @@ export const AppBar: React.FC<AppBarProps> = ({
           the other a `Tooltip` child, and both work by cloning what they wrap. */}
       <OnboardingTour.Target id={TOUR_TARGET_IDS.appMenu}>
         <Box className="flex items-center gap-0.5">
-          {/* Out of the row on a phone, where every pixel is contested — and
+          {/* Out of the row on a phone, where every pixel is contested, and
               into the menu below, so the control still exists at every width. */}
           <Box visibleFrom="sm">
             <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>

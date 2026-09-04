@@ -33,7 +33,7 @@ import type { MantineColorsTuple } from '@mantine/core'
  * inherits the design system's neutrals instead of a blue-leaning grey.
  *
  * The ORDER matters, not just the values: Mantine reaches for specific indices
- * for specific jobs — `gray[3]` for borders, `gray[5]` for placeholders,
+ * for specific jobs, `gray[3]` for borders, `gray[5]` for placeholders,
  * `gray[6]` for dimmed text. So each index carries the design system token that
  * plays that role, rather than the scale being a straight copy of `--n-*`.
  * `--n-0`, `--n-150` and `--n-950` are therefore absent here; they remain
@@ -42,24 +42,24 @@ import type { MantineColorsTuple } from '@mantine/core'
 const graphite: MantineColorsTuple = [
   '#fbfbfa', // n-25
   '#f6f6f4', // n-50
-  '#eeeeeb', // n-100 — border-subtle
-  '#d8d8d3', // n-200 — border-default  (Mantine's border shade)
-  '#c0c0b9', // n-300 — border-strong
-  '#9b9b93', // n-400 — text-disabled   (Mantine's placeholder shade)
-  '#79796f', // n-500 — text-subtle     (Mantine's dimmed shade)
-  '#5c5c55', // n-600 — text-muted
+  '#eeeeeb', // n-100: border-subtle
+  '#d8d8d3', // n-200: border-default  (Mantine's border shade)
+  '#c0c0b9', // n-300: border-strong
+  '#9b9b93', // n-400: text-disabled   (Mantine's placeholder shade)
+  '#79796f', // n-500: text-subtle     (Mantine's dimmed shade)
+  '#5c5c55', // n-600: text-muted
   '#454540', // n-700
-  '#2e2e2a', // n-800 — text-body
+  '#2e2e2a', // n-800: text-body
 ]
 
-/** Deep archival teal — the only saturated colour in the chrome. */
+/** Deep archival teal, the only saturated colour in the chrome. */
 const brand: MantineColorsTuple = [
   '#e8f3f2', // p-50
   '#c9e5e2', // p-100
   '#9dcfcb', // p-200
   '#66b2ad', // p-300
   '#32948e', // p-400
-  '#0e7c76', // p-500 — the primary shade in light mode
+  '#0e7c76', // p-500: the primary shade in light mode
   '#066560', // p-600
   '#04514d', // p-700
   '#06403d', // p-800
@@ -69,12 +69,12 @@ const brand: MantineColorsTuple = [
 /**
  * Dark surfaces. A real theme rather than an inversion, so the ramp is authored
  * rather than derived: text at the light end, borders in the middle, the
- * background levels at the dark end. Text stops at #f2f2f0 — never pure white.
+ * background levels at the dark end. Text stops at #f2f2f0, never pure white.
  *
  * Aligned to the indices Mantine actually uses, same as `graphite` above:
  * `dark[4]` is the border shade, `dark[6]` backs raised surfaces like menus and
  * `Paper`, and `dark[7]` is the body background. Putting a text colour at index
- * 4 — which is the intuitive reading of "light to dark" — makes every default
+ * 4 (which is the intuitive reading of "light to dark") makes every default
  * border in the app come out several steps too light.
  */
 const dark: MantineColorsTuple = [
@@ -115,21 +115,21 @@ export const theme = createTheme({
   },
 
   /**
-   * Compact productivity scale. `md` is 13px, NOT 16px — this is the single
+   * Compact productivity scale. `md` is 13px, NOT 16px, this is the single
    * most load-bearing deviation from Mantine's defaults, and every control size
    * below is calibrated to it.
    */
   fontSizes: {
     xs: '0.6875rem', // 11px
     sm: '0.75rem', // 12px
-    md: '0.8125rem', // 13px — body default
+    md: '0.8125rem', // 13px, body default
     lg: '0.875rem', // 14px
     xl: '1rem', // 16px
   },
   /**
-   * Two sets on purpose. The `xs`–`xl` keys SHARE names with `fontSizes`, so the
+   * Two sets on purpose. The `xs`-`xl` keys SHARE names with `fontSizes`, so the
    * Tailwind generator pairs them into one `text-<key>` utility that carries the
-   * right leading — 13px body text comes out at 1.45, per the design system.
+   * right leading, 13px body text comes out at 1.45, per the design system.
    * The named keys are standalone line-height utilities for the cases where
    * size and leading are chosen independently (display type, code panes).
    */
@@ -160,7 +160,7 @@ export const theme = createTheme({
     md: '7px',
     lg: '10px',
     xl: '14px',
-    // Named aliases — the DS assigns a radius per surface kind, so call sites
+    // Named aliases, the DS assigns a radius per surface kind, so call sites
     // name the surface rather than picking a size.
     control: '5px',
     panel: '7px',
@@ -182,7 +182,7 @@ export const theme = createTheme({
       '0 1px 2px rgba(18, 18, 16, 0.08), 0 12px 32px rgba(18, 18, 16, 0.1)',
   },
 
-  /** 80–320ms. `prefers-reduced-motion` zeroes these in `base.css`. */
+  /** 80-320ms. `prefers-reduced-motion` zeroes these in `base.css`. */
   other: {
     durationInstant: '80ms',
     durationFast: '120ms',
@@ -201,7 +201,7 @@ export const theme = createTheme({
      * Mantine's control heights are fixed pixels, not derived from font size:
      * `--input-height-xs` is 1.875rem and `--input-height-sm` is 2.25rem, with
      * `--mantine-scale: 1`, so they are 30px and 36px. The design system's
-     * default control is 30px — `--ctl-h-md` in tokens.css — which is Mantine's
+     * default control is 30px (`--ctl-h-md` in tokens.css), which is Mantine's
      * `xs`. Asking for `sm` in the belief that compact font sizes shrink it to
      * 30px produced a 36px control in a 44px header, which is where this came
      * from.
@@ -228,7 +228,7 @@ export const theme = createTheme({
         radius: 'dialog',
         shadow: 'xl',
         centered: true,
-        // 42% ink + 2px blur — one of only two places the DS uses blur at all.
+        // 42% ink + 2px blur, one of only two places the DS uses blur at all.
         overlayProps: { backgroundOpacity: 0.42, blur: 2 },
       },
     }),

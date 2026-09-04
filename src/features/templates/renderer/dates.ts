@@ -8,7 +8,7 @@ import type { DateRange } from '@/features/resume/model/document'
  * The model stores `YYYY-MM` where it can and free text where it cannot, because
  * a resume legitimately says things like "Summer 2019". So this recognises the
  * machine-readable forms, formats those for the document's locale, and passes
- * anything else through untouched — never rejecting or silently blanking what the
+ * anything else through untouched, never rejecting or silently blanking what the
  * user typed.
  */
 
@@ -22,7 +22,7 @@ const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/
  * Formats one end of a range.
  *
  * Built and formatted in UTC throughout. `new Date('2021-03')` is parsed as UTC
- * midnight, so formatting it in a timezone behind UTC would render "Feb 2021" —
+ * midnight, so formatting it in a timezone behind UTC would render "Feb 2021",
  * a resume that shows the wrong month depending on where it is opened.
  */
 const formatPoint = (value: string, locale: string): string => {
@@ -74,7 +74,7 @@ export const formatDateRange = (
   }
 
   const start = formatPoint(range.start ?? '', locale)
-  // `current` wins over `end` — the model's rule, so that ticking "current"
+  // `current` wins over `end`, the model's rule, so that ticking "current"
   // never requires clearing a stale end date first.
   // The one word on the paper this app supplies rather than the user, so it
   // follows the document's language along with the month names beside it.

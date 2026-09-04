@@ -7,7 +7,7 @@ import { createResume, expectPaperReady, openEmptyApp, paper } from './app'
  *
  * Both of its items were hardcoded `disabled`, which made the whole menu dead
  * UI: it opened and offered nothing. So the assertion that matters is not that
- * the items render — they always did — but that clicking one does something.
+ * the items render (they always did), but that clicking one does something.
  */
 
 test('the application menu opens the shortcuts sheet', async ({ page }) => {
@@ -39,15 +39,15 @@ test('the command palette navigates and creates', async ({ page }) => {
   /**
    * Scoped to the palette itself.
    *
-   * Its actions carry the same names as the controls they stand for — that is
-   * the point of a palette — so a page-wide search for "New resume" finds the
+   * Its actions carry the same names as the controls they stand for (that is
+   * the point of a palette), so a page-wide search for "New resume" finds the
    * sidebar's button, the header's, the empty state's and this one.
    */
   const palette = page
     .locator('[role="dialog"]')
     .filter({ has: page.getByPlaceholder('Search commands…') })
 
-  // Filtered by label, description and keywords — "unused" is a keyword on the
+  // Filtered by label, description and keywords, "unused" is a keyword on the
   // Images action rather than part of its name.
   await search.fill('unused')
   await palette.getByRole('button', { name: /Images/ }).click()
@@ -74,7 +74,7 @@ test('the palette leaves the code panes alone', async ({ page }) => {
 
   await page.keyboard.press('ControlOrMeta+K')
 
-  // Monaco binds mod+K itself, and its editable surface is a textarea — which
+  // Monaco binds mod+K itself, and its editable surface is a textarea, which
   // is what the palette's default `tagsToIgnore` excludes. A palette that stole
   // the chord would break the editor's own bindings.
   await expect(page.getByPlaceholder('Search commands…')).toBeHidden()
@@ -102,7 +102,7 @@ test('the application menu reaches the about page', async ({ page }) => {
  *
  * Worth a test rather than an eyeball because the interesting half is not the
  * collapse, it is that the width is restored by a script in the document head
- * rather than by React — so a reload is the assertion that matters.
+ * rather than by React, so a reload is the assertion that matters.
  */
 test('the sidebar collapses to a rail, and stays collapsed', async ({
   page,
@@ -138,7 +138,7 @@ test('the sidebar collapses to a rail, and stays collapsed', async ({
 test('the rail still reaches every destination', async ({ page }) => {
   await openEmptyApp(page)
 
-  // The keyboard, since that is the other way in — and Mantine cancels the
+  // The keyboard, since that is the other way in, and Mantine cancels the
   // browser's own binding, which on Firefox is the bookmarks sidebar.
   await page.keyboard.press('ControlOrMeta+B')
   expect(
@@ -151,7 +151,7 @@ test('the rail still reaches every destination', async ({ page }) => {
    * Found by name with no text on screen.
    *
    * A rail row is a glyph and a tooltip, and a tooltip is not an accessible
-   * name — so each one carries an `aria-label` while collapsed. This clicks the
+   * name, so each one carries an `aria-label` while collapsed. This clicks the
    * way a screen reader would find it, which is the only reason the assertion
    * is worth making.
    */
@@ -159,7 +159,7 @@ test('the rail still reaches every destination', async ({ page }) => {
   await expect(page).toHaveURL(/\/images$/)
 
   // And the one action a new user needs is still there, having moved out of the
-  // header — where there is no room beside the mark — into the list.
+  // header (where there is no room beside the mark) into the list.
   await page.getByRole('button', { name: 'New resume' }).first().click()
   await expect(page.getByRole('dialog', { name: 'New resume' })).toBeVisible()
 })
@@ -170,7 +170,7 @@ test('the rail still reaches every destination', async ({ page }) => {
  * This is a regression test with a specific shape in mind. The preview used to
  * re-paginate whenever its container's width changed, and that width was fed by
  * the frame's own scrollbar, which the zoom moved: a loop that mostly settled
- * after a few passes and, at the wrong geometry, did not — at which point React
+ * after a few passes and, at the wrong geometry, did not, at which point React
  * gives up on a chain of nested updates with "Maximum update depth exceeded".
  * Collapsing the sidebar repeatedly is what walks the zoom across geometries.
  */

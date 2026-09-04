@@ -1,7 +1,7 @@
 /**
  * The persistence layer.
  *
- * Everything above this line talks to repositories, never to Dexie directly —
+ * Everything above this line talks to repositories, never to Dexie directly,
  * that boundary is what keeps IndexedDB's constraints (no null in an index,
  * blob lifetimes, transaction scope) from leaking into feature code.
  */

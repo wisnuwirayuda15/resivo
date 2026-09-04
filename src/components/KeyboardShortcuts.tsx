@@ -10,7 +10,7 @@ import { useOs } from '@mantine/hooks'
  *
  * It documents what is bound and nothing else. A sheet listing shortcuts the app
  * does not have is worse than no sheet, so the three groups here are the three
- * places a keystroke means something different — and the reason it differs is
+ * places a keystroke means something different, and the reason it differs is
  * given, because "undo does something else in the code pane" is surprising until
  * you know the pane has its own history.
  */

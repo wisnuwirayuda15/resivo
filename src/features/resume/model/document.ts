@@ -1,5 +1,5 @@
 /**
- * The canonical resume document model — the single source of truth.
+ * The canonical resume document model, the single source of truth.
  *
  * Markdown editing, visual editing, template rendering and export all read and
  * write THIS tree. There is deliberately no second representation: the Markdown
@@ -91,7 +91,7 @@ export interface ParagraphBlock {
  * One item of a list.
  *
  * `list` is what makes nesting possible, and it holds a whole list rather than
- * just items so a bulleted list can contain a numbered one — which is exactly
+ * just items so a bulleted list can contain a numbered one, which is exactly
  * what Markdown allows and what a flat `Array<InlineText>` could not express.
  */
 export interface ListItem {
@@ -111,7 +111,7 @@ export interface NestedList {
 /**
  * A list. Bulleted by default, numbered when `ordered` is set.
  *
- * The kind is still `bulletList` because a list is a list — the marker is a
+ * The kind is still `bulletList` because a list is a list, the marker is a
  * property of it, not a different kind of block, and templates that override
  * the renderer key off the kind.
  */
@@ -127,7 +127,7 @@ export interface BulletListBlock {
  * A subheading inside a section.
  *
  * The level is the Markdown depth it is written at. Depth 2 is what opens a
- * section, so a heading block is always deeper than that — there is no level
+ * section, so a heading block is always deeper than that, there is no level
  * that could be read back as a section boundary.
  */
 export interface HeadingBlock {
@@ -223,7 +223,7 @@ export interface DividerBlock {
  * A forced page break.
  *
  * A block rather than a section flag, because a break belongs between two
- * particular things — half way down Experience, before the references — and only
+ * particular things (half way down Experience, before the references), and only
  * a block can sit there. It renders as a zero-height marker, so the height the
  * paginator measures is the height the printer produces whether the marker is
  * drawn or not.
@@ -233,7 +233,7 @@ export interface PageBreakBlock {
   kind: 'pageBreak'
 }
 
-/** Icon paired with a label — contact rows, links, locations. */
+/** Icon paired with a label, contact rows, links, locations. */
 export interface IconLabelBlock {
   id: string
   kind: 'iconLabel'
@@ -242,7 +242,7 @@ export interface IconLabelBlock {
 }
 
 /**
- * Escape hatch for Markdown this model does not represent — raw HTML,
+ * Escape hatch for Markdown this model does not represent, raw HTML,
  * footnotes, definitions. The original source is kept verbatim so the
  * round-trip stays lossless; the preview renders it as preformatted text and
  * the editor shows a non-blocking warning. Never silently drop input.
@@ -300,7 +300,7 @@ export interface SectionStyleOverride {
   columns?: 1 | 2
   /**
    * `page` starts the section on a fresh sheet. Absent and `auto` both mean
-   * "wherever it falls", which is the default a resume wants — a forced break is
+   * "wherever it falls", which is the default a resume wants, a forced break is
    * a decision about one section, not a habit.
    */
   breakBefore?: 'auto' | 'page'
@@ -329,7 +329,7 @@ export interface Section {
 export interface HeaderBlock {
   name: InlineText
   headline?: InlineText
-  /** Contact rows — email, phone, links. Each may carry an icon. */
+  /** Contact rows, email, phone, links. Each may carry an icon. */
   contacts: Array<ContactItem>
   /** Row id in the `images` table. */
   avatarImageId?: string
@@ -382,7 +382,7 @@ export interface DesignConfig {
   typography: {
     bodyFont: FontRef
     headingFont?: FontRef
-    /** Body size in points — resumes are print documents, so pt not px. */
+    /** Body size in points, resumes are print documents, so pt not px. */
     baseSize: number
     /** Modular scale ratio used to derive heading sizes. */
     scale: number

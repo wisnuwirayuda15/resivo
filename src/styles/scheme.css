@@ -1,5 +1,5 @@
 /**
- * Semantic colour aliases — the layer everything else consumes.
+ * Semantic colour aliases, the layer everything else consumes.
  *
  * Mantine sets `data-mantine-color-scheme="light" | "dark"` on <html> (it
  * resolves "auto" to one of those at runtime), so the design system's
@@ -15,10 +15,10 @@
  *
  * NOTE: nothing here reaches the resume. The preview renders inside
  * `.resivo-paper`, which resets to `--paper-*` tokens and stays light in both
- * schemes — see `src/features/templates/paper.css`.
+ * schemes, see `src/features/templates/paper.css`.
  */
 
-/* Light — also the default before the scheme attribute is applied */
+/* Light, also the default before the scheme attribute is applied */
 :root,
 [data-mantine-color-scheme='light'] {
   /* Max two background values per view: --bg-app plus --bg-surface */

@@ -1,6 +1,6 @@
 # Resivo
 
-A local-first resume builder. Everything lives in your browser — no account, no
+A local-first resume builder. Everything lives in your browser, no account, no
 server, no network request that carries your data anywhere.
 
 Write a resume in Markdown or edit it directly on the page, style it with a
@@ -48,7 +48,7 @@ to hover each one to find out which is which.
 
 **Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
 style controls on the right. Panel widths are draggable and remembered. Below
-1200px — where three panes and the sidebar no longer fit — the same three become
+1200px (where three panes and the sidebar no longer fit) the same three become
 one behind a tab strip rather than overflowing sideways. Nothing is dropped on a
 small screen: the controls a narrow pane cannot show inline fold into a popover,
 and the sidebar becomes a drawer.
@@ -59,13 +59,13 @@ convention could never recover reliably. Headings, lists of either kind at any
 depth, task lists, tables, quotes and fences are all typeset. Sections are
 opened by the shallowest heading level in the file, so a resume written
 elsewhere with `###` headings works as pasted. It round-trips losslessly:
-what is left — raw HTML, footnotes, link definitions — is kept verbatim and
+what is left (raw HTML, footnotes, link definitions) is kept verbatim and
 flagged as a warning rather than silently dropped, and text that arrives above
 the first heading goes into an untitled section rather than being refused.
 
 **A guide, and a prompt.** The editor carries the format's own documentation:
 every directive with a working example, and what custom CSS can and cannot reach.
-Two buttons copy it — one the guide, one a prompt that states the whole format to
+Two buttons copy it, one the guide, one a prompt that states the whole format to
 a language model, including what never to emit, so a resume you asked an
 assistant to write comes back in a shape this app can read. Every example in it
 is parsed by the real codec in a test, because a syntax guide's failure mode is
@@ -73,7 +73,7 @@ being wrong rather than being ugly.
 
 **Visual editing.** Click any text on the paper to edit it in place; drag blocks
 and sections to reorder them, or use the move buttons beside them. Switching the
-editor on cannot move a page break — the chrome is never part of what the
+editor on cannot move a page break, the chrome is never part of what the
 paginator measures.
 
 **Templates and style.** Four ATS-friendly templates (`classic`, `modern`,
@@ -89,7 +89,7 @@ paginator does _not_ do is split an item: an entry never breaks mid-entry, and
 by the same token a paragraph is never balanced across a break.
 
 **Custom CSS.** Your own stylesheet, applied to the resume only. It is
-sanitized — no `@import`, no external `url()`, no `position: fixed` — and injected
+sanitized (no `@import`, no external `url()`, no `position: fixed`), and injected
 into a cascade layer above the template, so it can restyle the paper but cannot
 reach the app around it or break the pagination it was measured against.
 
@@ -104,14 +104,14 @@ inline SVG so they survive into an export.
 
 **Export.** HTML is one file with no external reference of any kind: images,
 custom fonts and the bundled typefaces are all inlined. PDF is that same file,
-printed — built, handed to the browser in a frame of its own and thrown away, so
+printed, built, handed to the browser in a frame of its own and thrown away, so
 the PDF and the HTML export are one artefact with two destinations and neither
 can drift from the preview. Markdown uses the same serializer the editor reads.
 
 **Keyboard and discovery.** `Ctrl/Cmd+K` opens a command palette over every page
 and command; the application menu lists the shortcuts and the things worth
-knowing. A first visit offers a short tour — of the library, and of the editor
-the first time a resume is opened — which can be skipped from any step and
+knowing. A first visit offers a short tour (of the library, and of the editor
+the first time a resume is opened), which can be skipped from any step and
 restarted from that menu or the palette. Both run at any width: on a screen
 where the editor is one pane behind a tab strip, the tour opens the tab each
 step needs and points at that tab rather than at a column that is not there.
@@ -120,7 +120,7 @@ step needs and points at that tab rather than at a column that is not there.
 
 The preview is a same-origin **iframe**, and that choice drives much of the
 architecture. Only a separate document gives its own `@page` rule, its own root
-font size, and a cascade the app cannot leak into — so the paper stays light
+font size, and a cascade the app cannot leak into, so the paper stays light
 while the app is dark, and the document whose HTML is exported is the one on
 screen.
 
@@ -130,16 +130,16 @@ using the breaks that produced. Both passes render the same React elements, so
 what was measured is what appears. Export reuses those breaks rather than
 re-deriving them.
 
-That is also why CSS fragmentation properties — `orphans`, `widows`,
-`break-inside` — are deliberately absent from the print stylesheet. Each page box
+That is also why CSS fragmentation properties (`orphans`, `widows`,
+`break-inside`) are deliberately absent from the print stylesheet. Each page box
 is assigned exactly one sheet, so there is no CSS fragmentation left for them to
 influence, and `break-inside: avoid` on an item that printed a fraction taller
 than it measured would let the browser move it to a sheet of its own and add a
 page the preview never showed. The equivalent guarantees are structural instead:
 items are atomic, and a heading is kept with what follows it.
 
-The document is one typed model, and every edit — a keystroke in the Markdown
-pane, a slider in the style panel, a drag on the paper — goes through the same
+The document is one typed model, and every edit (a keystroke in the Markdown
+pane, a slider in the style panel, a drag on the paper) goes through the same
 typed recipes. That is what keeps one undo history coherent across three very
 different editing surfaces.
 
@@ -147,7 +147,7 @@ different editing surfaces.
 
 **There is no version history, and that is a decision.** Undo covers the whole
 session and every surface, and the JSON backup covers the cases that outlive
-one — a machine lost, a browser cleared, a document taken somewhere else. A
+one, a machine lost, a browser cleared, a document taken somewhere else. A
 revision store would spend the device's storage on a recovery path those two
 already provide, on an app whose whole premise is that the storage is finite and
 local. If a resume needs to be kept as it was, save a backup or export the
@@ -157,7 +157,7 @@ Markdown; both are one click.
 it was written.** It lists Iconify web components in the stack and Phosphor with
 a searchable picker in its own section; Phosphor is what was built, because the
 picker has to render thousands of glyphs under virtualization and an export has
-to inline real SVG — neither of which a webfont serves. And it asks for three
+to inline real SVG, neither of which a webfont serves. And it asks for three
 initial templates, where four exist: `classic`, `modern`, `technical` and
 `editorial`. Neither difference is a gap to close; both are recorded here so the
 PRD can be read as the brief it was rather than as a checklist that half
@@ -243,8 +243,8 @@ Playwright, in a real Chromium. This is the only place the parts that exist only
 in a browser get exercised: a Mantine modal, a Monaco editor that has actually
 laid itself out, the preview iframe, an edit made by clicking on the paper, a
 page count that changes when a break is inserted, and IndexedDB surviving a
-reload. `e2e/workflow.spec.ts` is the whole thing end to end — create, edit,
-restyle, add an image, export, group, back up, reload, wipe, restore — and it is
+reload. `e2e/workflow.spec.ts` is the whole thing end to end (create, edit,
+restyle, add an image, export, group, back up, reload, wipe, restore), and it is
 the test that says the app works, rather than that its parts do.
 
 `openEmptyApp` starts every spec from a deleted database, and marks the
@@ -267,6 +267,6 @@ bun run build
 node .output/server/index.mjs
 ```
 
-Any static or Node-compatible host works — there is no database to provision and
+Any static or Node-compatible host works, there is no database to provision and
 no environment variable to set, because the server only ever ships the app
 itself. For host-specific presets see https://v3.nitro.build/deploy.

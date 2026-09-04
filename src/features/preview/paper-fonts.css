@@ -4,7 +4,7 @@
  * Linked into the iframe as a real stylesheet rather than injected as text,
  * because `@font-face` needs resolvable URLs: Vite rewrites the paths inside
  * these packages when it processes the file, which a `?raw` import would skip.
- * The WOFF2 files themselves are shared with the app — this only re-declares the
+ * The WOFF2 files themselves are shared with the app, this only re-declares the
  * faces inside the iframe's document, which has its own font registry.
  *
  * Nothing is fetched from a CDN, here or anywhere. Resivo works offline.
@@ -12,7 +12,7 @@
  * The three stacks are restated rather than imported from the app's tokens: the
  * app's `--font-sans` and `--font-mono` come out of the generated `theme.css`,
  * which carries the whole Mantine and Tailwind base with it. Pulling that in
- * would drag the app's colour scheme into the paper — the one thing the iframe
+ * would drag the app's colour scheme into the paper, the one thing the iframe
  * exists to prevent. Keep these in step with `theme.ts` and `styles/fonts.css`.
  */
 @import '@fontsource-variable/instrument-sans';

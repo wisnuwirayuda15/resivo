@@ -5,7 +5,7 @@ import { create } from 'zustand'
  *
  * Below the three-pane breakpoint the editor is one pane behind a tab strip, so
  * a tour step that talks about the style panel has nothing to point at until
- * that tab is the active one — and four of the editor tour's six steps are in
+ * that tab is the active one, and four of the editor tour's six steps are in
  * that position. This is the channel that lets the tour ask.
  *
  * A store rather than props because the two ends are far apart: the tour

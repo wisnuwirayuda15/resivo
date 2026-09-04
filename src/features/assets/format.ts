@@ -9,7 +9,7 @@
 export const formatBytes = (bytes: number): string =>
   bytes < 1024
     ? // Below a kilobyte, rounding to KB reports "0 KB" for a file that plainly
-      // exists — which reads as a failed upload.
+      // exists, which reads as a failed upload.
       `${bytes} B`
     : bytes < 1024 * 1024
       ? `${Math.round(bytes / 1024)} KB`

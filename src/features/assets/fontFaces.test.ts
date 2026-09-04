@@ -25,7 +25,7 @@ describe('fontFaceCss', () => {
     expect(css).toContain('font-style: normal')
   })
 
-  /** A wrong `format()` is not ignored — the browser refuses the face — so each
+  /** A wrong `format()` is not ignored (the browser refuses the face), so each
    * stored format has to map to the hint CSS actually expects. */
   it.each([
     ['woff2', 'woff2'],
@@ -78,7 +78,7 @@ describe('fontFaceCss', () => {
     ])
 
     // One rule, and one declaration block. The words from the attack survive as
-    // inert text inside the quoted family — which is correct, and the point:
+    // inert text inside the quoted family, which is correct, and the point:
     // nothing can leave the quotes, so nothing is ever parsed as CSS.
     expect(css.match(/\{/g)).toHaveLength(1)
     expect(css.match(/\}/g)).toHaveLength(1)

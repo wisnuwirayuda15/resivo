@@ -3,7 +3,7 @@
  *
  * A blob and an anchor, not a data URL: a data URL puts the whole file in the
  * `href`, which browsers cap and which shows the entire document in the download
- * bar. The URL is revoked on the next turn of the event loop — after the click
+ * bar. The URL is revoked on the next turn of the event loop, after the click
  * has been dispatched, and before it can outlive the file it points at.
  */
 

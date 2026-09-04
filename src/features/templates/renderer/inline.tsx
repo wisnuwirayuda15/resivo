@@ -12,7 +12,7 @@ import type {
  * Renders the document's rich inline text.
  *
  * `InlineText` is a node array rather than a Markdown string, which is what
- * makes the Markdown round-trip deterministic — and it means this renderer is
+ * makes the Markdown round-trip deterministic, and it means this renderer is
  * the only thing that decides how a mark looks. Nothing here parses; it maps.
  */
 

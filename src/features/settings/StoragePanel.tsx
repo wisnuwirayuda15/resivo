@@ -20,7 +20,7 @@ import {
  * Deliberately not a quota bar. A browser's storage budget depends on the disk,
  * the origin and how much the user has visited the site, and
  * `navigator.storage.estimate()` returns a number that is padded, shared with
- * other origins and different in a private window — so drawing "23% full" would
+ * other origins and different in a private window, so drawing "23% full" would
  * be inventing precision. What is honest is what the tables actually hold.
  */
 
@@ -77,8 +77,8 @@ export const StoragePanel: React.FC = () => {
       <Text className="text-muted mt-3 max-w-[62ch] text-[13px]">
         Resumes themselves are text and take a negligible amount of room; images
         and fonts are what a device notices. Nothing is deleted automatically,
-        because an asset can be unused simply because it has not been placed yet
-        — the Images and Fonts pages are where that decision is made.
+        because an asset can be unused simply because it has not been placed
+        yet: the Images and Fonts pages are where that decision is made.
       </Text>
     </Box>
   )

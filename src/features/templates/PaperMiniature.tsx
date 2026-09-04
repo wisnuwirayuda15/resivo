@@ -7,9 +7,9 @@ import type { TemplateId } from '@/features/resume/model/document'
 /**
  * A resume shown as ruled bars rather than as type.
  *
- * Built from a handful of 1–7px boxes instead of a rendered page or a stored
- * screenshot: it stays crisp at any zoom, needs no asset pipeline, and — because
- * it sits inside `.resivo-paper` — it picks up the template's real paper tokens,
+ * Built from a handful of 1-7px boxes instead of a rendered page or a stored
+ * screenshot: it stays crisp at any zoom, needs no asset pipeline, and (because
+ * it sits inside `.resivo-paper`) it picks up the template's real paper tokens,
  * so the accent colour shown here is the one the resume will print with.
  *
  * The three sizes are the three places it appears: a library card, a template

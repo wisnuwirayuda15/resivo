@@ -16,11 +16,11 @@ import type { Recipe } from '@/features/editor/mutations'
 import type { ResumeDocument } from '@/features/resume/model/document'
 
 /**
- * Panel 3 — the style inspector.
+ * Panel 3, the style inspector.
  *
  * Three tabs, fixed by the design system: Style, Sections, Assets. Each is a
  * different way of editing the same document, and all three write through
- * `apply`, so the preview is never told to update — it re-renders because the
+ * `apply`, so the preview is never told to update: it re-renders because the
  * store changed, exactly as it does for a keystroke in the Markdown editor.
  *
  * The panel scrolls internally. Its header and tab strip stay put, because the
@@ -42,7 +42,7 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
     <aside className={cn('bg-surface flex min-h-0 flex-col', className)}>
       {/* `keepMounted={false}` so an inactive tab costs nothing: the style tab
         alone is thirty controlled inputs, and none of them holds state worth
-        preserving across a tab switch — every value they show lives in the
+        preserving across a tab switch, every value they show lives in the
         document. It belongs on `Tabs`, not on each panel: the panel-level prop
         can only force a panel to stay mounted, never the reverse. */}
       <Tabs

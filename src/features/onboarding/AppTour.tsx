@@ -28,7 +28,7 @@ import type { TourName } from './seen'
  * that crossed from the library into the editor would spend half its steps
  * darkening the screen and pointing at nothing while the other route's
  * components were unmounted. Each tour runs where its anchors are, and the
- * editor's arrives the first time someone opens a resume — which is also when
+ * editor's arrives the first time someone opens a resume, which is also when
  * it is useful.
  *
  * Nobody is made to finish one. `withSkipButton` is what the user asked for, and
@@ -58,7 +58,7 @@ interface AppTourProps {
  *
  * `bottom` is right for a button or a sidebar row, and wrong for a pane: three
  * of the editor's anchors are full-height columns, and "below" a target taller
- * than the viewport is off the bottom of the screen — which `shift` cannot
+ * than the viewport is off the bottom of the screen, which `shift` cannot
  * rescue, because it only moves along the cross axis. Beside a tall target the
  * popover is centred on it instead, which is on screen by construction.
  *
@@ -125,7 +125,7 @@ export const AppTour: React.FC<AppTourProps> = ({
   /**
    * Started in an effect, never during render.
    *
-   * `hasSeenTour` reads `localStorage`, which does not exist on the server —
+   * `hasSeenTour` reads `localStorage`, which does not exist on the server,
    * and starting false on both passes is what keeps the first client render
    * identical to the markup it hydrates.
    */
@@ -200,7 +200,7 @@ export const AppTour: React.FC<AppTourProps> = ({
       onOnboardingTourEnd={finish}
       /**
        * Two of the library's steps point at rows in the sidebar, which is a
-       * drawer below `sm` — so the tour opens it for those and closes it again
+       * drawer below `sm`, so the tour opens it for those and closes it again
        * on the way out. Without this the tour dimmed the screen, highlighted
        * nothing, and left no control on screen to go on with.
        *
@@ -220,7 +220,7 @@ export const AppTour: React.FC<AppTourProps> = ({
          * and the step change one commit; the package re-measures its cutout on
          * a 50ms poll for 1.5s afterwards, which covers the pane mounting.
          *
-         * A step with no pane of its own — the last one points at the app bar —
+         * A step with no pane of its own, the last one points at the app bar,
          * leaves the request where it was rather than dropping it. Releasing it
          * mid-tour would swap the pane behind the card for no reason the reader
          * can see; the release belongs at the end, and `finish` does it.
@@ -235,7 +235,7 @@ export const AppTour: React.FC<AppTourProps> = ({
        * Skip is given a real button.
        *
        * The package draws it as a Mantine `Anchor` with no `href`, which is an
-       * `<a>` that is neither focusable nor announced as anything — so the one
+       * `<a>` that is neither focusable nor announced as anything, so the one
        * control the user was promised could only be reached with a pointer.
        */
       skipNavigation={(controller) => (

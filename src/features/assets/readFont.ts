@@ -3,7 +3,7 @@
  *
  * A bad font is worse than a bad image: the browser silently falls back, so the
  * resume keeps printing but in the wrong face, and nothing anywhere says why.
- * So the file is not merely sniffed — it is handed to the font engine and only
+ * So the file is not merely sniffed, it is handed to the font engine and only
  * accepted if that engine parses it.
  */
 
@@ -47,7 +47,7 @@ const detectFormat = (head: Uint8Array): FontRecord['format'] | undefined => {
  *
  * `FontFace.load()` is the only honest check available in a browser: it runs the
  * same parser that would later refuse the face, so a file that passes here
- * cannot fail silently on the paper. The face is never added to the document —
+ * cannot fail silently on the paper. The face is never added to the document,
  * constructing and loading it is enough to validate.
  */
 const validate = async (bytes: ArrayBuffer): Promise<void> => {
@@ -133,7 +133,7 @@ export const readFontFile = async (file: File): Promise<AddFontInput> => {
 
   if (format === undefined) {
     throw new FontRejected(
-      'That file is not a WOFF2, WOFF, TrueType or OpenType font — whatever its ' +
+      'That file is not a WOFF2, WOFF, TrueType or OpenType font, whatever its ' +
         'name says.',
     )
   }

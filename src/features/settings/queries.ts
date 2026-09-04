@@ -23,8 +23,8 @@ export const settingKeys = {
  * The template the last resume was created with.
  *
  * A preference rather than a document field: someone who writes their resumes in
- * `editorial` should not have to pick it every time, and the alternative — the
- * dialog defaulting to `classic` for ever — is a small tax paid on every new
+ * `editorial` should not have to pick it every time, and the alternative (the
+ * dialog defaulting to `classic` for ever) is a small tax paid on every new
  * resume.
  */
 export const useLastTemplate = () =>

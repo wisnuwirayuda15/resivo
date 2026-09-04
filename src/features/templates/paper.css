@@ -1,10 +1,10 @@
 /**
- * Paper tokens — the resume's own styling, deliberately separate from the app.
+ * Paper tokens, the resume's own styling, deliberately separate from the app.
  *
  * The resume preview NEVER follows the app theme. Anything inside
  * `.resivo-paper` resets to template-owned light paper tokens and pins
  * `color-scheme: light`, so in dark mode the page is the brightest thing on
- * screen — intentionally, because it is what will be printed.
+ * screen, intentionally, because it is what will be printed.
  *
  * Used in two places, which is why the rules are NOT wrapped in a cascade layer
  * here:
@@ -55,16 +55,16 @@
 
 /* ---- Template scopes ---- */
 
-/* classic — traditional single-column serif. Uses the baseline above. */
+/* classic: traditional single-column serif. Uses the baseline above. */
 
-/* modern — clean contemporary sans, ink accent rather than colour. */
+/* modern: clean contemporary sans, ink accent rather than colour. */
 .resivo-paper[data-template='modern'] {
   --paper-font-body: var(--font-sans);
   --paper-font-head: var(--font-sans);
   --paper-accent: #1d1d1a;
 }
 
-/* technical — sans body with monospace headings, tighter body size. */
+/* technical: sans body with monospace headings, tighter body size. */
 .resivo-paper[data-template='technical'] {
   --paper-font-body: var(--font-sans);
   --paper-font-head: var(--font-mono);
@@ -72,7 +72,7 @@
   --paper-fs-body: 10pt;
 }
 
-/* editorial — serif throughout with a larger name and a red accent. */
+/* editorial: serif throughout with a larger name and a red accent. */
 .resivo-paper[data-template='editorial'] {
   --paper-font-body: var(--font-serif);
   --paper-font-head: var(--font-serif);

@@ -29,8 +29,8 @@ import type { IconCatalog, IconEntry } from './catalog'
  * The icon picker: all 1512 Phosphor icons, in all six weights, searchable.
  *
  * Two things keep it fast. The glyphs are one lazy import per weight rather than
- * 1512 component modules — and the search index is a seventh file, so typing is
- * never waiting on markup — and the grid is row-virtualized, so at any moment
+ * 1512 component modules (and the search index is a seventh file, so typing is
+ * never waiting on markup), and the grid is row-virtualized, so at any moment
  * about sixty glyphs exist in the DOM, whatever the query matched. Mounting the
  * whole set would be thousands of SVG nodes, which is not a frame-rate problem
  * so much as a several-second-freeze problem.
@@ -48,7 +48,7 @@ const CELL = 40
 const SEARCH_DELAY_MS = 80
 
 /** Single letters, because six full weight names do not fit a 480px dialog and
- * the glyphs in the grid are the real label — the control only has to say which
+ * the glyphs in the grid are the real label, the control only has to say which
  * one is showing. */
 const WEIGHT_LABELS: Record<IconWeight, string> = {
   thin: 'Thin',
@@ -168,7 +168,7 @@ const IconGrid: React.FC<{
     return (
       <Box className="flex flex-1 items-center justify-center p-6">
         <Text className="text-muted text-center text-[12px]">
-          No icon matches that. Try a word for what it depicts —
+          No icon matches that. Try a word for what it depicts,
           &ldquo;mail&rdquo; finds the envelope.
         </Text>
       </Box>
@@ -330,7 +330,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
           aria-label="Search icons"
           data-autofocus
           onChange={(event) => setTyped(event.currentTarget.value)}
-          placeholder="Search 1512 icons — try mail, phone, github"
+          placeholder="Search 1512 icons: try mail, phone, github"
           size="xs"
           value={typed}
         />

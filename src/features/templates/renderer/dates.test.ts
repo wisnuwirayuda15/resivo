@@ -22,7 +22,7 @@ describe('formatDateRange', () => {
 
   it("writes the ongoing end in the document's language", () => {
     // The one word on the paper the app supplies rather than the user. Before
-    // the locale could be set at all, this was always English — next to month
+    // the locale could be set at all, this was always English, next to month
     // names that were not.
     expect(formatDateRange({ start: '2021-03', current: true }, 'id')).toBe(
       `Mar 2021 ${RANGE_DASH} Sekarang`,

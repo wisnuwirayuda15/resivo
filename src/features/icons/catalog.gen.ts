@@ -1,13 +1,13 @@
 /* eslint-disable */
 // prettier-ignore-file
 /**
- * GENERATED — do not edit. Run \`bun run generate-icons\` to rebuild.
+ * GENERATED. Do not edit. Run \`bun run generate-icons\` to rebuild.
  *
  * Source: @phosphor-icons/core.
  * 1512 icons, searchable by name and by tag.
  *
  * Names and search terms only. The markup lives in \`glyphs.<weight>.gen.ts\`,
- * one file per weight — see \`scripts/generate-icon-catalog.mjs\` for why, and
+ * one file per weight, see \`scripts/generate-icon-catalog.mjs\` for why, and
  * \`catalog.ts\` for the reader.
  */
 export const ICON_INDEX_SOURCE = `acorn	*new* savings nut vegetable veggies food groceries market finances nature

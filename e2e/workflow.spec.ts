@@ -26,7 +26,7 @@ test('create, edit, style, export, back up, reload, restore', async ({
 }) => {
   test.slow()
 
-  /** Filled by step 9 and used by step 11 — the disaster it is a backup of
+  /** Filled by step 9 and used by step 11, the disaster it is a backup of
    * happens in between. */
   let backup = Buffer.alloc(0)
 
@@ -56,7 +56,7 @@ test('create, edit, style, export, back up, reload, restore', async ({
     )
 
     // The preview is debounced behind the parse, so this is the assertion that
-    // the whole chain — keystroke, parse, model, render, paginate — completed.
+    // the whole chain (keystroke, parse, model, render, paginate) completed.
     await expect
       .poll(() => paperText(page), { timeout: 15_000 })
       .toMatch(/Wrote the first algorithm/)
@@ -255,7 +255,7 @@ test('create, edit, style, export, back up, reload, restore', async ({
     await expect(page.getByText('Grace Hopper')).toBeVisible()
     await expect(page.getByRole('link', { name: /Applications/ })).toBeVisible()
 
-    // The document, the image and the group all came back — not just the rows.
+    // The document, the image and the group all came back, not just the rows.
     await page.getByText('Ada Lovelace').click()
     await expectPaperReady(page)
     expect(await paperText(page)).toMatch(/Wrote the first algorithm/)

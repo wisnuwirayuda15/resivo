@@ -14,8 +14,8 @@ import type { ResumeDocument } from '@/features/resume/model/document'
  *
  * PDF sits above the file formats and is not one of them: it produces no file,
  * it hands a document to the browser to print. That document is the HTML export
- * — the same bytes, with the typefaces and images inlined and the measured page
- * breaks already in page boxes — so the PDF and the HTML file are one artefact
+ * (the same bytes, with the typefaces and images inlined and the measured page
+ * breaks already in page boxes), so the PDF and the HTML file are one artefact
  * with two destinations, and neither can drift from the preview.
  *
  * It is disabled until the first pagination lands, because the page breaks are
@@ -47,7 +47,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
   /**
    * One path for every entry in the menu, including PDF.
    *
-   * PDF is not an adapter because it produces no file — but it is the same
+   * PDF is not an adapter because it produces no file, but it is the same
    * build, the same failures and the same busy state, so it goes through the
    * same function rather than a second one beside it.
    */

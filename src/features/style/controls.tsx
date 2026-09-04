@@ -17,7 +17,7 @@ import type { ReactNode } from 'react'
  * Every control in the panel is one of these, for two reasons. The panel is
  * 288px wide, so the label/control split has to be identical everywhere or the
  * column of controls looks ragged; and each control has to report its value the
- * same way the document stores it — a number as a number, a colour as a string —
+ * same way the document stores it, a number as a number, a colour as a string,
  * so the panel never has to parse anything on its way into `patchDesign`.
  */
 
