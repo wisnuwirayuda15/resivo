@@ -65,6 +65,15 @@ export const Shell: React.FC<ShellProps> = ({
   const [tourRequests, setTourRequests] = useState(0)
 
   /**
+   * The navbar held open by the tour, kept apart from the one the user opened.
+   *
+   * Separate so the scrim below stays tied to the user's own gesture: the tour
+   * already dims everything except its cutout, and a second veil over that
+   * would darken the very row it is pointing at.
+   */
+  const [tourNav, setTourNav] = useState(false)
+
+  /**
    * Read lazily rather than in an effect, and safe to: nothing the server
    * renders depends on it. The width is a CSS variable that a script in the
    * document head has already set, the toggle's label does not change with the
@@ -96,7 +105,7 @@ export const Shell: React.FC<ShellProps> = ({
     /* Outside the shell, because a tour step points at the sidebar and the app
        bar as well as at the content, and a target has to be below the provider
        to register itself. */
-    <AppTour restartSignal={tourRequests}>
+    <AppTour onRevealSidebar={setTourNav} restartSignal={tourRequests}>
       <AppShell
         layout="alt"
         // The height and width come from the tokens rather than from literals,
@@ -110,7 +119,7 @@ export const Shell: React.FC<ShellProps> = ({
           breakpoint: 'sm',
           // Below the breakpoint the sidebar becomes an overlay, opened by the
           // burger in the header. Desktop keeps it permanently visible.
-          collapsed: { mobile: !navOpened },
+          collapsed: { mobile: !navOpened && !tourNav },
         }}
         padding={0}
         transitionDuration={200}

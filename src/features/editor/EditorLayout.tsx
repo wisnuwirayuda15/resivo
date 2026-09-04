@@ -44,7 +44,21 @@ const PANE_COUNT = 3
 const WIDE = '(min-width: 1200px)'
 
 /** The design system's widths for the two side panels. */
-const CODE_DEFAULT = '420px'
+/**
+ * 400 rather than the design system's 420, by 20px of arithmetic.
+ *
+ * At the narrowest width that offers three panes, the sidebar, the code pane and
+ * the inspector are all fixed, so the preview gets whatever is left:
+ * 1200 − 232 − 420 − 288 − 2 handles = 258px. That is not enough for the
+ * preview's own control row, which was clipped there. Twenty pixels off this
+ * gives it 278 and the row fits.
+ *
+ * It does not make the preview reach its declared 340px minimum at that width —
+ * `Splitter` applies a pane's minimum while dragging, not when handing out the
+ * space left over at mount. That is worth knowing and is not this constant's job
+ * to fix.
+ */
+const CODE_DEFAULT = '400px'
 const INSPECTOR_DEFAULT = '288px'
 
 const DEFAULT_SIZES: Array<PaneSize> = [CODE_DEFAULT, 100, INSPECTOR_DEFAULT]

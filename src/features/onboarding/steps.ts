@@ -30,6 +30,19 @@ export const TOUR_TARGET_IDS = {
   history: 'tour-history',
 } as const
 
+/**
+ * The steps whose anchor is a row in the sidebar.
+ *
+ * Where the sidebar is permanent this means nothing. Where it is an overlay —
+ * a phone, a narrow tablet — those rows are translated off screen, so the tour
+ * would dim the app and point at nothing, with no way forward. `AppTour` opens
+ * the drawer for exactly these.
+ */
+export const SIDEBAR_STEP_IDS: ReadonlySet<string> = new Set([
+  TOUR_TARGET_IDS.assets,
+  TOUR_TARGET_IDS.settings,
+])
+
 const LIBRARY_STEPS: Array<OnboardingTourStep> = [
   {
     id: TOUR_TARGET_IDS.newResume,

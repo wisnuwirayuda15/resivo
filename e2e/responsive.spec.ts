@@ -148,10 +148,32 @@ test('fits a phone, with nothing pushed off the side', async ({ page }) => {
     expect(await overflow()).toBe(0)
   }
 
-  // What the strip keeps at this width, and what it drops.
+  // What the strip keeps at this width.
   await expect(page.getByText('1 page')).toBeVisible()
   await expect(page.getByRole('button', { name: 'Export' })).toBeVisible()
+
+  /**
+   * And what it folds away rather than drops.
+   *
+   * These three were simply absent on a phone, which is the complaint this
+   * covers: an indicator that exists on a desktop and nowhere else is a
+   * feature the small screen does not have.
+   */
   await expect(page.getByRole('button', { name: 'Zoom in' })).toBeHidden()
+  await page.getByRole('button', { name: 'Paper and zoom' }).click()
+
+  await expect(page.getByRole('button', { name: 'Zoom in' })).toBeVisible()
+  await expect(page.getByRole('button', { name: 'Fit width' })).toBeVisible()
+  // The label, not the radio: Mantine's segmented control parks the real input
+  // off-screen and styles the label, so the input is never "visible".
+  await expect(page.locator('label').filter({ hasText: /^A4$/ })).toBeVisible()
+
+  // The zoom really is the paper's, not a readout of its own.
+  const zoom = () => page.getByText(/^\d+%$/).innerText()
+  const before = await zoom()
+
+  await page.getByRole('button', { name: 'Zoom in' }).click()
+  await expect.poll(zoom).not.toBe(before)
 })
 
 /**
@@ -181,4 +203,49 @@ test('the navbar drawer closes when the page beside it is tapped', async ({
 
   await page.mouse.click(PHONE.width - 20, 500)
   await expect(settings).not.toBeInViewport()
+})
+
+/**
+ * The tour, on the screen where it had the least room to work.
+ *
+ * Two things were wrong at phone width. The popover renders at a fixed 374px,
+ * so on a 375px screen the text was clipped and "Next" sat off the right edge —
+ * a tour that could be started and not finished. And two of the library's steps
+ * point at rows in the sidebar, which is a drawer here: the tour dimmed the app,
+ * highlighted nothing, and left nothing on screen to go on with.
+ */
+test('the tour can be walked through on a phone', async ({ page }) => {
+  test.slow()
+
+  await page.setViewportSize(PHONE)
+  await openEmptyApp(page)
+
+  // Opted back in, the way the onboarding spec does.
+  await page.evaluate(() => {
+    localStorage.removeItem('resivo.onboarding.library')
+    localStorage.removeItem('resivo.onboarding.editor')
+  })
+  await page.reload()
+
+  const popover = page.locator(
+    '.mantine-OnboardingTourPopoverContent-popoverContent',
+  )
+  const focused = page.locator('[data-onboarding-tour-focus-reveal-focused]')
+
+  await expect(page.getByText('Start here')).toBeVisible({ timeout: 20_000 })
+
+  // Inside the viewport at every step, and pointing at something visible at
+  // every step — the two halves of "it works here at all".
+  for (const heading of [
+    'Images and fonts are shared',
+    'This is the important one',
+    'Everything, from the keyboard',
+  ]) {
+    await expect(popover).toBeInViewport({ ratio: 1 })
+    await page.getByRole('button', { name: 'Next' }).click()
+    await expect(page.getByText(heading)).toBeVisible()
+    await expect(focused).toBeInViewport({ ratio: 1 })
+  }
+
+  await expect(popover).toBeInViewport({ ratio: 1 })
 })

@@ -42,7 +42,9 @@ to hover each one to find out which is which.
 **Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
 style controls on the right. Panel widths are draggable and remembered. Below
 1200px — where three panes and the sidebar no longer fit — the same three become
-one behind a tab strip rather than overflowing sideways.
+one behind a tab strip rather than overflowing sideways. Nothing is dropped on a
+small screen: the controls a narrow pane cannot show inline fold into a popover,
+and the sidebar becomes a drawer.
 
 **Markdown.** CommonMark and GFM, plus directives such as
 `:::entry{title="…" start="2021-03"}` for the structured entries a heading

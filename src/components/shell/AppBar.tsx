@@ -139,9 +139,8 @@ export const AppBar: React.FC<AppBarProps> = ({
           the other a `Tooltip` child, and both work by cloning what they wrap. */}
       <OnboardingTour.Target id={TOUR_TARGET_IDS.appMenu}>
         <Box className="flex items-center gap-0.5">
-          {/* Out of the row on a phone, where every pixel is contested. The
-              scheme still follows the system by default, and the palette can
-              still switch it. */}
+          {/* Out of the row on a phone, where every pixel is contested — and
+              into the menu below, so the control still exists at every width. */}
           <Box visibleFrom="sm">
             <Tooltip label={isDark ? 'Light theme' : 'Dark theme'}>
               <BarButton
@@ -157,6 +156,15 @@ export const AppBar: React.FC<AppBarProps> = ({
               <BarButton icon="dots-three" label="Application menu" />
             </Menu.Target>
             <Menu.Dropdown>
+              {/* Where the theme toggle goes when the row cannot hold it. Only
+                  below the breakpoint, so it is never offered twice. */}
+              <Menu.Item
+                hiddenFrom="sm"
+                leftSection={<Icon name={isDark ? 'sun' : 'moon'} size={15} />}
+                onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
+              >
+                {isDark ? 'Light theme' : 'Dark theme'}
+              </Menu.Item>
               <Menu.Item
                 leftSection={<Icon name="keyboard" size={15} />}
                 onClick={onShowShortcuts}

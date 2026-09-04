@@ -64,16 +64,13 @@ export const SaveIndicator: React.FC = () => {
       <Box
         aria-live="polite"
         className={cn(
-          'flex flex-none items-center gap-1.5 text-[11px]',
-          'w-auto sm:w-[72px]',
+          'flex w-[72px] flex-none items-center gap-1.5 text-[11px]',
           report.className,
         )}
         role="status"
       >
         <Icon name={report.icon} size={13} />
-        {/* On a phone the glyph carries it alone: the row already holds a title,
-            two history buttons and a menu, and the tooltip still says the word. */}
-        <Text className="truncate" span visibleFrom="sm">
+        <Text className="truncate" span>
           {report.label}
         </Text>
       </Box>

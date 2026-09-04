@@ -5,7 +5,7 @@ import { useMediaQuery } from '@mantine/hooks'
 import { useRouterState } from '@tanstack/react-router'
 
 import { hasSeenTour, markTourSeen } from './seen'
-import { TOUR_TARGET_IDS, tourSteps } from './steps'
+import { SIDEBAR_STEP_IDS, TOUR_TARGET_IDS, tourSteps } from './steps'
 
 import type { ReactNode } from 'react'
 import type { TourName } from './seen'
@@ -38,6 +38,13 @@ interface AppTourProps {
    * than a boolean that is already set.
    */
   restartSignal: number
+  /**
+   * Opens or closes the navbar for a step anchored inside it.
+   *
+   * Only ever called with `true` where the navbar is an overlay: on a wide
+   * screen the sidebar is already there and nothing needs to move.
+   */
+  onRevealSidebar?: (reveal: boolean) => void
 }
 
 /**
@@ -75,6 +82,7 @@ const tourForPath = (pathname: string): TourName | null => {
 export const AppTour: React.FC<AppTourProps> = ({
   children,
   restartSignal,
+  onRevealSidebar,
 }) => {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
@@ -89,6 +97,14 @@ export const AppTour: React.FC<AppTourProps> = ({
    * rather than marked seen, so it still runs on a wider screen later.
    */
   const wide = useMediaQuery('(min-width: 1200px)', true, {
+    getInitialValueInEffect: false,
+  })
+
+  /**
+   * Whether the sidebar is a sidebar rather than a drawer. Mantine's `sm`, the
+   * same breakpoint `AppShell` collapses the navbar at.
+   */
+  const sidebarPermanent = useMediaQuery('(min-width: 48em)', true, {
     getInitialValueInEffect: false,
   })
   const eligible = name !== null && (name !== 'editor' || wide)
@@ -118,6 +134,7 @@ export const AppTour: React.FC<AppTourProps> = ({
 
   const finish = () => {
     setStarted(false)
+    onRevealSidebar?.(false)
 
     if (name !== null) {
       markTourSeen(name)
@@ -149,6 +166,18 @@ export const AppTour: React.FC<AppTourProps> = ({
         },
       })}
       onOnboardingTourEnd={finish}
+      /**
+       * Two of the library's steps point at rows in the sidebar, which is a
+       * drawer below `sm` — so the tour opens it for those and closes it again
+       * on the way out. Without this the tour dimmed the screen, highlighted
+       * nothing, and left no control on screen to go on with.
+       *
+       * The cutout follows: the package re-measures on a 50ms poll for 1.5s
+       * after each step, which comfortably outlasts the drawer's 200ms.
+       */
+      onOnboardingTourChange={(step) =>
+        onRevealSidebar?.(!sidebarPermanent && SIDEBAR_STEP_IDS.has(step.id))
+      }
       /**
        * Skip is given a real button.
        *

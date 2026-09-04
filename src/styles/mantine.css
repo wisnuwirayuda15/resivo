@@ -14,3 +14,22 @@
 @import '@mantine/spotlight/styles.layer.css';
 @import '@mantine/code-highlight/styles.layer.css';
 @import '@gfazioli/mantine-onboarding-tour/styles.layer.css';
+
+/**
+ * The tour's popover, kept inside the viewport.
+ *
+ * It renders at a fixed 374px, which is wider than a 375px phone once the
+ * arrow's offset is added — so on a phone the text was clipped and the "Next"
+ * button was off the right edge, leaving a tour that could be started and not
+ * finished. The package offers no width prop that reaches this element, and a
+ * cap is the right shape for the fix anyway: it changes nothing on a screen
+ * that has the room.
+ *
+ * In the `components` layer, above the package's own `mantine-onboarding-tour`
+ * layer and below Tailwind's utilities.
+ */
+@layer components {
+  .mantine-OnboardingTourPopoverContent-popoverContent {
+    max-width: calc(100vw - 2rem);
+  }
+}

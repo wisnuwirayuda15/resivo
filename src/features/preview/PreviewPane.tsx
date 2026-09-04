@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Box,
+  Popover,
   SegmentedControl,
   Text,
   Tooltip,
@@ -46,6 +47,15 @@ const PAGE_WIDTH_INCHES: Record<PaperSize, number> = {
 
 /** The horizontal padding `.rp-pages` puts around the page, both sides. */
 const WELL_PADDING = 40
+
+/**
+ * The narrowest pane that can hold the whole control row.
+ *
+ * Measured, not chosen: the row needs 538px at its shortest — one page, Letter —
+ * and grows with the page count's digits, so this is that with room for the
+ * count to reach three figures.
+ */
+const STRIP_MIN_WIDTH = 600
 
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value))
@@ -159,19 +169,101 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
   const dimensions = PAGE_DIMENSIONS[size]
 
+  /**
+   * Whether the strip has room for every control, or has to fold.
+   *
+   * Measured from the pane rather than asked of the viewport, because the pane
+   * is what the row has to fit in and the two part company in both directions.
+   * At a 768px viewport — an iPad held upright — the permanent sidebar leaves
+   * this pane 536px and the full row wants 538. In the other direction, three
+   * panes at 1200px leave the preview 258px, so a viewport that is "wide" by
+   * any breakpoint still cannot show the row. Both were clipped; one number
+   * covers both.
+   *
+   * Roomy until measured, so the row does not fold for a frame and then open.
+   */
+  const roomy = wellWidth === 0 || wellWidth >= STRIP_MIN_WIDTH
+
+  const paperSizeControl =
+    onPaperSizeChange === undefined ? null : (
+      <SegmentedControl
+        aria-label="Paper size"
+        // `satisfies` rather than a cast: the literals are checked against
+        // the model's sizes, and `onChange` still narrows to them.
+        data={['Letter', 'A4'] satisfies Array<PaperSize>}
+        onChange={onPaperSizeChange}
+        size="xs"
+        value={size}
+      />
+    )
+
+  /**
+   * The zoom cluster, built once and placed in one of two rows.
+   *
+   * Built as a value rather than duplicated into both branches, so the strip
+   * and the popover cannot drift and there is never a second copy of these
+   * controls in the document with the same accessible names.
+   */
+  const zoomControls = (
+    <Box className="flex items-center gap-1">
+      <Tooltip label="Zoom out">
+        <UnstyledButton
+          aria-label="Zoom out"
+          className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+          onClick={() => step(-1)}
+        >
+          <Icon name="minus" size={14} />
+        </UnstyledButton>
+      </Tooltip>
+
+      {/* Monospace, because it is a number that changes in place — the design
+          system's rule for every numeric readout. */}
+      <Text
+        span
+        className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
+      >
+        {Math.round(zoom * 100)}%
+      </Text>
+
+      <Tooltip label="Zoom in">
+        <UnstyledButton
+          aria-label="Zoom in"
+          className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
+          onClick={() => step(1)}
+        >
+          <Icon name="plus" size={14} />
+        </UnstyledButton>
+      </Tooltip>
+
+      <Tooltip label="Fit width">
+        <UnstyledButton
+          aria-label="Fit width"
+          aria-pressed={pinnedZoom === null}
+          className={cn(
+            'rounded-control flex size-[22px] items-center justify-center',
+            pinnedZoom === null
+              ? 'text-accent bg-selected'
+              : 'text-muted hover:text-body hover:bg-hover',
+          )}
+          onClick={() => setPinnedZoom(null)}
+        >
+          <Icon name="arrows-horizontal" size={14} />
+        </UnstyledButton>
+      </Tooltip>
+    </Box>
+  )
+
+  const sheet = `${dimensions.width} × ${dimensions.height}`
+
   return (
     <section className={cn('flex min-h-0 flex-col', className)}>
       <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTitlebar}>
         <header className="border-line-soft bg-surface flex h-titlebar flex-none items-center gap-3 border-b px-3">
-          {/* The count stays at every width; the sheet's measurements go, since
-              they are a reminder rather than something to act on and they are
-              the widest thing in the row. */}
+          {/* The count stays at every width. The sheet's measurements follow it
+              only when there is room, and move into the popover below. */}
           <Text span className="text-subtle flex-none font-mono text-[11px]">
             {pageCount} {pageCount === 1 ? 'page' : 'pages'}
-            <Text component="span" visibleFrom="sm">
-              {' · '}
-              {dimensions.width} × {dimensions.height}
-            </Text>
+            {roomy ? ` · ${sheet}` : ''}
           </Text>
 
           <Box className="ml-auto flex items-center gap-1">
@@ -190,71 +282,59 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
               />
             )}
 
-            {onPaperSizeChange === undefined ? null : (
-              <SegmentedControl
-                visibleFrom="sm"
-                aria-label="Paper size"
-                // `satisfies` rather than a cast: the literals are checked against
-                // the model's sizes, and `onChange` still narrows to them.
-                data={['Letter', 'A4'] satisfies Array<PaperSize>}
-                onChange={onPaperSizeChange}
-                size="xs"
-                value={size}
-              />
-            )}
+            {roomy ? (
+              <>
+                {paperSizeControl}
+                {zoomControls}
+              </>
+            ) : (
+              /* Everything the strip cannot hold, one tap away.
 
-            {/* Zoom, only where there is room for it.
-
-                Below `sm` the fit-to-width default is the only magnification
-                that makes sense on a screen narrower than the page, and four
-                more controls in a 38px row is what pushed this header — and
-                with it the whole editor — 58px wider than the viewport. */}
-            <Box className="flex items-center gap-1" visibleFrom="sm">
-              <Tooltip label="Zoom out">
-                <UnstyledButton
-                  aria-label="Zoom out"
-                  className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-                  onClick={() => step(-1)}
-                >
-                  <Icon name="minus" size={14} />
-                </UnstyledButton>
-              </Tooltip>
-
-              {/* Monospace, because it is a number that changes in place — the design
-                system's rule for every numeric readout. */}
-              <Text
-                span
-                className="text-subtle w-[3.5em] text-center font-mono text-[11px] tabular-nums"
+                 Not dropped, which is what it was: paper size, zoom and fit
+                 were simply not on a phone at all. These are the same controls
+                 moved rather than copied, so the document never holds a second
+                 Letter/A4 or a second "Fit width". */
+              <Popover
+                position="bottom-end"
+                radius="panel"
+                shadow="lg"
+                width={264}
+                withArrow
               >
-                {Math.round(zoom * 100)}%
-              </Text>
+                <Popover.Target>
+                  <UnstyledButton
+                    aria-label="Paper and zoom"
+                    className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[24px] items-center justify-center"
+                  >
+                    <Icon name="sliders-horizontal" size={15} />
+                  </UnstyledButton>
+                </Popover.Target>
 
-              <Tooltip label="Zoom in">
-                <UnstyledButton
-                  aria-label="Zoom in"
-                  className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
-                  onClick={() => step(1)}
-                >
-                  <Icon name="plus" size={14} />
-                </UnstyledButton>
-              </Tooltip>
+                <Popover.Dropdown>
+                  <Box className="flex flex-col gap-3">
+                    {paperSizeControl === null ? null : (
+                      <Box className="flex items-center justify-between gap-3">
+                        <Text className="text-muted text-[12px]" span>
+                          Paper
+                        </Text>
+                        {paperSizeControl}
+                      </Box>
+                    )}
 
-              <Tooltip label="Fit width">
-                <UnstyledButton
-                  aria-label="Fit width"
-                  aria-pressed={pinnedZoom === null}
-                  className={cn(
-                    'rounded-control flex size-[22px] items-center justify-center',
-                    pinnedZoom === null
-                      ? 'text-accent bg-selected'
-                      : 'text-muted hover:text-body hover:bg-hover',
-                  )}
-                  onClick={() => setPinnedZoom(null)}
-                >
-                  <Icon name="arrows-horizontal" size={14} />
-                </UnstyledButton>
-              </Tooltip>
-            </Box>
+                    <Box className="flex items-center justify-between gap-3">
+                      <Text className="text-muted text-[12px]" span>
+                        Zoom
+                      </Text>
+                      {zoomControls}
+                    </Box>
+
+                    <Text className="text-subtle font-mono text-[11px]" span>
+                      {sheet}
+                    </Text>
+                  </Box>
+                </Popover.Dropdown>
+              </Popover>
+            )}
           </Box>
         </header>
       </OnboardingTour.Target>
