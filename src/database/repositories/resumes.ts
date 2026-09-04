@@ -105,7 +105,12 @@ export interface CreateResumeInput {
   title?: string;
   groupId?: string;
   templateId?: TemplateId;
-  /** Supplied when importing or duplicating; omitted for a blank resume. */
+  /**
+   * The document to store. The new-resume dialog always supplies one, because
+   * it is the thing that knows whether the user asked for the example or a
+   * blank page; the fallback below covers a caller with nothing to say about
+   * the content, which is what a test and a bare "new resume" are.
+   */
   document?: ResumeDocument;
 }
 

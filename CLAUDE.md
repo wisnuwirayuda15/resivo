@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 487 tests in 33 files
-bun run test:e2e         # playwright, 56 specs, chromium only
+bun run test             # vitest, 494 tests in 34 files
+bun run test:e2e         # playwright, 59 specs, chromium only
 bun run lint             # eslint
 bun run check            # prettier --check
 bun run format           # prettier --write, then eslint --fix
@@ -107,6 +107,17 @@ over the real one.
 `ClientOnly`.** The SSR shell is kept and nothing that touches user data runs
 on the server.
 
+**`parseDocument(source, previous)` falls back to position, not just title.**
+Given a previous document, each heading takes the identity of a section that was
+already there, and when no title matches it takes the first one left. That is
+deliberate: it is what lets a section be renamed in the Markdown without losing
+its id, its icon, its hidden flag or its per-section style. It is also wrong for
+building a document out of nothing. Parsing the example resume against a freshly
+created empty document gave its Projects heading the leftover Education
+section's kind, and a template lays a section out by kind. Build from source
+alone (`parseDocument(source)`) whenever "previous" is not a document the user
+has actually been editing. `features/resume/sample.ts` is the one that does.
+
 **Mantine control heights are fixed pixels, not font-derived.** `xs` is 30px
 and `sm` is 36px. The theme defaults every control to `xs`, which is the design
 system's own default height.
@@ -132,7 +143,7 @@ e2e/               Playwright specs, and the moves they share in app.ts
 src/
   routes/          file-based routes
   features/
-    resume/        the document model, schema and queries
+    resume/        the document model, schema, queries and the example
     editor/        store, autosave, undo, Markdown and CSS panes
     preview/       iframe host, paginator, flow, reorder
     templates/     template registry and the renderers

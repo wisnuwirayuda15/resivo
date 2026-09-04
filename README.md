@@ -41,6 +41,16 @@ resumes", at `/resumes`.
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 
+**Two ways to start.** A new resume is either the example, a finished
+one-page resume with entries, dates, a tag list and every section a template
+lays out specially, or a blank page with the four usual sections and nothing in
+them. The example is the default until you pick the other, and then that is
+remembered. The point of it is the first minute: an empty page does not show
+what an entry is or that skills are a `::tags` line, and the writing guide is a
+drawer somebody has to know to open. It is real Markdown, checked against the
+real parser in a test, so what you read in the code pane is what the format
+actually is. A third way in is an existing Markdown file, from the same dialog.
+
 **Sidebar.** Collapses to a 60px rail of icons, from the header or Ctrl/Cmd+B,
 and stays that way across a reload. The rail drops the group list rather than
 shrinking it: every group is the same folder glyph, so a column of them asks you
@@ -196,7 +206,7 @@ e2e/               Playwright specs, and the moves they share
 src/
   routes/          file-based routes (library, editor, assets, settings, about)
   features/
-    resume/        the document model, schema and queries
+    resume/        the document model, schema, queries and the example
     editor/        store, autosave, undo, Markdown and CSS panes
     preview/       iframe host, paginator, flow, reorder
     templates/     template registry and the renderers

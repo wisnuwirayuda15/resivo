@@ -3,8 +3,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { groupRepo, resumeRepo } from "@/database/index";
 
 import type { QueryClient } from "@tanstack/react-query";
-import type { ResumeRecord, ResumeSummary } from "@/database/index";
-import type { TemplateId } from "./model/document";
+import type {
+  CreateResumeInput,
+  ResumeRecord,
+  ResumeSummary,
+} from "@/database/index";
 
 /**
  * Query bindings over the resume and group repositories.
@@ -117,11 +120,15 @@ export const useCreateResume = () => {
   const client = useQueryClient();
 
   return useMutation({
-    mutationFn: (input: {
-      title?: string;
-      groupId?: string;
-      templateId?: TemplateId;
-    }) => resumeRepo.createResume(input),
+    /**
+     * The repository's own input type, rather than a narrower copy of it.
+     *
+     * The copy used to leave `document` out while the new-resume dialog passed
+     * one anyway, through a spread, which is the one shape TypeScript does not
+     * check for excess properties. It worked, and it was one refactor away
+     * from silently dropping an imported resume.
+     */
+    mutationFn: (input: CreateResumeInput) => resumeRepo.createResume(input),
     onSuccess: () => invalidateLibrary(client),
   });
 };

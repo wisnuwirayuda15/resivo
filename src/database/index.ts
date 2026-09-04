@@ -23,6 +23,6 @@ export * as settingsRepo from "./repositories/settings";
 
 export { SETTING_KEYS } from "./repositories/settings";
 
-export type { ResumeSummary } from "./repositories/resumes";
+export type { CreateResumeInput, ResumeSummary } from "./repositories/resumes";
 export type { ImageSummary } from "./repositories/images";
 export type { FontSummary } from "./repositories/fonts";

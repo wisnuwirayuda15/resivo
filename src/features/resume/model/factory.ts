@@ -68,9 +68,11 @@ export const createSection = (
  *
  * Starts with the four sections almost every resume has, each empty, rather
  * than a blank page: an empty section is a visible affordance ("add an entry"),
- * whereas a blank document gives the user nothing to click. Sample content is
- * deliberately not inserted, the user's document should never contain text
- * they did not write.
+ * whereas a blank document gives the user nothing to click.
+ *
+ * Nothing is written into it. A document should never contain text its owner
+ * did not write, so the example resume in `features/resume/sample.ts` is
+ * something the new-resume dialog offers and this is what it offers instead.
  */
 export const createEmptyDocument = (
   templateId: TemplateId = "classic",

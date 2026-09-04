@@ -6,6 +6,7 @@ import {
   FileButton,
   Group,
   Modal,
+  SegmentedControl,
   Select,
   Stack,
   Text,
@@ -16,15 +17,19 @@ import { UNGROUPED } from "@/database/index";
 import { Icon } from "@/features/icons/IconRenderer";
 import { applyMarkdown } from "@/features/markdown/index";
 import { createEmptyDocument } from "../model/index";
+import { createStartingDocument } from "../sample";
 import { templateList } from "@/features/templates/catalog";
 import {
+  useLastResumeStart,
   useLastTemplate,
+  useRememberResumeStart,
   useRememberTemplate,
 } from "@/features/settings/queries";
 
 import { TemplateTile } from "./TemplateTile";
 import { useCreateResume, useGroups } from "../queries";
 
+import type { ResumeStart } from "../sample";
 import type { ResumeDocument, TemplateId } from "../model/document";
 
 /**
@@ -101,6 +106,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
    * under the pointer.
    */
   const [picked, setPicked] = useState<TemplateId | null>(null);
+  /** The starting point, derived from the remembered one for the same reason. */
+  const [pickedStart, setPickedStart] = useState<ResumeStart | null>(null);
   const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED);
   const [imported, setImported] = useState<ImportedMarkdown | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
@@ -109,9 +116,17 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   const createResume = useCreateResume();
   const lastTemplate = useLastTemplate();
   const rememberTemplate = useRememberTemplate();
+  const lastStart = useLastResumeStart();
+  const rememberStart = useRememberResumeStart();
 
   const templateId = picked ?? lastTemplate.data ?? "classic";
   const setTemplateId = setPicked;
+
+  /**
+   * An imported file is itself the starting point, so the choice does not
+   * apply while one is loaded rather than silently losing to it.
+   */
+  const start: ResumeStart = pickedStart ?? lastStart.data ?? "sample";
 
   const close = () => {
     onClose();
@@ -119,6 +134,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     // transition.
     setTitle("");
     setPicked(null);
+    setPickedStart(null);
     setGroupId(defaultGroupId ?? UNGROUPED);
     setImported(null);
     setImportError(null);
@@ -178,16 +194,29 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
       ...(title.trim() === "" ? {} : { title: title.trim() }),
       templateId,
       ...(groupId === UNGROUPED ? {} : { groupId }),
-      // Parsed here rather than at import, so the template chosen by now is the
-      // one the document carries.
-      ...(imported === null
-        ? {}
-        : { document: documentFrom(templateId, imported.source).document }),
+      /**
+       * Built here rather than left to the repository's own default, so what
+       * the dialog offered is what gets written and there is one answer to
+       * "what does a new resume contain".
+       *
+       * An imported file is parsed at this point rather than when it was read,
+       * so the template chosen by now is the one the document carries.
+       */
+      document:
+        imported === null
+          ? createStartingDocument(start, templateId)
+          : documentFrom(templateId, imported.source).document,
     });
 
     // Remembered after the resume exists, so a failed create does not change
-    // what the dialog offers next time.
+    // what the dialog offers next time. The starting point is only remembered
+    // when it was the starting point: an import overrides it, and answering a
+    // question the user was not asked would be a guess.
     rememberTemplate.mutate(templateId);
+
+    if (imported === null) {
+      rememberStart.mutate(start);
+    }
 
     close();
     onCreated(created.id);
@@ -216,6 +245,37 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
               />
             ))}
           </Box>
+        </Box>
+
+        <Box>
+          <Text
+            className="text-muted mb-2 text-[12px] font-medium"
+            component="div"
+          >
+            Start from
+          </Text>
+
+          <SegmentedControl
+            data={[
+              { value: "sample", label: "Example resume" },
+              { value: "blank", label: "Blank page" },
+            ]}
+            // An imported file is the starting point, so the choice is shown
+            // as inapplicable rather than left looking as though it still
+            // decides what the resume contains.
+            disabled={imported !== null}
+            fullWidth
+            onChange={(value) => setPickedStart(value)}
+            value={start}
+          />
+
+          <Text className="text-muted mt-2 text-[12px] leading-snug">
+            {imported !== null
+              ? "The imported file decides what is on the page."
+              : start === "sample"
+                ? "A finished resume to edit over, with entries, dates and a skills list already written."
+                : "The four sections almost every resume has, each empty."}
+          </Text>
         </Box>
 
         <Group grow align="flex-start">

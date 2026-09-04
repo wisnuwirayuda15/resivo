@@ -2,6 +2,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { SETTING_KEYS, settingsRepo } from "@/database/index";
 
+import { RESUME_STARTS } from "@/features/resume/sample";
+
+import type { ResumeStart } from "@/features/resume/sample";
 import type { TemplateId } from "@/features/resume/model/document";
 
 /**
@@ -17,6 +20,7 @@ import type { TemplateId } from "@/features/resume/model/document";
 export const settingKeys = {
   all: ["settings"] as const,
   lastTemplate: ["settings", SETTING_KEYS.lastTemplateId] as const,
+  resumeStart: ["settings", SETTING_KEYS.newResumeStart] as const,
 };
 
 /**
@@ -43,6 +47,41 @@ export const useRememberTemplate = () => {
   return useMutation({
     mutationFn: (templateId: TemplateId) =>
       settingsRepo.setSetting(SETTING_KEYS.lastTemplateId, templateId),
+    onSuccess: () => client.invalidateQueries({ queryKey: settingKeys.all }),
+  });
+};
+
+/**
+ * Whether the last new resume started from the example or a blank page.
+ *
+ * The fallback is the example, and only for a device that has never answered:
+ * the empty page was what the app used to do unconditionally, and its failure
+ * mode is that nothing on it says what an entry or a tag list is. Someone who
+ * picks blank once is never shown the example again.
+ *
+ * Validated on the way out rather than trusted. The value is whatever a restored
+ * backup put in the table, and a document built from an unrecognised string
+ * would be neither of the two things the dialog offered.
+ */
+export const useLastResumeStart = () =>
+  useQuery({
+    queryKey: settingKeys.resumeStart,
+    queryFn: async () => {
+      const stored = await settingsRepo.getSetting<unknown>(
+        SETTING_KEYS.newResumeStart,
+        null,
+      );
+
+      return RESUME_STARTS.find((start) => start === stored) ?? "sample";
+    },
+  });
+
+export const useRememberResumeStart = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (start: ResumeStart) =>
+      settingsRepo.setSetting(SETTING_KEYS.newResumeStart, start),
     onSuccess: () => client.invalidateQueries({ queryKey: settingKeys.all }),
   });
 };

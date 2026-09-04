@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 
 /**
  * Shared moves for the end-to-end specs.
@@ -76,11 +76,32 @@ export const openEmptyApp = async (page: Page): Promise<void> => {
   await expect(page.getByRole("link", { name: "Templates" })).toBeVisible();
 };
 
-/** Creates a resume through the dialog, and lands in its editor. */
+/**
+ * Picks one option of a Mantine `SegmentedControl`, by its visible label.
+ *
+ * The click goes to the label and not to the radio it names, which is the one
+ * place in this file that does not go through a role. Mantine renders each
+ * segment's input as a 0 by 0 box behind the label, so a click on the element
+ * that carries the accessible name has no area to land on. The radio is still
+ * what an assertion reads, because it is what holds the state.
+ */
+export const pickSegment = (
+  scope: Locator | Page,
+  label: string,
+): Promise<void> => scope.getByText(label, { exact: true }).click();
+
+/**
+ * Creates a resume through the dialog, and lands in its editor.
+ *
+ * Blank unless a spec asks for the example. The dialog's own default is the
+ * example resume, which is right for a person and wrong for a spec: every test
+ * below writes its own document and would otherwise have to clear somebody
+ * else's first. `starting.spec.ts` is where the default itself is checked.
+ */
 export const createResume = async (
   page: Page,
   title: string,
-  options: { template?: string } = {},
+  options: { template?: string; start?: "Example resume" | "Blank page" } = {},
 ): Promise<void> => {
   /**
    * The app bar's, not the sidebar's and not the empty state's.
@@ -102,6 +123,8 @@ export const createResume = async (
   if (options.template !== undefined) {
     await dialog.getByRole("button", { name: options.template }).click();
   }
+
+  await pickSegment(dialog, options.start ?? "Blank page");
 
   await dialog.getByLabel("Name").fill(title);
   await dialog.getByRole("button", { name: "Create resume" }).click();

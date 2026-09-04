@@ -31,6 +31,12 @@ import type { SettingRecord } from "../records";
 export const SETTING_KEYS = {
   /** Last template chosen in the new-resume dialog. */
   lastTemplateId: "editor.lastTemplateId",
+  /**
+   * Whether the new-resume dialog last started from the example or a blank
+   * page. Remembered for the same reason the template is: someone who writes
+   * their own from nothing should not have to say so on every resume.
+   */
+  newResumeStart: "editor.newResumeStart",
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];
