@@ -19,3 +19,4 @@
 @import './mantine.css'; /* extra Mantine package styles (dates, notifications, spotlight, code, tour) */
 @import './highlight.css'; /* syntax-highlighting tokens, mapped onto the app's palette */
 @import '../features/templates/paper.css'; /* .resivo-paper tokens, for in-app paper miniatures */
+@import '../features/landing/landing.css'; /* scroll-reveal states for the landing page */

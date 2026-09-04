@@ -82,7 +82,8 @@ const tourForPath = (pathname: string): TourName | null => {
     return 'editor'
   }
 
-  return pathname === '/resumes' || pathname === '/' ? 'library' : null
+  // Not '/', which is the landing page and has no shell to point at.
+  return pathname === '/resumes' ? 'library' : null
 }
 
 export const AppTour: React.FC<AppTourProps> = ({

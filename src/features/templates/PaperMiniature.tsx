@@ -12,15 +12,17 @@ import type { TemplateId } from '@/features/resume/model/document'
  * it sits inside `.resivo-paper` — it picks up the template's real paper tokens,
  * so the accent colour shown here is the one the resume will print with.
  *
- * The two sizes are the two places it appears: a library card and a template
- * tile. They differ only in metrics, which is why they are a table rather than
- * two components.
+ * The three sizes are the three places it appears: a library card, a template
+ * tile, and the landing page. They differ only in metrics, which is why they
+ * are a table rather than three components.
  *
  * Geometry is expressed in Tailwind arbitrary values rather than Mantine's
  * `h`/`w`/`mt` style props, because those convert a bare number to `rem` and
  * these bars are sub-pixel-sensitive hairlines: a 1px rule that scales with the
  * root font size stops being a 1px rule.
  */
+
+export type PaperMiniatureSize = 'card' | 'tile' | 'hero'
 
 interface Metrics {
   /** The page box. */
@@ -39,7 +41,24 @@ interface Metrics {
   sections: number
 }
 
-const METRICS: Record<'card' | 'tile', Metrics> = {
+const METRICS: Record<PaperMiniatureSize, Metrics> = {
+  /**
+   * The landing page's, where the miniature is the largest thing on screen
+   * rather than a thumbnail beside a name.
+   *
+   * Three sections instead of four: at 224 by 290 the bars are big enough that
+   * a fourth would reach the bottom edge, and a page with no room left at the
+   * foot reads as a page that overflowed.
+   */
+  hero: {
+    page: 'h-[290px] w-[224px] px-6 py-7 shadow-paper',
+    name: 'h-[13px] w-[58%]',
+    contact: 'mt-[7px] h-[5px] w-[40%]',
+    section: 'mt-[20px]',
+    heading: 'h-[7px] w-[30%]',
+    line: 'mt-[6px] h-[4px]',
+    sections: 3,
+  },
   card: {
     page: 'h-[150px] w-[116px] px-3 py-3.5 shadow-paper',
     name: 'h-[7px] w-[60%]',
@@ -66,7 +85,7 @@ const LINES = [0, 1, 2]
 
 interface PaperMiniatureProps {
   templateId: TemplateId
-  size: 'card' | 'tile'
+  size: PaperMiniatureSize
   className?: string
 }
 

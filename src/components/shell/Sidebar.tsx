@@ -6,16 +6,17 @@ import {
   Tooltip,
   UnstyledButton,
 } from '@mantine/core'
-import { Link } from '@tanstack/react-router'
 import { useMediaQuery } from '@mantine/hooks'
+import { Link } from '@tanstack/react-router'
 
-import { Icon } from '@/features/icons/IconRenderer'
-import { GroupRow } from '@/features/resume/components/GroupRow'
 import { UNGROUPED } from '@/database/index'
-import { useGroupCounts, useGroups } from '@/features/resume/queries'
+import { Icon } from '@/features/icons/IconRenderer'
 import { TOUR_TARGET_IDS } from '@/features/onboarding/steps'
+import { GroupRow } from '@/features/resume/components/GroupRow'
+import { useGroupCounts, useGroups } from '@/features/resume/queries'
 import { cn } from '@/lib/utils'
 
+import { Logo, LogoMark } from './Logo'
 import {
   NavButton,
   NavGroup,
@@ -23,7 +24,6 @@ import {
   NavLink,
   navItemClassName,
 } from './NavItem'
-import { Logo, LogoMark } from './Logo'
 
 interface SidebarProps {
   onNewResume: () => void
@@ -114,7 +114,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <LogoMark />
         ) : (
           <>
-            <Logo />
+            <Link to="/">
+              <Logo />
+            </Link>
             {/* Privacy stated as fact, not as a boast. */}
             <Badge variant="default" size="xs" radius="pill">
               local

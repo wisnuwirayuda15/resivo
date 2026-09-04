@@ -31,6 +31,13 @@ The app runs at http://localhost:3000.
 
 ## What it does
 
+**A landing page at `/`.** The root used to redirect straight into the
+library, which meant an app whose whole premise is that your data stays on your
+own device had nowhere to say so before asking for it. The page is served from
+the same SSR shell, reads nothing from the database, and shows the format next
+to the page it produces. The library is still the canonical URL for "all my
+resumes", at `/resumes`.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 
@@ -185,6 +192,7 @@ src/
     assets/        images and fonts
     export/        PDF, HTML and Markdown adapters
     guide/         the writing guide, and the prompt for a model
+    landing/       the marketing page at `/`
     backup/        whole-database backup and restore
     settings/      app preferences and storage usage
     commands/      the command palette

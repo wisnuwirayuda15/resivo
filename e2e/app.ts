@@ -37,7 +37,9 @@ export const PNG_2X2 =
  * connection closes — which, in a page that is still running, is never.
  */
 export const openEmptyApp = async (page: Page): Promise<void> => {
-  await page.goto('/')
+  // The library, not '/': that is the landing page now, and every spec here
+  // is about the app behind it.
+  await page.goto('/resumes')
 
   /**
    * Marked as a returning user, unless a spec asks otherwise.

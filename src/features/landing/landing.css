@@ -1,0 +1,51 @@
+/**
+ * Motion for the landing page, and nothing else.
+ *
+ * Two states on one attribute rather than a keyframe per section. A transition
+ * can be interrupted and retargeted halfway; a keyframe restarts from zero, so
+ * a reader who scrolls back up mid-reveal would see the animation begin again.
+ *
+ * Durations and curves come from the design system's own motion tokens, so the
+ * page moves at the same speed the app does. `--ease-entrance` is the strong
+ * ease-out the app already uses for things arriving on screen.
+ *
+ * In the `components` layer, so a Tailwind utility on the element still wins.
+ */
+@layer components {
+  [data-reveal] {
+    transition:
+      opacity var(--duration-slow) var(--ease-entrance),
+      transform var(--duration-slow) var(--ease-entrance);
+  }
+
+  /**
+   * The pre-reveal state.
+   *
+   * 10px, not 40px. The purpose is to sequence the reading order, not to make
+   * the page perform, and a long travel on every section is the thing that
+   * makes a marketing page feel like it is fighting the scroll.
+   */
+  [data-reveal='pending'] {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  [data-reveal='shown'] {
+    opacity: 1;
+    transform: none;
+  }
+
+  /**
+   * Reduced motion keeps the content and drops the movement.
+   *
+   * Written as `[data-reveal]` so it has the same specificity as the pending
+   * rule above and wins on order, with no `!important` needed.
+   */
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal] {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+  }
+}
