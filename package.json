@@ -20,7 +20,8 @@
     "generate-favicon": "node scripts/render-favicon.mjs",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "generate-og": "node scripts/render-og.mjs"
+    "generate-og": "node scripts/render-og.mjs",
+    "test:e2e:pwa": "playwright test --config playwright.pwa.config.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

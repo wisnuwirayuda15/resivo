@@ -38,6 +38,14 @@ the same SSR shell, reads nothing from the database, and shows the format next
 to the page it produces. The library is still the canonical URL for "all my
 resumes", at `/resumes`.
 
+**Installable, and it opens with no network.** Resivo can be installed from the
+browser and put in a dock or on a home screen, where it runs in its own window
+and starts at the library rather than the landing page. A service worker caches
+the app itself, so a reload works with the network gone: your resumes were
+always on the device, and now the thing that reads them is too. Nothing is
+precached in bulk (the build is 21 MB, most of it Monaco's language workers), so
+what the app has used is what it can open without a connection.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 
@@ -203,6 +211,7 @@ boundaries.
 
 ```
 e2e/               Playwright specs, and the moves they share
+e2e-pwa/           the offline spec, which needs a real build
 src/
   routes/          file-based routes (library, editor, assets, settings, about)
   features/
@@ -236,11 +245,12 @@ bun run build          # production build
 bun run typecheck      # tsc --noEmit
 bun run test           # vitest
 bun run test:e2e       # playwright, in a real browser
+bun run test:e2e:pwa   # playwright against a real build, for offline
 bun run lint           # eslint
 bun run check          # prettier --check
 bun run format         # prettier --write, then eslint --fix
 bun run generate-icons # rebuild the icon catalog from @phosphor-icons/core
-bun run generate-favicon # re-render the favicon PNGs from public/favicon.svg
+bun run generate-favicon # re-render the PNG marks from the two SVGs in public/
 bun run generate-og      # re-render public/og.png, the social card
 ```
 
@@ -280,6 +290,16 @@ overlay would otherwise intercept the clicks the rest of the suite makes.
 
 `bun run test:e2e:ui` opens Playwright's runner if you want to watch it happen.
 The dev server is started automatically, and reused if one is already running.
+
+```bash
+bun run test:e2e:pwa
+```
+
+The service worker, and the only suite that runs against a real build. It has to:
+the worker is registered only in production, and what it caches are hashed asset
+URLs that do not exist until a build has produced them, so run against the dev
+server this spec would pass while testing nothing. It builds, serves on :3100,
+takes the network away with the app open, and reloads.
 
 ## Deploying
 

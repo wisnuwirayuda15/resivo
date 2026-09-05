@@ -26,6 +26,10 @@ export default [
       "src/routeTree.gen.ts",
       "src/features/icons/*.gen.ts",
       "scripts/**",
+      // The service worker is served as it is written, from the origin root, so
+      // it is outside the module graph and outside tsconfig with it. Prettier
+      // still formats it and a Playwright spec still exercises it.
+      "public/sw.js",
     ],
   },
 ];

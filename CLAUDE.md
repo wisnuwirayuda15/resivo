@@ -14,8 +14,9 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 494 tests in 34 files
+bun run test             # vitest, 501 tests in 35 files
 bun run test:e2e         # playwright, 59 specs, chromium only
+bun run test:e2e:pwa     # playwright against a real build, 4 specs
 bun run lint             # eslint
 bun run check            # prettier --check
 bun run format           # prettier --write, then eslint --fix
@@ -31,7 +32,7 @@ dependency resolving:
 ```bash
 bun run generate-routes    # src/routeTree.gen.ts
 bun run generate-icons     # src/features/icons/*.gen.ts
-bun run generate-favicon   # public/favicon-32.png, apple-touch-icon.png
+bun run generate-favicon   # the five PNG marks in public/
 bun run generate-og        # public/og.png
 ```
 
@@ -143,10 +144,24 @@ IndexedDB and a crawler would only ever see an empty shell. Build the tags with
 `__root.tsx`, not in a route's `head`: the router dedupes meta by name and would
 keep only one of the light and dark pair.
 
+**The service worker is production-only, and that is why it has its own test
+config.** `public/sw.js` is registered from an inline script in `__root.tsx`
+only when `import.meta.env.PROD`, because a worker caching Vite's unhashed dev
+modules reads as the app ignoring a saved edit. It also means `bun run test:e2e`
+(a dev server, on purpose) cannot exercise it at all, hence
+`playwright.pwa.config.ts` and `e2e-pwa/`, which build and serve for real on
+:3100. Three rules inside it: navigations are network-first so a deploy lands on
+the first visit, `/assets/*` is cache-first because every name there carries a
+content hash, and the manifest and icons are stale-while-revalidate because
+their names are stable. It deliberately does not `skipWaiting` or claim clients,
+so an update never purges the cache under a page that is still running. Bump
+`VERSION` in it when its logic changes.
+
 ## Layout
 
 ```
 e2e/               Playwright specs, and the moves they share in app.ts
+e2e-pwa/           the offline spec, which needs a real build (own config)
 src/
   routes/          file-based routes
   features/

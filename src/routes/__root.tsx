@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Providers } from "@/components/providers";
 import { SIDEBAR_RESTORE_SCRIPT } from "@/components/shell/sidebarState";
 
+import { SERVICE_WORKER_SCRIPT } from "@/lib/serviceWorker";
 import { THEME_COLOR, seo } from "@/lib/seo";
 
 import appCss from "@/styles/global.css?url";
@@ -186,6 +187,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           dangerouslySetInnerHTML={{ __html: SIDEBAR_RESTORE_SCRIPT }}
           suppressHydrationWarning
         />
+        {/* Null in development, where a worker caching unhashed dev modules
+            would look like the app ignoring a saved edit. */}
+        {SERVICE_WORKER_SCRIPT === null ? null : (
+          <script
+            dangerouslySetInnerHTML={{ __html: SERVICE_WORKER_SCRIPT }}
+            suppressHydrationWarning
+          />
+        )}
         <HeadContent />
       </head>
       <body>
