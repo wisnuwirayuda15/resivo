@@ -112,11 +112,18 @@ Given a previous document, each heading takes the identity of a section that was
 already there, and when no title matches it takes the first one left. That is
 deliberate: it is what lets a section be renamed in the Markdown without losing
 its id, its icon, its hidden flag or its per-section style. It is also wrong for
-building a document out of nothing. Parsing the example resume against a freshly
-created empty document gave its Projects heading the leftover Education
-section's kind, and a template lays a section out by kind. Build from source
-alone (`parseDocument(source)`) whenever "previous" is not a document the user
-has actually been editing. `features/resume/sample.ts` is the one that does.
+building a document out of nothing. A template's empty starting point carries
+four sections (Summary, Experience, Education, Skills), so a file whose second
+section is Projects took Experience's kind, and a template lays a section out by
+kind. Nothing corrected it afterwards, because kind is never written back to
+Markdown.
+
+So there are two calls, and the difference between them is building against
+editing. `applyMarkdown(document, source)` is for a document the user has been
+editing. `documentFromMarkdown(base, source)` parses the source alone and keeps
+only `base`'s design tokens, and is what both the example resume and the
+Markdown importer use. Anything else that turns a file into a new document wants
+the second one.
 
 **Mantine control heights are fixed pixels, not font-derived.** `xs` is 30px
 and `sm` is 36px. The theme defaults every control to `xs`, which is the design

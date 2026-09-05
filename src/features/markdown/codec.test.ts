@@ -7,7 +7,7 @@ import {
   text,
 } from "@/features/resume/model/index";
 
-import { parseDocument } from "./parse";
+import { documentFromMarkdown, parseDocument } from "./parse";
 import { serializeDocument } from "./serialize";
 
 import type {
@@ -693,5 +693,84 @@ describe("section kinds", () => {
     const { content } = parseDocument(`# Ada\n\n## ${title}\n\nText.\n`);
 
     expect(content.sections[0]?.kind).toBe(kind);
+  });
+});
+
+/**
+ * Building a document from a file, against editing one that exists.
+ *
+ * The two look alike and are not: `parseDocument` given a previous document
+ * matches each heading against it, and falls back to the first section still
+ * unclaimed when no title matches. That fallback is deliberate, and the tests
+ * above depend on it, it is what lets a section be renamed without losing the
+ * id, icon, hidden flag and style Markdown has no syntax for.
+ *
+ * It is also wrong for a document nobody has edited yet. A template's empty
+ * starting point carries four sections, so an imported file with a heading
+ * those four do not have took a leftover section's kind, and a template lays a
+ * section out by kind. Nothing corrected it later, because kind is never
+ * written back to Markdown, so the file's own headings never got another say.
+ */
+describe("building a document from a file", () => {
+  const IMPORTED = `# Ada Lovelace
+
+## Summary
+
+Mathematician.
+
+## Projects
+
+::tags[Note G]
+
+## Skills
+
+::tags[Calculus]
+`;
+
+  it("takes each section's kind from its own heading", () => {
+    const { document } = documentFromMarkdown(
+      createEmptyDocument("classic"),
+      IMPORTED,
+    );
+
+    expect(document.content.sections.map((one) => one.kind)).toEqual([
+      "summary",
+      "projects",
+      "skills",
+    ]);
+  });
+
+  it("keeps the template's design and nothing else from the empty document", () => {
+    const empty = createEmptyDocument("editorial");
+    const { document } = documentFromMarkdown(empty, IMPORTED);
+
+    expect(document.design).toEqual(empty.design);
+    expect(document.templateId).toBe("editorial");
+    // The four sections the empty document carries are gone, not appended to.
+    expect(document.content.sections).toHaveLength(3);
+    // `meta` is refreshed, which is what the library list sorts and searches on.
+    expect(document.meta.fullName).toBe("Ada Lovelace");
+  });
+
+  it("still reports what it could not represent", () => {
+    const { warnings } = documentFromMarkdown(
+      createEmptyDocument("classic"),
+      "# Ada\n\n## Summary\n\n<div>raw</div>\n",
+    );
+
+    expect(warnings).toHaveLength(1);
+  });
+
+  it("is not what reading the same file as an edit would do", () => {
+    /**
+     * The bug, kept visible rather than described.
+     *
+     * Not an assertion that this is right, it is why `documentFromMarkdown`
+     * exists. If the positional fallback is ever removed, this fails, and the
+     * failure is the notice that the split above may no longer be needed.
+     */
+    const { content } = parseDocument(IMPORTED, createEmptyDocument("classic"));
+
+    expect(content.sections[1]?.kind).toBe("experience");
   });
 });

@@ -15,7 +15,7 @@ import {
 
 import { UNGROUPED } from "@/database/index";
 import { Icon } from "@/features/icons/IconRenderer";
-import { applyMarkdown } from "@/features/markdown/index";
+import { documentFromMarkdown } from "@/features/markdown/index";
 import { createEmptyDocument } from "../model/index";
 import { createStartingDocument } from "../sample";
 import { templateList } from "@/features/templates/catalog";
@@ -54,11 +54,21 @@ interface ImportedMarkdown {
  * dialog. A Markdown resume is a few kilobytes. */
 const MAX_IMPORT_BYTES = 1024 * 1024;
 
+/**
+ * An imported file as a document, and what came of reading it.
+ *
+ * `documentFromMarkdown` rather than `applyMarkdown`: the empty document here
+ * is a starting point nobody has edited, so matching the file's sections
+ * against its four would hand a heading it does not have (Projects, say) the
+ * kind of whichever section was left over, and a template lays a section out by
+ * kind. The empty document supplies the template's design tokens and nothing
+ * else.
+ */
 const documentFrom = (
   templateId: TemplateId,
   source: string,
 ): { document: ResumeDocument; warningCount: number; fullName: string } => {
-  const { document, warnings } = applyMarkdown(
+  const { document, warnings } = documentFromMarkdown(
     createEmptyDocument(templateId),
     source,
   );

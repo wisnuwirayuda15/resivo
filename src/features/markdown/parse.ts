@@ -872,6 +872,10 @@ export const parseDocument = (
 /**
  * The whole round trip in one call: source in, a document ready for the store
  * out, with `meta` refreshed because the name may have changed.
+ *
+ * For a document the user has been editing. The source is read against it, so
+ * every section keeps the id, icon, hidden flag and style that Markdown has no
+ * syntax for.
  */
 export const applyMarkdown = (
   document: ResumeDocument,
@@ -880,4 +884,28 @@ export const applyMarkdown = (
   const { content, warnings } = parseDocument(source, document);
 
   return { document: syncMeta({ ...document, content }), warnings };
+};
+
+/**
+ * The same round trip, for a document that does not exist yet.
+ *
+ * The difference is the argument `parseDocument` is not given. Matching against
+ * a previous document falls back to position when no title matches, which is
+ * what lets a section be renamed without losing what Markdown cannot carry, and
+ * which is wrong when the "previous" document is a template's empty starting
+ * point: its four sections are Summary, Experience, Education and Skills, so a
+ * file whose second section is Projects took Experience's `kind`, and a
+ * template lays a section out by kind. Nothing corrected it afterwards, because
+ * `kind` is never written back to Markdown.
+ *
+ * `base` is therefore only the design: the template's tokens, its paper size,
+ * the empty `customCss`. Everything in `content` comes from the source.
+ */
+export const documentFromMarkdown = (
+  base: ResumeDocument,
+  source: string,
+): { document: ResumeDocument; warnings: Array<ParseWarning> } => {
+  const { content, warnings } = parseDocument(source);
+
+  return { document: syncMeta({ ...base, content }), warnings };
 };

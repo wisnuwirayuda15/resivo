@@ -1,6 +1,6 @@
-import { parseDocument } from "@/features/markdown/index";
+import { documentFromMarkdown } from "@/features/markdown/index";
 
-import { createEmptyDocument, syncMeta } from "./model/index";
+import { createEmptyDocument } from "./model/index";
 
 import type { ResumeDocument, TemplateId } from "./model/document";
 
@@ -89,24 +89,16 @@ Calculus, and the beginnings of symbolic logic.
 /**
  * The example resume as a document, on the given template.
  *
- * Parsed with no previous document, and deliberately not through
- * `applyMarkdown`. Given one, the parser hands each heading the identity of a
- * section that was already there, falling back to position when no title
- * matches, which is what lets a section be renamed without losing its icon or
- * its id. Against a freshly created empty document that fallback is wrong in a
- * way nothing later corrects: this file's Projects heading would inherit the
- * leftover Education section's kind, and templates lay a section out by kind.
- *
- * So the content comes from the source alone, and only the empty document's
- * design tokens are kept, which is the part the chosen template decides.
+ * `documentFromMarkdown` and not `applyMarkdown`, which is the difference
+ * between building a document and editing one: this file's Projects heading
+ * would otherwise inherit the empty document's leftover Education section, and
+ * a template lays a section out by kind. The empty document is here only for
+ * the template's design tokens.
  */
 export const createSampleDocument = (
   templateId: TemplateId = "classic",
 ): ResumeDocument =>
-  syncMeta({
-    ...createEmptyDocument(templateId),
-    content: parseDocument(SAMPLE_SOURCE).content,
-  });
+  documentFromMarkdown(createEmptyDocument(templateId), SAMPLE_SOURCE).document;
 
 /**
  * What a new resume starts as.

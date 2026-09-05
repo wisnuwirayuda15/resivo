@@ -6,6 +6,6 @@
  * used as a pair.
  */
 export { serializeDocument } from "./serialize";
-export { applyMarkdown, parseDocument } from "./parse";
+export { applyMarkdown, documentFromMarkdown, parseDocument } from "./parse";
 export { sectionKindFromTitle } from "./spec";
 export type { ParseResult, ParseWarning } from "./parse";
