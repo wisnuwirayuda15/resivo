@@ -16,7 +16,7 @@ import { EmptyState } from "@/components/EmptyState";
 import { Providers } from "@/components/providers";
 import { SIDEBAR_RESTORE_SCRIPT } from "@/components/shell/sidebarState";
 
-import { seo } from "@/lib/seo";
+import { THEME_COLOR, seo } from "@/lib/seo";
 
 import appCss from "@/styles/global.css?url";
 
@@ -101,6 +101,20 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         href: appCss,
       },
       /**
+       * What makes the app installable.
+       *
+       * The manifest is a static file rather than a route, so it is served
+       * without waking the server and cached like any other asset. It names the
+       * app, its icons, and the URL an installed copy opens at, which is
+       * `/resumes` and not `/`: somebody who installed this is not a stranger
+       * who needs the pitch. `src/lib/manifest.test.ts` is what keeps its name
+       * and description from drifting from `seo.ts`.
+       */
+      {
+        rel: "manifest",
+        href: "/manifest.webmanifest",
+      },
+      /**
        * The `R.` mark, three times over, because no single format is enough.
        *
        * The SVG is the real one and every current browser prefers it. The 32px
@@ -108,7 +122,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
        * `apple-touch-icon` for a home-screen shortcut, which is a bitmap by
        * specification, without it iOS uses a screenshot of the page. All three
        * are the same drawing; `bun run generate-favicon` writes the PNGs from
-       * the SVG.
+       * the SVG, along with the two the manifest names.
        */
       {
         rel: "icon",
@@ -153,12 +167,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             both schemes, and this app follows the system. The values are the
             two `--bg-app` grounds from the design system. */}
         <meta
-          content="#fbfbfa"
+          content={THEME_COLOR.light}
           media="(prefers-color-scheme: light)"
           name="theme-color"
         />
         <meta
-          content="#121210"
+          content={THEME_COLOR.dark}
           media="(prefers-color-scheme: dark)"
           name="theme-color"
         />

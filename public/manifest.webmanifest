@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "Resivo, a local-first resume builder",
+  "short_name": "Resivo",
+  "description": "Write a resume in Markdown, style it with your own CSS, and export a PDF that matches the page. No account, no server, nothing leaves your browser.",
+  "lang": "en",
+  "dir": "ltr",
+  "start_url": "/resumes",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fbfbfa",
+  "theme_color": "#fbfbfa",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any"
+    },
+    {
+      "src": "/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}

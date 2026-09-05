@@ -31,6 +31,17 @@ export const SITE_DESCRIPTION =
  */
 export const OG_IMAGE = "/og.png";
 
+/**
+ * The two grounds the browser chrome is painted with, mirroring the design
+ * system's `--bg-app` in each scheme.
+ *
+ * Here as literals because a `theme-color` meta tag cannot read a CSS custom
+ * property, and in one place because there are three consumers now: the two
+ * scheme-aware meta tags in the document head, and the web app manifest, which
+ * has no way to follow a scheme and so has to pick one of them.
+ */
+export const THEME_COLOR = { light: "#fbfbfa", dark: "#121210" } as const;
+
 interface MetaTag {
   title?: string;
   name?: string;

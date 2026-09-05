@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img">
+  <title>Resivo</title>
+  <!-- The maskable variant of favicon.svg, and a separate file rather than a
+       transform of it, because the two answer to different rules.
+
+       A maskable icon is cropped by the platform to whatever shape it likes: a
+       circle on Android, a squircle on some launchers, a rounded rectangle
+       elsewhere. Only the middle 80 percent is guaranteed to survive, so the
+       ground is full bleed with no corner radius (the launcher supplies the
+       shape) and the mark is drawn at 57 percent of the width, which is what
+       fits inside that circle including its corners. The favicon's own mark
+       spans 74 percent, whose diagonal falls outside it. -->
+  <rect width="32" height="32" fill="#121210" />
+  <g transform="translate(6.9 7.15) scale(0.184) translate(0 -12)">
+    <g
+      fill="none"
+      stroke="#f2f2f0"
+      stroke-width="16"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M8 100V20h30a22 22 0 0 1 0 44H8" />
+      <path d="M30 64l30 36" />
+    </g>
+    <circle cx="89" cy="98" r="10" fill="#32948e" />
+  </g>
+</svg>
