@@ -38,13 +38,15 @@ the same SSR shell, reads nothing from the database, and shows the format next
 to the page it produces. The library is still the canonical URL for "all my
 resumes", at `/resumes`.
 
-**Installable, and it opens with no network.** Resivo can be installed from the
-browser and put in a dock or on a home screen, where it runs in its own window
-and starts at the library rather than the landing page. A service worker caches
-the app itself, so a reload works with the network gone: your resumes were
-always on the device, and now the thing that reads them is too. Nothing is
-precached in bulk (the build is 21 MB, most of it Monaco's language workers), so
-what the app has used is what it can open without a connection.
+**Installable, and it opens with no network.** Resivo can be installed from
+Settings or from the browser's own control, and put in a dock or on a home
+screen, where it runs in its own window and starts at the library rather than
+the landing page. A service worker caches the app itself, so a reload works with
+the network gone: your resumes were always on the device, and now the thing that
+reads them is too. Nothing is precached in bulk (the build is 21 MB, most of it
+Monaco's language workers), so what the app has used is what it can open without
+a connection. Settings says which of those two states this device is in, rather
+than claiming offline before it is true.
 
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
@@ -227,6 +229,7 @@ src/
     export/        PDF, HTML and Markdown adapters
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at `/`
+    pwa/           installing, and whether the app is cached here
     backup/        whole-database backup and restore
     settings/      app preferences and storage usage
     commands/      the command palette

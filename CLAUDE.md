@@ -14,9 +14,9 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 501 tests in 35 files
+bun run test             # vitest, 507 tests in 36 files
 bun run test:e2e         # playwright, 59 specs, chromium only
-bun run test:e2e:pwa     # playwright against a real build, 4 specs
+bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
 bun run format           # prettier --write, then eslint --fix
@@ -177,6 +177,7 @@ src/
     export/        PDF, HTML and Markdown adapters
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /
+    pwa/           installing, and whether the app is cached here
     backup/        whole-database backup and restore
     settings/      app preferences and storage usage
     commands/      the command palette

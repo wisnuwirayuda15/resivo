@@ -6,14 +6,15 @@ import { seo } from "@/lib/seo";
 import { ClientOnly } from "@/components/client-only";
 import { Shell } from "@/components/shell/Shell";
 import { BackupPanel } from "@/features/backup/BackupPanel";
+import { InstallPanel } from "@/features/pwa/InstallPanel";
 import { StoragePanel } from "@/features/settings/StoragePanel";
 
 /**
  * Settings.
  *
- * Two things, and they are the two questions about a local-first app that are
- * not about any one document: what happens if this laptop is lost, and how much
- * of the device is this using.
+ * Three things, and they are the three questions about a local-first app that
+ * are not about any one document: what happens if this laptop is lost, how much
+ * of the device is this using, and can it be kept here rather than fetched.
  */
 const SettingsRoute: React.FC = () => (
   <Shell title="Settings">
@@ -57,6 +58,32 @@ const SettingsRoute: React.FC = () => (
             }
           >
             <StoragePanel />
+          </ClientOnly>
+        </Box>
+      </Box>
+
+      <Box className="border-line-soft border-t pt-6">
+        <Text className="text-body text-[15px] font-medium">
+          Install on this device
+        </Text>
+        <Text className="text-muted mt-1 max-w-[62ch] text-[13px]">
+          Resivo can be installed like any other application, and once it is
+          cached it opens whether or not there is a network.
+        </Text>
+
+        <Box className="mt-4">
+          {/* Client-only for the same reason as the two above: every answer
+              here comes from the browser (whether it has offered an install,
+              whether a worker is controlling the page) and none of them exists
+              on the server. */}
+          <ClientOnly
+            fallback={
+              <Box className="flex py-6">
+                <Loader size="sm" />
+              </Box>
+            }
+          >
+            <InstallPanel />
           </ClientOnly>
         </Box>
       </Box>

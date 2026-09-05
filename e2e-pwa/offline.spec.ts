@@ -106,6 +106,29 @@ test("opens the library with the network gone", async ({ page, context }) => {
   ).toBeVisible();
 });
 
+test("settings says the app is cached, once it is", async ({ page }) => {
+  await page.goto("/settings");
+  await workerReady(page);
+
+  /**
+   * Not yet, on a first visit. Asserted as the absence of the claim rather
+   * than as the presence of one of the two states that precede it, because
+   * which of those it is depends on whether the worker finished installing
+   * before the panel read it, and both are honest. What must never happen is
+   * this page promising that it would survive the network going away, when
+   * nothing is controlling it and it would not.
+   */
+  await expect(
+    page.getByText(/cached on this device, so it opens/),
+  ).toBeHidden();
+
+  await page.reload();
+
+  await expect(
+    page.getByText(/cached on this device, so it opens/),
+  ).toBeVisible({ timeout: 15_000 });
+});
+
 test("a resume written online still opens offline", async ({
   page,
   context,
