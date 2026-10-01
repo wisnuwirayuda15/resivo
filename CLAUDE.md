@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 507 tests in 36 files
-bun run test:e2e         # playwright, 59 specs, chromium only
+bun run test             # vitest, 592 tests in 40 files
+bun run test:e2e         # playwright, 66 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -174,6 +174,7 @@ src/
     style/         the style inspector
     icons/         generated icon catalog and picker
     assets/        images and fonts
+    ats/           the ATS check: pure rules over the document, and the tab
     export/        PDF, HTML and Markdown adapters
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /

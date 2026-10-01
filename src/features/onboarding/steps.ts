@@ -130,9 +130,9 @@ const EDITOR_STEPS: Array<OnboardingTourStep> = [
   },
   {
     id: TOUR_TARGET_IDS.inspector,
-    title: "Three tabs worth knowing",
+    title: "Four tabs worth knowing",
     content:
-      "Style is every design token: paper size, margins, type, colour, rules, and where pages break. Sections is the outline: reorder, hide, add an icon, start a section on a new page. Assets places an image or sets the resume in an uploaded face.",
+      "Style is every design token: paper size, margins, type, colour, rules, and where pages break. Sections is the outline: reorder, hide, add an icon, start a section on a new page. Assets places an image or sets the resume in an uploaded face. ATS lists the common ways a resume reads badly to an applicant tracking system, and fixes some of them in one click.",
   },
   {
     id: TOUR_TARGET_IDS.history,

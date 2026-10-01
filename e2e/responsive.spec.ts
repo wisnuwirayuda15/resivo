@@ -326,7 +326,7 @@ test("the editor tour runs on a phone, one tab at a time", async ({ page }) => {
     { heading: "Every directive, with an example", tab: "Code" },
     { heading: "The paper is editable too", tab: "Paper" },
     { heading: "Export is the same document", tab: "Paper" },
-    { heading: "Three tabs worth knowing", tab: "Style" },
+    { heading: "Four tabs worth knowing", tab: "Style" },
     { heading: "Nothing here is one-way", tab: "Style" },
   ] as const;
 

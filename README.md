@@ -128,6 +128,18 @@ printed, built, handed to the browser in a frame of its own and thrown away, so
 the PDF and the HTML export are one artefact with two destinations and neither
 can drift from the preview. Markdown uses the same serializer the editor reads.
 
+**An ATS check.** The inspector's fourth tab reads the document the way an
+applicant tracking system might and lists what would trip it: no name or email,
+a contact that is only an icon, an end date before its start, dates written in
+words, two columns, a table, text a stylesheet hides, a body size or a margin
+too small to print, a colour too pale to read. Each finding says what is wrong
+and why a parser or a recruiter would care, and the ones with an obvious repair
+carry a button, plus one to apply them all. A fix goes through the same edit
+path as everything else, so one undo takes it back. It looks for common
+problems and cannot promise how a particular system will parse a file, because
+none of them publishes how, and the panel says so. It runs on the document in
+the browser and sends nothing anywhere.
+
 **Keyboard and discovery.** `Ctrl/Cmd+K` opens a command palette over every page
 and command; the application menu lists the shortcuts and the things worth
 knowing. A first visit offers a short tour (of the library, and of the editor
@@ -172,6 +184,12 @@ revision store would spend the device's storage on a recovery path those two
 already provide, on an app whose whole premise is that the storage is finite and
 local. If a resume needs to be kept as it was, save a backup or export the
 Markdown; both are one click.
+
+**A dismissed ATS finding is remembered for the session, not saved.** Saving it
+would mean a new field on the document, a bump of its schema version and a
+migration that touches every stored resume, for a preference that only matters
+while someone works down the list. It is kept per resume in memory, so it
+survives switching tabs but not a reload.
 
 **Three pages are indexable, and the rest say so.** `/`, `/templates` and
 `/about` carry a title, a description and a social card. Every route behind the
@@ -226,6 +244,7 @@ src/
     style/         the style inspector
     icons/         generated icon catalog and picker
     assets/        images and fonts
+    ats/           the ATS check: rules, fixes, and the inspector tab
     export/        PDF, HTML and Markdown adapters
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at `/`
