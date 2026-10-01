@@ -42,6 +42,9 @@ export const TEMPLATE_CATALOG: Record<TemplateId, TemplateMeta> = {
   modern: { id: "modern", supportedSections: ALL_SECTIONS },
   technical: { id: "technical", supportedSections: ALL_SECTIONS },
   editorial: { id: "editorial", supportedSections: ALL_SECTIONS },
+  compact: { id: "compact", supportedSections: ALL_SECTIONS },
+  profile: { id: "profile", supportedSections: ALL_SECTIONS },
+  bold: { id: "bold", supportedSections: ALL_SECTIONS },
 };
 
 export const templateList: Array<TemplateMeta> = TEMPLATE_IDS.map(

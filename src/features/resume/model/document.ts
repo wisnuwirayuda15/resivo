@@ -31,6 +31,9 @@ export const TEMPLATE_IDS = [
   "modern",
   "technical",
   "editorial",
+  "compact",
+  "profile",
+  "bold",
 ] as const;
 export type TemplateId = (typeof TEMPLATE_IDS)[number];
 

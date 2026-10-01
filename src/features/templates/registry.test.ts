@@ -20,7 +20,7 @@ describe("template registry", () => {
 
   /**
    * The whole registry shares one stylesheet, so a delta written without its
-   * `[data-template=...]` scope would restyle all four templates at once, and
+   * `[data-template=...]` scope would restyle every template at once, and
    * because the paginator measures what these rules produce, it would move page
    * breaks in resumes the author never opened.
    */

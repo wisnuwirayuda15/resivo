@@ -20,8 +20,8 @@ import type { TemplateComponents } from "./renderer/types";
  * the cases where a different look genuinely needs different markup.
  *
  * Every delta below is pure CSS for a reason: the paginator measures the markup
- * the renderers produce, and four templates producing four different DOM shapes
- * would be four sets of measurement behaviour to keep honest. Restyling the same
+ * the renderers produce, and seven templates producing seven different DOM shapes
+ * would be seven sets of measurement behaviour to keep honest. Restyling the same
  * elements keeps one flow and one set of guarantees.
  */
 
@@ -156,11 +156,114 @@ const editorial: ResumeTemplate = {
 `,
 };
 
+/**
+ * Compact, for a long history on few pages.
+ *
+ * The saving is in vertical rhythm, which the defaults already tighten, and in
+ * what is left over here: a smaller name, a contact row that sits closer to it,
+ * and bullets that lose a little indent and gap. Nothing is made smaller than the
+ * ATS floor, so the resume that fits is still one a parser and a recruiter read.
+ */
+const compact: ResumeTemplate = {
+  id: "compact",
+  version: 1,
+  baseCss: `
+.resivo-paper[data-template='compact'] .rp-name {
+  font-size: calc(var(--paper-fs-name) * 0.85);
+}
+
+.resivo-paper[data-template='compact'] .rp-contacts {
+  margin-top: 0.35em;
+}
+
+.resivo-paper[data-template='compact'] .rp-section-title {
+  letter-spacing: 0.04em;
+}
+
+.resivo-paper[data-template='compact'] .rp-bullets {
+  padding-left: 1em;
+}
+
+.resivo-paper[data-template='compact'] .rp-bullets > li {
+  margin-top: 0.05em;
+}
+`,
+};
+
+/**
+ * Profile, a header built around the photograph.
+ *
+ * The shared header already lays the avatar out beside the text, so this does not
+ * add markup: it centres the pair on one line, rules the header off from the
+ * body, and sets the headline in the accent. With no photograph it is a
+ * left-aligned header with that rule, which is a fair resume rather than a
+ * broken one. Section headings drop the upper case, which is what the serif
+ * face asks for.
+ */
+const profile: ResumeTemplate = {
+  id: "profile",
+  version: 1,
+  baseCss: `
+.resivo-paper[data-template='profile'] .rp-header {
+  align-items: center;
+  gap: 1.2em;
+  padding-bottom: 0.7em;
+  border-bottom: 1px solid var(--paper-rule-color);
+}
+
+.resivo-paper[data-template='profile'] .rp-headline {
+  color: var(--paper-accent);
+}
+
+.resivo-paper[data-template='profile'] .rp-section-title {
+  letter-spacing: 0.03em;
+  text-transform: none;
+}
+`,
+};
+
+/**
+ * Bold, a heavy name and section headings over a thick accent rule.
+ *
+ * The weight is in the type: an upper-cased name, wider tracking on the headings
+ * and a bolder entry title. Case is a presentation property, so the text a parser
+ * reads is the text that was typed.
+ */
+const bold: ResumeTemplate = {
+  id: "bold",
+  version: 1,
+  baseCss: `
+.resivo-paper[data-template='bold'] .rp-name {
+  letter-spacing: 0.01em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.resivo-paper[data-template='bold'] .rp-headline {
+  margin-top: 0.3em;
+  font-weight: 600;
+  color: var(--paper-ink);
+}
+
+.resivo-paper[data-template='bold'] .rp-section-title {
+  font-size: calc(var(--paper-fs-section) * 1.05);
+  letter-spacing: 0.08em;
+}
+
+.resivo-paper[data-template='bold'] .rp-entry-title {
+  font-weight: 700;
+}
+`,
+};
+
 const TEMPLATES: Record<TemplateId, ResumeTemplate> = {
   classic,
   modern,
   technical,
   editorial,
+  compact,
+  profile,
+  bold,
 };
 
 export interface ResolvedTemplate {

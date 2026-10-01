@@ -39,6 +39,8 @@ interface Metrics {
   line: string;
   /** How many sections to draw. */
   sections: number;
+  /** The photograph's circle, drawn only for the template built around one. */
+  avatar: string;
 }
 
 const METRICS: Record<PaperMiniatureSize, Metrics> = {
@@ -58,6 +60,7 @@ const METRICS: Record<PaperMiniatureSize, Metrics> = {
     heading: "h-[7px] w-[30%]",
     line: "mt-[6px] h-[4px]",
     sections: 3,
+    avatar: "size-[30px]",
   },
   card: {
     page: "h-[150px] w-[116px] px-3 py-3.5 shadow-paper",
@@ -67,6 +70,7 @@ const METRICS: Record<PaperMiniatureSize, Metrics> = {
     heading: "h-[4px] w-[32%]",
     line: "mt-[3px] h-[2.5px]",
     sections: 3,
+    avatar: "size-[18px]",
   },
   tile: {
     page: "h-[94px] w-[72px] px-2 py-2.5 shadow-xs",
@@ -76,6 +80,7 @@ const METRICS: Record<PaperMiniatureSize, Metrics> = {
     heading: "h-[3px] w-[34%]",
     line: "mt-[2.5px] h-[2px]",
     sections: 2,
+    avatar: "size-[12px]",
   },
 };
 
@@ -95,6 +100,11 @@ export const PaperMiniature: React.FC<PaperMiniatureProps> = ({
   className,
 }) => {
   const metrics = METRICS[size];
+  // Profile is the one template whose header is drawn differently: a circle
+  // beside the name, which is the whole reason to choose it. Bold is the one
+  // whose rules are in the accent, because its weight is in them.
+  const withAvatar = templateId === "profile";
+  const boldRule = templateId === "bold";
 
   return (
     <Box
@@ -102,13 +112,32 @@ export const PaperMiniature: React.FC<PaperMiniatureProps> = ({
       className={cn("resivo-paper rounded-[2px]", metrics.page, className)}
       data-template={templateId}
     >
-      <Box className={cn(metrics.name, "bg-[var(--paper-ink)]")} />
-      <Box className={cn(metrics.contact, "bg-[var(--paper-ink-muted)]")} />
+      <Box className={cn(withAvatar && "flex items-center gap-[6px]")}>
+        {withAvatar ? (
+          <Box
+            className={cn(
+              metrics.avatar,
+              "flex-none rounded-full bg-[var(--paper-accent)] opacity-40",
+            )}
+          />
+        ) : null}
+        <Box className={cn(withAvatar && "min-w-0 flex-1")}>
+          <Box className={cn(metrics.name, "bg-[var(--paper-ink)]")} />
+          <Box className={cn(metrics.contact, "bg-[var(--paper-ink-muted)]")} />
+        </Box>
+      </Box>
 
       {Array.from({ length: metrics.sections }, (_, section) => (
         <Box className={metrics.section} key={section}>
           <Box className={cn(metrics.heading, "bg-[var(--paper-accent)]")} />
-          <Box className="mt-[2px] h-px bg-[var(--paper-rule)]" />
+          <Box
+            className={cn(
+              "mt-[2px]",
+              boldRule
+                ? "h-[2px] bg-[var(--paper-accent)]"
+                : "h-px bg-[var(--paper-rule)]",
+            )}
+          />
           {LINES.map((line) => (
             <Box
               className={cn(

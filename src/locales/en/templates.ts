@@ -33,4 +33,25 @@ export const templates = {
     atsNotes:
       "Dividers are off by default and hierarchy comes from type size. Still single column and parser-safe.",
   },
+  compact: {
+    name: "Compact",
+    description:
+      "A dense sans layout with tight rhythm, for a long history that has to stay on few pages.",
+    atsNotes:
+      "Body text is 9.5pt with 0.5in margins, the smallest the ATS check accepts. Single column, so it reads in order.",
+  },
+  profile: {
+    name: "Profile",
+    description:
+      "A header built around your photograph, with serif headings over a sans body.",
+    atsNotes:
+      "The photograph sits beside the name and is decorative. Without one the header is a plain left-aligned block. Still single column.",
+  },
+  bold: {
+    name: "Bold",
+    description:
+      "A heavy upper-case name and strong section headings over a thick accent rule.",
+    atsNotes:
+      "Weight comes from type and a rule, not from layout. Case is styling only, so the text a parser reads is what you typed.",
+  },
 } as const;

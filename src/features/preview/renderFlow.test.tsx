@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isValidElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
 
 import { createEmptyDocument } from "@/features/resume/model/index";
 import { resolveTemplate } from "@/features/templates/registry";
@@ -116,6 +117,40 @@ describe("renderFlow", () => {
 
     expect(isValidElement(header) ? header.type : undefined).toBe(
       template.components.Header,
+    );
+  });
+
+  /**
+   * Profile is built around the photograph, and it adds no markup of its own: the
+   * shared header puts the avatar inside `.rp-header`, ahead of the text, and the
+   * template's CSS is what lays the two out as a row. So the thing to pin is
+   * that the element the CSS targets is where the CSS expects it.
+   */
+  it("puts the avatar inside the header, before the name, for Profile", () => {
+    const document = sample();
+    document.templateId = "profile";
+    document.content.header.avatarImageId = "photo";
+
+    const context: RenderContext = {
+      ...contextFor(document),
+      images: new Map([
+        ["photo", { url: "blob:photo", width: 96, height: 96 }],
+      ]),
+    };
+    const rendered = renderFlow(
+      document,
+      resolveTemplate("profile"),
+      context,
+      documentFlow(document),
+    );
+    const header = rendered[0]?.node;
+
+    expect(header).not.toBeNull();
+
+    const markup = renderToStaticMarkup(<>{header}</>);
+
+    expect(markup).toMatch(
+      /<header class="rp-header"><img alt="" class="rp-avatar" src="blob:photo"\/><div class="rp-header-text">/,
     );
   });
 });

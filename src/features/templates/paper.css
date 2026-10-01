@@ -79,3 +79,29 @@
   --paper-accent: #94271d;
   --paper-fs-name: 26pt;
 }
+
+/* compact: sans throughout at the smallest body size the ATS check accepts. */
+.resivo-paper[data-template="compact"] {
+  --paper-font-body: var(--font-sans);
+  --paper-font-head: var(--font-sans);
+  --paper-accent: #1b3a6b;
+  --paper-fs-body: 9.5pt;
+  --paper-lh: 1.3;
+  --paper-margin: 0.5in;
+}
+
+/* profile: sans body under serif headings, a plum accent, and a bigger photo. */
+.resivo-paper[data-template="profile"] {
+  --paper-font-body: var(--font-sans);
+  --paper-font-head: var(--font-serif);
+  --paper-accent: #6d3a8f;
+  --paper-avatar-size: 96px;
+}
+
+/* bold: heavy sans headings with an orange accent. */
+.resivo-paper[data-template="bold"] {
+  --paper-font-body: var(--font-sans);
+  --paper-font-head: var(--font-sans);
+  --paper-accent: #c2410c;
+  --paper-fs-name: 25.6pt;
+}

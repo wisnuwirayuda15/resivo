@@ -1,4 +1,5 @@
 import { deepEqual } from "@/lib/deep-equal";
+import { assertNever } from "@/lib/assert-never";
 
 import type {
   DesignConfig,
@@ -113,6 +114,47 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
       design.rules.showDividers = false;
       design.spacing.section = 1.1;
       break;
+
+    case "compact":
+      // The densest, for a long history. 9.5pt and a 0.5in margin are the floor
+      // the ATS check accepts (below them it warns), so this sits exactly on
+      // it rather than under, and the room comes from rhythm instead: tighter
+      // lines, sections and paragraphs.
+      design.typography.bodyFont = SANS;
+      design.typography.headingFont = SANS;
+      design.typography.baseSize = 9.5;
+      design.typography.lineHeight = 1.3;
+      design.paper.margin = { top: 0.5, right: 0.5, bottom: 0.5, left: 0.5 };
+      design.colors.accent = "#1b3a6b";
+      design.spacing = { section: 0.65, paragraph: 0.25, heading: 0.3 };
+      break;
+
+    case "profile":
+      // A header built around the photograph, so the avatar is a little larger
+      // than elsewhere. Without one it reads as a plain left-aligned header.
+      design.typography.bodyFont = SANS;
+      design.typography.headingFont = SERIF;
+      design.colors.accent = "#6d3a8f";
+      design.image.avatarSize = 96;
+      break;
+
+    case "bold":
+      // Heavy sans headings over a thick rule in the accent. The rule colour is
+      // the accent, which is the one place a template seeds it away from the
+      // shared pale grey, so the rule is what carries the weight.
+      design.typography.bodyFont = SANS;
+      design.typography.headingFont = SANS;
+      design.typography.scale = 1.25;
+      design.typography.weights = { body: 400, heading: 700 };
+      design.colors.accent = "#c2410c";
+      design.rules = { showDividers: true, width: 2, color: "#c2410c" };
+      design.spacing.section = 1;
+      break;
+
+    default:
+      // A template added to `TEMPLATE_IDS` without a case here would quietly
+      // take the Classic baseline, which is not a bug anything would report.
+      return assertNever(templateId);
   }
 
   return design;

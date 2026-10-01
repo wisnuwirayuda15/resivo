@@ -110,10 +110,10 @@ and sections to reorder them, or use the move buttons beside them. Switching the
 editor on cannot move a page break, the chrome is never part of what the
 paginator measures.
 
-**Templates and style.** Four ATS-friendly templates (`classic`, `modern`,
-`technical`, `editorial`), all pure CSS over one shared markup, plus a control
-for every design token: paper size, margins, fonts, sizes, colours, rhythm,
-rules, icons, and where pages break.
+**Templates and style.** Seven ATS-friendly single-column templates (`classic`,
+`modern`, `technical`, `editorial`, `compact`, `profile`, `bold`), all pure CSS
+over one shared markup, plus a control for every design token: paper size,
+margins, fonts, sizes, colours, rhythm, rules, icons, and where pages break.
 
 **Page breaks.** Three scales, because the need comes in three. `::pagebreak`
 puts a break between two particular things and round-trips through Markdown; a
