@@ -100,8 +100,12 @@ interface PreviewPaperProps {
    * Published rather than kept private because HTML export needs the breaks the
    * user is looking at. Pagination is a measurement, and there is nothing to
    * measure in a string, so export reuses this instead of estimating.
+   *
+   * The second argument is the document those breaks were measured for. It is
+   * what lets a reader that is not in this tree (the ATS tab) know whether a
+   * page count is about the document in front of it or about an earlier one.
    */
-  onPaginated?: (pages: Array<Array<string>>) => void;
+  onPaginated?: (pages: Array<Array<string>>, measured: ResumeDocument) => void;
 }
 
 /** Everything that, if it changed, invalidates a set of page breaks. */
@@ -124,6 +128,10 @@ interface PaginationKey {
 
 interface PaginationResult extends PaginationKey {
   pages: Array<Array<string>>;
+  /** The document the pages were measured for. Not part of the key above: it
+   * is implied by `items`, which is memoised on it, and carrying it there
+   * would only be a second way to say the same thing. */
+  document: ResumeDocument;
 }
 
 /**
@@ -352,6 +360,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       images,
       laidOut,
       pages: paginate(measured.metrics, measured.contentHeight),
+      document,
     });
   }, [
     stale,
@@ -373,12 +382,13 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   }, [pageCount, onPageCountChange]);
 
   const breaks = paged?.pages;
+  const measuredDocument = paged?.document;
 
   useEffect(() => {
-    if (breaks !== undefined) {
-      onPaginated?.(breaks);
+    if (breaks !== undefined && measuredDocument !== undefined) {
+      onPaginated?.(breaks, measuredDocument);
     }
-  }, [breaks, onPaginated]);
+  }, [breaks, measuredDocument, onPaginated]);
 
   /**
    * A one-step keyboard move, or `null` when there is nowhere to go.

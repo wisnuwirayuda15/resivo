@@ -3,6 +3,10 @@ import { Box, Button, Text, Tooltip, UnstyledButton } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { useEditorStore } from "@/features/editor/store";
+import {
+  pageCountFor,
+  useMeasuredPages,
+} from "@/features/preview/measuredPages";
 import { cn } from "@/lib/utils";
 
 import { checkDocument } from "./check";
@@ -21,6 +25,13 @@ import type { AtsIssue, Severity } from "./types";
  * and while it is, it runs once per document change. The check is linear in the
  * number of blocks, so there is no debounce: one would only make the list lag
  * behind the paper it describes.
+ *
+ * The page count is the one input that is not in the document: the paper
+ * measures it, and `preview/measuredPages` carries it here, tied to the
+ * document it was measured for.
+ *
+ * Every fix goes through `apply`, the same door as every other edit, so the
+ * preview updates because the store did and one undo takes a fix back.
  */
 
 interface AtsPanelProps {
@@ -117,7 +128,14 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
   const dismiss = useAtsDismissals((state) => state.dismiss);
   const restoreAll = useAtsDismissals((state) => state.restoreAll);
 
-  const issues = useMemo(() => checkDocument(document), [document]);
+  const measured = useMeasuredPages((state) => state.measured);
+  const paperMounted = useMeasuredPages((state) => state.mounted);
+  const pageCount = pageCountFor({ measured, mounted: paperMounted }, document);
+
+  const issues = useMemo(
+    () => checkDocument(document, { pageCount }),
+    [document, pageCount],
+  );
   const shown = useMemo(
     () => issues.filter((issue) => !dismissed.includes(issue.id)),
     [issues, dismissed],
@@ -197,6 +215,18 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
           </Box>
         )}
       </section>
+
+      {/* Only when there is no paper on screen to ask. With one mounted the
+          count is on its way, and saying "not checked" for the frame before it
+          arrives would put a line in and out of the panel on every keystroke. */}
+      {pageCount === null && !paperMounted ? (
+        <Text
+          className="text-muted border-line-soft border-b px-3 py-2 text-[11px] leading-snug"
+          role="note"
+        >
+          Length is not checked here. Open the Paper tab to measure it.
+        </Text>
+      ) : null}
 
       {shown.length === 0 ? null : (
         <ul aria-label="ATS issues" className="m-0 list-none p-0">

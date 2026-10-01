@@ -7,6 +7,7 @@ import {
   openEditorPane,
   openEmptyApp,
   openInspectorTab,
+  typeMarkdown,
 } from "./app";
 
 /**
@@ -113,6 +114,57 @@ test("a dismissed issue stays dismissed across tabs, and can be brought back", a
   await expect(page.getByText("1 issue dismissed")).toBeVisible();
   await page.getByRole("button", { name: "Show again" }).click();
   await expect(email).toBeVisible();
+});
+
+/**
+ * Three sheets: two forced breaks, so the length does not depend on fonts. The
+ * empty Summary is there to give the tab something it can fix, which the
+ * stale-count spec needs in order to change the document from inside the tab.
+ */
+const THREE_PAGES =
+  "# Ada\n\n## Summary\n\n## Experience\n\n::pagebreak\n\n::pagebreak\n";
+
+test("flags a resume past two pages, from what the paper measured", async ({
+  page,
+}) => {
+  await createResume(page, "Long one");
+  await typeMarkdown(page, THREE_PAGES);
+  await expect(page.getByText("3 pages", { exact: true })).toBeVisible();
+
+  await openInspectorTab(page, "ATS");
+
+  await expect(issues(page)).toContainText("The resume runs to 3 pages.");
+  // The paper is on screen, so there is nothing to apologise for.
+  await expect(page.getByRole("note")).toHaveCount(0);
+});
+
+test("says it cannot check length when the paper is not on screen, and does not keep a stale count", async ({
+  page,
+}) => {
+  test.slow();
+
+  await page.setViewportSize({ width: 900, height: 800 });
+  await createResume(page, "Long one");
+
+  await openEditorPane(page, "Code");
+  await typeMarkdown(page, THREE_PAGES);
+
+  // Visit the paper so it measures, then leave it.
+  await openEditorPane(page, "Paper");
+  await expect(page.getByText(/^3 pages/)).toBeVisible();
+
+  await openEditorPane(page, "Style");
+  await openInspectorTab(page, "ATS");
+
+  // The document has not changed since it was measured, so the count holds.
+  await expect(issues(page)).toContainText("The resume runs to 3 pages.");
+  await expect(page.getByRole("note")).toHaveCount(0);
+
+  // Any edit makes it a different document, with nobody to measure it.
+  await page.getByRole("button", { name: /^Fix all/ }).click();
+
+  await expect(issues(page)).not.toContainText("pages.");
+  await expect(page.getByRole("note")).toContainText("Open the Paper tab");
 });
 
 test("the ATS tab is reachable on a narrow screen", async ({ page }) => {

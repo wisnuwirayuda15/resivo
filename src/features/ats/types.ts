@@ -39,5 +39,20 @@ export interface AtsIssue {
   fix?: AtsFix;
 }
 
+/**
+ * What a rule may know that is not in the document.
+ *
+ * Only the page count today. It is a measurement of the rendered paper, so it is
+ * handed in rather than derived, and it is `null` whenever nobody has measured
+ * the current document. A rule that needs it has to say nothing for `null`, not
+ * guess.
+ */
+export interface AtsContext {
+  pageCount: number | null;
+}
+
 /** A rule reads the document and returns every place it applies, possibly none. */
-export type AtsRule = (document: ResumeDocument) => Array<AtsIssue>;
+export type AtsRule = (
+  document: ResumeDocument,
+  context: AtsContext,
+) => Array<AtsIssue>;

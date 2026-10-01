@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   Box,
   Popover,
@@ -18,6 +25,7 @@ import { cn } from "@/lib/utils";
 
 import { PreviewFrame } from "./PreviewFrame";
 import { PAGE_DIMENSIONS } from "./css";
+import { useMeasuredPages } from "./measuredPages";
 
 import type { Recipe } from "@/features/editor/mutations";
 import type {
@@ -163,9 +171,23 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   );
 
   const handlePaginated = useCallback(
-    (next: Array<Array<string>>) => setPages(next),
+    (next: Array<Array<string>>, measured: ResumeDocument) => {
+      setPages(next);
+      useMeasuredPages.getState().report(measured, next.length);
+    },
     [],
   );
+
+  /**
+   * Layout, not passive, so it runs before the frame's own passive effect has a
+   * chance to report: children's passive effects run before their parent's, and
+   * a passive mount here would clear the first count the paper reports.
+   */
+  useLayoutEffect(() => {
+    useMeasuredPages.getState().mount();
+
+    return () => useMeasuredPages.getState().unmount();
+  }, []);
 
   const dimensions = PAGE_DIMENSIONS[size];
 

@@ -608,3 +608,31 @@ describe("content rules", () => {
     ).not.toContain("ats.entry-empty");
   });
 });
+
+describe("length rule", () => {
+  const withPages = (pageCount: number | null) =>
+    checkDocument(clean(), { pageCount }).filter(
+      (issue) => issue.rule === "ats.page-count",
+    );
+
+  it("flags a resume past two pages and says how many", () => {
+    const found = withPages(3);
+
+    expect(found).toHaveLength(1);
+    expect(found[0]?.message).toBe("The resume runs to 3 pages.");
+    expect(found[0]?.severity).toBe("warning");
+  });
+
+  it("accepts one page and two", () => {
+    expect(withPages(1)).toEqual([]);
+    expect(withPages(2)).toEqual([]);
+  });
+
+  it("says nothing when nobody measured, rather than guessing", () => {
+    expect(withPages(null)).toEqual([]);
+    // And a caller with no paper to ask gets the same.
+    expect(
+      checkDocument(clean()).filter((issue) => issue.rule === "ats.page-count"),
+    ).toEqual([]);
+  });
+});

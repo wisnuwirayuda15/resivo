@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 592 tests in 40 files
-bun run test:e2e         # playwright, 66 specs, chromium only
+bun run test             # vitest, 601 tests in 41 files
+bun run test:e2e         # playwright, 68 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check

@@ -56,8 +56,9 @@ interface PreviewFrameProps {
   title?: string;
   /** Called whenever pagination settles on a different number of pages. */
   onPageCountChange?: (count: number) => void;
-  /** Called with the flow-item ids on each page whenever pagination settles. */
-  onPaginated?: (pages: Array<Array<string>>) => void;
+  /** Called with the flow-item ids on each page, and the document they were
+   * measured for, whenever pagination settles. */
+  onPaginated?: (pages: Array<Array<string>>, measured: ResumeDocument) => void;
   /**
    * Handed a function that prints the iframe.
    *

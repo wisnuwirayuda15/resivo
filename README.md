@@ -132,7 +132,8 @@ can drift from the preview. Markdown uses the same serializer the editor reads.
 applicant tracking system might and lists what would trip it: no name or email,
 a contact that is only an icon, an end date before its start, dates written in
 words, two columns, a table, text a stylesheet hides, a body size or a margin
-too small to print, a colour too pale to read. Each finding says what is wrong
+too small to print, a colour too pale to read, a resume that runs past two
+pages. Each finding says what is wrong
 and why a parser or a recruiter would care, and the ones with an obvious repair
 carry a button, plus one to apply them all. A fix goes through the same edit
 path as everything else, so one undo takes it back. It looks for common
@@ -184,6 +185,15 @@ revision store would spend the device's storage on a recovery path those two
 already provide, on an app whose whole premise is that the storage is finite and
 local. If a resume needs to be kept as it was, save a backup or export the
 Markdown; both are one click.
+
+**The ATS check asks the paper for the page count, and says so when it cannot.**
+Length is not in the document: it comes from laying the document out at a real
+width with real fonts, which only the preview does. The preview reports each
+measurement together with the document it measured, and the check uses a count
+only for that document. Below 1200px the paper is unmounted whenever another
+pane is open, so an edit made there changes the length with nobody measuring it.
+A bare number would keep claiming the old count, so after such an edit the tab
+says it cannot check length and asks for the Paper tab instead.
 
 **A dismissed ATS finding is remembered for the session, not saved.** Saving it
 would mean a new field on the document, a bump of its schema version and a
