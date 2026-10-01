@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 
 import { UNGROUPED } from "@/database/index";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/features/icons/IconRenderer";
 import { documentFromMarkdown } from "@/features/markdown/index";
 import { createEmptyDocument } from "../model/index";
@@ -109,6 +109,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 }) => {
   const { t } = useTranslation("library");
   const { t: tc } = useTranslation("common");
+  // A blank page is started in the language the app is in, headings and all.
+  const uiLanguage = useUiLanguage();
   const [title, setTitle] = useState("");
   /**
    * The template, as "what the user picked, or what they picked last time".
@@ -220,7 +222,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
        */
       document:
         imported === null
-          ? createStartingDocument(start, templateId)
+          ? createStartingDocument(start, templateId, uiLanguage)
           : documentFrom(templateId, imported.source).document,
     });
 

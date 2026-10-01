@@ -1,3 +1,4 @@
+import { assets } from "./assets";
 import { ats } from "./ats";
 import { commands } from "./commands";
 import { common } from "./common";
@@ -21,4 +22,5 @@ export const id = {
   editor,
   style,
   ats,
+  assets,
 };

@@ -69,12 +69,17 @@ const coreSectionsMissing: AtsRule = (document) => {
 };
 
 /**
- * Only for documents written in English. The known headings are English, so a
- * resume in another language would have every section called unusual, which is
- * a claim about the checker's vocabulary and not about the resume.
+ * The languages whose headings the checker knows (see `SECTION_SYNONYMS`).
+ * For a resume in any other language every section would be called unusual,
+ * which is a claim about the checker's vocabulary and not about the resume.
  */
+const KNOWN_HEADING_LANGUAGES = ["en", "id"];
+
+/** Only for a document written in a language whose headings are known. */
 const sectionTitleUnusual: AtsRule = (document) =>
-  document.meta.locale.toLowerCase().startsWith("en")
+  KNOWN_HEADING_LANGUAGES.includes(
+    document.meta.locale.toLowerCase().split("-")[0] ?? "",
+  )
     ? visibleSections(document).flatMap((section) =>
         section.kind === "custom" &&
         effectiveKind(section) === "custom" &&

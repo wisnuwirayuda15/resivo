@@ -1,6 +1,7 @@
 import { Text } from "@mantine/core";
 
 import { ConfirmDialog } from "@/components/ConfirmDialog";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import type { FontSummary, ImageSummary } from "@/database/index";
 
@@ -26,22 +27,28 @@ export const DeleteImageDialog: React.FC<DeleteImageDialogProps> = ({
   unused,
   onConfirm,
   onCancel,
-}) => (
-  <ConfirmDialog
-    confirmLabel="Delete image"
-    danger
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-    opened={image !== null}
-    title={`Delete ${image?.name ?? "image"}?`}
-  >
-    <Text className="text-[13px]">
-      {image !== null && !unused
-        ? "A resume still refers to this image. Deleting it leaves that resume showing a missing-image box."
-        : "This image is not used by any resume. Deleting it frees the space it takes on this device."}
-    </Text>
-  </ConfirmDialog>
-);
+}) => {
+  const { t } = useTranslation("assets");
+
+  return (
+    <ConfirmDialog
+      confirmLabel={t("dialogs.deleteImage.confirm")}
+      danger
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      opened={image !== null}
+      title={t("dialogs.deleteImage.title", {
+        name: image?.name ?? t("dialogs.deleteImage.fallbackName"),
+      })}
+    >
+      <Text className="text-[13px]">
+        {image !== null && !unused
+          ? t("dialogs.deleteImage.inUse")
+          : t("dialogs.deleteImage.unused")}
+      </Text>
+    </ConfirmDialog>
+  );
+};
 
 interface DeleteFontDialogProps {
   font: FontSummary | null;
@@ -55,19 +62,25 @@ export const DeleteFontDialog: React.FC<DeleteFontDialogProps> = ({
   unused,
   onConfirm,
   onCancel,
-}) => (
-  <ConfirmDialog
-    confirmLabel="Delete font"
-    danger
-    onCancel={onCancel}
-    onConfirm={onConfirm}
-    opened={font !== null}
-    title={`Delete ${font?.family ?? "font"}?`}
-  >
-    <Text className="text-[13px]">
-      {font !== null && !unused
-        ? "A resume is set in this font. Deleting it makes that resume print in a fallback face instead, which changes where its pages break."
-        : "No resume is set in this font. Deleting it frees the space it takes on this device."}
-    </Text>
-  </ConfirmDialog>
-);
+}) => {
+  const { t } = useTranslation("assets");
+
+  return (
+    <ConfirmDialog
+      confirmLabel={t("dialogs.deleteFont.confirm")}
+      danger
+      onCancel={onCancel}
+      onConfirm={onConfirm}
+      opened={font !== null}
+      title={t("dialogs.deleteFont.title", {
+        name: font?.family ?? t("dialogs.deleteFont.fallbackName"),
+      })}
+    >
+      <Text className="text-[13px]">
+        {font !== null && !unused
+          ? t("dialogs.deleteFont.inUse")
+          : t("dialogs.deleteFont.unused")}
+      </Text>
+    </ConfirmDialog>
+  );
+};

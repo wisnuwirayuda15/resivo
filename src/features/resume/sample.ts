@@ -111,10 +111,16 @@ export const createSampleDocument = (
 export const RESUME_STARTS = ["sample", "blank"] as const;
 export type ResumeStart = (typeof RESUME_STARTS)[number];
 
+/**
+ * `locale` is the language of the page being started and applies to a blank
+ * page only. The example is Ada Lovelace's resume in English, a document and not
+ * an interface, and translating it would be writing a different resume.
+ */
 export const createStartingDocument = (
   start: ResumeStart,
   templateId: TemplateId,
+  locale = "en",
 ): ResumeDocument =>
   start === "blank"
-    ? createEmptyDocument(templateId)
+    ? createEmptyDocument(templateId, locale)
     : createSampleDocument(templateId);

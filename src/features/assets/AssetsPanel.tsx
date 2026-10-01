@@ -17,6 +17,7 @@ import {
 } from "@/features/editor/mutations";
 import { plainText } from "@/features/resume/model/index";
 import { createId } from "@/lib/id";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { AssetNameInput } from "./components/AssetNameInput";
 import { AssetUpload, UploadError } from "./components/AssetUpload";
@@ -69,6 +70,7 @@ interface AssetsPanelProps {
 }
 
 const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
+  const { t } = useTranslation("assets");
   const { data: images, isPending } = useImages();
   const { data: unused } = useUnusedImages();
   const add = useAddImage();
@@ -84,7 +86,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 
   const sections = document.content.sections.map((section) => ({
     value: section.id,
-    label: plainText(section.title).trim() || "Untitled section",
+    label: plainText(section.title).trim() || t("images.untitledSection"),
   }));
 
   const insertInto = (target: string) => {
@@ -105,17 +107,17 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
   };
 
   return (
-    <ControlGroup title="Images">
+    <ControlGroup title={t("images.title")}>
       <Box className="flex items-center gap-2">
         <AssetUpload
           accept={IMAGE_ACCEPT}
-          label="Add image"
+          label={t("images.add")}
           loading={add.isPending}
           onFile={(file) => add.mutate(file)}
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {(images ?? []).length} stored
+          {t("images.stored", { count: (images ?? []).length })}
         </Text>
       </Box>
 
@@ -126,18 +128,23 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
           <Loader size="sm" />
         </Box>
       ) : (images ?? []).length === 0 ? (
-        <Text className="text-muted mt-2 text-[12px]">
-          No images yet. Add one and it is available to every resume on this
-          device.
-        </Text>
+        <Text className="text-muted mt-2 text-[12px]">{t("images.empty")}</Text>
       ) : (
         <Box className="mt-2 grid grid-cols-4 gap-2">
           {(images ?? []).map((image) => (
             <Tooltip
               key={image.id}
-              label={`${image.name}, ${image.width}×${image.height}, ${formatBytes(image.size)}${
-                unusedIds.has(image.id) ? ", unused" : ""
-              }`}
+              label={t(
+                unusedIds.has(image.id)
+                  ? "images.tooltipUnused"
+                  : "images.tooltip",
+                {
+                  name: image.name,
+                  width: image.width,
+                  height: image.height,
+                  size: formatBytes(image.size),
+                },
+              )}
             >
               <UnstyledButton
                 aria-pressed={image.id === selectedId}
@@ -158,7 +165,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
       {selected === undefined ? null : (
         <Box className="border-line-soft mt-3 flex flex-col gap-2 border-t pt-3">
           <AssetNameInput
-            aria-label="Image name"
+            aria-label={t("images.imageName")}
             onCommit={(name) => rename.mutate({ id: selected.id, name })}
             value={selected.name}
           />
@@ -168,7 +175,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
               onClick={() => apply(setAvatarImage(selected.id))}
               variant="default"
             >
-              Use as photo
+              {t("images.usePhoto")}
             </Button>
 
             {document.content.header.avatarImageId === selected.id ? (
@@ -176,7 +183,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
                 onClick={() => apply(setAvatarImage(undefined))}
                 variant="subtle"
               >
-                Remove as photo
+                {t("images.removePhoto")}
               </Button>
             ) : null}
           </Box>
@@ -185,11 +192,11 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
               the panel has no notion of "where the cursor is". */}
           <Box className="flex items-end gap-2">
             <Select
-              aria-label="Section to insert into"
+              aria-label={t("images.sectionTo")}
               className="flex-1"
               data={sections}
               onChange={setSectionId}
-              placeholder="Insert into section…"
+              placeholder={t("images.insertInto")}
               value={sectionId}
             />
             <Button
@@ -197,20 +204,22 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
               onClick={() => sectionId !== null && insertInto(sectionId)}
               variant="default"
             >
-              Insert
+              {t("images.insert")}
             </Button>
           </Box>
 
           <Box className="flex items-center justify-between">
             <Text className="text-subtle font-mono text-[11px]" span>
-              {unusedIds.has(selected.id) ? "Used by no resume" : "In use"}
+              {unusedIds.has(selected.id)
+                ? t("images.usedByNone")
+                : t("images.inUse")}
             </Text>
             <Button
               color="red"
               onClick={() => setConfirming(selected)}
               variant="subtle"
             >
-              Delete
+              {t("images.delete")}
             </Button>
           </Box>
         </Box>
@@ -233,6 +242,7 @@ const ImageGallery: React.FC<AssetsPanelProps> = ({ document, apply }) => {
 };
 
 const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
+  const { t } = useTranslation("assets");
   const { data: fonts, isPending } = useFonts();
   const { data: unused } = useUnusedFonts();
   const add = useAddFont();
@@ -253,17 +263,17 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
     );
 
   return (
-    <ControlGroup title="Fonts">
+    <ControlGroup title={t("fonts.title")}>
       <Box className="flex items-center gap-2">
         <AssetUpload
           accept={FONT_ACCEPT}
-          label="Add font"
+          label={t("fonts.add")}
           loading={add.isPending}
           onFile={(file) => add.mutate(file)}
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {(fonts ?? []).length} stored
+          {t("images.stored", { count: (fonts ?? []).length })}
         </Text>
       </Box>
 
@@ -274,11 +284,7 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
           <Loader size="sm" />
         </Box>
       ) : (fonts ?? []).length === 0 ? (
-        <Text className="text-muted mt-2 text-[12px]">
-          The three built-in families need no upload. Add a WOFF2, WOFF,
-          TrueType or OpenType file to use your own, it is embedded in an HTML
-          export, so the file stays self-contained.
-        </Text>
+        <Text className="text-muted mt-2 text-[12px]">{t("fonts.empty")}</Text>
       ) : (
         <Box className="mt-2 flex flex-col gap-2">
           {(fonts ?? []).map((font) => (
@@ -291,7 +297,7 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
                     size="compact-xs"
                     variant={bodyFont.fontId === font.id ? "light" : "subtle"}
                   >
-                    Body
+                    {t("fonts.body")}
                   </Button>
                   <Button
                     disabled={headingFont?.fontId === font.id}
@@ -301,7 +307,7 @@ const FontList: React.FC<AssetsPanelProps> = ({ document, apply }) => {
                       headingFont?.fontId === font.id ? "light" : "subtle"
                     }
                   >
-                    Headings
+                    {t("fonts.headings")}
                   </Button>
                 </>
               }

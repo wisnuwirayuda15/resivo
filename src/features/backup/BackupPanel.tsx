@@ -13,10 +13,12 @@ import { useQueryClient } from "@tanstack/react-query";
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { downloadBlob } from "@/lib/download";
+import { Trans, useErrorText, useTranslation } from "@/lib/i18n/useTranslation";
 
 import { createBackup, restoreBackup } from "./backup";
 import { parseBackup } from "./format";
 
+import type { TFunction } from "i18next";
 import type { RestoreReport } from "./backup";
 
 /**
@@ -29,61 +31,63 @@ import type { RestoreReport } from "./backup";
  * takes away what is still there.
  */
 
-const summarise = (report: RestoreReport): Array<string> => {
+/**
+ * What a restore did, one line for each thing it did.
+ *
+ * Takes `t` so it stays a plain function of the report: a count of zero is not
+ * a line, and the plural of each noun is the message's, not this file's.
+ */
+const summarise = (
+  report: RestoreReport,
+  t: TFunction<"settings">,
+): Array<string> => {
   const lines: Array<string> = [];
 
   if (report.resumesAdded > 0) {
+    const restored = t("backup.summary.resumes", {
+      count: report.resumesAdded,
+    });
+
     lines.push(
-      `${report.resumesAdded} ${report.resumesAdded === 1 ? "resume" : "resumes"} restored` +
-        (report.resumesRenumbered > 0
-          ? ` (${report.resumesRenumbered} kept alongside an existing copy)`
-          : ""),
+      report.resumesRenumbered > 0
+        ? `${restored} ${t("backup.summary.alongside", { count: report.resumesRenumbered })}`
+        : restored,
     );
   }
 
-  if (report.groupsAdded > 0) {
-    lines.push(`${report.groupsAdded} groups restored`);
+  const counted = [
+    ["groups", report.groupsAdded],
+    ["images", report.imagesAdded],
+    ["imagesPresent", report.imagesAlreadyPresent],
+    ["fonts", report.fontsAdded],
+    ["fontsPresent", report.fontsAlreadyPresent],
+    ["settings", report.settingsAdded],
+  ] as const;
+
+  for (const [key, count] of counted) {
+    if (count > 0) {
+      lines.push(t(`backup.summary.${key}`, { count }));
+    }
   }
 
-  if (report.imagesAdded > 0) {
-    lines.push(`${report.imagesAdded} images restored`);
-  }
-
-  if (report.imagesAlreadyPresent > 0) {
-    lines.push(
-      `${report.imagesAlreadyPresent} images were already stored, so they were not duplicated`,
-    );
-  }
-
-  if (report.fontsAdded > 0) {
-    lines.push(`${report.fontsAdded} fonts restored`);
-  }
-
-  if (report.fontsAlreadyPresent > 0) {
-    lines.push(`${report.fontsAlreadyPresent} fonts were already stored`);
-  }
-
-  if (report.settingsAdded > 0) {
-    lines.push(
-      `${report.settingsAdded} ${report.settingsAdded === 1 ? "setting" : "settings"} restored, leaving the ones this device already had`,
-    );
-  }
-
-  return lines.length === 0
-    ? ["That backup was empty. Nothing changed."]
-    : lines;
+  return lines.length === 0 ? [t("backup.summary.empty")] : lines;
 };
 
 export const BackupPanel: React.FC = () => {
+  const { t } = useTranslation("settings");
+  const errorText = useErrorText();
   const client = useQueryClient();
 
   const [busy, setBusy] = useState<"backup" | "restore" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{
+    cause: unknown;
+    during: "backup" | "restore";
+  } | null>(null);
   const [report, setReport] = useState<RestoreReport | null>(null);
 
   const download = async () => {
     setBusy("backup");
-    setError(null);
+    setFailed(null);
 
     try {
       const now = Date.now();
@@ -99,11 +103,7 @@ export const BackupPanel: React.FC = () => {
         `resivo-backup-${stamp}.json`,
       );
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "The backup could not be written.",
-      );
+      setFailed({ cause, during: "backup" });
     } finally {
       setBusy(null);
     }
@@ -111,7 +111,7 @@ export const BackupPanel: React.FC = () => {
 
   const restore = async (file: File) => {
     setBusy("restore");
-    setError(null);
+    setFailed(null);
     setReport(null);
 
     try {
@@ -122,23 +122,35 @@ export const BackupPanel: React.FC = () => {
       // them.
       await client.invalidateQueries();
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "That file could not be restored.",
-      );
+      setFailed({ cause, during: "restore" });
     } finally {
       setBusy(null);
     }
   };
 
+  /**
+   * The error is kept as the thing that was thrown, and worded here, so a refusal
+   * raised in one language reads in the language the screen is in now. Which
+   * fallback it gets depends on what was being attempted.
+   */
+  const failure = (): string =>
+    failed === null
+      ? ""
+      : errorText(
+          failed.cause,
+          failed.during === "backup"
+            ? t("backup.writeFailed")
+            : t("backup.restoreFailed"),
+        );
+
   return (
     <Box className="flex max-w-[62ch] flex-col gap-6">
       <Box>
-        <Text className="text-body text-[14px] font-medium">Back up</Text>
+        <Text className="text-body text-[14px] font-medium">
+          {t("backup.backUp")}
+        </Text>
         <Text className="text-muted mt-1 text-[13px]">
-          Writes every resume, group, image and font on this device to one JSON
-          file. Nothing is sent anywhere, the file is saved by your browser.
+          {t("backup.backUpBody")}
         </Text>
 
         <Button
@@ -149,18 +161,20 @@ export const BackupPanel: React.FC = () => {
           size="xs"
           variant="default"
         >
-          Download backup
+          {t("backup.download")}
         </Button>
       </Box>
 
       <Box>
-        <Text className="text-body text-[14px] font-medium">Restore</Text>
+        <Text className="text-body text-[14px] font-medium">
+          {t("backup.restore")}
+        </Text>
         <Text className="text-muted mt-1 text-[13px]">
-          Adds the contents of a backup to this device. Nothing already here is
-          replaced or deleted: a resume that collides with one you already have
-          is restored beside it, marked{" "}
-          <Code className="text-[12px]">(restored)</Code>, and an image whose
-          bytes are already stored is not duplicated.
+          <Trans
+            components={{ code: <Code className="text-[12px]" /> }}
+            i18nKey="backup.restoreBody"
+            t={t}
+          />
         </Text>
 
         <FileButton
@@ -176,7 +190,7 @@ export const BackupPanel: React.FC = () => {
               size="xs"
               variant="default"
             >
-              Choose a backup file
+              {t("backup.choose")}
             </Button>
           )}
         </FileButton>
@@ -185,18 +199,20 @@ export const BackupPanel: React.FC = () => {
       {busy === "restore" ? (
         <Box className="flex items-center gap-2">
           <Loader size={14} />
-          <Text className="text-muted text-[12px]">Restoring…</Text>
+          <Text className="text-muted text-[12px]">
+            {t("backup.restoring")}
+          </Text>
         </Box>
       ) : null}
 
-      {error === null ? null : (
+      {failed === null ? null : (
         <Alert
           color="red"
           icon={<Icon name="warning" size={14} />}
-          title="Nothing was restored"
+          title={t("backup.failedTitle")}
           variant="light"
         >
-          <Text className="text-[12px]">{error}</Text>
+          <Text className="text-[12px]">{failure()}</Text>
         </Alert>
       )}
 
@@ -204,11 +220,11 @@ export const BackupPanel: React.FC = () => {
         <Alert
           color="teal"
           icon={<Icon name="check-circle" size={14} />}
-          title="Restored"
+          title={t("backup.restoredTitle")}
           variant="light"
         >
           <List className="text-[12px]" size="xs" spacing={2}>
-            {summarise(report).map((line) => (
+            {summarise(report, t).map((line) => (
               <List.Item key={line}>{line}</List.Item>
             ))}
           </List>

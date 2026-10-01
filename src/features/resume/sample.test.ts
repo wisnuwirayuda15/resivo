@@ -2,7 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import { parseDocument, serializeDocument } from "@/features/markdown/index";
 import { plainText } from "./model/index";
-import { SAMPLE_SOURCE, createSampleDocument } from "./sample";
+import {
+  SAMPLE_SOURCE,
+  createSampleDocument,
+  createStartingDocument,
+} from "./sample";
 
 import type { EntryBlock, TagListBlock } from "./model/document";
 
@@ -101,5 +105,23 @@ describe("the example resume", () => {
     expect(createSampleDocument("editorial").design).not.toEqual(
       createSampleDocument("classic").design,
     );
+  });
+});
+
+describe("createStartingDocument", () => {
+  it("starts a blank page in the language it is given", () => {
+    const blank = createStartingDocument("blank", "modern", "id");
+
+    expect(blank.meta.locale).toBe("id");
+    expect(
+      blank.content.sections.map((section) => plainText(section.title)),
+    ).toEqual(["Ringkasan", "Pengalaman", "Pendidikan", "Keahlian"]);
+  });
+
+  it("does not translate the example, which is a resume and not an interface", () => {
+    const sample = createStartingDocument("sample", "modern", "id");
+
+    expect(sample.meta.locale).toBe("en");
+    expect(plainText(sample.content.header.name)).toBe("Ada Lovelace");
   });
 });

@@ -7,10 +7,13 @@
  * accepted if that engine parses it.
  */
 
+import { LocalizedError } from "@/lib/i18n/LocalizedError";
+
 import type { AddFontInput } from "@/database/repositories/fonts";
 import type { FontRecord } from "@/database/records";
 
-export class FontRejected extends Error {}
+/** A refusal that carries the key of its own words, like `AssetRejected`. */
+export class FontRejected extends LocalizedError {}
 
 export const FONT_ACCEPT = ".woff2,.woff,.ttf,.otf,font/woff2,font/woff";
 
@@ -61,6 +64,7 @@ const validate = async (bytes: ArrayBuffer): Promise<void> => {
     throw new FontRejected(
       "That file is not a font this browser can read. If it is an older " +
         "format, converting it to WOFF2 usually works.",
+      "assets:rejected.font.unreadable",
     );
   }
 };
@@ -125,6 +129,11 @@ export const readFontFile = async (file: File): Promise<AddFontInput> => {
     throw new FontRejected(
       `That file is ${Math.round(file.size / 1024)}KB. The limit is ` +
         `${MAX_FONT_BYTES / 1024}KB, which is generous for one weight of a text face.`,
+      "assets:rejected.font.tooLarge",
+      {
+        size: `${Math.round(file.size / 1024)}KB`,
+        limit: `${MAX_FONT_BYTES / 1024}KB`,
+      },
     );
   }
 
@@ -135,6 +144,7 @@ export const readFontFile = async (file: File): Promise<AddFontInput> => {
     throw new FontRejected(
       "That file is not a WOFF2, WOFF, TrueType or OpenType font, whatever its " +
         "name says.",
+      "assets:rejected.font.notAFont",
     );
   }
 

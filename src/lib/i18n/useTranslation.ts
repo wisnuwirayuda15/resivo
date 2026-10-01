@@ -4,6 +4,9 @@ import { useTranslation as useI18nextTranslation } from "react-i18next";
 import i18n from "./index";
 import { FALLBACK_LANGUAGE, isAppLanguage } from "./language";
 
+import { LocalizedError } from "./LocalizedError";
+
+import type { ErrorParams } from "./LocalizedError";
 import type { AppLanguage } from "./language";
 
 /**
@@ -58,3 +61,41 @@ export const useTranslation = ((
 
   return useI18nextTranslation(ns, { ...options, lng });
 }) as typeof useI18nextTranslation;
+
+/**
+ * The words for an error, in the interface language.
+ *
+ * A `LocalizedError` is worded from its key and parameters, so a refusal reads in
+ * whichever language the screen is in even if it was raised in another. Anything
+ * else is shown as its own message, because an error nobody planned for has no
+ * key and paraphrasing it would be inventing what it meant.
+ *
+ * The one cast is here and not at each call: the key arrives as a runtime string
+ * from an error, which the type system cannot check against the message tree.
+ * Both languages having every key is the parity test's job.
+ */
+export const useErrorText = (): ((
+  error: unknown,
+  fallback: string,
+) => string) => {
+  const { t } = useTranslation();
+  const lookup = t as unknown as (key: string, options?: ErrorParams) => string;
+
+  return (error, fallback) => {
+    if (error instanceof LocalizedError) {
+      return lookup(error.key, error.params);
+    }
+
+    return error instanceof Error ? error.message : fallback;
+  };
+};
+
+/**
+ * `Trans`, re-exported so no file but this one imports from the library.
+ *
+ * Give it the `t` of `useTranslation` (`<Trans t={t} i18nKey=... />`), which is
+ * the one pinned to the language this component should render in. Without it
+ * `Trans` follows the global instance, which is the thing the wrapper above
+ * exists to avoid.
+ */
+export { Trans } from "react-i18next";

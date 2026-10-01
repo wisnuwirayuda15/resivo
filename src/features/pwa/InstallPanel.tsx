@@ -2,10 +2,9 @@ import { useState } from "react";
 import { Box, Button, Text } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { useInstallability } from "./install";
-
-import type { CacheState } from "./install";
 
 /**
  * Installing Resivo, and whether it can be opened without a network.
@@ -19,19 +18,13 @@ import type { CacheState } from "./install";
  * There is deliberately no prompt anywhere else. An install banner over the
  * library would be asking for something on the app's behalf before the user has
  * decided they want it; Settings is where somebody goes having decided.
+ *
+ * What the cache state means for the person reading it, not what it is, is in
+ * the `settings` messages under `install.cache`, keyed by the state.
  */
 
-/** What the cache state means for the person reading it, not what it is. */
-const CACHE_COPY: Record<CacheState, string> = {
-  ready:
-    "The app itself is cached on this device, so it opens and runs with no network at all.",
-  pending:
-    "The app has just been cached on this device. The next time it is opened it will work with no network.",
-  absent:
-    "The app is not cached on this device yet, so opening it still needs a connection. Your resumes are stored here either way.",
-};
-
 export const InstallPanel: React.FC = () => {
+  const { t } = useTranslation("settings");
   const { state, cache, install } = useInstallability();
   const [asking, setAsking] = useState(false);
 
@@ -51,7 +44,7 @@ export const InstallPanel: React.FC = () => {
         <Box className="flex items-baseline gap-2">
           <Icon className="text-accent translate-y-0.5" name="check-circle" />
           <Text className="text-body text-[13px]">
-            Installed on this device, and running in its own window.
+            {t("install.installed")}
           </Text>
         </Box>
       ) : state === "available" ? (
@@ -61,13 +54,10 @@ export const InstallPanel: React.FC = () => {
             loading={asking}
             onClick={() => void ask()}
           >
-            Install Resivo
+            {t("install.button")}
           </Button>
           <Text className="text-muted mt-3 max-w-[62ch] text-[13px]">
-            Installing puts Resivo in your dock, taskbar or home screen. It gets
-            a window of its own with no address bar, and opens at your resumes
-            rather than at the landing page. Nothing is uploaded and nothing
-            changes about where your data is kept.
+            {t("install.availableBody")}
           </Text>
         </Box>
       ) : (
@@ -77,14 +67,12 @@ export const InstallPanel: React.FC = () => {
               platform, whether the page is served over HTTPS and whether it
               has been installed already, and this app cannot tell those apart
               from here. */}
-          This browser has not offered to install Resivo. Where installing is
-          supported, the address bar carries an install icon; on an iPhone or
-          iPad it is Share, then Add to Home Screen.
+          {t("install.notOffered")}
         </Text>
       )}
 
       <Text className="text-muted mt-3 max-w-[62ch] text-[13px]">
-        {CACHE_COPY[cache]}
+        {t(`install.cache.${cache}`)}
       </Text>
     </Box>
   );

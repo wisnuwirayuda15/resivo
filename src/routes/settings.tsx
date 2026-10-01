@@ -1,8 +1,8 @@
 import { Box, Loader, Text } from "@mantine/core";
 import { createFileRoute } from "@tanstack/react-router";
-import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { seo } from "@/lib/seo";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { ClientOnly } from "@/components/client-only";
 import { Shell } from "@/components/shell/Shell";
@@ -14,15 +14,22 @@ import { StoragePanel } from "@/features/settings/StoragePanel";
 /**
  * Settings.
  *
- * Three things, and they are the three questions about a local-first app that
- * are not about any one document: what happens if this laptop is lost, how much
- * of the device is this using, and can it be kept here rather than fetched.
+ * The questions about a local-first app that are not about any one document:
+ * what language it speaks, what happens if this laptop is lost, how much of the
+ * device is this using, and can it be kept here rather than fetched.
  */
+const Pending: React.FC = () => (
+  <Box className="flex py-6">
+    <Loader size="sm" />
+  </Box>
+);
+
 const SettingsRoute: React.FC = () => {
   const { t } = useTranslation("settings");
+  const { t: tShell } = useTranslation("shell");
 
   return (
-    <Shell title="Settings">
+    <Shell title={tShell("sidebar.settings")}>
       <Box className="flex flex-col gap-6 p-6">
         <Box>
           <Text className="text-body text-[15px] font-medium">
@@ -39,42 +46,29 @@ const SettingsRoute: React.FC = () => {
 
         <Box className="border-line-soft border-t pt-6">
           <Text className="text-body text-[15px] font-medium">
-            Backup and restore
+            {t("backup.title")}
           </Text>
           <Text className="text-muted mt-1 max-w-[62ch] text-[13px]">
-            Everything Resivo stores lives in this browser, on this device.
-            There is no copy anywhere else, so a backup is the only thing that
-            survives a cleared browser or a lost machine.
+            {t("backup.intro")}
           </Text>
         </Box>
 
         {/* Client-only: reading the database and writing a file both need a
           browser, and this page is nothing but those two things. */}
-        <ClientOnly
-          fallback={
-            <Box className="flex py-6">
-              <Loader size="sm" />
-            </Box>
-          }
-        >
+        <ClientOnly fallback={<Pending />}>
           <BackupPanel />
         </ClientOnly>
 
         <Box className="border-line-soft border-t pt-6">
-          <Text className="text-body text-[15px] font-medium">Storage</Text>
+          <Text className="text-body text-[15px] font-medium">
+            {t("storage.title")}
+          </Text>
           <Text className="text-muted mt-1 max-w-[62ch] text-[13px]">
-            Every image and font is stored once and shared by every resume on
-            this device.
+            {t("storage.intro")}
           </Text>
 
           <Box className="mt-4">
-            <ClientOnly
-              fallback={
-                <Box className="flex py-6">
-                  <Loader size="sm" />
-                </Box>
-              }
-            >
+            <ClientOnly fallback={<Pending />}>
               <StoragePanel />
             </ClientOnly>
           </Box>
@@ -82,11 +76,10 @@ const SettingsRoute: React.FC = () => {
 
         <Box className="border-line-soft border-t pt-6">
           <Text className="text-body text-[15px] font-medium">
-            Install on this device
+            {t("install.title")}
           </Text>
           <Text className="text-muted mt-1 max-w-[62ch] text-[13px]">
-            Resivo can be installed like any other application, and once it is
-            cached it opens whether or not there is a network.
+            {t("install.intro")}
           </Text>
 
           <Box className="mt-4">
@@ -94,13 +87,7 @@ const SettingsRoute: React.FC = () => {
               here comes from the browser (whether it has offered an install,
               whether a worker is controlling the page) and none of them exists
               on the server. */}
-            <ClientOnly
-              fallback={
-                <Box className="flex py-6">
-                  <Loader size="sm" />
-                </Box>
-              }
-            >
+            <ClientOnly fallback={<Pending />}>
               <InstallPanel />
             </ClientOnly>
           </Box>

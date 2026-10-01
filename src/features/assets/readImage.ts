@@ -7,6 +7,8 @@
  * user sees, so each says what to do about it.
  */
 
+import { LocalizedError } from "@/lib/i18n/LocalizedError";
+
 import type { AddImageInput } from "@/database/repositories/images";
 
 /**
@@ -31,7 +33,12 @@ export const IMAGE_ACCEPT = [...ACCEPTED].join(",");
  */
 export const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
 
-export class AssetRejected extends Error {}
+/**
+ * A refusal, as an error that carries the key of its own words. `message` is
+ * the English sentence a log or a test reads; the screen that shows it chooses
+ * the words by `key`, in the language it is in.
+ */
+export class AssetRejected extends LocalizedError {}
 
 const megabytes = (bytes: number): string =>
   `${Math.round((bytes / (1024 * 1024)) * 10) / 10}MB`;
@@ -55,6 +62,7 @@ const measure = async (
     throw new AssetRejected(
       "That file could not be decoded as an image. It may be corrupt, or named " +
         "with an extension that does not match its contents.",
+      "assets:rejected.image.notDecodable",
     );
   }
 
@@ -70,6 +78,10 @@ export const readImageFile = async (file: File): Promise<AddImageInput> => {
     throw new AssetRejected(
       `${file.type === "" ? "That file" : file.type} is not a supported image. ` +
         "Use PNG, JPEG, WebP or GIF.",
+      file.type === ""
+        ? "assets:rejected.image.unsupportedUnknown"
+        : "assets:rejected.image.unsupported",
+      { type: file.type },
     );
   }
 
@@ -78,6 +90,8 @@ export const readImageFile = async (file: File): Promise<AddImageInput> => {
       `That image is ${megabytes(file.size)}. The limit is ` +
         `${megabytes(MAX_IMAGE_BYTES)}, export a smaller copy, since a resume ` +
         "prints it a few inches wide at most.",
+      "assets:rejected.image.tooLarge",
+      { size: megabytes(file.size), limit: megabytes(MAX_IMAGE_BYTES) },
     );
   }
 

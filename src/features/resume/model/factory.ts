@@ -2,6 +2,7 @@ import { createId } from "@/lib/id";
 import { templateDefaults } from "@/features/templates/defaults";
 
 import { DOCUMENT_VERSION } from "./document";
+import { sectionTitle } from "./sectionTitles";
 
 import type {
   ContactItem,
@@ -73,23 +74,29 @@ export const createSection = (
  * Nothing is written into it. A document should never contain text its owner
  * did not write, so the example resume in `features/resume/sample.ts` is
  * something the new-resume dialog offers and this is what it offers instead.
+ *
+ * The four headings are the one exception, and they are the document's own
+ * words: in the language the resume is written in, which the caller says. A
+ * resume started by someone using the app in Indonesian is not handed a
+ * "Summary" to retitle in every one of its sections.
  */
 export const createEmptyDocument = (
   templateId: TemplateId = "classic",
+  locale = "en",
 ): ResumeDocument => ({
   schemaVersion: DOCUMENT_VERSION,
   templateId,
-  meta: { fullName: "", locale: "en" },
+  meta: { fullName: "", locale },
   content: {
     header: {
       name: [],
       contacts: [],
     },
     sections: [
-      createSection("summary", "Summary"),
-      createSection("experience", "Experience"),
-      createSection("education", "Education"),
-      createSection("skills", "Skills"),
+      createSection("summary", sectionTitle("summary", locale)),
+      createSection("experience", sectionTitle("experience", locale)),
+      createSection("education", sectionTitle("education", locale)),
+      createSection("skills", sectionTitle("skills", locale)),
     ],
   },
   design: templateDefaults(templateId),

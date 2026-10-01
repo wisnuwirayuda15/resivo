@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { documentSchema } from "@/features/resume/model/index";
+import { LocalizedError } from "@/lib/i18n/LocalizedError";
 
 /**
  * The backup file's shape.
@@ -105,7 +106,8 @@ export type BackupResume = z.infer<typeof resumeSchema>;
 export type BackupImage = z.infer<typeof imageSchema>;
 export type BackupFont = z.infer<typeof fontSchema>;
 
-export class BackupRejected extends Error {}
+/** A refusal that carries the key of its own words, like `AssetRejected`. */
+export class BackupRejected extends LocalizedError {}
 
 /**
  * Parses and validates a backup file.
@@ -122,6 +124,7 @@ export const parseBackup = (text: string): Backup => {
   } catch {
     throw new BackupRejected(
       "That file is not valid JSON, so it is not a Resivo backup.",
+      "settings:backup.rejected.notJson",
     );
   }
 
@@ -131,6 +134,8 @@ export const parseBackup = (text: string): Backup => {
     throw new BackupRejected(
       "That JSON file is not a Resivo backup. A backup starts with " +
         `"kind": "${BACKUP_KIND}".`,
+      "settings:backup.rejected.notBackup",
+      { kind: BACKUP_KIND },
     );
   }
 
@@ -141,6 +146,8 @@ export const parseBackup = (text: string): Backup => {
       `That backup was written by a newer version of Resivo (format ${version}, ` +
         `this build reads ${BACKUP_VERSION}). Update before restoring it, ` +
         "restoring it here could lose part of it.",
+      "settings:backup.rejected.newer",
+      { version, supported: BACKUP_VERSION },
     );
   }
 
@@ -155,6 +162,15 @@ export const parseBackup = (text: string): Backup => {
           ? "."
           : `: ${first.message} (at ${first.path.join(".") || "the top level"}).`) +
         " Nothing was changed.",
+      first === undefined
+        ? "settings:backup.rejected.unreadable"
+        : "settings:backup.rejected.unreadableAt",
+      first === undefined
+        ? {}
+        : {
+            detail: first.message,
+            path: first.path.join(".") || "/",
+          },
     );
   }
 

@@ -9,6 +9,7 @@ import {
   useUnusedFonts,
   useUnusedImages,
 } from "@/features/assets/queries";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * What Resivo is holding on this device.
@@ -30,19 +31,24 @@ const Row: React.FC<{
   bytes: number;
   unused: number;
   to: "/images" | "/fonts";
-}> = ({ label, count, bytes, unused, to }) => (
-  <Box className="border-line-soft flex items-baseline justify-between gap-3 border-b py-2 last:border-b-0">
-    <Link className="text-body hover:text-accent text-[13px]" to={to}>
-      {label}
-    </Link>
-    <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-      {count} {count === 1 ? "file" : "files"} · {formatBytes(bytes)}
-      {unused === 0 ? "" : ` · ${unused} unused`}
-    </Text>
-  </Box>
-);
+}> = ({ label, count, bytes, unused, to }) => {
+  const { t } = useTranslation("settings");
+
+  return (
+    <Box className="border-line-soft flex items-baseline justify-between gap-3 border-b py-2 last:border-b-0">
+      <Link className="text-body hover:text-accent text-[13px]" to={to}>
+        {label}
+      </Link>
+      <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
+        {t("storage.files", { count })} · {formatBytes(bytes)}
+        {unused === 0 ? "" : ` · ${t("storage.unused", { count: unused })}`}
+      </Text>
+    </Box>
+  );
+};
 
 export const StoragePanel: React.FC = () => {
+  const { t } = useTranslation("settings");
   const usage = useAssetUsage();
   const images = useImages();
   const fonts = useFonts();
@@ -62,23 +68,20 @@ export const StoragePanel: React.FC = () => {
       <Row
         bytes={usage.data.images}
         count={(images.data ?? []).length}
-        label="Images"
+        label={t("storage.images")}
         to="/images"
         unused={(unusedImages.data ?? []).length}
       />
       <Row
         bytes={usage.data.fonts}
         count={(fonts.data ?? []).length}
-        label="Fonts"
+        label={t("storage.fonts")}
         to="/fonts"
         unused={(unusedFonts.data ?? []).length}
       />
 
       <Text className="text-muted mt-3 max-w-[62ch] text-[13px]">
-        Resumes themselves are text and take a negligible amount of room; images
-        and fonts are what a device notices. Nothing is deleted automatically,
-        because an asset can be unused simply because it has not been placed
-        yet: the Images and Fonts pages are where that decision is made.
+        {t("storage.note")}
       </Text>
     </Box>
   );

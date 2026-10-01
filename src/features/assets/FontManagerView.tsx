@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Loader, Text } from "@mantine/core";
 
 import { EmptyState } from "@/components/EmptyState";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { AssetUpload, UploadError } from "./components/AssetUpload";
 import { DeleteFontDialog } from "./components/deleteDialogs";
@@ -21,6 +22,7 @@ import type { FontSummary } from "@/database/index";
  * about the files: what is stored, what it costs, and what nothing uses.
  */
 export const FontManagerView: React.FC = () => {
+  const { t } = useTranslation("assets");
   const { data: fonts, isPending } = useFonts();
   const { data: unused } = useUnusedFonts();
   const add = useAddFont();
@@ -35,24 +37,23 @@ export const FontManagerView: React.FC = () => {
   return (
     <Box className="p-6">
       <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
-        Resivo ships with Instrument Sans, JetBrains Mono and Source Serif 4,
-        which need no upload. Add a WOFF2, WOFF, TrueType or OpenType file to
-        use your own, the browser&rsquo;s own font parser validates it on
-        upload, so a bad file is refused rather than silently falling back, and
-        the face is embedded into an HTML export.
+        {t("fontsPage.intro")}
       </Text>
 
       <Box className="mb-4 flex flex-wrap items-center gap-3">
         <AssetUpload
           accept={FONT_ACCEPT}
-          label="Add font"
+          label={t("fonts.add")}
           loading={add.isPending}
           onFile={(file) => add.mutate(file)}
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{" "}
-          unused
+          {t("fontsPage.stats", {
+            count: all.length,
+            size: formatBytes(totalBytes),
+            unused: unusedIds.size,
+          })}
         </Text>
       </Box>
 
@@ -64,9 +65,9 @@ export const FontManagerView: React.FC = () => {
         </Box>
       ) : all.length === 0 ? (
         <EmptyState
-          body="Upload a WOFF2, WOFF or TrueType file to set a resume in your own typeface. It stays on this device and is embedded into exports."
+          body={t("fontsPage.emptyBody")}
           icon="text-aa"
-          title="No custom fonts"
+          title={t("fontsPage.emptyTitle")}
         />
       ) : (
         <Box className="grid grid-cols-[repeat(auto-fill,minmax(280px,1fr))] gap-3">

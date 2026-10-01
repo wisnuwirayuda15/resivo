@@ -245,17 +245,39 @@ describe("structure rules", () => {
     );
   });
 
-  it("calls an unknown English heading unusual, and stays quiet in other languages", () => {
+  it("calls an unknown heading unusual, and stays quiet in a language it has no headings for", () => {
     const section = createSection("custom", "Volunteering", [
       entry("e", "Helper", { start: "2020" }),
     ]);
     const english = withSections(section);
-    const indonesian = withSections(section);
+    const german = withSections(section);
 
-    indonesian.meta = { ...indonesian.meta, locale: "id" };
+    german.meta = { ...german.meta, locale: "de" };
 
     expect(rulesOf(english)).toContain("ats.section-title-unusual");
-    expect(rulesOf(indonesian)).not.toContain("ats.section-title-unusual");
+    expect(rulesOf(german)).not.toContain("ats.section-title-unusual");
+  });
+
+  it("reads Indonesian headings as the kinds they name, and flags an unknown one", () => {
+    const known = withSections(
+      createSection("custom", "Pengalaman Kerja", [
+        entry("e", "Analis", { start: "2020" }),
+      ]),
+    );
+    const unknown = withSections(
+      createSection("custom", "Kegiatan Sosial", [
+        entry("e", "Relawan", { start: "2020" }),
+      ]),
+    );
+
+    known.meta = { ...known.meta, locale: "id-ID" };
+    unknown.meta = { ...unknown.meta, locale: "id-ID" };
+
+    // A known heading is neither unusual nor a reason to say the resume has no
+    // experience.
+    expect(rulesOf(known)).not.toContain("ats.section-title-unusual");
+    expect(rulesOf(known)).not.toContain("ats.core-sections-missing");
+    expect(rulesOf(unknown)).toContain("ats.section-title-unusual");
   });
 
   it("flags two columns and offers one", () => {

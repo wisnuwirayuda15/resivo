@@ -100,3 +100,55 @@ test("a stored language the app does not know is ignored", async ({ page }) => {
   await expect(page.getByRole("link", { name: /^All resumes/ })).toBeVisible();
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
 });
+
+/**
+ * Hands a file to the page's hidden file input and waits for the page to react.
+ *
+ * Retried, for the reason `chooseInSettings` is: before React has taken over a
+ * server-rendered page the input exists and its handler does not, so the first
+ * file is simply dropped.
+ */
+const offerFile = async (
+  page: Page,
+  file: { name: string; mimeType: string; buffer: Buffer },
+  expected: ReturnType<Page["getByText"]>,
+) => {
+  await expect(async () => {
+    await page.locator('input[type="file"]').first().setInputFiles(file);
+    await expect(expected).toBeVisible({ timeout: 1000 });
+  }).toPass();
+};
+
+test("a refused upload is explained in the interface language", async ({
+  page,
+}) => {
+  await openEmptyApp(page);
+  await page.evaluate(() => localStorage.setItem("resivo.language", "id"));
+  await page.goto("/images");
+
+  await offerFile(
+    page,
+    { name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("hello") },
+    page.getByText(/bukan gambar yang didukung/),
+  );
+});
+
+test("a refused backup is explained in the interface language", async ({
+  page,
+}) => {
+  await openEmptyApp(page);
+  await page.evaluate(() => localStorage.setItem("resivo.language", "id"));
+  await page.goto("/settings");
+
+  await expect(page.getByText("Cadangkan dan pulihkan")).toBeVisible();
+
+  await offerFile(
+    page,
+    {
+      name: "backup.json",
+      mimeType: "application/json",
+      buffer: Buffer.from("not json at all"),
+    },
+    page.getByText(/bukan JSON yang valid/),
+  );
+});

@@ -1,8 +1,7 @@
 import { Alert, Button, FileButton, Text } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
-
-import { errorMessage } from "../format";
+import { useErrorText } from "@/lib/i18n/useTranslation";
 
 interface AssetUploadProps {
   /** The `accept` string from `readImage` or `readFont`. */
@@ -49,14 +48,17 @@ export const AssetUpload: React.FC<AssetUploadProps> = ({
 export const UploadError: React.FC<{ error: unknown; className?: string }> = ({
   error,
   className,
-}) =>
-  error === null || error === undefined ? null : (
+}) => {
+  const errorText = useErrorText();
+
+  return error === null || error === undefined ? null : (
     <Alert
       className={className}
       color="red"
       icon={<Icon name="warning" size={14} />}
       variant="light"
     >
-      <Text className="text-[12px]">{errorMessage(error)}</Text>
+      <Text className="text-[12px]">{errorText(error, String(error))}</Text>
     </Alert>
   );
+};

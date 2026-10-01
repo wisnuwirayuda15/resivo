@@ -75,6 +75,10 @@ describe.each(NAMESPACES)("namespace %s", (namespace) => {
       ([key, value]) =>
         indonesian[key] === value &&
         value.split(/\s+/).length >= SHORT &&
+        // A string that is only placeholders and punctuation, such as
+        // "{{width}}×{{height}} · {{size}}", has nothing to translate, so being
+        // the same in both languages is correct.
+        /\p{L}/u.test(value.replace(/\{\{[^}]*\}\}/g, "")) &&
         !SAME_ON_PURPOSE.has(`${namespace}.${key}`),
     );
 

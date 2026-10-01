@@ -66,6 +66,29 @@ describe("createEmptyDocument", () => {
     ).toBe(true);
   });
 
+  it("names its sections in the language it is started in, and says so", () => {
+    const document = createEmptyDocument("classic", "id");
+
+    expect(document.meta.locale).toBe("id");
+    expect(
+      document.content.sections.map((section) => plainText(section.title)),
+    ).toEqual(["Ringkasan", "Pengalaman", "Pendidikan", "Keahlian"]);
+
+    // And the kinds are the same, which is what a template lays them out by.
+    expect(document.content.sections.map((section) => section.kind)).toEqual(
+      createEmptyDocument().content.sections.map((section) => section.kind),
+    );
+  });
+
+  it("is English unless told otherwise", () => {
+    const document = createEmptyDocument();
+
+    expect(document.meta.locale).toBe("en");
+    expect(
+      document.content.sections.map((section) => plainText(section.title)),
+    ).toEqual(["Summary", "Experience", "Education", "Skills"]);
+  });
+
   it("inserts no sample content into the user document", () => {
     const document = createEmptyDocument();
 

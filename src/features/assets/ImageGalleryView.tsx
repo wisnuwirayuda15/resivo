@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, Loader, SegmentedControl, Text } from "@mantine/core";
 
 import { EmptyState } from "@/components/EmptyState";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { AssetNameInput } from "./components/AssetNameInput";
 import { AssetUpload, UploadError } from "./components/AssetUpload";
@@ -31,6 +32,7 @@ import type { ImageSummary } from "@/database/index";
  * nothing refers to any more.
  */
 export const ImageGalleryView: React.FC = () => {
+  const { t } = useTranslation("assets");
   const { data: images, isPending } = useImages();
   const { data: unused } = useUnusedImages();
   const add = useAddImage();
@@ -49,33 +51,33 @@ export const ImageGalleryView: React.FC = () => {
   return (
     <Box className="p-6">
       <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
-        Images are stored on this device and shared by every resume on it, so
-        the same photograph does not have to be uploaded twice. Nothing is
-        deleted automatically: an image can be unused simply because it has not
-        been placed yet.
+        {t("imagesPage.intro")}
       </Text>
 
       <Box className="mb-4 flex flex-wrap items-center gap-3">
         <AssetUpload
           accept={IMAGE_ACCEPT}
-          label="Add image"
+          label={t("images.add")}
           loading={add.isPending}
           onFile={(file) => add.mutate(file)}
         />
 
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {all.length} stored · {formatBytes(totalBytes)} · {unusedIds.size}{" "}
-          unused
+          {t("imagesPage.stats", {
+            count: all.length,
+            size: formatBytes(totalBytes),
+            unused: unusedIds.size,
+          })}
         </Text>
 
         <Box className="flex-1" />
 
         {all.length === 0 ? null : (
           <SegmentedControl
-            aria-label="Filter images"
+            aria-label={t("imagesPage.filter")}
             data={[
-              { value: "all", label: "All" },
-              { value: "unused", label: "Unused" },
+              { value: "all", label: t("imagesPage.filterAll") },
+              { value: "unused", label: t("imagesPage.filterUnused") },
             ]}
             onChange={(value) =>
               setFilter(value === "unused" ? "unused" : "all")
@@ -94,15 +96,15 @@ export const ImageGalleryView: React.FC = () => {
         </Box>
       ) : all.length === 0 ? (
         <EmptyState
-          body="Upload an image to use it as a photo or place it in a resume. It stays on this device and can be reused across resumes."
+          body={t("imagesPage.emptyBody")}
           icon="image"
-          title="No images yet"
+          title={t("imagesPage.emptyTitle")}
         />
       ) : visible.length === 0 ? (
         <EmptyState
-          body="Every stored image is referenced by at least one resume."
+          body={t("imagesPage.nothingUnusedBody")}
           icon="check-circle"
-          title="Nothing unused"
+          title={t("imagesPage.nothingUnusedTitle")}
         />
       ) : (
         <Box className="grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-4">
@@ -113,7 +115,7 @@ export const ImageGalleryView: React.FC = () => {
               </Box>
 
               <AssetNameInput
-                aria-label={`Name of ${image.name}`}
+                aria-label={t("imagesPage.nameOf", { name: image.name })}
                 onCommit={(name) => rename.mutate({ id: image.id, name })}
                 value={image.name}
               />
@@ -123,8 +125,16 @@ export const ImageGalleryView: React.FC = () => {
                   className="text-subtle truncate font-mono text-[10px] tabular-nums"
                   span
                 >
-                  {image.width}×{image.height} · {formatBytes(image.size)}
-                  {unusedIds.has(image.id) ? " · unused" : ""}
+                  {t(
+                    unusedIds.has(image.id)
+                      ? "imagesPage.metaUnused"
+                      : "imagesPage.meta",
+                    {
+                      width: image.width,
+                      height: image.height,
+                      size: formatBytes(image.size),
+                    },
+                  )}
                 </Text>
                 <Button
                   color="red"
@@ -132,7 +142,7 @@ export const ImageGalleryView: React.FC = () => {
                   size="compact-xs"
                   variant="subtle"
                 >
-                  Delete
+                  {t("images.delete")}
                 </Button>
               </Box>
             </Box>
