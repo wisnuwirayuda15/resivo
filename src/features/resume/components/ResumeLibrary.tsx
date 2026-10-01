@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { Box, Skeleton, Text } from "@mantine/core";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { EmptyState } from "@/components/EmptyState";
 
 import { ResumeCard } from "./ResumeCard";
@@ -55,6 +57,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
   sort,
   emptyState,
 }) => {
+  const { t } = useTranslation("library");
   const [renaming, setRenaming] = useState<ResumeSummary | undefined>(
     undefined,
   );
@@ -104,8 +107,8 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
     return (
       <EmptyState
         icon="magnifying-glass"
-        title="No matches"
-        body={`Nothing in this view matches "${query.trim()}". Try a shorter search, or clear it to see everything.`}
+        title={t("search.noMatches")}
+        body={t("search.noMatchesBody", { query: query.trim() })}
       />
     );
   }
@@ -139,8 +142,8 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
           recover from), so it always asks first and names what will go. */}
       <ConfirmDialog
         opened={deleting !== undefined}
-        title={`Delete "${deleting?.title ?? ""}"?`}
-        confirmLabel="Delete"
+        title={t("delete.title", { title: deleting?.title ?? "" })}
+        confirmLabel={t("delete.confirm")}
         danger
         onCancel={() => setDeleting(undefined)}
         onConfirm={() => {
@@ -151,8 +154,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
         }}
       >
         <Text size="md" c="var(--text-muted)">
-          It is removed from this device and cannot be recovered. Archive it
-          instead to keep it out of the way.
+          {t("delete.body")}
         </Text>
       </ConfirmDialog>
     </>

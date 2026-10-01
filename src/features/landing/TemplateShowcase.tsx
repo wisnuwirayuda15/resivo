@@ -4,6 +4,7 @@ import { Box, Text, UnstyledButton } from "@mantine/core";
 import { PaperMiniature } from "@/features/templates/PaperMiniature";
 import { cn } from "@/lib/utils";
 import { templateList } from "@/features/templates/catalog";
+import { useTemplateText } from "@/features/templates/useTemplateText";
 
 import { Reveal } from "./Reveal";
 
@@ -29,6 +30,7 @@ import type { TemplateId } from "@/features/resume/model/document";
  */
 export const TemplateShowcase: React.FC = () => {
   const [active, setActive] = useState<TemplateId>("classic");
+  const text = useTemplateText();
 
   return (
     <Box className="bg-surface border-line-soft border-t" component="section">
@@ -71,13 +73,13 @@ export const TemplateShowcase: React.FC = () => {
                       )}
                       component="div"
                     >
-                      {template.name}
+                      {text(template.id).name}
                     </Text>
                     <Text
                       className="text-muted mt-1 max-w-[52ch] text-[12.5px] leading-relaxed"
                       component="div"
                     >
-                      {template.description}
+                      {text(template.id).description}
                     </Text>
                   </UnstyledButton>
                 );

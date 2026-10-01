@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { useCreateGroup } from "../queries";
 
 interface NewGroupDialogProps {
@@ -12,6 +14,8 @@ export const NewGroupDialog: React.FC<NewGroupDialogProps> = ({
   opened,
   onClose,
 }) => {
+  const { t } = useTranslation("library");
+  const { t: tc } = useTranslation("common");
   const [name, setName] = useState("");
   const createGroup = useCreateGroup();
 
@@ -32,11 +36,16 @@ export const NewGroupDialog: React.FC<NewGroupDialogProps> = ({
   };
 
   return (
-    <Modal opened={opened} onClose={close} title="New group" size={420}>
+    <Modal
+      opened={opened}
+      onClose={close}
+      title={t("group.newTitle")}
+      size={420}
+    >
       <Stack gap="lg">
         <TextInput
-          label="Name"
-          placeholder="Applications"
+          label={t("group.name")}
+          placeholder={t("group.placeholder")}
           data-autofocus
           value={name}
           onChange={(event) => setName(event.currentTarget.value)}
@@ -48,14 +57,14 @@ export const NewGroupDialog: React.FC<NewGroupDialogProps> = ({
         />
         <Group justify="flex-end" gap="xs">
           <Button variant="default" onClick={close}>
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             onClick={() => void submit()}
             loading={createGroup.isPending}
             disabled={name.trim() === ""}
           >
-            Create group
+            {t("group.create")}
           </Button>
         </Group>
       </Stack>

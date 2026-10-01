@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect } from "react";
 
+import dayjs from "dayjs";
 import "dayjs/locale/id";
 
 import { useUiLanguage } from "./useTranslation";
@@ -28,6 +29,9 @@ export const LanguageSync: React.FC = () => {
 
   useBrowserLayoutEffect(() => {
     document.documentElement.lang = language;
+    // The relative times on a card ("2 hours ago") and the calendar both read
+    // dayjs's global locale.
+    dayjs.locale(language);
   }, [language]);
 
   return null;

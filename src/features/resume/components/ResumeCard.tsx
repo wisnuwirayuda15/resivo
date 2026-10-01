@@ -4,7 +4,8 @@ import { Box, Menu, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import { Icon } from "@/features/icons/IconRenderer";
 import { PaperMiniature } from "@/features/templates/PaperMiniature";
 import { RelativeTime } from "@/components/RelativeTime";
-import { templateName } from "@/features/templates/catalog";
+import { useTemplateText } from "@/features/templates/useTemplateText";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { moveDestinations } from "../groups";
 
@@ -39,9 +40,15 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
   onRestore,
   onDelete,
 }) => {
+  const { t } = useTranslation("library");
+  const templateText = useTemplateText();
   const archived = resume.archivedAt !== 0;
 
-  const destinations = moveDestinations(groups, resume.groupId);
+  const destinations = moveDestinations(
+    groups,
+    resume.groupId,
+    t("group.ungrouped"),
+  );
 
   return (
     // Only colour and shadow cross-fade, never layout properties, which
@@ -68,8 +75,8 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             className="text-subtle mt-1 truncate font-mono text-[11px]"
             component="div"
           >
-            Edited <RelativeTime value={resume.updatedAt} /> ·{" "}
-            {templateName(resume.templateId)}
+            {t("card.edited")} <RelativeTime value={resume.updatedAt} /> ·{" "}
+            {templateText(resume.templateId).name}
           </Text>
         </Box>
       </Link>
@@ -78,9 +85,9 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
       <Box className="absolute top-2 right-2 opacity-0 transition-opacity group-hover:opacity-100 focus-within:opacity-100">
         <Menu position="bottom-end" radius="panel" shadow="lg" width={180}>
           <Menu.Target>
-            <Tooltip label="More">
+            <Tooltip label={t("card.more")}>
               <UnstyledButton
-                aria-label={`Actions for ${resume.title}`}
+                aria-label={t("card.actions", { title: resume.title })}
                 className="border-line bg-surface text-muted hover:text-body rounded-control flex h-[26px] w-[26px] items-center justify-center border shadow-xs"
               >
                 <Icon name="dots-three" size={15} />
@@ -90,24 +97,26 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
           {/* Named. There is one of these on every card, and an unnamed menu is
               announced as just "menu", which says nothing about which resume is
               about to be archived. */}
-          <Menu.Dropdown aria-label={`Actions for ${resume.title}`}>
+          <Menu.Dropdown
+            aria-label={t("card.actions", { title: resume.title })}
+          >
             <Menu.Item
               leftSection={<Icon name="cursor-text" size={15} />}
               onClick={onRename}
             >
-              Rename
+              {t("card.rename")}
             </Menu.Item>
             <Menu.Item
               leftSection={<Icon name="copy" size={15} />}
               onClick={onDuplicate}
             >
-              Duplicate
+              {t("card.duplicate")}
             </Menu.Item>
             {destinations.length === 0 ? null : (
               <Menu.Sub>
                 <Menu.Sub.Target>
                   <Menu.Sub.Item leftSection={<Icon name="folder" size={15} />}>
-                    Move to
+                    {t("card.moveTo")}
                   </Menu.Sub.Item>
                 </Menu.Sub.Target>
                 <Menu.Sub.Dropdown>
@@ -125,14 +134,14 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
                 leftSection={<Icon name="arrow-counter-clockwise" size={15} />}
                 onClick={onRestore}
               >
-                Restore
+                {t("card.restore")}
               </Menu.Item>
             ) : (
               <Menu.Item
                 leftSection={<Icon name="archive" size={15} />}
                 onClick={onArchive}
               >
-                Archive
+                {t("card.archive")}
               </Menu.Item>
             )}
             <Menu.Item
@@ -140,7 +149,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
               leftSection={<Icon name="trash" size={15} />}
               onClick={onDelete}
             >
-              Delete
+              {t("card.delete")}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>

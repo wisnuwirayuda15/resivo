@@ -3,6 +3,8 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Box, Button, Menu, Select, TextInput } from "@mantine/core";
 import { z } from "zod";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { seo } from "@/lib/seo";
 
 import { Shell } from "@/components/shell/Shell";
@@ -33,15 +35,17 @@ const searchSchema = z.object({
  *
  * Two controls offer them (a select where the row has room and a menu where it
  * does not), and a list that lived in only one of them would be a list that
- * could differ between widths.
+ * could differ between widths. The labels are message keys, said in the
+ * interface language where they are drawn.
  */
-const SORT_OPTIONS: ReadonlyArray<{ value: SortKey; label: string }> = [
-  { value: "edited", label: "Last edited" },
-  { value: "created", label: "Date created" },
-  { value: "title", label: "Name" },
-];
+const SORT_OPTIONS = [
+  { value: "edited", labelKey: "sort.edited" },
+  { value: "created", labelKey: "sort.created" },
+  { value: "title", labelKey: "sort.name" },
+] as const satisfies ReadonlyArray<{ value: SortKey; labelKey: string }>;
 
 const LibraryRoute: React.FC = () => {
+  const { t } = useTranslation("library");
   const { group, q, sort } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const [newResumeOpen, setNewResumeOpen] = useState(false);
@@ -53,7 +57,7 @@ const LibraryRoute: React.FC = () => {
     group === undefined
       ? undefined
       : (groups.data?.find((candidate) => candidate.id === group)?.name ??
-        "Ungrouped");
+        t("group.ungrouped"));
 
   const visible =
     group === undefined
@@ -68,7 +72,7 @@ const LibraryRoute: React.FC = () => {
 
   return (
     <Shell
-      title={groupName ?? "All resumes"}
+      title={groupName ?? t("title.all")}
       activeGroupId={group}
       allActive={group === undefined}
       actions={
@@ -78,8 +82,8 @@ const LibraryRoute: React.FC = () => {
               the reason this row exists. */}
           <TextInput
             className="w-[126px] sm:w-[200px]"
-            placeholder="Search resumes"
-            aria-label="Search resumes"
+            placeholder={t("search.placeholder")}
+            aria-label={t("search.label")}
             leftSection={<Icon name="magnifying-glass" size={15} />}
             value={q ?? ""}
             onChange={(event) =>
@@ -102,8 +106,11 @@ const LibraryRoute: React.FC = () => {
           <Select
             visibleFrom="sm"
             w={132}
-            aria-label="Sort resumes"
-            data={SORT_OPTIONS}
+            aria-label={t("sort.label")}
+            data={SORT_OPTIONS.map((option) => ({
+              value: option.value,
+              label: t(option.labelKey),
+            }))}
             value={sort}
             onChange={(value) => setSearch({ sort: value ?? "edited" })}
             allowDeselect={false}
@@ -113,7 +120,7 @@ const LibraryRoute: React.FC = () => {
             <Menu position="bottom-end" radius="panel" shadow="lg" width={180}>
               <Menu.Target>
                 <Button
-                  aria-label="Sort resumes"
+                  aria-label={t("sort.label")}
                   className="w-[30px] px-0"
                   variant="default"
                 >
@@ -121,7 +128,7 @@ const LibraryRoute: React.FC = () => {
                 </Button>
               </Menu.Target>
               <Menu.Dropdown>
-                <Menu.Label>Sort by</Menu.Label>
+                <Menu.Label>{t("sort.by")}</Menu.Label>
                 {SORT_OPTIONS.map((option) => (
                   <Menu.Item
                     key={option.value}
@@ -133,7 +140,7 @@ const LibraryRoute: React.FC = () => {
                     }
                     onClick={() => setSearch({ sort: option.value })}
                   >
-                    {option.label}
+                    {t(option.labelKey)}
                   </Menu.Item>
                 ))}
               </Menu.Dropdown>
@@ -150,13 +157,13 @@ const LibraryRoute: React.FC = () => {
                 looking out of line with everything else in the row.
                 `aria-label` is what keeps the button named either way. */}
             <Button
-              aria-label="New resume"
+              aria-label={t("newResume")}
               className="max-sm:w-[30px] max-sm:px-0"
               onClick={() => setNewResumeOpen(true)}
             >
               <Icon name="plus" size={15} />
               <Box className="ms-1.5 hidden sm:inline" component="span">
-                New resume
+                {t("newResume")}
               </Box>
             </Button>
           </OnboardingTour.Target>
@@ -174,20 +181,18 @@ const LibraryRoute: React.FC = () => {
               icon="file-text"
               title={
                 group === undefined
-                  ? "No resumes yet"
-                  : `Nothing in ${groupName}`
+                  ? t("empty.none")
+                  : t("empty.group", { group: groupName ?? group })
               }
               body={
-                group === undefined
-                  ? "Create a resume to get started. Everything you write stays on this device."
-                  : "Move a resume into this group, or create one here."
+                group === undefined ? t("empty.noneBody") : t("empty.groupBody")
               }
               action={
                 <Button
                   leftSection={<Icon name="plus" size={15} />}
                   onClick={() => setNewResumeOpen(true)}
                 >
-                  New resume
+                  {t("newResume")}
                 </Button>
               }
             />

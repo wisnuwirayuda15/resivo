@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Button, Group, Modal, Stack, TextInput } from "@mantine/core";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { useUpdateResume } from "../queries";
 
 import type { ResumeSummary } from "@/database/index";
@@ -15,6 +17,8 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
   resume,
   onClose,
 }) => {
+  const { t } = useTranslation("library");
+  const { t: tc } = useTranslation("common");
   const [title, setTitle] = useState("");
   const update = useUpdateResume();
 
@@ -42,12 +46,12 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
     <Modal
       opened={resume !== undefined}
       onClose={onClose}
-      title="Rename resume"
+      title={t("rename.title")}
       size={420}
     >
       <Stack gap="lg">
         <TextInput
-          label="Name"
+          label={t("rename.name")}
           data-autofocus
           value={title}
           onChange={(event) => setTitle(event.currentTarget.value)}
@@ -59,10 +63,10 @@ export const RenameResumeDialog: React.FC<RenameResumeDialogProps> = ({
         />
         <Group justify="flex-end" gap="xs">
           <Button variant="default" onClick={onClose}>
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button onClick={() => void submit()} loading={update.isPending}>
-            Rename
+            {t("rename.submit")}
           </Button>
         </Group>
       </Stack>

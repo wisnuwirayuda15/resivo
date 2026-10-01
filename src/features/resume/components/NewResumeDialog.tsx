@@ -14,6 +14,7 @@ import {
 } from "@mantine/core";
 
 import { UNGROUPED } from "@/database/index";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/features/icons/IconRenderer";
 import { documentFromMarkdown } from "@/features/markdown/index";
 import { createEmptyDocument } from "../model/index";
@@ -106,6 +107,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   onCreated,
   defaultGroupId,
 }) => {
+  const { t } = useTranslation("library");
+  const { t: tc } = useTranslation("common");
   const [title, setTitle] = useState("");
   /**
    * The template, as "what the user picked, or what they picked last time".
@@ -166,7 +169,10 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 
     if (file.size > MAX_IMPORT_BYTES) {
       setImportError(
-        `${file.name} is ${Math.round(file.size / 1024)} KB. Markdown resumes are a few kilobytes; this is probably not one.`,
+        t("create.tooBig", {
+          name: file.name,
+          size: Math.round(file.size / 1024),
+        }),
       );
       return;
     }
@@ -174,7 +180,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     const source = await file.text();
 
     if (source.trim() === "") {
-      setImportError(`${file.name} is empty.`);
+      setImportError(t("create.empty", { name: file.name }));
       return;
     }
 
@@ -233,14 +239,14 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   };
 
   return (
-    <Modal opened={opened} onClose={close} title="New resume" size={620}>
+    <Modal opened={opened} onClose={close} title={t("create.title")} size={620}>
       <Stack gap="lg">
         <Box>
           <Text
             className="text-muted mb-2 text-[12px] font-medium"
             component="div"
           >
-            Template
+            {t("create.template")}
           </Text>
           {/* Two across on a phone. Four tiles in 340px gives each about 80,
               which breaks the description to one word a line and still spills
@@ -262,13 +268,13 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             className="text-muted mb-2 text-[12px] font-medium"
             component="div"
           >
-            Start from
+            {t("create.startFrom")}
           </Text>
 
           <SegmentedControl
             data={[
-              { value: "sample", label: "Example resume" },
-              { value: "blank", label: "Blank page" },
+              { value: "sample", label: t("create.example") },
+              { value: "blank", label: t("create.blank") },
             ]}
             // An imported file is the starting point, so the choice is shown
             // as inapplicable rather than left looking as though it still
@@ -281,17 +287,17 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 
           <Text className="text-muted mt-2 text-[12px] leading-snug">
             {imported !== null
-              ? "The imported file decides what is on the page."
+              ? t("create.importedHint")
               : start === "sample"
-                ? "A finished resume to edit over, with entries, dates and a skills list already written."
-                : "The four sections almost every resume has, each empty."}
+                ? t("create.exampleHint")
+                : t("create.blankHint")}
           </Text>
         </Box>
 
         <Group grow align="flex-start">
           <TextInput
-            label="Name"
-            placeholder="Staff Engineer 2026"
+            label={t("create.name")}
+            placeholder={t("create.namePlaceholder")}
             value={title}
             onChange={(event) => setTitle(event.currentTarget.value)}
             // Enter submits, since the template is already chosen by then.
@@ -302,9 +308,9 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             }}
           />
           <Select
-            label="Group"
+            label={t("create.group")}
             data={[
-              { value: UNGROUPED, label: "No group" },
+              { value: UNGROUPED, label: t("create.noGroup") },
               ...(groups.data ?? []).map((group) => ({
                 value: group.id,
                 label: group.name,
@@ -332,10 +338,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             title={imported.filename}
           >
             {imported.warningCount === 0
-              ? "Read with nothing left over."
-              : `Read. ${imported.warningCount} ${
-                  imported.warningCount === 1 ? "line" : "lines"
-                } could not be typeset and are kept as source text, the editor points at each one.`}
+              ? t("create.readClean")
+              : t("create.readWarnings", { count: imported.warningCount })}
           </Alert>
         )}
 
@@ -352,7 +356,9 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
                 leftSection={<Icon name="file-arrow-down" size={15} />}
                 variant="subtle"
               >
-                {imported === null ? "Import Markdown" : "Choose another file"}
+                {imported === null
+                  ? t("create.importMarkdown")
+                  : t("create.chooseAnother")}
               </Button>
             )}
           </FileButton>
@@ -363,13 +369,13 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
           <Box className="hidden flex-1 sm:block" />
 
           <Button variant="default" onClick={close}>
-            Cancel
+            {tc("cancel")}
           </Button>
           <Button
             onClick={() => void submit()}
             loading={createResume.isPending}
           >
-            Create resume
+            {t("create.submit")}
           </Button>
         </Group>
       </Stack>

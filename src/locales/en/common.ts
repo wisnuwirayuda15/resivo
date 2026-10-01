@@ -9,4 +9,12 @@ export const common = {
   save: "Save",
   rename: "Rename",
   reload: "Reload",
+  errors: {
+    somethingWrong: "Something went wrong",
+    somethingWrongBody:
+      "Your resumes are stored on this device and are unaffected. Reload to try again.",
+    notFound: "Page not found",
+    notFoundBody: "That address does not exist in Resivo.",
+    goToResumes: "Go to resumes",
+  },
 } as const;

@@ -13,7 +13,8 @@ import {
   designMatchesTemplate,
   templateDefaults,
 } from "@/features/templates/defaults";
-import { TEMPLATE_CATALOG, templateList } from "@/features/templates/catalog";
+import { templateList } from "@/features/templates/catalog";
+import { useTemplateText } from "@/features/templates/useTemplateText";
 import { setTemplate } from "@/features/editor/mutations";
 import { cn } from "@/lib/utils";
 
@@ -80,6 +81,7 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
   apply,
 }) => {
   const [pending, setPending] = useState<TemplateId | null>(null);
+  const text = useTemplateText();
 
   const select = (next: TemplateId) => {
     if (next === templateId) {
@@ -123,10 +125,10 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
               <TemplateSwatch id={template.id} />
               <Box className="min-w-0 flex-1" component="span">
                 <Text span className="text-title block text-[12px] font-medium">
-                  {template.name}
+                  {text(template.id).name}
                 </Text>
                 <Text span className="text-subtle block truncate text-[11px]">
-                  {template.description}
+                  {text(template.id).description}
                 </Text>
               </Box>
             </UnstyledButton>
@@ -143,9 +145,9 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
         <Stack gap="lg">
           <Text className="text-body text-[13px] leading-normal">
             You have changed the style tokens on this resume. Switching to{" "}
-            {pending === null ? "" : TEMPLATE_CATALOG[pending].name} can keep
-            those changes, or replace them with that template&rsquo;s own
-            defaults. Your content is untouched either way.
+            {pending === null ? "" : text(pending).name} can keep those changes,
+            or replace them with that template&rsquo;s own defaults. Your
+            content is untouched either way.
           </Text>
           <Group gap="xs" justify="flex-end">
             <Button onClick={() => setPending(null)} variant="subtle">

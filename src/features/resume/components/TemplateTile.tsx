@@ -1,6 +1,7 @@
 import { Box, Text, UnstyledButton } from "@mantine/core";
 
 import { PaperMiniature } from "@/features/templates/PaperMiniature";
+import { useTemplateText } from "@/features/templates/useTemplateText";
 import { cn } from "@/lib/utils";
 
 import type { TemplateMeta } from "@/features/templates/catalog";
@@ -25,6 +26,7 @@ export const TemplateTile: React.FC<TemplateTileProps> = ({
   selected = false,
   onSelect,
 }) => {
+  const text = useTemplateText()(template.id);
   const className = cn(
     "rounded-card duration-fast ease-standard border p-2 text-left transition-colors",
     selected
@@ -42,13 +44,13 @@ export const TemplateTile: React.FC<TemplateTileProps> = ({
 
       <Box className="px-1 pt-2 pb-0.5">
         <Text className="text-title text-[13px] font-medium" component="div">
-          {template.name}
+          {text.name}
         </Text>
         <Text
           className="text-muted mt-0.5 text-[11px] leading-snug"
           component="div"
         >
-          {template.description}
+          {text.description}
         </Text>
       </Box>
     </>

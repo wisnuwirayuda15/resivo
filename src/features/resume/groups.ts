@@ -19,11 +19,15 @@ export interface MoveDestination {
  *
  * The group the resume is already in is left out, so the menu never offers a
  * move that would do nothing.
+ *
+ * The label of the one destination that has no record is a parameter, so this
+ * stays a pure function and the caller says it in the interface language.
  */
 export const moveDestinations = (
   groups: ReadonlyArray<GroupRecord>,
   currentGroupId: string,
+  ungroupedLabel = "Ungrouped",
 ): Array<MoveDestination> =>
-  [{ id: UNGROUPED, name: "Ungrouped" }, ...groups]
+  [{ id: UNGROUPED, name: ungroupedLabel }, ...groups]
     .filter((group) => group.id !== currentGroupId)
     .map((group) => ({ id: group.id, name: group.name }));

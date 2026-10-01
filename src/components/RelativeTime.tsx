@@ -4,6 +4,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import utc from "dayjs/plugin/utc";
 
+import { useUiLanguage } from "@/lib/i18n/useTranslation";
+
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
 
@@ -50,6 +52,10 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({
   className,
 }) => {
   const [label, setLabel] = useState(() => absoluteLabel(value));
+  // In the dependencies below so a language change redraws the phrase, and
+  // read here and not in the effect so the effect re-runs after LanguageSync
+  // has told dayjs which language it is now.
+  const language = useUiLanguage();
 
   useEffect(() => {
     setLabel(dayjs(value).fromNow());
@@ -60,7 +66,7 @@ export const RelativeTime: React.FC<RelativeTimeProps> = ({
     const timer = setInterval(() => setLabel(dayjs(value).fromNow()), 60_000);
 
     return () => clearInterval(timer);
-  }, [value]);
+  }, [value, language]);
 
   return (
     <Text

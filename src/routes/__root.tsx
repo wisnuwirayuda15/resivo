@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 
 import { EmptyState } from "@/components/EmptyState";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Providers } from "@/components/providers";
 import { SIDEBAR_RESTORE_SCRIPT } from "@/components/shell/sidebarState";
 
@@ -37,43 +38,53 @@ interface MyRouterContext {
  * per the design system's rule for errors: no error code in the primary line, no
  * apology.
  */
-const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => (
-  <Box className="bg-app min-h-dvh">
-    <EmptyState
-      icon="warning-circle"
-      title="Something went wrong"
-      body="Your resumes are stored on this device and are unaffected. Reload to try again."
-      action={
-        <Box className="flex flex-col items-center gap-3">
-          <Button onClick={() => window.location.reload()}>Reload</Button>
-          {/* The message is for the user's bug report, so it is shown rather
-              than swallowed, but kept out of the primary line. */}
-          <Text
-            className="text-subtle max-w-[60ch] text-[11px] break-words"
-            component="code"
-          >
-            {error instanceof Error ? error.message : String(error)}
-          </Text>
-        </Box>
-      }
-    />
-  </Box>
-);
+const RootErrorComponent: React.FC<ErrorComponentProps> = ({ error }) => {
+  const { t } = useTranslation("common");
 
-const RootNotFound: React.FC = () => (
-  <Box className="bg-app min-h-dvh">
-    <EmptyState
-      icon="file-text"
-      title="Page not found"
-      body="That address does not exist in Resivo."
-      action={
-        <Button component={Link} to="/resumes">
-          Go to resumes
-        </Button>
-      }
-    />
-  </Box>
-);
+  return (
+    <Box className="bg-app min-h-dvh">
+      <EmptyState
+        icon="warning-circle"
+        title={t("errors.somethingWrong")}
+        body={t("errors.somethingWrongBody")}
+        action={
+          <Box className="flex flex-col items-center gap-3">
+            <Button onClick={() => window.location.reload()}>
+              {t("reload")}
+            </Button>
+            {/* The message is for the user's bug report, so it is shown rather
+              than swallowed, but kept out of the primary line. */}
+            <Text
+              className="text-subtle max-w-[60ch] text-[11px] break-words"
+              component="code"
+            >
+              {error instanceof Error ? error.message : String(error)}
+            </Text>
+          </Box>
+        }
+      />
+    </Box>
+  );
+};
+
+const RootNotFound: React.FC = () => {
+  const { t } = useTranslation("common");
+
+  return (
+    <Box className="bg-app min-h-dvh">
+      <EmptyState
+        icon="file-text"
+        title={t("errors.notFound")}
+        body={t("errors.notFoundBody")}
+        action={
+          <Button component={Link} to="/resumes">
+            {t("errors.goToResumes")}
+          </Button>
+        }
+      />
+    </Box>
+  );
+};
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({

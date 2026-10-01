@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { seo } from "@/lib/seo";
 
 import { Shell } from "@/components/shell/Shell";
@@ -16,10 +18,11 @@ import { useArchivedResumes } from "@/features/resume/queries";
  * would defeat the point.
  */
 const ArchiveRoute: React.FC = () => {
+  const { t } = useTranslation("library");
   const archived = useArchivedResumes();
 
   return (
-    <Shell title="Archived">
+    <Shell title={t("title.archived")}>
       <ClientOnly>
         <ResumeLibrary
           resumes={archived.data}
@@ -29,8 +32,8 @@ const ArchiveRoute: React.FC = () => {
           emptyState={
             <EmptyState
               icon="archive"
-              title="Nothing archived"
-              body="Archiving hides a resume from the library without deleting it. Archived resumes show up here."
+              title={t("empty.archived")}
+              body={t("empty.archivedBody")}
             />
           }
         />

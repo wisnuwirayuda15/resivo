@@ -12,6 +12,8 @@ import {
 } from "@mantine/core";
 import { Link } from "@tanstack/react-router";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { Icon } from "@/features/icons/IconRenderer";
 import { NavItemContent, navItemClassName } from "@/components/shell/NavItem";
@@ -45,6 +47,8 @@ export const GroupRow: React.FC<GroupRowProps> = ({
   active,
   onNavigate,
 }) => {
+  const { t } = useTranslation("library");
+  const { t: tc } = useTranslation("common");
   const [renaming, setRenaming] = useState(false);
   const [name, setName] = useState(group.name);
   const [confirming, setConfirming] = useState(false);
@@ -80,13 +84,13 @@ export const GroupRow: React.FC<GroupRowProps> = ({
         <Menu position="right-start" radius="panel" shadow="lg" width={170}>
           <Menu.Target>
             <UnstyledButton
-              aria-label={`Actions for ${group.name}`}
+              aria-label={t("group.actions", { name: group.name })}
               className="text-muted hover:bg-hover hover:text-body rounded-control bg-surface flex h-[20px] w-[20px] items-center justify-center"
             >
               <Icon name="dots-three" size={14} />
             </UnstyledButton>
           </Menu.Target>
-          <Menu.Dropdown aria-label={`Actions for ${group.name}`}>
+          <Menu.Dropdown aria-label={t("group.actions", { name: group.name })}>
             <Menu.Item
               leftSection={<Icon name="cursor-text" size={15} />}
               onClick={() => {
@@ -94,14 +98,14 @@ export const GroupRow: React.FC<GroupRowProps> = ({
                 setRenaming(true);
               }}
             >
-              Rename
+              {t("group.rename")}
             </Menu.Item>
             <Menu.Item
               c="var(--danger-text)"
               leftSection={<Icon name="trash" size={15} />}
               onClick={() => setConfirming(true)}
             >
-              Delete group
+              {t("group.delete")}
             </Menu.Item>
           </Menu.Dropdown>
         </Menu>
@@ -111,12 +115,12 @@ export const GroupRow: React.FC<GroupRowProps> = ({
         onClose={() => setRenaming(false)}
         opened={renaming}
         size={420}
-        title="Rename group"
+        title={t("group.renameTitle")}
       >
         <Stack gap="lg">
           <TextInput
             data-autofocus
-            label="Name"
+            label={t("group.name")}
             onChange={(event) => setName(event.currentTarget.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter") {
@@ -127,17 +131,17 @@ export const GroupRow: React.FC<GroupRowProps> = ({
           />
           <ButtonRow gap="xs" justify="flex-end">
             <Button onClick={() => setRenaming(false)} variant="default">
-              Cancel
+              {tc("cancel")}
             </Button>
             <Button loading={rename.isPending} onClick={() => void submit()}>
-              Rename
+              {t("group.rename")}
             </Button>
           </ButtonRow>
         </Stack>
       </Modal>
 
       <ConfirmDialog
-        confirmLabel="Delete group"
+        confirmLabel={t("group.delete")}
         danger
         onCancel={() => setConfirming(false)}
         onConfirm={() => {
@@ -145,14 +149,12 @@ export const GroupRow: React.FC<GroupRowProps> = ({
           setConfirming(false);
         }}
         opened={confirming}
-        title={`Delete ${group.name}?`}
+        title={t("group.deleteTitle", { name: group.name })}
       >
         <Text className="text-[13px]">
           {count === undefined || count === 0
-            ? "The group is empty, so nothing else changes."
-            : `The ${count === 1 ? "resume" : `${count} resumes`} in it ${
-                count === 1 ? "becomes" : "become"
-              } ungrouped. Nothing is deleted but the group itself.`}
+            ? t("group.deleteEmpty")
+            : t("group.deleteSome", { count })}
         </Text>
       </ConfirmDialog>
     </Box>

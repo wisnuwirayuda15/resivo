@@ -6,6 +6,7 @@ import { seo } from "@/lib/seo";
 import { Shell } from "@/components/shell/Shell";
 import { TemplateTile } from "@/features/resume/components/TemplateTile";
 import { templateList } from "@/features/templates/catalog";
+import { useTemplateText } from "@/features/templates/useTemplateText";
 
 /**
  * The template gallery.
@@ -15,30 +16,34 @@ import { templateList } from "@/features/templates/catalog";
  * reads to an applicant tracking system, which is the whole reason these
  * layouts stay single-column.
  */
-const TemplatesRoute: React.FC = () => (
-  <Shell title="Templates">
-    <Box className="p-6">
-      <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
-        Every template is single-column and parser-safe. They differ in
-        typeface, spacing and how much hierarchy comes from rules rather than
-        type size.
-      </Text>
+const TemplatesRoute: React.FC = () => {
+  const text = useTemplateText();
 
-      <Box className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
-        {templateList.map((template) => (
-          <Box key={template.id} className="flex flex-col gap-2">
-            {/* No `onSelect`, so the tile renders inert, this view describes,
+  return (
+    <Shell title="Templates">
+      <Box className="p-6">
+        <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
+          Every template is single-column and parser-safe. They differ in
+          typeface, spacing and how much hierarchy comes from rules rather than
+          type size.
+        </Text>
+
+        <Box className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
+          {templateList.map((template) => (
+            <Box key={template.id} className="flex flex-col gap-2">
+              {/* No `onSelect`, so the tile renders inert, this view describes,
                 it does not apply. */}
-            <TemplateTile template={template} />
-            <Text className="text-subtle px-1 text-[11px] leading-snug">
-              {template.atsNotes}
-            </Text>
-          </Box>
-        ))}
+              <TemplateTile template={template} />
+              <Text className="text-subtle px-1 text-[11px] leading-snug">
+                {text(template.id).atsNotes}
+              </Text>
+            </Box>
+          ))}
+        </Box>
       </Box>
-    </Box>
-  </Shell>
-);
+    </Shell>
+  );
+};
 
 export const Route = createFileRoute("/templates")({
   head: () => ({

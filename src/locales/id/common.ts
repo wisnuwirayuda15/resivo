@@ -8,4 +8,12 @@ export const common = {
   save: "Simpan",
   rename: "Ganti nama",
   reload: "Muat ulang",
+  errors: {
+    somethingWrong: "Terjadi kesalahan",
+    somethingWrongBody:
+      "Resume Anda tersimpan di perangkat ini dan tidak terpengaruh. Muat ulang untuk mencoba lagi.",
+    notFound: "Halaman tidak ditemukan",
+    notFoundBody: "Alamat itu tidak ada di Resivo.",
+    goToResumes: "Buka resume",
+  },
 } satisfies Widen<typeof en>;
