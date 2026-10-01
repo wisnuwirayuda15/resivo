@@ -5,6 +5,7 @@ import { useOs } from "@mantine/hooks";
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { useEditorStore } from "./store";
 
@@ -59,6 +60,7 @@ const HistoryButton = ({
 );
 
 export const HistoryControls: React.FC = () => {
+  const { t } = useTranslation("editor");
   const undo = useEditorStore((state) => state.undo);
   const redo = useEditorStore((state) => state.redo);
   // Called in the selector rather than read as a field: both are derived from
@@ -75,19 +77,19 @@ export const HistoryControls: React.FC = () => {
        Tooltip child, and Tooltip works by cloning what it wraps. */
     <OnboardingTour.Target id={TOUR_TARGET_IDS.history}>
       <Box className="flex items-center gap-0.5">
-        <Tooltip label={`Undo (${modifier}Z)`}>
+        <Tooltip label={t("history.undo", { shortcut: `${modifier}Z` })}>
           <HistoryButton
             disabled={!canUndo}
             icon="arrow-u-up-left"
-            label={`Undo (${modifier}Z)`}
+            label={t("history.undo", { shortcut: `${modifier}Z` })}
             onClick={undo}
           />
         </Tooltip>
-        <Tooltip label={`Redo (${modifier}⇧Z)`}>
+        <Tooltip label={t("history.redo", { shortcut: `${modifier}⇧Z` })}>
           <HistoryButton
             disabled={!canRedo}
             icon="arrow-u-up-right"
-            label={`Redo (${modifier}⇧Z)`}
+            label={t("history.redo", { shortcut: `${modifier}⇧Z` })}
             onClick={redo}
           />
         </Tooltip>

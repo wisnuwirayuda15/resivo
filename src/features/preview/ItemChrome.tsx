@@ -1,5 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 /**
  * The editing chrome around one flow item.
  *
@@ -50,6 +52,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   children,
   className,
 }) => {
+  const { t } = useTranslation("editor");
   const {
     attributes,
     listeners,
@@ -79,7 +82,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
         <div className="rp-chrome" contentEditable={false}>
           <div className="rp-chrome-row">
             <button
-              aria-label="Drag to move"
+              aria-label={t("chrome.drag")}
               className="rp-chrome-grip"
               ref={setActivatorNodeRef}
               type="button"
@@ -93,7 +96,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
             </button>
 
             <button
-              aria-label="Move up"
+              aria-label={t("chrome.moveUp")}
               className="rp-chrome-button"
               disabled={onMoveUp === null || onMoveUp === undefined}
               onClick={() => onMoveUp?.()}
@@ -103,7 +106,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
             </button>
 
             <button
-              aria-label="Move down"
+              aria-label={t("chrome.moveDown")}
               className="rp-chrome-button"
               disabled={onMoveDown === null || onMoveDown === undefined}
               onClick={() => onMoveDown?.()}
@@ -114,7 +117,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
 
             {onRemove === undefined ? null : (
               <button
-                aria-label="Delete"
+                aria-label={t("chrome.delete")}
                 className="rp-chrome-button rp-chrome-danger"
                 onClick={onRemove}
                 type="button"

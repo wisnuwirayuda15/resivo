@@ -7,6 +7,7 @@ import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 import { GuideButton } from "@/features/guide/GuideButton";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import type { ParseWarning } from "@/features/markdown/index";
 import type { ResumeDocument } from "@/features/resume/model/document";
@@ -51,6 +52,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
   onCustomCssChange,
   className,
 }) => {
+  const { t } = useTranslation("editor");
   const [tab, setTab] = useState<string | null>("markdown");
   const [refusals, setRefusals] = useState(0);
 
@@ -77,7 +79,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
           value={tab}
         >
           <Tabs.List
-            aria-label="Source files"
+            aria-label={t("code.sourceFiles")}
             className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
           >
             <Tabs.Tab
@@ -101,7 +103,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
                   className="text-warning-text font-mono text-[11px] tabular-nums"
                   span
                 >
-                  {notices} {notices === 1 ? "notice" : "notices"}
+                  {t("code.notices", { count: notices })}
                 </Text>
               )}
               <GuideButton />

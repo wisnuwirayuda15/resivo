@@ -15,6 +15,8 @@ import { previewStylesheet } from "./css";
 
 import paperFontsHref from "./paper-fonts.css?url";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import type { Recipe } from "@/features/editor/mutations";
 import type { RenderMode } from "@/features/templates/renderer/types";
 import type { ResumeDocument } from "@/features/resume/model/document";
@@ -75,10 +77,11 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
   apply,
   zoom = 1,
   className,
-  title = "Resume preview",
+  title,
   onPageCountChange,
   onPaginated,
 }) => {
+  const { t } = useTranslation("editor");
   const frameRef = useRef<HTMLIFrameElement | null>(null);
   const styleRef = useRef<HTMLStyleElement | null>(null);
   const [frameDocument, setFrameDocument] = useState<Document | null>(null);
@@ -205,7 +208,7 @@ export const PreviewFrame: React.FC<PreviewFrameProps> = ({
          */
         sandbox="allow-same-origin allow-modals"
         srcDoc={SKELETON}
-        title={title}
+        title={title ?? t("preview.frameTitle")}
       />
 
       {frameDocument === null

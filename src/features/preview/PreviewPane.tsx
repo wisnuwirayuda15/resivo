@@ -22,6 +22,7 @@ import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { ExportMenu } from "@/features/export/ExportMenu";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { PreviewFrame } from "./PreviewFrame";
 import { PAGE_DIMENSIONS } from "./css";
@@ -89,6 +90,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   title = "Resume",
   className,
 }) => {
+  const { t } = useTranslation("editor");
   const size = resume.design.paper.size;
 
   const wellRef = useRef<HTMLDivElement | null>(null);
@@ -209,7 +211,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
   const paperSizeControl =
     onPaperSizeChange === undefined ? null : (
       <SegmentedControl
-        aria-label="Paper size"
+        aria-label={t("preview.paperSize")}
         // `satisfies` rather than a cast: the literals are checked against
         // the model's sizes, and `onChange` still narrows to them.
         data={["Letter", "A4"] satisfies Array<PaperSize>}
@@ -228,9 +230,9 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
    */
   const zoomControls = (
     <Box className="flex items-center gap-1">
-      <Tooltip label="Zoom out">
+      <Tooltip label={t("preview.zoomOut")}>
         <UnstyledButton
-          aria-label="Zoom out"
+          aria-label={t("preview.zoomOut")}
           className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
           onClick={() => step(-1)}
         >
@@ -247,9 +249,9 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
         {Math.round(zoom * 100)}%
       </Text>
 
-      <Tooltip label="Zoom in">
+      <Tooltip label={t("preview.zoomIn")}>
         <UnstyledButton
-          aria-label="Zoom in"
+          aria-label={t("preview.zoomIn")}
           className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[22px] items-center justify-center"
           onClick={() => step(1)}
         >
@@ -257,9 +259,9 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
         </UnstyledButton>
       </Tooltip>
 
-      <Tooltip label="Fit width">
+      <Tooltip label={t("preview.fitWidth")}>
         <UnstyledButton
-          aria-label="Fit width"
+          aria-label={t("preview.fitWidth")}
           aria-pressed={pinnedZoom === null}
           className={cn(
             "rounded-control flex size-[22px] items-center justify-center",
@@ -284,7 +286,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
           {/* The count stays at every width. The sheet's measurements follow it
               only when there is room, and move into the popover below. */}
           <Text span className="text-subtle flex-none font-mono text-[11px]">
-            {pageCount} {pageCount === 1 ? "page" : "pages"}
+            {t("preview.pages", { count: pageCount })}
             {roomy ? ` · ${sheet}` : ""}
           </Text>
 
@@ -293,10 +295,10 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
             {apply === undefined ? null : (
               <SegmentedControl
-                aria-label="Preview mode"
+                aria-label={t("preview.mode")}
                 data={[
-                  { value: "read", label: "Read" },
-                  { value: "visual", label: "Visual" },
+                  { value: "read", label: t("preview.read") },
+                  { value: "visual", label: t("preview.visual") },
                 ]}
                 onChange={(next) => setEditing(next === "visual")}
                 size="xs"
@@ -325,7 +327,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
               >
                 <Popover.Target>
                   <UnstyledButton
-                    aria-label="Paper and zoom"
+                    aria-label={t("preview.paperAndZoom")}
                     className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[24px] items-center justify-center"
                   >
                     <Icon name="sliders-horizontal" size={15} />
@@ -337,7 +339,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
                     {paperSizeControl === null ? null : (
                       <Box className="flex items-center justify-between gap-3">
                         <Text className="text-muted text-[12px]" span>
-                          Paper
+                          {t("preview.paper")}
                         </Text>
                         {paperSizeControl}
                       </Box>
@@ -345,7 +347,7 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
                     <Box className="flex items-center justify-between gap-3">
                       <Text className="text-muted text-[12px]" span>
-                        Zoom
+                        {t("preview.zoom")}
                       </Text>
                       {zoomControls}
                     </Box>

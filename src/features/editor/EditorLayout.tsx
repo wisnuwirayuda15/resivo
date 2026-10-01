@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Splitter, Tabs } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { Icon } from "@/features/icons/IconRenderer";
@@ -83,6 +84,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
    * client-only boundary, so `localStorage` is there, and restoring in an
    * effect would show the default layout for a frame and then jump.
    */
+  const { t } = useTranslation("editor");
   const [sizes, setSizes] = useState<Array<PaneSize>>(
     () => readPaneSizes(PANE_COUNT) ?? DEFAULT_SIZES,
   );
@@ -197,7 +199,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
         value={activePane}
       >
         <Tabs.List
-          aria-label="Editor panes"
+          aria-label={t("panes.label")}
           className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
         >
           {/* The tour points at these rather than at the panes they open, and
@@ -208,7 +210,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
               leftSection={<Icon name="markdown-logo" size={13} />}
               value="code"
             >
-              Code
+              {t("panes.code")}
             </Tabs.Tab>
           </OnboardingTour.Target>
           <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTab}>
@@ -216,7 +218,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
               leftSection={<Icon name="file-text" size={13} />}
               value="paper"
             >
-              Paper
+              {t("panes.paper")}
             </Tabs.Tab>
           </OnboardingTour.Target>
           <OnboardingTour.Target id={TOUR_TARGET_IDS.styleTab}>
@@ -224,7 +226,7 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
               leftSection={<Icon name="palette" size={13} />}
               value="style"
             >
-              Style
+              {t("panes.style")}
             </Tabs.Tab>
           </OnboardingTour.Target>
         </Tabs.List>

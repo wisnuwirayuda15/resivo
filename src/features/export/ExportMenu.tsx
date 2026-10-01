@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box, Button, Menu, Text } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { downloadBlob, safeFilename } from "@/lib/download";
 
 import { buildExportHtml, exportAdapters } from "./adapters";
@@ -41,6 +42,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
   title,
   pages,
 }) => {
+  const { t } = useTranslation("editor");
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,11 +77,7 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
         );
       }
     } catch (cause) {
-      setError(
-        cause instanceof Error
-          ? cause.message
-          : "The export could not be written.",
-      );
+      setError(cause instanceof Error ? cause.message : t("export.failed"));
     } finally {
       setBusy(null);
     }
@@ -101,26 +99,25 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
             size="xs"
             variant="default"
           >
-            Export
+            {t("export.button")}
           </Button>
         </Menu.Target>
 
         <Menu.Dropdown>
-          <Menu.Label>Print</Menu.Label>
+          <Menu.Label>{t("export.print")}</Menu.Label>
           <Menu.Item
             disabled={pages === undefined}
             leftSection={<Icon name="file-pdf" size={14} />}
             onClick={() => void run("pdf")}
           >
-            <Text className="text-[13px]">PDF</Text>
+            <Text className="text-[13px]">{t("export.pdf.name")}</Text>
             <Text className="text-subtle text-[11px]">
-              Prints the exported document. Choose &ldquo;Save as PDF&rdquo;,
-              and leave the scale and margins as they are.
+              {t("export.pdf.hint")}
             </Text>
           </Menu.Item>
 
           <Menu.Divider />
-          <Menu.Label>File</Menu.Label>
+          <Menu.Label>{t("export.file")}</Menu.Label>
 
           {exportAdapters.map((adapter) => (
             <Menu.Item
@@ -131,7 +128,9 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
               onClick={() => void run(adapter.format)}
             >
               <Text className="text-[13px]">{adapter.label}</Text>
-              <Text className="text-subtle text-[11px]">{adapter.hint}</Text>
+              <Text className="text-subtle text-[11px]">
+                {t(`export.formats.${adapter.format}.hint`)}
+              </Text>
             </Menu.Item>
           ))}
         </Menu.Dropdown>

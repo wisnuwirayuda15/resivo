@@ -1,5 +1,7 @@
 import { Box, Text, Tooltip } from "@mantine/core";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { Icon } from "@/features/icons/IconRenderer";
 import { cn } from "@/lib/utils";
 
@@ -22,42 +24,24 @@ import type { SaveStatus } from "./autosave";
  * selector re-renders this and nothing else.
  */
 
-interface Report {
-  icon: string;
-  label: string;
-  /** Says where, because "saved" in an app with no account invites the question. */
-  detail: string;
-  className: string;
-}
-
-const REPORTS: Record<SaveStatus, Report> = {
-  saved: {
-    icon: "check-circle",
-    label: "Saved",
-    detail: "Written to this device. There is no copy anywhere else.",
-    className: "text-subtle",
-  },
-  saving: {
-    icon: "circle-dashed",
-    label: "Saving",
-    detail: "Writing to this device.",
-    className: "text-muted",
-  },
-  error: {
-    icon: "warning-circle",
-    label: "Not saved",
-    detail:
-      "The last write failed, and this resume is not on disk. Your edits are still on screen, export a copy before closing the tab.",
-    className: "text-[var(--danger-text)]",
-  },
+/**
+ * What each status looks like. The words are in the `editor` namespace under
+ * the status's own name, and say where, because "saved" in an app with no
+ * account invites the question.
+ */
+const REPORTS: Record<SaveStatus, { icon: string; className: string }> = {
+  saved: { icon: "check-circle", className: "text-subtle" },
+  saving: { icon: "circle-dashed", className: "text-muted" },
+  error: { icon: "warning-circle", className: "text-[var(--danger-text)]" },
 };
 
 export const SaveIndicator: React.FC = () => {
+  const { t } = useTranslation("editor");
   const status = useEditorStore((state) => state.saveStatus);
   const report = REPORTS[status];
 
   return (
-    <Tooltip label={report.detail} multiline w={260}>
+    <Tooltip label={t(`save.${status}.detail`)} multiline w={260}>
       {/* A fixed width, so the row does not shift as the word changes. Three
           labels of three different lengths in a 44px bar would nudge everything
           beside them on every keystroke. */}
@@ -71,7 +55,7 @@ export const SaveIndicator: React.FC = () => {
       >
         <Icon name={report.icon} size={13} />
         <Text className="truncate" span>
-          {report.label}
+          {t(`save.${status}.label`)}
         </Text>
       </Box>
     </Tooltip>

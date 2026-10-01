@@ -14,6 +14,7 @@ import { useAutosave } from "@/features/editor/useAutosave";
 import { useDocumentHistoryShortcuts } from "@/features/editor/useDocumentHistoryShortcuts";
 import { useEditorStore } from "@/features/editor/store";
 import { useResume } from "@/features/resume/queries";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * One resume.
@@ -28,6 +29,7 @@ import { useResume } from "@/features/resume/queries";
  * there is a document to edit at all.
  */
 const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
+  const { t } = useTranslation("editor");
   const resume = useResume(resumeId);
   const load = useEditorStore((state) => state.load);
   const apply = useEditorStore((state) => state.apply);
@@ -77,11 +79,11 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     return (
       <EmptyState
         icon="warning-circle"
-        title="This resume could not be opened"
+        title={t("route.couldNotOpen")}
         body={
           resume.error instanceof Error
             ? resume.error.message
-            : "The stored document could not be read."
+            : t("route.couldNotRead")
         }
       />
     );
@@ -91,8 +93,8 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     return (
       <EmptyState
         icon="warning-circle"
-        title="Resume not found"
-        body="It may have been deleted on this device. Go back to the library to see what is there."
+        title={t("route.notFound")}
+        body={t("route.notFoundBody")}
       />
     );
   }
@@ -110,6 +112,7 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
 };
 
 const ResumeScreen: React.FC = () => {
+  const { t } = useTranslation("editor");
   const { resumeId } = Route.useParams();
   const resume = useResume(resumeId);
 
@@ -127,7 +130,7 @@ const ResumeScreen: React.FC = () => {
           </Box>
         </ClientOnly>
       }
-      title={resume.data?.title ?? "Resume"}
+      title={resume.data?.title ?? t("route.untitled")}
     >
       {/* The editor fills the viewport rather than scrolling the page: the pane
           inside it owns its own scrolling, so the chrome never moves. */}

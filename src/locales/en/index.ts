@@ -1,5 +1,6 @@
 import { commands } from "./commands";
 import { common } from "./common";
+import { editor } from "./editor";
 import { library } from "./library";
 import { settings } from "./settings";
 import { shell } from "./shell";
@@ -19,4 +20,5 @@ export const en = {
   settings,
   library,
   templates,
+  editor,
 } as const;

@@ -35,6 +35,7 @@ import { ItemChrome } from "./ItemChrome";
 import { isMovable, moveRecipe, stepRecipe } from "./reorder";
 import { paginate } from "./paginate";
 import { renderFlow } from "./renderFlow";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Recipe } from "@/features/editor/mutations";
@@ -206,6 +207,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   onPageCountChange,
   onPaginated,
 }) => {
+  const { t } = useTranslation("editor");
   /**
    * Glyphs load asynchronously, one file per weight, and one that appears after
    * pagination changes nothing about layout only because the reserved box is
@@ -487,7 +489,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
             chrome's own × above. */}
         {isBreak ? null : (
           <button
-            aria-label="Insert a page break after this"
+            aria-label={t("chrome.insertBreak")}
             className="rp-chrome-button"
             onClick={() =>
               apply(
@@ -535,7 +537,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
 
     return (
       <select
-        aria-label="Image width"
+        aria-label={t("chrome.imageWidth")}
         className="rp-chrome-select"
         onChange={(event) => {
           const next = Number(event.currentTarget.value);
@@ -573,7 +575,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
           className="resivo-paper rp-page"
           key={index}
           {...pageAttributes}
-          aria-label={`Page ${index + 1}`}
+          aria-label={t("preview.page", { number: index + 1 })}
           role="group"
         >
           <div className="rp-page-body" data-paged>

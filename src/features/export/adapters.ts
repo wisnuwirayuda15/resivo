@@ -17,6 +17,10 @@ import type { ResumeDocument } from "@/features/resume/model/document";
  * this app writes but a print the browser performs, on the same document
  * `buildExportHtml` produces below. `print.ts` says why that is the only path
  * from CSS to vector text; `ExportMenu` is where it is offered.
+ *
+ * What each format is good for is not here: formats are not interchangeable and
+ * the difference is not obvious from the extension, so the menu says it, in the
+ * `editor` namespace under `export.formats`, keyed by the format.
  */
 
 export interface ExportContext {
@@ -33,9 +37,6 @@ export interface ExportContext {
 export interface ExportAdapter {
   format: "html" | "markdown";
   label: string;
-  /** What the format is good for, in the menu. Formats are not interchangeable
-   * and the difference is not obvious from the extension. */
-  hint: string;
   mimeType: string;
   extension: string;
   run: (context: ExportContext) => Promise<Blob>;
@@ -70,7 +71,6 @@ export const buildExportHtml = async ({
 const htmlAdapter: ExportAdapter = {
   format: "html",
   label: "HTML",
-  hint: "One self-contained file. Same layout as the preview, no network.",
   mimeType: "text/html;charset=utf-8",
   extension: "html",
   run: async (context) =>
@@ -82,7 +82,6 @@ const htmlAdapter: ExportAdapter = {
 const markdownAdapter: ExportAdapter = {
   format: "markdown",
   label: "Markdown",
-  hint: "Content only, in the same dialect the editor reads. Styling is lost.",
   mimeType: "text/markdown;charset=utf-8",
   extension: "md",
   /**
