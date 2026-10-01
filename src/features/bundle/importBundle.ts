@@ -21,7 +21,12 @@ import {
   resumeFileSchema,
 } from "./format";
 
-import type { FontRecord, ImageRecord, ResumeRecord } from "@/database/records";
+import type {
+  FontRecord,
+  ImageRecord,
+  ResumeRecord,
+  ResumeTarget,
+} from "@/database/records";
 import type { ResumeDocument } from "@/features/resume/model/document";
 import type { BundleFontMeta, BundleImageMeta } from "./format";
 
@@ -62,6 +67,7 @@ export interface ParsedFont {
 
 export interface ParsedBundle {
   title: string;
+  target?: ResumeTarget;
   document: ResumeDocument;
   images: Array<ParsedImage>;
   fonts: Array<ParsedFont>;
@@ -297,6 +303,9 @@ export const readResumeBundle = async (
 
   return {
     title: resumeFile.data.title,
+    ...(resumeFile.data.target === undefined
+      ? {}
+      : { target: resumeFile.data.target }),
     document,
     images,
     fonts,
@@ -428,6 +437,7 @@ export const restoreResumeBundle = async (
         title: options.title ?? parsed.title,
         groupId,
         document: remapAssets(parsed.document, imageIdMap, fontIdMap),
+        ...(parsed.target === undefined ? {} : { target: parsed.target }),
       });
     },
   );

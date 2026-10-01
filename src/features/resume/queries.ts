@@ -6,6 +6,7 @@ import { downloadBlob, safeFilename } from "@/lib/download";
 import type { QueryClient } from "@tanstack/react-query";
 import type { ParsedBundle } from "@/features/bundle/importBundle";
 import type {
+  ResumeTarget,
   CreateResumeInput,
   ResumeRecord,
   ResumeSummary,
@@ -263,6 +264,19 @@ export const useExportResumeBundle = () =>
       );
     },
   });
+
+export const useCreateVersion = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: {
+      sourceId: string;
+      title: string;
+      target: ResumeTarget;
+    }) => resumeRepo.createVersion(input.sourceId, input.target, input.title),
+    onSuccess: () => invalidateLibrary(client),
+  });
+};
 
 export const useDuplicateResume = () => {
   const client = useQueryClient();

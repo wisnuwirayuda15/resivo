@@ -125,6 +125,25 @@ export const library = {
     readWarnings_other:
       "Terbaca. {{count}} baris tidak dapat ditata dan disimpan sebagai teks sumber, editor menunjukkan masing-masing.",
   },
+  version: {
+    action: "Buat versi untuk lowongan",
+    title: "Versi baru",
+    intro:
+      "Salinan {{title}} untuk disesuaikan dengan satu lowongan. Ia resume tersendiri, dan keduanya tetap dapat dibandingkan.",
+    company: "Perusahaan",
+    role: "Posisi",
+    url: "Tautan lowongan",
+    urlHint:
+      "Opsional. Tempat lowongan berada, untuk saat tiba waktunya bersiap.",
+    urlInvalid: "Tautan diawali http:// atau https://",
+    companyRequired: "Sebutkan untuk perusahaan mana.",
+    titleFor: "{{title}} untuk {{company}}",
+    submit: "Buat versi",
+    for: "Untuk {{company}}, {{role}}",
+    forCompany: "Untuk {{company}}",
+    count_one: "{{count}} versi",
+    count_other: "{{count}} versi",
+  },
   group: {
     ungrouped: "Tanpa grup",
     newTitle: "Grup baru",

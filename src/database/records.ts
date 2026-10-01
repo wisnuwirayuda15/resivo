@@ -24,6 +24,19 @@ export const UNGROUPED = "";
  */
 export const NOT_ARCHIVED = 0;
 
+/**
+ * What a version of a resume is for: the job it was written to answer.
+ *
+ * Free text, because a company and a role are whatever the posting called them,
+ * and an optional link back to the posting, which is the one thing someone
+ * preparing for an interview will want to reopen.
+ */
+export interface ResumeTarget {
+  company: string;
+  role: string;
+  url?: string;
+}
+
 export interface ResumeRecord {
   id: string;
   /** Group id, or `UNGROUPED`. Never null, see `UNGROUPED`. */
@@ -43,6 +56,19 @@ export interface ResumeRecord {
   /** Timestamp once archived, or `NOT_ARCHIVED`. Archived resumes are hidden
    * from the library, never deleted. */
   archivedAt: number;
+  /**
+   * The resume this one is a version of, when it is one.
+   *
+   * Always the root, never another version: a version made from a version still
+   * points at the resume the family started from, so there is one level of
+   * "versions of" and not a tree to walk. Absent for an ordinary resume, which
+   * is every row written before this existed. Not indexed, so adding it needed
+   * no Dexie version, and the library filters in memory as it already does.
+   */
+  baseId?: string;
+  /** The job a version answers. Survives the base being deleted: the version is
+   * still written for that job, it is just no longer linked to anything. */
+  target?: ResumeTarget;
 }
 
 export interface GroupRecord {

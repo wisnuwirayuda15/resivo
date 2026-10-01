@@ -128,6 +128,24 @@ export const library = {
     readWarnings_other:
       "Read. {{count}} lines could not be typeset and are kept as source text, the editor points at each one.",
   },
+  version: {
+    action: "Create version for a job",
+    title: "New version",
+    intro:
+      "A copy of {{title}} to tailor for one job. It is a resume of its own, and the two stay comparable.",
+    company: "Company",
+    role: "Role",
+    url: "Posting link",
+    urlHint: "Optional. Where the posting is, for when it is time to prepare.",
+    urlInvalid: "A link starts with http:// or https://",
+    companyRequired: "Say which company it is for.",
+    titleFor: "{{title}} for {{company}}",
+    submit: "Create version",
+    for: "For {{company}}, {{role}}",
+    forCompany: "For {{company}}",
+    count_one: "{{count}} version",
+    count_other: "{{count}} versions",
+  },
   group: {
     ungrouped: "Ungrouped",
     newTitle: "New group",

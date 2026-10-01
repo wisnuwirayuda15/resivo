@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { resumeTargetSchema } from "@/database/targetSchema";
 import { documentSchema } from "@/features/resume/model/index";
 import { LocalizedError } from "@/lib/i18n/LocalizedError";
 
@@ -60,6 +61,14 @@ const resumeSchema = z.object({
    * migrations run on read, and this is a write.
    */
   document: documentSchema,
+  /**
+   * Optional, and read here or they would be thrown away: `z.object` drops
+   * keys it does not name, so without these two a restore would turn every
+   * version back into an ordinary resume with no word of it. The version number
+   * is unchanged, because nothing about an older file became invalid.
+   */
+  baseId: z.string().min(1).optional(),
+  target: resumeTargetSchema.optional(),
 });
 
 const groupSchema = z.object({

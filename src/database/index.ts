@@ -12,6 +12,7 @@ export type {
   GroupRecord,
   ImageRecord,
   ResumeRecord,
+  ResumeTarget,
   SettingRecord,
 } from "./records";
 

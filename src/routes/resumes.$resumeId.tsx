@@ -14,6 +14,7 @@ import { useAutosave } from "@/features/editor/useAutosave";
 import { useDocumentHistoryShortcuts } from "@/features/editor/useDocumentHistoryShortcuts";
 import { useEditorStore } from "@/features/editor/store";
 import { useResume } from "@/features/resume/queries";
+import { VersionChip } from "@/features/versions/VersionChip";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
@@ -125,6 +126,7 @@ const ResumeScreen: React.FC = () => {
           {/* The save state before the undo pair: it is a readout, and the
               controls beside it are actions. */}
           <Box className="flex items-center gap-2">
+            <VersionChip resumeId={resumeId} />
             <SaveIndicator />
             <HistoryControls />
           </Box>

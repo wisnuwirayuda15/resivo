@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { resumeTargetSchema } from "@/database/targetSchema";
 import { LocalizedError } from "@/lib/i18n/LocalizedError";
 
 /**
@@ -92,6 +93,13 @@ const fontMetaSchema = z.object({
 
 export const resumeFileSchema = z.object({
   title: z.string().max(512),
+  /**
+   * The job this was written for, when it was a version. Optional, so a bundle
+   * from before versions existed still reads, and carried as a plain field: the
+   * link to a base resume is not, because it points at a row that is not in the
+   * file.
+   */
+  target: resumeTargetSchema.optional(),
   /** Validated by `migrateDocument` and `documentSchema`, which know how, and
    * which a document from an older build has to go through first. */
   document: z.unknown(),

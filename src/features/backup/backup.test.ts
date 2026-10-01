@@ -7,6 +7,7 @@ import { __setDbForTesting } from "@/database/db";
 import { createId } from "@/lib/id";
 
 import { createBackup, restoreBackup } from "./backup";
+import { parseBackup } from "./format";
 
 import type { Backup } from "./format";
 import type { ResivoDB } from "@/database/db";
@@ -475,5 +476,90 @@ describe("restoreBackup", () => {
     await restoreBackup(backup, NOW);
 
     expect(await db.images.count()).toBe(1);
+  });
+});
+
+describe("versions in a backup", () => {
+  const TARGET = { company: "Acme", role: "Analyst" };
+
+  /** A version row, the way the repository writes one. */
+  const version = (id: string, baseId: string | undefined) => ({
+    id,
+    title: `Version ${id}`,
+    groupId: "",
+    order: 0,
+    createdAt: 1,
+    updatedAt: 2,
+    archivedAt: 0,
+    document: createEmptyDocument(),
+    target: TARGET,
+    ...(baseId === undefined ? {} : { baseId }),
+  });
+
+  it("carries the link and the target through a round trip", async () => {
+    await addResume("base", "Master");
+    await db.resumes.add(version("v1", "base"));
+
+    const backup = await createBackup(NOW);
+
+    // The fields have to survive the schema, which drops keys it does not name.
+    expect(parseBackup(JSON.stringify(backup)).resumes).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: "v1", baseId: "base", target: TARGET }),
+      ]),
+    );
+
+    await db.resumes.clear();
+    await restoreBackup(backup, NOW);
+
+    expect((await db.resumes.get("v1"))?.baseId).toBe("base");
+    expect((await db.resumes.get("v1"))?.target).toEqual(TARGET);
+  });
+
+  it("follows the base to its new id when the old one is taken here", async () => {
+    // Both rows come from the file, and both ids are taken on this device, so
+    // both are renumbered. The version has to point at where the base landed,
+    // and the base comes *after* the version in the file, which is why the ids
+    // are decided before anything is written.
+    await addResume("base", "Already here");
+    await addResume("v1", "Also here");
+
+    await restoreBackup(
+      backupWith({
+        resumes: [
+          version("v1", "base"),
+          { ...version("base", undefined), title: "Master", target: undefined },
+        ],
+      }),
+      NOW,
+    );
+
+    const all = await db.resumes.toArray();
+    const restoredVersion = all.find(
+      (row) => row.title === "Version v1 (restored)",
+    );
+    const restoredBase = all.find((row) => row.title === "Master (restored)");
+
+    expect(restoredVersion).toBeDefined();
+    expect(restoredBase).toBeDefined();
+    expect(restoredVersion?.baseId).toBe(restoredBase?.id);
+    expect(restoredVersion?.baseId).not.toBe("base");
+  });
+
+  it("keeps a link to a base that is on this device but not in the file", async () => {
+    await addResume("base", "Master");
+
+    await restoreBackup(backupWith({ resumes: [version("v1", "base")] }), NOW);
+
+    expect((await db.resumes.get("v1"))?.baseId).toBe("base");
+  });
+
+  it("drops a link to a base that is nowhere, and keeps the target", async () => {
+    await restoreBackup(backupWith({ resumes: [version("v1", "gone")] }), NOW);
+
+    const restored = await db.resumes.get("v1");
+
+    expect(restored).not.toHaveProperty("baseId");
+    expect(restored?.target).toEqual(TARGET);
   });
 });

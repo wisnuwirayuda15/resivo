@@ -59,6 +59,46 @@ export const editor = {
     },
     failed: "Ekspor tidak dapat ditulis.",
   },
+  versions: {
+    chip: "Versi untuk {{company}}",
+    chipAria: "Resume ini adalah versi untuk {{company}}",
+    openBase: "Buka {{title}}",
+    compare: "Bandingkan",
+    title: "Perubahan dari {{title}}",
+    intro:
+      "Apa yang dimiliki versi ini tetapi tidak dimiliki {{title}}, dan apa yang tidak ada padanya.",
+    identical: "Belum ada yang berbeda dari {{title}}.",
+    noSharedIdentity:
+      "Keduanya tidak berbagi bagian berdasarkan identitas, yang terjadi ketika Markdown salah satunya diganti seluruhnya. Karena itu semua di bawah ditampilkan sebagai baru, dan perbandingan baris demi baris tidak mungkin.",
+    header: {
+      name: "Nama",
+      headline: "Judul singkat",
+      contact: "Kontak",
+    },
+    settings: {
+      template: "Template berbeda",
+      design: "Pengaturan gaya berbeda",
+      customCss: "CSS khusus berbeda",
+    },
+    section: {
+      added: "Bagian ditambahkan",
+      removed: "Bagian dihapus",
+      moved: "Dipindahkan",
+      hidden: "Disembunyikan di sini",
+      shown: "Ditampilkan di sini",
+      renamed: "Diganti namanya dari {{from}}",
+      style: "Gaya berbeda",
+    },
+    block: {
+      added: "Ditambahkan",
+      removed: "Dihapus",
+      changed: "Diubah",
+      moved: "Dipindahkan",
+      formatOnly: "Kata sama, format berbeda",
+    },
+    unchanged_one: "{{count}} bagian tidak berubah.",
+    unchanged_other: "{{count}} bagian tidak berubah.",
+  },
   preview: {
     pages_one: "{{count}} halaman",
     pages_other: "{{count}} halaman",

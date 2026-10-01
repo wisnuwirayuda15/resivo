@@ -78,6 +78,18 @@ are read, sizes are checked from what the archive declares before anything is
 inflated, every image and font goes through the same checks as an upload, and
 nothing is written until all of it has passed.
 
+**A version per job.** Create version for a job, on a card, copies a resume
+for one company and role (and, if you like, a link to the posting). A version
+is a resume of its own, finished and exportable, and not a revision of the
+original: Resivo has no version history, and this does not change that, because
+what is stored is whole resumes and the comparison is between two things that
+both exist. The copy keeps the ids of every section and block, so the Compare
+button in a version's editor can line the two up by identity and show what was
+reworded word by word, what was added, removed, hidden or moved, and whether the
+template or style differs. Cards say what a version is for and how many a
+resume has, and search finds the company or role. Deleting the original keeps
+its versions as ordinary resumes that still say what they were written for.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 

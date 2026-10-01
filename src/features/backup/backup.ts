@@ -201,13 +201,39 @@ export const restoreBackup = async (
     }
   }
 
+  /**
+   * The id each resume will have here, decided before any is written. A version
+   * names its base, the base may come later in the file than the version, and
+   * the link has to be rewritten to wherever the base lands.
+   */
+  const resumeIdMap = new Map<string, string>();
+
   for (const resume of backup.resumes) {
     const clash = await db.resumes.get(resume.id);
-    const id = clash === undefined ? resume.id : createId();
+
+    resumeIdMap.set(resume.id, clash === undefined ? resume.id : createId());
+  }
+
+  for (const { baseId: oldBaseId, ...resume } of backup.resumes) {
+    const id = resumeIdMap.get(resume.id) ?? resume.id;
 
     if (id !== resume.id) {
       report.resumesRenumbered += 1;
     }
+
+    /**
+     * Where the link goes: the base as it was restored from this file, or, when
+     * it is not in the file, the same id if this device has that resume. A link
+     * to nothing is dropped, and the target kept, so the version is still known
+     * to be for that job.
+     */
+    const baseId =
+      oldBaseId === undefined
+        ? undefined
+        : (resumeIdMap.get(oldBaseId) ??
+          ((await db.resumes.get(oldBaseId)) === undefined
+            ? undefined
+            : oldBaseId));
 
     /**
      * A group that is not in this backup and not on this device would leave the
@@ -224,6 +250,7 @@ export const restoreBackup = async (
       ...resume,
       id,
       groupId,
+      ...(baseId === undefined ? {} : { baseId }),
       document: remapAssets(resume.document, imageIdMap, fontIdMap),
       // A restore is a change to this device, whatever the file says. Sorting the
       // library by "recently edited" would otherwise bury what was just restored.

@@ -285,6 +285,36 @@ describe("a bundle", () => {
     expect((await getDb().images.get("img-1"))?.name).toBe("someone else's");
   });
 
+  it("carries the job a version was written for, and not the link to a base", async () => {
+    const target = {
+      company: "Acme",
+      role: "Analyst",
+      url: "https://acme.example/1",
+    };
+    const blob = await buildResumeBundle(
+      { title: "For Acme", document: createEmptyDocument(), target },
+      NOW,
+    );
+
+    await newDevice();
+
+    const { resume } = await restoreResumeBundle(
+      await readResumeBundle(blob, READERS),
+    );
+
+    expect(resume.target).toEqual(target);
+    expect(resume).not.toHaveProperty("baseId");
+  });
+
+  it("reads a bundle written before versions existed, which has no target", async () => {
+    const blob = await bundleOf({
+      title: "old",
+      document: createEmptyDocument(),
+    });
+
+    expect((await readResumeBundle(blob, READERS)).target).toBeUndefined();
+  });
+
   it("does not take a group it was not given, or one this device lacks", async () => {
     const blob = await bundleOf({
       title: "x",

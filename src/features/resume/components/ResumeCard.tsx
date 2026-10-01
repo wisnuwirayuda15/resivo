@@ -13,10 +13,13 @@ import type { GroupRecord, ResumeSummary } from "@/database/index";
 
 interface ResumeCardProps {
   resume: ResumeSummary;
+  /** How many versions were made from this resume, for the line under it. */
+  versionCount: number;
   /** Every group the resume could be moved to, in the sidebar's order. */
   groups: ReadonlyArray<GroupRecord>;
   onRename: () => void;
   onDuplicate: () => void;
+  onCreateVersion: () => void;
   onExportBundle: () => void;
   onMove: (groupId: string) => void;
   onArchive: () => void;
@@ -33,9 +36,11 @@ interface ResumeCardProps {
  */
 export const ResumeCard: React.FC<ResumeCardProps> = ({
   resume,
+  versionCount,
   groups,
   onRename,
   onDuplicate,
+  onCreateVersion,
   onExportBundle,
   onMove,
   onArchive,
@@ -80,6 +85,24 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             {t("card.edited")} <RelativeTime value={resume.updatedAt} /> ·{" "}
             {templateText(resume.templateId).name}
           </Text>
+          {/* What a version is for, or how many there are of this one. Said
+              under the metadata and not in place of it, so a card is still a
+              card whether or not it belongs to a family. */}
+          {resume.target === undefined && versionCount === 0 ? null : (
+            <Text
+              className="text-accent mt-1 truncate text-[11px]"
+              component="div"
+            >
+              {resume.target === undefined
+                ? t("version.count", { count: versionCount })
+                : resume.target.role === ""
+                  ? t("version.forCompany", { company: resume.target.company })
+                  : t("version.for", {
+                      company: resume.target.company,
+                      role: resume.target.role,
+                    })}
+            </Text>
+          )}
         </Box>
       </Link>
 
@@ -113,6 +136,12 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
               onClick={onDuplicate}
             >
               {t("card.duplicate")}
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<Icon name="git-branch" size={15} />}
+              onClick={onCreateVersion}
+            >
+              {t("version.action")}
             </Menu.Item>
             <Menu.Item
               leftSection={<Icon name="file-zip" size={15} />}

@@ -431,3 +431,13 @@ export const textToMarkdown = (source: string): string => {
     .replace(/\n{3,}/g, "\n\n")
     .trimEnd()}\n`;
 };
+
+/**
+ * One block as the plain lines a reader of the text export would see.
+ *
+ * Exported for the comparison of two resumes, which needs "what does this block
+ * say" in a form that can be diffed word by word, and which should agree with the
+ * text export about what a block says rather than keep a second opinion.
+ */
+export const blockText = (block: Block, locale: string): string =>
+  blockLines(block, locale).join("\n");

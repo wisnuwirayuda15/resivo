@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import { Box, Skeleton, Text } from "@mantine/core";
+import { useNavigate } from "@tanstack/react-router";
 import { notifications } from "@mantine/notifications";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { EmptyState } from "@/components/EmptyState";
+import { CreateVersionDialog } from "@/features/versions/CreateVersionDialog";
 
 import { ResumeCard } from "./ResumeCard";
 import { RenameResumeDialog } from "./RenameResumeDialog";
@@ -66,6 +68,10 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
   const [deleting, setDeleting] = useState<ResumeSummary | undefined>(
     undefined,
   );
+  const [versioning, setVersioning] = useState<ResumeSummary | undefined>(
+    undefined,
+  );
+  const navigate = useNavigate();
 
   const duplicate = useDuplicateResume();
   const exportBundle = useExportResumeBundle();
@@ -83,7 +89,15 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
         : (resumes ?? []).filter((resume) =>
             // Title and the denormalized header name, so searching for the
             // person's name works as well as searching for the file's name.
-            [resume.title, resume.fullName, resume.headline ?? ""]
+            [
+              resume.title,
+              resume.fullName,
+              resume.headline ?? "",
+              // The job a version is for, so "acme" finds the resume written
+              // for Acme whatever it was titled.
+              resume.target?.company ?? "",
+              resume.target?.role ?? "",
+            ]
               .join(" ")
               .toLowerCase()
               .includes(needle),
@@ -91,6 +105,21 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
 
     return [...matches].sort(compare(sort));
   }, [resumes, query, sort]);
+
+  /** Versions per resume, among what is on screen. A family split across the
+   * library and the archive counts only the half that can be seen, which is the
+   * half the number is about. */
+  const versionCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+
+    for (const resume of resumes ?? []) {
+      if (resume.baseId !== undefined) {
+        counts.set(resume.baseId, (counts.get(resume.baseId) ?? 0) + 1);
+      }
+    }
+
+    return counts;
+  }, [resumes]);
 
   if (isLoading) {
     return (
@@ -123,6 +152,8 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
           <ResumeCard
             key={resume.id}
             resume={resume}
+            versionCount={versionCounts.get(resume.id) ?? 0}
+            onCreateVersion={() => setVersioning(resume)}
             onRename={() => setRenaming(resume)}
             groups={groups.data ?? []}
             onDuplicate={() => duplicate.mutate(resume.id)}
@@ -144,6 +175,22 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
           />
         ))}
       </Box>
+
+      <CreateVersionDialog
+        baseTitle={
+          resumes?.find(
+            (candidate) =>
+              candidate.id === (versioning?.baseId ?? versioning?.id),
+          )?.title ??
+          versioning?.title ??
+          ""
+        }
+        source={versioning}
+        onClose={() => setVersioning(undefined)}
+        onCreated={(resumeId) =>
+          void navigate({ to: "/resumes/$resumeId", params: { resumeId } })
+        }
+      />
 
       <RenameResumeDialog
         resume={renaming}

@@ -9,7 +9,7 @@ import type {
   ResumeDocument,
   TemplateId,
 } from "@/features/resume/model/document";
-import type { ResumeRecord } from "../records";
+import type { ResumeRecord, ResumeTarget } from "../records";
 
 /**
  * Resume rows.
@@ -112,6 +112,10 @@ export interface CreateResumeInput {
    * the content, which is what a test and a bare "new resume" are.
    */
   document?: ResumeDocument;
+  /** Set only by a caller that knows this is a version, `createVersion` or an
+   * import that carries one. */
+  baseId?: string;
+  target?: ResumeTarget;
 }
 
 /** Appends after the last resume in the target group. */
@@ -141,6 +145,8 @@ export const createResume = async (
     createdAt: now,
     updatedAt: now,
     archivedAt: NOT_ARCHIVED,
+    ...(input.baseId === undefined ? {} : { baseId: input.baseId }),
+    ...(input.target === undefined ? {} : { target: input.target }),
   };
 
   await getDb().resumes.add(record);
@@ -208,6 +214,44 @@ export const duplicateResume = async (
   });
 };
 
+/**
+ * A version of a resume, written for one job.
+ *
+ * A copy, not a view: the document is cloned whole, and the **ids of its
+ * sections and blocks are kept**. That is what lets two resumes be compared
+ * later, by identity rather than by guessing which paragraph became which, and
+ * it is safe because ids are only unique within a document. The version belongs
+ * to the same group as what it was made from.
+ *
+ * A version of a version still points at the resume the family started from, so
+ * "versions of this resume" is one flat list. The copy is taken from the one the
+ * person was looking at, though: starting from the tailored text is the point.
+ *
+ * It is a separate resume and nothing keeps the two in step. That is the choice
+ * that makes this compatible with the app having no version history: what is
+ * stored is whole resumes, each one finished and exportable, and the comparison
+ * is between two things that both exist.
+ */
+export const createVersion = async (
+  sourceId: string,
+  target: ResumeTarget,
+  title: string,
+): Promise<ResumeRecord | undefined> => {
+  const source = await getResume(sourceId);
+
+  if (source === undefined) {
+    return undefined;
+  }
+
+  return createResume({
+    title,
+    groupId: source.groupId,
+    document: structuredClone(source.document),
+    baseId: source.baseId ?? source.id,
+    target,
+  });
+};
+
 export const archiveResume = async (id: string): Promise<void> => {
   const now = Date.now();
 
@@ -221,8 +265,24 @@ export const restoreResume = async (id: string): Promise<void> => {
   });
 };
 
+/**
+ * Deletes a resume. Its versions are kept, as resumes in their own right.
+ *
+ * Deleting what a family started from must not take the tailored resumes with
+ * it, so in the same transaction each one's link is cleared. Its target stays:
+ * it is still written for that job, and the library goes on saying so.
+ */
 export const deleteResume = async (id: string): Promise<void> => {
-  await getDb().resumes.delete(id);
+  const db = getDb();
+
+  await db.transaction("rw", db.resumes, async () => {
+    await db.resumes
+      .filter((record) => record.baseId === id)
+      .modify((record) => {
+        delete record.baseId;
+      });
+    await db.resumes.delete(id);
+  });
 };
 
 /**

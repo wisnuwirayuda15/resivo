@@ -17,6 +17,7 @@ import {
 } from "./format";
 
 import type { Zippable } from "fflate";
+import type { ResumeTarget } from "@/database/records";
 import type { ResumeDocument } from "@/features/resume/model/document";
 import type {
   BundleFontMeta,
@@ -63,7 +64,11 @@ const entryName = (
   `${folder}/${/^[A-Za-z0-9_-]{1,128}$/.test(id) ? id : String(index)}.${extension}`;
 
 export const buildResumeBundle = async (
-  resume: { title: string; document: ResumeDocument },
+  resume: {
+    title: string;
+    document: ResumeDocument;
+    target?: ResumeTarget | undefined;
+  },
   now: number,
 ): Promise<Blob> => {
   const { document } = resume;
@@ -135,6 +140,7 @@ export const buildResumeBundle = async (
 
   const resumeFile: BundleResumeFile = {
     title: resume.title,
+    ...(resume.target === undefined ? {} : { target: resume.target }),
     document,
     images,
     fonts,

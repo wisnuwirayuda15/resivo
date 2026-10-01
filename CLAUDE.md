@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 749 tests in 45 files
-bun run test:e2e         # playwright, 85 specs, chromium only
+bun run test             # vitest, 782 tests in 48 files
+bun run test:e2e         # playwright, 86 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -207,6 +207,7 @@ src/
     export/        PDF, HTML, Markdown, JSON Resume and plain text adapters
     interchange/   reading a file into a document, and JSON Resume and text out
     bundle/        one resume as a zip with its images and fonts, both ways
+    versions/      a version per job: the comparison, its drawer, the dialog
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /
     pwa/           installing, and whether the app is cached here
