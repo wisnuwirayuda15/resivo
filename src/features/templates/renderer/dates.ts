@@ -19,6 +19,54 @@ const YEAR_ONLY = /^\d{4}$/;
 const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/;
 
 /**
+ * What one end of a range turned out to be.
+ *
+ * `text` is everything the formatter passes through untouched: "Summer 2019", a
+ * month outside 1 to 12, an empty string. A day, when one is given, is read and
+ * dropped, because the paper never prints it.
+ */
+export type DatePoint =
+  | { kind: "year"; year: number }
+  | { kind: "month"; year: number; month: number }
+  | { kind: "text" };
+
+/**
+ * Classifies one end of a range.
+ *
+ * The single place the model's machine-readable date forms are recognised, so
+ * the formatter and anything that reasons about dates (the ATS checker) cannot
+ * disagree about what counts as one.
+ */
+export const parseDatePoint = (value: string): DatePoint => {
+  const trimmed = value.trim();
+
+  if (YEAR_ONLY.test(trimmed)) {
+    return { kind: "year", year: Number(trimmed) };
+  }
+
+  const match = YEAR_MONTH.exec(trimmed);
+
+  if (match === null) {
+    return { kind: "text" };
+  }
+
+  const [, yearText, monthText] = match;
+
+  if (yearText === undefined || monthText === undefined) {
+    return { kind: "text" };
+  }
+
+  const month = Number(monthText);
+
+  // A month outside 1 to 12 is not a date the user meant; it stays text.
+  if (month < 1 || month > 12) {
+    return { kind: "text" };
+  }
+
+  return { kind: "month", year: Number(yearText), month };
+};
+
+/**
  * Formats one end of a range.
  *
  * Built and formatted in UTC throughout. `new Date('2021-03')` is parsed as UTC
@@ -27,27 +75,10 @@ const YEAR_MONTH = /^(\d{4})-(\d{2})(?:-\d{2})?$/;
  */
 const formatPoint = (value: string, locale: string): string => {
   const trimmed = value.trim();
+  const point = parseDatePoint(trimmed);
 
-  if (trimmed === "" || YEAR_ONLY.test(trimmed)) {
-    return trimmed;
-  }
-
-  const match = YEAR_MONTH.exec(trimmed);
-
-  if (match === null) {
-    return trimmed;
-  }
-
-  const [, yearText, monthText] = match;
-
-  if (yearText === undefined || monthText === undefined) {
-    return trimmed;
-  }
-
-  const month = Number(monthText);
-
-  // A month outside 1–12 is not a date the user meant; show what they typed.
-  if (month < 1 || month > 12) {
+  // A year, free text or a month that is not one: show what they typed.
+  if (point.kind !== "month") {
     return trimmed;
   }
 
@@ -55,7 +86,7 @@ const formatPoint = (value: string, locale: string): string => {
     month: "short",
     year: "numeric",
     timeZone: "UTC",
-  }).format(new Date(Date.UTC(Number(yearText), month - 1, 1)));
+  }).format(new Date(Date.UTC(point.year, point.month - 1, 1)));
 };
 
 /**

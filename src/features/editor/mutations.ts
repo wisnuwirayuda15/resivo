@@ -291,6 +291,37 @@ export const setSectionBreakBefore =
     section.style = { ...section.style, breakBefore };
   };
 
+/**
+ * How many columns a section is set in.
+ *
+ * One column deletes the key, for the same reason `setSectionBreakBefore` does
+ * on `auto`: the default is what a document without an override already means,
+ * and an override object holding nothing is noise in every diff of it.
+ */
+export const setSectionColumns =
+  (sectionId: string, columns: 1 | 2): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId);
+
+    if (section === undefined) {
+      return;
+    }
+
+    if (columns === 1) {
+      if (section.style !== undefined) {
+        delete section.style.columns;
+
+        if (Object.keys(section.style).length === 0) {
+          delete section.style;
+        }
+      }
+
+      return;
+    }
+
+    section.style = { ...section.style, columns };
+  };
+
 export const moveSection =
   (from: number, to: number): Recipe =>
   (draft) => {

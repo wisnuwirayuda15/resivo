@@ -1,6 +1,38 @@
 import { describe, expect, it } from "vitest";
 
-import { RANGE_DASH, formatDateRange } from "./dates";
+import { RANGE_DASH, formatDateRange, parseDatePoint } from "./dates";
+
+describe("parseDatePoint", () => {
+  it("recognises the machine-readable forms", () => {
+    expect(parseDatePoint("2021")).toEqual({ kind: "year", year: 2021 });
+    expect(parseDatePoint("2021-03")).toEqual({
+      kind: "month",
+      year: 2021,
+      month: 3,
+    });
+    // The day is read and dropped, the paper never prints it.
+    expect(parseDatePoint("2021-03-15")).toEqual({
+      kind: "month",
+      year: 2021,
+      month: 3,
+    });
+  });
+
+  it("treats everything else as text", () => {
+    expect(parseDatePoint("Summer 2019")).toEqual({ kind: "text" });
+    expect(parseDatePoint("")).toEqual({ kind: "text" });
+    expect(parseDatePoint("2021-13")).toEqual({ kind: "text" });
+    expect(parseDatePoint("2021-00")).toEqual({ kind: "text" });
+  });
+
+  it("ignores surrounding whitespace", () => {
+    expect(parseDatePoint("  2021-03 ")).toEqual({
+      kind: "month",
+      year: 2021,
+      month: 3,
+    });
+  });
+});
 
 describe("formatDateRange", () => {
   it("formats a machine-readable range", () => {
