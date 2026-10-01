@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 690 tests in 43 files
-bun run test:e2e         # playwright, 78 specs, chromium only
+bun run test             # vitest, 724 tests in 44 files
+bun run test:e2e         # playwright, 82 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -192,7 +192,8 @@ src/
     icons/         generated icon catalog and picker
     assets/        images and fonts
     ats/           the ATS check: pure rules over the document, and the tab
-    export/        PDF, HTML and Markdown adapters
+    export/        PDF, HTML, Markdown, JSON Resume and plain text adapters
+    interchange/   reading a file into a document, and JSON Resume and text out
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /
     pwa/           installing, and whether the app is cached here

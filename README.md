@@ -73,7 +73,15 @@ remembered. The point of it is the first minute: an empty page does not show
 what an entry is or that skills are a `::tags` line, and the writing guide is a
 drawer somebody has to know to open. It is real Markdown, checked against the
 real parser in a test, so what you read in the code pane is what the format
-actually is. A third way in is an existing Markdown file, from the same dialog.
+actually is. A third way in is an existing file, from the same dialog: Markdown,
+a JSON Resume file, or plain text. Plain text is read for the conventions a text
+resume has (a name on top, contacts under it, headings in capitals or by their
+usual names, a bullet character) and handed to the Markdown reader, so there is
+one parser and a file cannot be understood two ways. JSON Resume is read
+leniently, a wrong type in one field does not refuse the file, and what a resume
+here has no place for (the photograph, links on jobs, grades) is listed rather
+than dropped quietly. Whatever comes in is checked against the document schema
+before anything is written.
 
 **Sidebar.** Collapses to a 60px rail of icons, from the header or Ctrl/Cmd+B,
 and stays that way across a reload. The rail drops the group list rather than
@@ -140,7 +148,10 @@ inline SVG so they survive into an export.
 custom fonts and the bundled typefaces are all inlined. PDF is that same file,
 printed, built, handed to the browser in a frame of its own and thrown away, so
 the PDF and the HTML export are one artefact with two destinations and neither
-can drift from the preview. Markdown uses the same serializer the editor reads.
+can drift from the preview. Markdown uses the same serializer the editor reads. JSON Resume carries the
+content in the format other tools read, and plain text is the same content with
+no styling, for a form that asks you to paste a resume; neither can carry the
+design, so neither reads back to the same look.
 
 **An ATS check.** The inspector's fourth tab reads the document the way an
 applicant tracking system might and lists what would trip it: no name or email,

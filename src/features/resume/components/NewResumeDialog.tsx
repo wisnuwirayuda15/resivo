@@ -14,9 +14,13 @@ import {
 } from "@mantine/core";
 
 import { UNGROUPED } from "@/database/index";
-import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
+import {
+  useErrorText,
+  useTranslation,
+  useUiLanguage,
+} from "@/lib/i18n/useTranslation";
 import { Icon } from "@/features/icons/IconRenderer";
-import { documentFromMarkdown } from "@/features/markdown/index";
+import { importDocument } from "@/features/interchange/index";
 import { createEmptyDocument } from "../model/index";
 import { createStartingDocument } from "../sample";
 import { templateList } from "@/features/templates/catalog";
@@ -30,55 +34,54 @@ import {
 import { TemplateTile } from "./TemplateTile";
 import { useCreateResume, useGroups } from "../queries";
 
+import type { DroppedField, ImportFormat } from "@/features/interchange/index";
 import type { ResumeStart } from "../sample";
-import type { ResumeDocument, TemplateId } from "../model/document";
+import type { TemplateId } from "../model/document";
 
 /**
- * A Markdown file the dialog has read but not yet turned into a resume.
+ * A file the dialog has read but not yet turned into a resume.
  *
  * The source text is kept rather than the parsed document, because the template
  * is chosen in this same dialog and the document is built from it, so the parse
  * is redone at submit against whatever template is selected by then. Parsing is
  * cheap; a stale `templateId` inside a stored document is not.
  */
-interface ImportedMarkdown {
+interface ImportedFile {
   filename: string;
   source: string;
+  format: ImportFormat;
   /** Counted, not listed: the file is not open yet, so there is nowhere to point
    * at. The editor shows each one against its line once the resume exists. */
   warningCount: number;
-  /** The name the file's own `#` heading gave, if it gave one. */
+  /** Fields a JSON Resume file had that a resume here has no place for. */
+  dropped: Array<DroppedField>;
+  /** The name the file itself gave, if it gave one. */
   fullName: string;
 }
 
 /** Enough for any resume, and small enough that reading it cannot hang the
- * dialog. A Markdown resume is a few kilobytes. */
+ * dialog. A resume file is a few kilobytes. */
 const MAX_IMPORT_BYTES = 1024 * 1024;
 
 /**
  * An imported file as a document, and what came of reading it.
  *
- * `documentFromMarkdown` rather than `applyMarkdown`: the empty document here
- * is a starting point nobody has edited, so matching the file's sections
- * against its four would hand a heading it does not have (Projects, say) the
- * kind of whichever section was left over, and a template lays a section out by
- * kind. The empty document supplies the template's design tokens and nothing
- * else.
+ * Built on the empty document for the chosen template, in English whatever the
+ * interface is in: a file is somebody's own writing, and the language it is in
+ * is not something the app can read off it. `importDocument` builds with
+ * `documentFromMarkdown` and never `applyMarkdown` (see CLAUDE.md), so the
+ * empty document supplies the template's design tokens and nothing else.
  */
 const documentFrom = (
   templateId: TemplateId,
+  filename: string,
   source: string,
-): { document: ResumeDocument; warningCount: number; fullName: string } => {
-  const { document, warnings } = documentFromMarkdown(
-    createEmptyDocument(templateId),
-    source,
-  );
+) => importDocument(filename, source, createEmptyDocument(templateId));
 
-  return {
-    document,
-    warningCount: warnings.length,
-    fullName: document.meta.fullName,
-  };
+const FORMAT_ICONS: Record<ImportFormat, string> = {
+  markdown: "markdown-logo",
+  "json-resume": "brackets-curly",
+  text: "text-align-left",
 };
 
 /** `resume.md` becomes `resume`. A fallback for when the file has no `#`
@@ -109,6 +112,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 }) => {
   const { t } = useTranslation("library");
   const { t: tc } = useTranslation("common");
+  const errorText = useErrorText();
   // A blank page is started in the language the app is in, headings and all.
   const uiLanguage = useUiLanguage();
   const [title, setTitle] = useState("");
@@ -124,7 +128,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   /** The starting point, derived from the remembered one for the same reason. */
   const [pickedStart, setPickedStart] = useState<ResumeStart | null>(null);
   const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED);
-  const [imported, setImported] = useState<ImportedMarkdown | null>(null);
+  const [imported, setImported] = useState<ImportedFile | null>(null);
   const [importError, setImportError] = useState<string | null>(null);
 
   const groups = useGroups();
@@ -186,12 +190,23 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
       return;
     }
 
-    const parsed = documentFrom(templateId, source);
+    let parsed: ReturnType<typeof documentFrom>;
+
+    try {
+      parsed = documentFrom(templateId, file.name, source);
+    } catch (cause) {
+      setImportError(
+        errorText(cause, t("create.errors.invalid", { detail: "" })),
+      );
+      return;
+    }
 
     setImported({
       filename: file.name,
       source,
+      format: parsed.format,
       warningCount: parsed.warningCount,
+      dropped: parsed.dropped,
       fullName: parsed.fullName,
     });
 
@@ -223,7 +238,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
       document:
         imported === null
           ? createStartingDocument(start, templateId, uiLanguage)
-          : documentFrom(templateId, imported.source).document,
+          : documentFrom(templateId, imported.filename, imported.source)
+              .document,
     });
 
     // Remembered after the resume exists, so a failed create does not change
@@ -333,7 +349,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
         {imported === null ? null : (
           <Alert
             color="blue"
-            icon={<Icon name="markdown-logo" size={16} />}
+            icon={<Icon name={FORMAT_ICONS[imported.format]} size={16} />}
             variant="light"
             withCloseButton
             onClose={() => setImported(null)}
@@ -342,6 +358,13 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             {imported.warningCount === 0
               ? t("create.readClean")
               : t("create.readWarnings", { count: imported.warningCount })}
+            {imported.dropped.length === 0
+              ? null
+              : ` ${t("create.dropped", {
+                  fields: imported.dropped
+                    .map((field) => t(`create.droppedFields.${field}`))
+                    .join(", "),
+                })}`}
           </Alert>
         )}
 
@@ -349,7 +372,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
           {/* Import is an alternative starting point, not a separate flow: the
               template, name and group above still apply to what it produces. */}
           <FileButton
-            accept=".md,.markdown,.txt,text/markdown"
+            accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"
             onChange={(file) => void importFile(file)}
           >
             {(props) => (
@@ -359,7 +382,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
                 variant="subtle"
               >
                 {imported === null
-                  ? t("create.importMarkdown")
+                  ? t("create.importFile")
                   : t("create.chooseAnother")}
               </Button>
             )}

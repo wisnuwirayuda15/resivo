@@ -1,4 +1,5 @@
 import { serializeDocument } from "@/features/markdown/index";
+import { toJsonResume, toPlainText } from "@/features/interchange/index";
 import {
   documentFontIds,
   documentImageIds,
@@ -35,7 +36,7 @@ export interface ExportContext {
 }
 
 export interface ExportAdapter {
-  format: "html" | "markdown";
+  format: "html" | "markdown" | "json-resume" | "text";
   label: string;
   mimeType: string;
   extension: string;
@@ -97,7 +98,44 @@ const markdownAdapter: ExportAdapter = {
     ),
 };
 
+const jsonResumeAdapter: ExportAdapter = {
+  format: "json-resume",
+  label: "JSON Resume",
+  mimeType: "application/json;charset=utf-8",
+  extension: "json",
+  /**
+   * The content in the format other tools read, not a dump of this app's own
+   * document: that one is the backup's business, and carries ids and style
+   * tokens that mean nothing anywhere else.
+   */
+  run: ({ document }) =>
+    Promise.resolve(
+      new Blob(
+        [
+          `${JSON.stringify(toJsonResume(document), null, 2)}
+`,
+        ],
+        {
+          type: "application/json;charset=utf-8",
+        },
+      ),
+    ),
+};
+
+const textAdapter: ExportAdapter = {
+  format: "text",
+  label: "Plain text",
+  mimeType: "text/plain;charset=utf-8",
+  extension: "txt",
+  run: ({ document }) =>
+    Promise.resolve(
+      new Blob([toPlainText(document)], { type: "text/plain;charset=utf-8" }),
+    ),
+};
+
 export const exportAdapters: Array<ExportAdapter> = [
   htmlAdapter,
   markdownAdapter,
+  jsonResumeAdapter,
+  textAdapter,
 ];

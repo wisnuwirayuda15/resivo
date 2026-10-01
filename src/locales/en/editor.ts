@@ -52,6 +52,12 @@ export const editor = {
       markdown: {
         hint: "Content only, in the same dialect the editor reads. Styling is lost.",
       },
+      "json-resume": {
+        hint: "Content in the JSON Resume format other tools read. Sections with no equivalent are left out.",
+      },
+      text: {
+        hint: "Plain text with no styling, for a form that asks you to paste your resume.",
+      },
     },
     failed: "The export could not be written.",
   },

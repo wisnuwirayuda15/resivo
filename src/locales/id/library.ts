@@ -67,13 +67,31 @@ export const library = {
     namePlaceholder: "Lamaran Staff Engineer 2026",
     group: "Grup",
     noGroup: "Tanpa grup",
-    importMarkdown: "Impor Markdown",
+    importFile: "Impor berkas",
     chooseAnother: "Pilih berkas lain",
     submit: "Buat resume",
     tooBig:
-      "{{name}} berukuran {{size}} KB. Resume Markdown hanya beberapa kilobita, jadi ini kemungkinan bukan resume.",
+      "{{name}} berukuran {{size}} KB. Berkas resume hanya beberapa kilobita, jadi ini kemungkinan bukan resume.",
     empty: "{{name}} kosong.",
+    importHint:
+      "Markdown, JSON Resume, atau teks biasa. Nama yang dipakai berkas menentukan bagian-bagiannya, jadi periksa sekali setelah terbuka.",
     readClean: "Terbaca tanpa sisa.",
+    dropped:
+      "Tidak disertakan, karena resume di sini tidak punya tempat untuknya: {{fields}}.",
+    droppedFields: {
+      image: "foto",
+      urls: "tautan pada pekerjaan, sekolah, dan proyek",
+      score: "nilai",
+      courses: "mata kuliah",
+      level: "tingkat keahlian",
+      keywords: "kata kunci proyek",
+    },
+    errors: {
+      invalidJson: "Berkas itu bukan JSON yang valid.",
+      notJsonResume:
+        "Berkas JSON itu bukan JSON Resume, jadi tidak ada yang dapat dibaca sebagai resume.",
+      invalid: "Berkas itu tidak dapat dijadikan resume. {{detail}}",
+    },
     readWarnings_one:
       "Terbaca. {{count}} baris tidak dapat ditata dan disimpan sebagai teks sumber, editor menunjukkannya.",
     readWarnings_other:

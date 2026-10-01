@@ -71,13 +71,30 @@ export const library = {
     namePlaceholder: "Staff Engineer 2026",
     group: "Group",
     noGroup: "No group",
-    importMarkdown: "Import Markdown",
+    importFile: "Import a file",
     chooseAnother: "Choose another file",
     submit: "Create resume",
     tooBig:
-      "{{name}} is {{size}} KB. Markdown resumes are a few kilobytes; this is probably not one.",
+      "{{name}} is {{size}} KB. A resume file is a few kilobytes; this is probably not one.",
     empty: "{{name}} is empty.",
+    importHint:
+      "Markdown, JSON Resume or plain text. What the file calls things decides the sections, so check them over once it opens.",
     readClean: "Read with nothing left over.",
+    dropped: "Left out, because a resume here has no place for it: {{fields}}.",
+    droppedFields: {
+      image: "the photograph",
+      urls: "links on jobs, schools and projects",
+      score: "grades",
+      courses: "courses",
+      level: "skill levels",
+      keywords: "project keywords",
+    },
+    errors: {
+      invalidJson: "That file is not valid JSON.",
+      notJsonResume:
+        "That JSON file is not a JSON Resume, so there is nothing here to read as a resume.",
+      invalid: "That file could not be turned into a resume. {{detail}}",
+    },
     readWarnings_one:
       "Read. {{count}} line could not be typeset and is kept as source text, the editor points at it.",
     readWarnings_other:

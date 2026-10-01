@@ -47,6 +47,12 @@ export const editor = {
       markdown: {
         hint: "Hanya isi, dalam dialek yang sama dengan yang dibaca editor. Gaya hilang.",
       },
+      "json-resume": {
+        hint: "Isi dalam format JSON Resume yang dibaca alat lain. Bagian tanpa padanan tidak disertakan.",
+      },
+      text: {
+        hint: "Teks biasa tanpa gaya, untuk formulir yang meminta Anda menempelkan resume.",
+      },
     },
     failed: "Ekspor tidak dapat ditulis.",
   },

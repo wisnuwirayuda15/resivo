@@ -27,6 +27,8 @@ import type { ResumeDocument } from "@/features/resume/model/document";
 const ICONS: Record<string, string> = {
   html: "file-text",
   markdown: "markdown-logo",
+  "json-resume": "brackets-curly",
+  text: "text-align-left",
 };
 
 interface ExportMenuProps {
