@@ -48,6 +48,20 @@ Monaco's language workers), so what the app has used is what it can open without
 a connection. Settings says which of those two states this device is in, rather
 than claiming offline before it is true.
 
+**English and Indonesian.** The whole interface, including the writing guide,
+the tours and the ATS findings, is available in both, chosen in Settings or from
+the command palette and kept in this browser. English is the default and what the
+server renders, so the indexed pages are stable for a crawler; the stored choice,
+or failing that the browser's language, is applied after hydration rather than
+during it, which is the price of not detecting a language on the server without
+sending anything about the visitor to it. A new blank resume names its sections
+in the interface's language, and the Markdown importer recognises the Indonesian
+headings. The prompt for a language model stays in English on purpose: it is an
+instruction to a model, not part of the interface. Messages are TypeScript
+modules, the Indonesian ones are typed against the English, and a test fails on
+a missing key, a changed placeholder or a sentence left untranslated. A lint
+rule rejects text written straight into JSX.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 

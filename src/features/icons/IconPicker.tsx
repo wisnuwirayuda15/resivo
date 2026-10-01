@@ -158,8 +158,7 @@ const IconGrid: React.FC<{
     return (
       <Box className="flex flex-1 items-center justify-center p-6">
         <Text className="text-muted text-center text-[12px]">
-          No icon matches that. Try a word for what it depicts,
-          &ldquo;mail&rdquo; finds the envelope.
+          {t("iconPicker.noMatch")}
         </Text>
       </Box>
     );
@@ -216,7 +215,10 @@ const IconGrid: React.FC<{
 
       <Box className="border-line-soft h-statusbar flex flex-none items-center justify-between border-t px-3">
         <Text className="text-subtle font-mono text-[11px] tabular-nums" span>
-          {matches.length} of {catalog.entries.length}
+          {t("iconPicker.count", {
+            shown: matches.length,
+            total: catalog.entries.length,
+          })}
         </Text>
         <Text className="text-subtle truncate pl-2 font-mono text-[11px]" span>
           {matches[active]?.name ?? ""}

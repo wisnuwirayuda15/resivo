@@ -1,6 +1,7 @@
 //  @ts-check
 
 import { tanstackConfig } from "@tanstack/eslint-config";
+import i18next from "eslint-plugin-i18next";
 
 export default [
   ...tanstackConfig,
@@ -36,6 +37,41 @@ export default [
                 "Import useTranslation from @/lib/i18n/useTranslation, which is safe across hydration.",
             },
           ],
+        },
+      ],
+    },
+  },
+  {
+    /**
+     * Words a person reads go through `t()`. Text between JSX tags is what a
+     * migration forgets, and the only kind of literal this can judge without
+     * guessing: attributes also carry class names, ids and test hooks, which
+     * made the stricter mode report hundreds of non-words. Attribute text is
+     * covered by the parity tests instead, which fail on an untranslated
+     * sentence in the Indonesian messages.
+     */
+    files: ["src/**/*.tsx"],
+    ignores: ["src/**/*.test.tsx"],
+    plugins: { i18next },
+    rules: {
+      "i18next/no-literal-string": [
+        "error",
+        {
+          mode: "jsx-text-only",
+          // Replaces the plugin's own exclusions, so the symbol and number
+          // patterns it ships with are repeated. The rest are text that is the
+          // same in every language: the two file names on the code tabs, the
+          // drag and scroll glyphs, and the specimen on a template's swatch.
+          words: {
+            exclude: [
+              "[0-9!-/:-@[-`{-~]+",
+              "[A-Z_-]+",
+              "^resume\\.md$",
+              "^style\\.css$",
+              "^Aa$",
+              "^[\\u00b7\\u00d7\\u2190-\\u21ff\\u2800-\\u28ff\\u2900-\\u297f]+$",
+            ],
+          },
         },
       ],
     },

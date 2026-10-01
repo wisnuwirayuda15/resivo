@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 601 tests in 41 files
-bun run test:e2e         # playwright, 68 specs, chromium only
+bun run test             # vitest, 674 tests in 43 files
+bun run test:e2e         # playwright, 75 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -136,6 +136,23 @@ it,** with `keepMounted={false}` because an inactive Mantine panel is
 zero width. The onboarding tour drives that tab strip through
 `features/editor/tourPane.ts`, and below the breakpoint its three pane steps
 point at the tab that opens each pane rather than at the pane.
+
+**Words go through `t()`, and the language is applied after hydration.**
+Messages are `src/locales/{en,id}/<namespace>.ts`; the English `as const` is the
+type source and the Indonesian file is `satisfies Widen<typeof en...>`, so a
+missing key fails `typecheck`. Import `useTranslation` from
+`@/lib/i18n/useTranslation`, never from `react-i18next` (lint forbids it): the
+wrapper is pinned to a `useSyncExternalStore` whose server snapshot is `"en"`,
+which is what keeps the first client render identical to the server's. The
+stored language (`localStorage` `resivo.language`) is applied in an effect, so
+there is no detector plugin. `t()` is only ever called during render, never at
+module load, which is why switching language needs no reload. Data that holds
+words (the catalog, the tour, the ATS findings) holds keys and params, and the
+words are looked up when shown; `checkDocument` stays pure and language-free.
+`i18next/no-literal-string` rejects text between JSX tags, and
+`src/lib/i18n/i18n.test.ts` fails on a missing key, a changed placeholder or an
+Indonesian sentence still in English. `AI_PROMPT` and the SEO tags stay English
+on purpose.
 
 **SEO: three routes are indexable** (`/`, `/templates`, `/about`) and every
 route behind the app shell sends `noindex`, because they render one browser's

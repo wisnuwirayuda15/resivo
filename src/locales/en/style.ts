@@ -95,6 +95,9 @@ export const style = {
     weight: "Icon weight",
     grid: "Icons",
     remove: "Remove icon",
+    noMatch:
+      "No icon matches that. Try a word for what it depicts, “mail” finds the envelope.",
+    count: "{{shown}} of {{total}}",
     weights: {
       thin: "Thin",
       light: "Light",

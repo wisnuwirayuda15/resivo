@@ -93,6 +93,9 @@ export const style = {
     weight: "Ketebalan ikon",
     grid: "Ikon",
     remove: "Hapus ikon",
+    noMatch:
+      "Tidak ada ikon yang cocok. Coba kata untuk apa yang digambarkannya, “mail” menemukan amplop.",
+    count: "{{shown}} dari {{total}}",
     weights: {
       thin: "Tipis",
       light: "Ringan",
