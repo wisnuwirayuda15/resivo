@@ -15,6 +15,32 @@ export default [
     },
   },
   {
+    /**
+     * Components take `useTranslation` from `lib/i18n/useTranslation`, not from
+     * the library. The two differ in one argument, the language the hook is
+     * pinned to, and using the library's by habit renders the wrong language on
+     * a component that has not hydrated yet and throws the subtree away. The
+     * wrapper file itself, and the instance setup, are the only places that
+     * import it.
+     */
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/lib/i18n/useTranslation.ts", "src/lib/i18n/index.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "react-i18next",
+              message:
+                "Import useTranslation from @/lib/i18n/useTranslation, which is safe across hydration.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
     ignores: [
       "eslint.config.js",
       "prettier.config.js",

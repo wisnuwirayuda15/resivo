@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 
 import { Link } from "@tanstack/react-router";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { Icon } from "@/features/icons/IconRenderer";
@@ -88,6 +89,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   onStartTour,
   onToggleSidebar,
 }) => {
+  const { t } = useTranslation("shell");
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -104,10 +106,10 @@ export const AppBar: React.FC<AppBarProps> = ({
           change with the state, a control that renames itself is one the
           server cannot render, and "Toggle" is what the burger says too. */}
       <Box className="flex items-center" visibleFrom="sm">
-        <Tooltip label="Toggle sidebar">
+        <Tooltip label={t("appBar.toggleSidebar")}>
           <BarButton
             icon="sidebar-simple"
-            label="Toggle sidebar"
+            label={t("appBar.toggleSidebar")}
             onClick={onToggleSidebar}
           />
         </Tooltip>
@@ -145,10 +147,12 @@ export const AppBar: React.FC<AppBarProps> = ({
           {/* Out of the row on a phone, where every pixel is contested, and
               into the menu below, so the control still exists at every width. */}
           <Box visibleFrom="sm">
-            <Tooltip label={isDark ? "Light theme" : "Dark theme"}>
+            <Tooltip
+              label={isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
+            >
               <BarButton
                 icon={isDark ? "sun" : "moon"}
-                label="Toggle theme"
+                label={t("appBar.toggleTheme")}
                 onClick={() => setColorScheme(isDark ? "light" : "dark")}
               />
             </Tooltip>
@@ -156,7 +160,10 @@ export const AppBar: React.FC<AppBarProps> = ({
 
           <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
             <Menu.Target>
-              <BarButton icon="dots-three" label="Application menu" />
+              <BarButton
+                icon="dots-three"
+                label={t("appBar.applicationMenu")}
+              />
             </Menu.Target>
             <Menu.Dropdown>
               {/* Where the theme toggle goes when the row cannot hold it. Only
@@ -166,27 +173,27 @@ export const AppBar: React.FC<AppBarProps> = ({
                 leftSection={<Icon name={isDark ? "sun" : "moon"} size={15} />}
                 onClick={() => setColorScheme(isDark ? "light" : "dark")}
               >
-                {isDark ? "Light theme" : "Dark theme"}
+                {isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
               </Menu.Item>
               <Menu.Item
                 leftSection={<Icon name="keyboard" size={15} />}
                 onClick={onShowShortcuts}
               >
-                Keyboard shortcuts
+                {t("appBar.keyboardShortcuts")}
               </Menu.Item>
               <Menu.Item
                 component={Link}
                 leftSection={<Icon name="info" size={15} />}
                 to="/about"
               >
-                About Resivo
+                {t("appBar.about")}
               </Menu.Item>
               <Menu.Divider />
               <Menu.Item
                 leftSection={<Icon name="sparkle" size={15} />}
                 onClick={onStartTour}
               >
-                Take the tour
+                {t("appBar.takeTheTour")}
               </Menu.Item>
             </Menu.Dropdown>
           </Menu>

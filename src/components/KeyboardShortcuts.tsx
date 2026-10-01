@@ -1,5 +1,8 @@
 import { Box, Kbd, Modal, Text } from "@mantine/core";
 import { useOs } from "@mantine/hooks";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
+import type { TFunction } from "i18next";
 
 /**
  * What the keyboard does.
@@ -33,68 +36,73 @@ interface Group {
   shortcuts: Array<Shortcut>;
 }
 
-const groups = (mod: string): Array<Group> => [
+const groups = (mod: string, t: TFunction<"shell">): Array<Group> => [
   {
-    title: "Anywhere in the app",
+    title: t("shortcuts.anywhere.title"),
     shortcuts: [
-      { keys: [[mod, "K"]], description: "Open the command palette" },
+      { keys: [[mod, "K"]], description: t("shortcuts.anywhere.palette") },
       {
         keys: [[mod, "B"]],
-        description: "Collapse or expand the sidebar",
+        description: t("shortcuts.anywhere.sidebar"),
       },
-      { keys: [[mod, "Z"]], description: "Undo the last change to the resume" },
+      { keys: [[mod, "Z"]], description: t("shortcuts.anywhere.undo") },
       {
         keys: [
           [mod, "Shift", "Z"],
           [mod, "Y"],
         ],
-        description: "Redo",
+        description: t("shortcuts.anywhere.redo"),
       },
     ],
   },
   {
-    title: "In the Markdown and CSS panes",
-    note: "The code editor keeps its own history, so undo there means the text you typed rather than the document as a whole.",
+    title: t("shortcuts.code.title"),
+    note: t("shortcuts.code.note"),
     shortcuts: [
-      { keys: [[mod, "Z"]], description: "Undo typing, a step at a time" },
-      { keys: [[mod, "F"]], description: "Find in the pane" },
-      { keys: [["F1"]], description: "The code editor's own command list" },
+      { keys: [[mod, "Z"]], description: t("shortcuts.code.undo") },
+      { keys: [[mod, "F"]], description: t("shortcuts.code.find") },
+      { keys: [["F1"]], description: t("shortcuts.code.commands") },
     ],
   },
   {
-    title: "On the paper, in Visual mode",
-    note: "The paper is a document of its own, which is why a keystroke inside it does not reach the app around it.",
+    title: t("shortcuts.paper.title"),
+    note: t("shortcuts.paper.note"),
     shortcuts: [
-      { keys: [["Enter"]], description: "Edit the highlighted text" },
-      { keys: [["Enter"]], description: "Finish editing and keep the change" },
-      { keys: [["Escape"]], description: "Finish editing and discard it" },
+      { keys: [["Enter"]], description: t("shortcuts.paper.edit") },
+      { keys: [["Enter"]], description: t("shortcuts.paper.keep") },
+      { keys: [["Escape"]], description: t("shortcuts.paper.discard") },
     ],
   },
 ];
 
-const Keys: React.FC<{ keys: Array<Array<string>> }> = ({ keys }) => (
-  <Box className="flex flex-none items-center gap-1.5">
-    {keys.map((combination, index) => (
-      <Box className="flex items-center gap-1" key={combination.join("+")}>
-        {index === 0 ? null : (
-          <Text className="text-subtle mr-1 text-[11px]" span>
-            or
-          </Text>
-        )}
-        {combination.map((key) => (
-          <Kbd key={key} size="xs">
-            {key}
-          </Kbd>
-        ))}
-      </Box>
-    ))}
-  </Box>
-);
+const Keys: React.FC<{ keys: Array<Array<string>> }> = ({ keys }) => {
+  const { t } = useTranslation("shell");
+
+  return (
+    <Box className="flex flex-none items-center gap-1.5">
+      {keys.map((combination, index) => (
+        <Box className="flex items-center gap-1" key={combination.join("+")}>
+          {index === 0 ? null : (
+            <Text className="text-subtle mr-1 text-[11px]" span>
+              {t("shortcuts.or")}
+            </Text>
+          )}
+          {combination.map((key) => (
+            <Kbd key={key} size="xs">
+              {key}
+            </Kbd>
+          ))}
+        </Box>
+      ))}
+    </Box>
+  );
+};
 
 export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
   opened,
   onClose,
 }) => {
+  const { t } = useTranslation("shell");
   // The label has to name the right key or it is worse than no label.
   const mod = useOs() === "macos" ? "⌘" : "Ctrl";
 
@@ -103,10 +111,10 @@ export const KeyboardShortcuts: React.FC<KeyboardShortcutsProps> = ({
       onClose={onClose}
       opened={opened}
       size={560}
-      title="Keyboard shortcuts"
+      title={t("shortcuts.title")}
     >
       <Box className="flex flex-col gap-5">
-        {groups(mod).map((group) => (
+        {groups(mod, t).map((group) => (
           <Box key={group.title}>
             <Text
               className="text-subtle text-[10px] font-medium tracking-[0.06em] uppercase"

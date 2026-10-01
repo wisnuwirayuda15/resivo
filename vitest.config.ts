@@ -28,6 +28,7 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.{test,spec}.{ts,tsx}"],
+    setupFiles: ["src/lib/i18n/test-setup.ts"],
     /**
      * Vitest stubs CSS imports to an empty module by default, and that stubbing
      * catches `?raw` too. The preview engine injects its stylesheets into the

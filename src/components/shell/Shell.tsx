@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { AppShell, Burger, Overlay } from "@mantine/core";
 import { useDisclosure, useHotkeys } from "@mantine/hooks";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { ClientOnly } from "@/components/client-only";
 import { AppTour } from "@/features/onboarding/AppTour";
@@ -47,6 +48,7 @@ export const Shell: React.FC<ShellProps> = ({
   activeGroupId,
   allActive = false,
 }) => {
+  const { t } = useTranslation("shell");
   const navigate = useNavigate();
   const [navOpened, { toggle: toggleNav, close: closeNav }] =
     useDisclosure(false);
@@ -189,7 +191,7 @@ export const Shell: React.FC<ShellProps> = ({
                 onClick={toggleNav}
                 hiddenFrom="sm"
                 size="sm"
-                aria-label="Toggle navigation"
+                aria-label={t("appBar.toggleNavigation")}
               />
             }
           />

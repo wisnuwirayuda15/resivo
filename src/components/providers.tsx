@@ -7,6 +7,9 @@ import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { ReactQueryDevtoolsPanel } from "@tanstack/react-query-devtools";
 import { FormDevtoolsPanel } from "@tanstack/react-form-devtools";
 
+import "@/lib/i18n";
+import { LanguageSync } from "@/lib/i18n/LanguageSync";
+import { useUiLanguage } from "@/lib/i18n/useTranslation";
 import { theme } from "@/styles/theme";
 
 import type { ReactNode } from "react";
@@ -28,6 +31,8 @@ export const Providers: React.FC<ProvidersProps> = ({
   queryClient,
   children,
 }) => {
+  const language = useUiLanguage();
+
   return (
     <QueryClientProvider client={queryClient}>
       <MantineProvider
@@ -35,7 +40,10 @@ export const Providers: React.FC<ProvidersProps> = ({
         defaultColorScheme="auto"
         deduplicateInlineStyles
       >
-        <DatesProvider settings={{}}>
+        {/* The calendar and date inputs follow the interface language, through
+            the locale dayjs was given in `LanguageSync`. */}
+        <DatesProvider settings={{ locale: language }}>
+          <LanguageSync />
           {children}
           <Notifications />
           <TanStackDevtools

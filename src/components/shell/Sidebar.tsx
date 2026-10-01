@@ -1,6 +1,7 @@
 import { ActionIcon, AppShell, Box, ScrollArea, Tooltip } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { Link, useLocation } from "@tanstack/react-router";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { UNGROUPED } from "@/database/index";
 import { Icon } from "@/features/icons/IconRenderer";
@@ -75,6 +76,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   allActive,
   collapsed,
 }) => {
+  const { t } = useTranslation("shell");
   const groups = useGroups();
   const counts = useGroupCounts();
   const { pathname } = useLocation();
@@ -114,10 +116,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <Logo />
             </Link>
             <Box className="flex-1" />
-            <Tooltip label="New resume">
+            <Tooltip label={t("sidebar.newResume")}>
               <ActionIcon
                 onClick={onNewResume}
-                aria-label="New resume"
+                aria-label={t("sidebar.newResume")}
                 className="hover:bg-hover hover:text-body my-1"
               >
                 <Icon name="plus" size={16} />
@@ -133,14 +135,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <NavButton
               collapsed
               icon="plus"
-              label="New resume"
+              label={t("sidebar.newResume")}
               onClick={onNewResume}
             />
           ) : null}
           <NavLink
             collapsed={rail}
             icon="squares-four"
-            label="All resumes"
+            label={t("sidebar.allResumes")}
             count={total}
             to="/resumes"
             active={allActive}
@@ -149,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <NavLink
             collapsed={rail}
             icon="archive"
-            label="Archived"
+            label={t("sidebar.archived")}
             to="/archive"
             active={pathname === "/archive"}
             onNavigate={onNavigate}
@@ -157,7 +159,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </NavGroup>
 
         {rail ? null : (
-          <NavGroup label="Groups">
+          <NavGroup label={t("sidebar.groups")}>
             {groups.data?.map((group) => (
               <GroupRow
                 active={activeGroupId === group.id}
@@ -180,21 +182,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
               >
                 <NavItemContent
                   icon="folder-open"
-                  label="Ungrouped"
+                  label={t("sidebar.ungrouped")}
                   count={ungroupedCount}
                 />
               </Link>
             ) : null}
 
-            <NavButton icon="plus" label="New group" onClick={onNewGroup} />
+            <NavButton
+              icon="plus"
+              label={t("sidebar.newGroup")}
+              onClick={onNewGroup}
+            />
           </NavGroup>
         )}
 
-        <NavGroup collapsed={rail} label="Library">
+        <NavGroup collapsed={rail} label={t("sidebar.library")}>
           <NavLink
             collapsed={rail}
             icon="sparkle"
-            label="Templates"
+            label={t("sidebar.templates")}
             to="/templates"
             active={pathname === "/templates"}
             onNavigate={onNavigate}
@@ -202,7 +208,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <NavLink
             collapsed={rail}
             icon="image"
-            label="Images"
+            label={t("sidebar.images")}
             to="/images"
             active={pathname === "/images"}
             onNavigate={onNavigate}
@@ -211,7 +217,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <NavLink
             collapsed={rail}
             icon="text-aa"
-            label="Fonts"
+            label={t("sidebar.fonts")}
             to="/fonts"
             active={pathname === "/fonts"}
             onNavigate={onNavigate}
@@ -226,7 +232,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <NavLink
             collapsed={rail}
             icon="gear"
-            label="Settings"
+            label={t("sidebar.settings")}
             to="/settings"
             onNavigate={onNavigate}
             tourId={TOUR_TARGET_IDS.settings}
@@ -238,7 +244,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           is the kind of thing a tooltip can hold. */}
       {rail ? (
         <AppShell.Section className="flex justify-center px-0 pt-2 pb-3">
-          <Tooltip label="No account. No cloud." offset={10} position="right">
+          <Tooltip label={t("sidebar.privacy")} offset={10} position="right">
             <Box className="text-subtle flex items-center">
               <Icon name="lock-simple" size={13} />
             </Box>
@@ -247,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       ) : (
         <AppShell.Section className="text-subtle flex items-center gap-1.5 px-3 pt-2 pb-3 text-[11px]">
           <Icon name="lock-simple" size={13} />
-          No account. No cloud.
+          {t("sidebar.privacy")}
         </AppShell.Section>
       )}
     </>

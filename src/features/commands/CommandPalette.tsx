@@ -1,8 +1,11 @@
 import { Spotlight } from "@mantine/spotlight";
 import { useComputedColorScheme, useMantineColorScheme } from "@mantine/core";
 import { useNavigate } from "@tanstack/react-router";
+import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 
 import { Icon } from "@/features/icons/IconRenderer";
+import { setLanguage } from "@/lib/i18n";
+import { LANGUAGE_NAMES, SUPPORTED_LANGUAGES } from "@/lib/i18n/language";
 
 import type { SpotlightActionGroupData } from "@mantine/spotlight";
 
@@ -42,126 +45,140 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onStartTour,
   onToggleSidebar,
 }) => {
+  const { t } = useTranslation("commands");
   const navigate = useNavigate();
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
   });
   const isDark = scheme === "dark";
+  const language = useUiLanguage();
 
   const groups: Array<SpotlightActionGroupData> = [
     {
-      group: "Create",
+      group: t("groups.create"),
       actions: [
         {
           id: "new-resume",
-          label: "New resume",
-          description: "Pick a template, or import a Markdown file",
-          keywords: "create add import",
+          label: t("newResume.label"),
+          description: t("newResume.description"),
+          keywords: t("newResume.keywords"),
           leftSection: <Icon name="file-plus" size={16} />,
           onClick: onNewResume,
         },
         {
           id: "new-group",
-          label: "New group",
-          description: "A folder for a set of resumes",
-          keywords: "create add folder",
+          label: t("newGroup.label"),
+          description: t("newGroup.description"),
+          keywords: t("newGroup.keywords"),
           leftSection: <Icon name="folder-open" size={16} />,
           onClick: onNewGroup,
         },
       ],
     },
     {
-      group: "Go to",
+      group: t("groups.goTo"),
       actions: [
         {
           id: "resumes",
-          label: "All resumes",
-          keywords: "library home",
+          label: t("resumes.label"),
+          keywords: t("resumes.keywords"),
           leftSection: <Icon name="file-text" size={16} />,
           onClick: () => void navigate({ to: "/resumes" }),
         },
         {
           id: "archive",
-          label: "Archived",
-          keywords: "hidden",
+          label: t("archive.label"),
+          keywords: t("archive.keywords"),
           leftSection: <Icon name="archive" size={16} />,
           onClick: () => void navigate({ to: "/archive" }),
         },
         {
           id: "templates",
-          label: "Templates",
-          description: "What each layout is for, and how it reads to a parser",
-          keywords: "ats layout design",
+          label: t("templates.label"),
+          description: t("templates.description"),
+          keywords: t("templates.keywords"),
           leftSection: <Icon name="squares-four" size={16} />,
           onClick: () => void navigate({ to: "/templates" }),
         },
         {
           id: "images",
-          label: "Images",
-          description: "Every image on this device, and what nothing uses",
-          keywords: "photo avatar assets unused",
+          label: t("images.label"),
+          description: t("images.description"),
+          keywords: t("images.keywords"),
           leftSection: <Icon name="image" size={16} />,
           onClick: () => void navigate({ to: "/images" }),
         },
         {
           id: "fonts",
-          label: "Fonts",
-          description: "Uploaded typefaces",
-          keywords: "typeface assets woff",
+          label: t("fonts.label"),
+          description: t("fonts.description"),
+          keywords: t("fonts.keywords"),
           leftSection: <Icon name="text-aa" size={16} />,
           onClick: () => void navigate({ to: "/fonts" }),
         },
         {
           id: "settings",
-          label: "Settings",
-          description: "Back up and restore, and what the device is holding",
-          keywords: "backup restore export storage",
+          label: t("settings.label"),
+          description: t("settings.description"),
+          keywords: t("settings.keywords"),
           leftSection: <Icon name="gear" size={16} />,
           onClick: () => void navigate({ to: "/settings" }),
         },
         {
           id: "about",
-          label: "About Resivo",
-          keywords: "help privacy local",
+          label: t("about.label"),
+          keywords: t("about.keywords"),
           leftSection: <Icon name="info" size={16} />,
           onClick: () => void navigate({ to: "/about" }),
         },
       ],
     },
     {
-      group: "This app",
+      group: t("groups.app"),
       actions: [
         {
           id: "theme",
-          label: isDark ? "Light theme" : "Dark theme",
-          keywords: "dark light appearance colour color",
+          label: isDark ? t("theme.light") : t("theme.dark"),
+          keywords: t("theme.keywords"),
           leftSection: <Icon name={isDark ? "sun" : "moon"} size={16} />,
           onClick: () => setColorScheme(isDark ? "light" : "dark"),
         },
         {
           id: "sidebar",
-          label: "Toggle sidebar",
-          description: "Collapse it to a rail of icons, or bring it back",
-          keywords: "navbar rail collapse expand hide narrow",
+          label: t("sidebar.label"),
+          description: t("sidebar.description"),
+          keywords: t("sidebar.keywords"),
           leftSection: <Icon name="sidebar-simple" size={16} />,
           onClick: onToggleSidebar,
         },
         {
           id: "shortcuts",
-          label: "Keyboard shortcuts",
-          keywords: "keys help bindings",
+          label: t("shortcuts.label"),
+          keywords: t("shortcuts.keywords"),
           leftSection: <Icon name="keyboard" size={16} />,
           onClick: onShowShortcuts,
         },
         {
           id: "tour",
-          label: "Take the tour",
-          description: "A short walk through what is worth knowing",
-          keywords: "onboarding help guide intro",
+          label: t("tour.label"),
+          description: t("tour.description"),
+          keywords: t("tour.keywords"),
           leftSection: <Icon name="sparkle" size={16} />,
           onClick: onStartTour,
         },
+        // One entry for each language other than the current one. The palette
+        // offers the change rather than a toggle, because with more than two
+        // languages a toggle would have to guess which one was meant.
+        ...SUPPORTED_LANGUAGES.filter((option) => option !== language).map(
+          (option) => ({
+            id: `language-${option}`,
+            label: t("language.label", { language: LANGUAGE_NAMES[option] }),
+            keywords: t("language.keywords"),
+            leftSection: <Icon name="translate" size={16} />,
+            onClick: () => void setLanguage(option),
+          }),
+        ),
       ],
     },
   ];
@@ -169,11 +186,11 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   return (
     <Spotlight
       actions={groups}
-      nothingFound="No command matches that."
+      nothingFound={t("nothingFound")}
       radius="dialog"
       scrollable
       searchProps={{
-        placeholder: "Search commands…",
+        placeholder: t("search"),
         leftSection: <Icon name="magnifying-glass" size={16} />,
       }}
       shadow="xl"
