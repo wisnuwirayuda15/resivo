@@ -10,6 +10,7 @@ import {
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { Logo } from "@/components/shell/Logo";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * The landing page's own bar.
@@ -24,11 +25,12 @@ import { Logo } from "@/components/shell/Logo";
  */
 
 const LINKS = [
-  { label: "Templates", to: "/templates" },
-  { label: "About", to: "/about" },
+  { key: "templates", to: "/templates" },
+  { key: "about", to: "/about" },
 ] as const;
 
 export const LandingNav: React.FC = () => {
+  const { t } = useTranslation("landing");
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -41,7 +43,7 @@ export const LandingNav: React.FC = () => {
       component="header"
     >
       <Box className="mx-auto flex h-[56px] max-w-[1120px] items-center gap-4 px-4 sm:px-8">
-        <Link aria-label="Resivo" to="/">
+        <Link aria-label={t("nav.logo")} to="/">
           <Logo className="h-[16px]" />
         </Link>
 
@@ -56,12 +58,12 @@ export const LandingNav: React.FC = () => {
               key={link.to}
               to={link.to}
             >
-              {link.label}
+              {t(`nav.${link.key}`)}
             </Text>
           ))}
 
           <UnstyledButton
-            aria-label={isDark ? "Light theme" : "Dark theme"}
+            aria-label={isDark ? t("nav.lightTheme") : t("nav.darkTheme")}
             className="text-muted hover:text-body hover:bg-hover rounded-control duration-fast ease-standard flex size-[30px] items-center justify-center transition-colors active:scale-[0.96]"
             onClick={() => setColorScheme(isDark ? "light" : "dark")}
           >
@@ -73,7 +75,7 @@ export const LandingNav: React.FC = () => {
             component={Link}
             to="/resumes"
           >
-            Open the app
+            {t("nav.openApp")}
           </Button>
         </Box>
       </Box>

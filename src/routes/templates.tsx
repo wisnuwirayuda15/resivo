@@ -7,6 +7,7 @@ import { Shell } from "@/components/shell/Shell";
 import { TemplateTile } from "@/features/resume/components/TemplateTile";
 import { templateList } from "@/features/templates/catalog";
 import { useTemplateText } from "@/features/templates/useTemplateText";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * The template gallery.
@@ -18,14 +19,13 @@ import { useTemplateText } from "@/features/templates/useTemplateText";
  */
 const TemplatesRoute: React.FC = () => {
   const text = useTemplateText();
+  const { t } = useTranslation("landing");
 
   return (
-    <Shell title="Templates">
+    <Shell title={t("templatesPage.title")}>
       <Box className="p-6">
         <Text className="text-muted mb-5 max-w-[70ch] text-[13px] leading-normal">
-          Every template is single-column and parser-safe. They differ in
-          typeface, spacing and how much hierarchy comes from rules rather than
-          type size.
+          {t("templatesPage.intro")}
         </Text>
 
         <Box className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] gap-4">
@@ -48,9 +48,9 @@ const TemplatesRoute: React.FC = () => {
 export const Route = createFileRoute("/templates")({
   head: () => ({
     meta: seo({
-      title: "Four ATS-friendly resume templates | Resivo",
+      title: "ATS-friendly resume templates | Resivo",
       description:
-        "Four single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.",
+        "Single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.",
     }),
   }),
   component: TemplatesRoute,

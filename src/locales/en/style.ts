@@ -88,6 +88,22 @@ export const style = {
     rounded: "Rounded",
     square: "Square",
   },
+  iconPicker: {
+    title: "Choose an icon",
+    search: "Search icons",
+    searchPlaceholder: "Search 1512 icons: try mail, phone, github",
+    weight: "Icon weight",
+    grid: "Icons",
+    remove: "Remove icon",
+    weights: {
+      thin: "Thin",
+      light: "Light",
+      regular: "Regular",
+      bold: "Bold",
+      fill: "Fill",
+      duotone: "Duo",
+    },
+  },
   fontVariant: "{{family}} {{weight}}",
   fontVariantItalic: "{{family}} {{weight}} italic",
   sections: {

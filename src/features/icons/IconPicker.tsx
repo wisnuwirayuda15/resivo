@@ -13,6 +13,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ICON_WEIGHTS } from "@/features/resume/model/document";
 
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { Icon } from "./IconRenderer";
 import {
@@ -47,18 +48,6 @@ const CELL = 40;
  * keystroke while still feeling immediate. */
 const SEARCH_DELAY_MS = 80;
 
-/** Single letters, because six full weight names do not fit a 480px dialog and
- * the glyphs in the grid are the real label, the control only has to say which
- * one is showing. */
-const WEIGHT_LABELS: Record<IconWeight, string> = {
-  thin: "Thin",
-  light: "Light",
-  regular: "Regular",
-  bold: "Bold",
-  fill: "Fill",
-  duotone: "Duo",
-};
-
 interface IconPickerProps {
   opened: boolean;
   /** The name currently chosen, if any. Shown selected and scrolled to. */
@@ -77,6 +66,7 @@ const IconGrid: React.FC<{
   weight: IconWeight;
   onChange: (name: string) => void;
 }> = ({ catalog, query, value, weight, onChange }) => {
+  const { t } = useTranslation("style");
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [columns, setColumns] = useState(6);
 
@@ -184,7 +174,7 @@ const IconGrid: React.FC<{
         onKeyDown={handleKeyDown}
         ref={scrollRef}
         role="listbox"
-        aria-label="Icons"
+        aria-label={t("iconPicker.grid")}
         tabIndex={0}
       >
         <Box
@@ -275,6 +265,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   onClear,
   onClose,
 }) => {
+  const { t } = useTranslation("style");
   const [catalog, setCatalog] = useState<IconCatalog | null>(null);
   const [typed, setTyped] = useState("");
   const [query, setQuery] = useState("");
@@ -324,13 +315,18 @@ export const IconPicker: React.FC<IconPickerProps> = ({
   );
 
   return (
-    <Modal onClose={onClose} opened={opened} size={480} title="Choose an icon">
+    <Modal
+      onClose={onClose}
+      opened={opened}
+      size={480}
+      title={t("iconPicker.title")}
+    >
       <Box className="flex h-[460px] flex-col">
         <TextInput
-          aria-label="Search icons"
+          aria-label={t("iconPicker.search")}
           data-autofocus
           onChange={(event) => setTyped(event.currentTarget.value)}
-          placeholder="Search 1512 icons: try mail, phone, github"
+          placeholder={t("iconPicker.searchPlaceholder")}
           size="xs"
           value={typed}
         />
@@ -339,11 +335,13 @@ export const IconPicker: React.FC<IconPickerProps> = ({
             cell, and a control that sits over what it changes makes that
             obvious. */}
         <SegmentedControl
-          aria-label="Icon weight"
+          aria-label={t("iconPicker.weight")}
           className="mt-2 flex-none"
           data={ICON_WEIGHTS.map((option) => ({
             value: option,
-            label: WEIGHT_LABELS[option],
+            // Short, because six full names do not fit a 480px dialog and the
+            // glyphs in the grid are the real label.
+            label: t(`iconPicker.weights.${option}`),
           }))}
           fullWidth
           onChange={(next) => {
@@ -380,7 +378,7 @@ export const IconPicker: React.FC<IconPickerProps> = ({
                 onClose();
               }}
             >
-              Remove icon
+              {t("iconPicker.remove")}
             </UnstyledButton>
           </Box>
         )}

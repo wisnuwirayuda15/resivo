@@ -86,6 +86,22 @@ export const style = {
     rounded: "Sudut membulat",
     square: "Persegi",
   },
+  iconPicker: {
+    title: "Pilih ikon",
+    search: "Cari ikon",
+    searchPlaceholder: "Cari 1512 ikon: coba mail, phone, github",
+    weight: "Ketebalan ikon",
+    grid: "Ikon",
+    remove: "Hapus ikon",
+    weights: {
+      thin: "Tipis",
+      light: "Ringan",
+      regular: "Normal",
+      bold: "Tebal",
+      fill: "Isi",
+      duotone: "Dua nada",
+    },
+  },
   fontVariant: "{{family}} {{weight}}",
   fontVariantItalic: "{{family}} {{weight}} miring",
   sections: {

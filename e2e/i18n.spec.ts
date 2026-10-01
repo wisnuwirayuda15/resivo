@@ -152,3 +152,34 @@ test("a refused backup is explained in the interface language", async ({
     page.getByText(/bukan JSON yang valid/),
   );
 });
+
+test("the public pages follow the language, links inside sentences included", async ({
+  page,
+}) => {
+  await page.addInitScript(() => localStorage.setItem("resivo.language", "id"));
+
+  // The landing page is rendered on the server in English and moves to the
+  // reader's language once it has hydrated, so the assertion waits for it.
+  await page.goto("/");
+  await expect(
+    page.getByRole("heading", {
+      name: "Resume Anda tidak pernah meninggalkan browser ini.",
+    }),
+  ).toBeVisible();
+
+  // A link in the middle of a sentence, which `Trans` places by the
+  // translation's own word order.
+  await page.goto("/about");
+
+  const settings = page.getByRole("link", { name: "Pengaturan", exact: true });
+
+  await expect(settings.first()).toBeVisible();
+  await expect(
+    page.getByText("Berkas cadangan di", { exact: false }),
+  ).toContainText("Pengaturan");
+
+  await page.goto("/templates");
+  await expect(
+    page.getByText("Setiap template satu kolom dan aman bagi parser."),
+  ).toBeVisible();
+});

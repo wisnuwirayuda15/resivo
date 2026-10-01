@@ -3,6 +3,7 @@ import { ats } from "./ats";
 import { commands } from "./commands";
 import { common } from "./common";
 import { editor } from "./editor";
+import { landing } from "./landing";
 import { library } from "./library";
 import { settings } from "./settings";
 import { shell } from "./shell";
@@ -23,4 +24,5 @@ export const id = {
   style,
   ats,
   assets,
+  landing,
 };

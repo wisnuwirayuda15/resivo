@@ -3,6 +3,7 @@ import { Box, Text, UnstyledButton } from "@mantine/core";
 
 import { PaperMiniature } from "@/features/templates/PaperMiniature";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { templateList } from "@/features/templates/catalog";
 import { useTemplateText } from "@/features/templates/useTemplateText";
 
@@ -11,7 +12,7 @@ import { Reveal } from "./Reveal";
 import type { TemplateId } from "@/features/resume/model/document";
 
 /**
- * The four templates, switched by the reader.
+ * The templates, switched by the reader.
  *
  * The motion here is a state transition and nothing else: the reader points at
  * a name and the page beside it becomes that template. It is worth animating
@@ -19,8 +20,8 @@ import type { TemplateId } from "@/features/resume/model/document";
  * between two pages that are 90 percent alike reads as a flicker rather than as
  * a change.
  *
- * All four pages are rendered and stacked, with opacity deciding which is on
- * top. That is not a shortcut for a keyframe: hovering across four rows is a
+ * Every page is rendered and stacked, with opacity deciding which is on
+ * top. That is not a shortcut for a keyframe: hovering across the rows is a
  * rapid, interruptible gesture, and a transition retargets from wherever it had
  * got to while a keyframe would start over on each row.
  *
@@ -31,6 +32,7 @@ import type { TemplateId } from "@/features/resume/model/document";
 export const TemplateShowcase: React.FC = () => {
   const [active, setActive] = useState<TemplateId>("classic");
   const text = useTemplateText();
+  const { t } = useTranslation("landing");
 
   return (
     <Box className="bg-surface border-line-soft border-t" component="section">
@@ -40,12 +42,10 @@ export const TemplateShowcase: React.FC = () => {
             className="text-title max-w-[28ch] text-[26px] leading-[1.15] font-semibold tracking-[-0.015em] sm:text-[30px]"
             component="h2"
           >
-            Four templates, every one of them single column.
+            {t("showcase.title")}
           </Text>
           <Text className="text-muted mt-4 max-w-[58ch] text-[14px] leading-relaxed">
-            Each is pure CSS over the same markup, so switching never rewrites
-            what you wrote. Single column with headings in document order is
-            also what an applicant tracking system can actually read.
+            {t("showcase.body")}
           </Text>
         </Reveal>
 
