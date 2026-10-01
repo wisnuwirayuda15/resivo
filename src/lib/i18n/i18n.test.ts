@@ -18,10 +18,18 @@ import {
  * they are the failures the reference project has no defence against.
  */
 
-type Tree = { [key: string]: string | Tree };
+type Tree = { [key: string]: string | ReadonlyArray<string> | Tree };
 
-/** `a.b.c` for every string in a message tree. */
-const flatten = (tree: Tree, prefix = ""): Record<string, string> =>
+/**
+ * `a.b.c` for every string in a message tree, and `a.b.0`, `a.b.1` for the
+ * strings of a paragraph list. An array is held to the same keys as any other
+ * node, which is what makes "the same number of paragraphs in both languages" a
+ * property of the key check and not a separate one.
+ */
+const flatten = (
+  tree: Tree | ReadonlyArray<string>,
+  prefix = "",
+): Record<string, string> =>
   Object.entries(tree).reduce<Record<string, string>>((acc, [key, value]) => {
     const path = prefix === "" ? key : `${prefix}.${key}`;
 

@@ -12,7 +12,15 @@ import {
   TAGS_DIRECTIVE,
 } from "@/features/markdown/spec";
 
-import { AI_PROMPT, GUIDE, guideMarkdown } from "./content";
+import { SUPPORTED_LANGUAGES } from "@/lib/i18n/language";
+
+import {
+  AI_PROMPT,
+  GUIDE,
+  guideMarkdown,
+  guideWords,
+  sectionWords,
+} from "./content";
 
 /**
  * The guide has to be true.
@@ -78,6 +86,24 @@ describe("the writing guide", () => {
   });
 
   it("reaches the whole directive vocabulary between the guide and the prompt", () => {
+    // In every language: a directive is named in code, and a translation that
+    // lost the name would teach a reader something that does not parse.
+    for (const language of SUPPORTED_LANGUAGES) {
+      const everywhere = `${guideMarkdown(language)}\n${AI_PROMPT}`;
+
+      for (const name of [
+        CONTACT_DIRECTIVE,
+        ENTRY_DIRECTIVE,
+        ICON_DIRECTIVE,
+        IMAGE_DIRECTIVE,
+        LABEL_DIRECTIVE,
+        PAGE_BREAK_DIRECTIVE,
+        TAGS_DIRECTIVE,
+      ]) {
+        expect(everywhere, `${language}: ${name}`).toContain(name);
+      }
+    }
+
     const everywhere = `${guideMarkdown()}\n${AI_PROMPT}`;
 
     for (const name of [
@@ -110,26 +136,35 @@ describe("the writing guide", () => {
     expect(AI_PROMPT).toContain(`Do not write \`::${IMAGE_DIRECTIVE}\``);
   });
 
-  describe("the copied Markdown", () => {
-    const markdown = guideMarkdown();
+  describe.each(SUPPORTED_LANGUAGES)(
+    "the copied Markdown, in %s",
+    (language) => {
+      const markdown = guideMarkdown(language);
+      const words = guideWords(language);
 
-    it("carries every chapter and section", () => {
-      for (const chapter of GUIDE) {
-        expect(markdown).toContain(`## ${chapter.title}`);
+      it("carries every chapter and section", () => {
+        for (const chapter of GUIDE) {
+          expect(markdown).toContain(`## ${words.chapters[chapter.id].title}`);
 
-        for (const section of chapter.sections) {
-          expect(markdown).toContain(`### ${section.title}`);
+          for (const section of chapter.sections) {
+            const text = sectionWords(words, chapter.id, section.id);
+
+            // A section with no words would print its id, which is the fallback.
+            expect(text.title).not.toBe(section.id);
+            expect(text.body.length).toBeGreaterThan(0);
+            expect(markdown).toContain(`### ${text.title}`);
+          }
         }
-      }
-    });
+      });
 
-    it("closes every fence it opens", () => {
-      const fences = markdown
-        .split("\n")
-        .filter((line) => line.startsWith("```"));
+      it("closes every fence it opens", () => {
+        const fences = markdown
+          .split("\n")
+          .filter((line) => line.startsWith("```"));
 
-      expect(fences.length % 2).toBe(0);
-      expect(fences.length).toBe(snippets.length * 2);
-    });
-  });
+        expect(fences.length % 2).toBe(0);
+        expect(fences.length).toBe(snippets.length * 2);
+      });
+    },
+  );
 });

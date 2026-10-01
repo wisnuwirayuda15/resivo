@@ -4,6 +4,8 @@ import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouterState } from "@tanstack/react-router";
 
+import { useTranslation } from "@/lib/i18n/useTranslation";
+
 import { hasSeenTour, markTourSeen } from "./seen";
 import { useTourPane } from "@/features/editor/tourPane";
 import {
@@ -91,6 +93,7 @@ export const AppTour: React.FC<AppTourProps> = ({
   restartSignal,
   onRevealSidebar,
 }) => {
+  const { t } = useTranslation("onboarding");
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   });
@@ -244,11 +247,14 @@ export const AppTour: React.FC<AppTourProps> = ({
           size="compact-xs"
           variant="subtle"
         >
-          Skip
+          {t("buttons.skip")}
         </Button>
       )}
       started={started}
-      tour={tourSteps(name, { wideEditor })}
+      endStepNavigation={t("buttons.end")}
+      nextStepNavigation={t("buttons.next")}
+      prevStepNavigation={t("buttons.prev")}
+      tour={tourSteps(name, t, { wideEditor })}
       withNextButton
       withPrevButton
       withSkipButton

@@ -1,4 +1,6 @@
+import type { TFunction } from "i18next";
 import type { OnboardingTourStep } from "@gfazioli/mantine-onboarding-tour";
+import type { en } from "@/locales/en";
 import type { EditorPane } from "@/features/editor/tourPane";
 import type { TourName } from "./seen";
 
@@ -76,70 +78,34 @@ export const EDITOR_STEP_PANES: Readonly<Record<string, EditorPane>> = {
   [TOUR_TARGET_IDS.styleTab]: "style",
 };
 
-const LIBRARY_STEPS: Array<OnboardingTourStep> = [
-  {
-    id: TOUR_TARGET_IDS.newResume,
-    title: "Start here",
-    content:
-      "Pick one of four single-column templates, or import a Markdown file you already have, the importer keeps what it cannot typeset rather than dropping it.",
-  },
-  {
-    id: TOUR_TARGET_IDS.assets,
-    title: "Images and fonts are shared",
-    content:
-      "Uploaded once and available to every resume on this device, so the same photograph never has to be added twice. Both pages also show what nothing refers to any more, which is the only safe way to reclaim the space.",
-  },
-  {
-    id: TOUR_TARGET_IDS.settings,
-    title: "This is the important one",
-    content:
-      "Everything lives in this browser and nowhere else. Clearing its storage deletes your resumes, and no server has a copy. The backup file in Settings is the only thing that survives that, writing one now is cheaper than wishing you had.",
-  },
-  {
-    id: TOUR_TARGET_IDS.appMenu,
-    title: "Everything, from the keyboard",
-    content:
-      "Ctrl+K (or Cmd+K) opens a command palette over the whole app: every page, every command, searchable. The menu here lists the other shortcuts, and is where this tour can be started again.",
-  },
+/**
+ * What each tour is made of: a target to point at and the key its words are
+ * filed under in the `onboarding` messages. The sentence about a target is not
+ * here, because it is in the language the interface is in.
+ */
+interface StepDefinition<TKey extends string> {
+  id: string;
+  key: TKey;
+}
+
+const LIBRARY_STEPS: Array<
+  StepDefinition<keyof (typeof en)["onboarding"]["library"]>
+> = [
+  { id: TOUR_TARGET_IDS.newResume, key: "newResume" },
+  { id: TOUR_TARGET_IDS.assets, key: "assets" },
+  { id: TOUR_TARGET_IDS.settings, key: "settings" },
+  { id: TOUR_TARGET_IDS.appMenu, key: "appMenu" },
 ];
 
-const EDITOR_STEPS: Array<OnboardingTourStep> = [
-  {
-    id: TOUR_TARGET_IDS.code,
-    title: "Markdown, and your own CSS",
-    content:
-      "Two tabs. The Markdown is the document (headings, lists, tables, task lists), and the CSS is yours to restyle the paper with. It is sanitized and scoped, so it cannot reach the app around it or break the pagination it was measured against.",
-  },
-  {
-    id: TOUR_TARGET_IDS.guide,
-    title: "Every directive, with an example",
-    content:
-      "The format is Markdown plus a few directives (an entry, a contact, a list of skills), and this is where each one is written down, with an example that is checked against the real parser. It also copies a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.",
-  },
-  {
-    id: TOUR_TARGET_IDS.paper,
-    title: "The paper is editable too",
-    content:
-      "Switch to Visual and click any text to change it in place, or drag a block to move it. Every edit goes to the same document as the Markdown, which is why one undo history covers all of it.",
-  },
-  {
-    id: TOUR_TARGET_IDS.paperTitlebar,
-    title: "Export is the same document",
-    content:
-      "HTML is one self-contained file (images and fonts inlined, no external reference of any kind), and PDF is that same file printed, so the two cannot disagree. Markdown uses the same writer the editor reads.",
-  },
-  {
-    id: TOUR_TARGET_IDS.inspector,
-    title: "Four tabs worth knowing",
-    content:
-      "Style is every design token: paper size, margins, type, colour, rules, and where pages break. Sections is the outline: reorder, hide, add an icon, start a section on a new page. Assets places an image or sets the resume in an uploaded face. ATS lists the common ways a resume reads badly to an applicant tracking system, and fixes some of them in one click.",
-  },
-  {
-    id: TOUR_TARGET_IDS.history,
-    title: "Nothing here is one-way",
-    content:
-      "Undo and redo cover the document, whichever surface the change came from: a slider, a drag, a keystroke on the paper. Autosave writes to this device as you go.",
-  },
+type EditorKey = keyof (typeof en)["onboarding"]["editor"];
+
+const EDITOR_STEPS: Array<StepDefinition<EditorKey>> = [
+  { id: TOUR_TARGET_IDS.code, key: "code" },
+  { id: TOUR_TARGET_IDS.guide, key: "guide" },
+  { id: TOUR_TARGET_IDS.paper, key: "paper" },
+  { id: TOUR_TARGET_IDS.paperTitlebar, key: "paperTitlebar" },
+  { id: TOUR_TARGET_IDS.inspector, key: "inspector" },
+  { id: TOUR_TARGET_IDS.history, key: "history" },
 ];
 
 /**
@@ -155,7 +121,7 @@ const NARROW_EDITOR_ANCHORS: Readonly<Record<string, string>> = {
   [TOUR_TARGET_IDS.inspector]: TOUR_TARGET_IDS.styleTab,
 };
 
-const NARROW_EDITOR_STEPS: Array<OnboardingTourStep> = EDITOR_STEPS.map(
+const NARROW_EDITOR_STEPS: Array<StepDefinition<EditorKey>> = EDITOR_STEPS.map(
   (step) => {
     const anchor = NARROW_EDITOR_ANCHORS[step.id];
 
@@ -165,6 +131,7 @@ const NARROW_EDITOR_STEPS: Array<OnboardingTourStep> = EDITOR_STEPS.map(
 
 export const tourSteps = (
   name: TourName,
+  t: TFunction<"onboarding">,
   /**
    * Whether the editor is showing all three panes. False on a screen where it
    * is one pane behind a tab strip, which is what decides where the editor
@@ -173,8 +140,20 @@ export const tourSteps = (
   options: { wideEditor: boolean } = { wideEditor: true },
 ): Array<OnboardingTourStep> => {
   if (name === "library") {
-    return LIBRARY_STEPS;
+    return LIBRARY_STEPS.map(({ id, key }) => ({
+      id,
+      title: t(`library.${key}.title`),
+      content: t(`library.${key}.content`),
+    }));
   }
 
-  return options.wideEditor ? EDITOR_STEPS : NARROW_EDITOR_STEPS;
+  // The words are filed under the step's own key, whichever anchor it points at
+  // on a narrow screen, so one sentence serves both layouts.
+  return (options.wideEditor ? EDITOR_STEPS : NARROW_EDITOR_STEPS).map(
+    ({ id, key }) => ({
+      id,
+      title: t(`editor.${key}.title`),
+      content: t(`editor.${key}.content`),
+    }),
+  );
 };

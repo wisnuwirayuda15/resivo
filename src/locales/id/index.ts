@@ -3,8 +3,10 @@ import { ats } from "./ats";
 import { commands } from "./commands";
 import { common } from "./common";
 import { editor } from "./editor";
+import { guide } from "./guide";
 import { landing } from "./landing";
 import { library } from "./library";
+import { onboarding } from "./onboarding";
 import { settings } from "./settings";
 import { shell } from "./shell";
 import { style } from "./style";
@@ -25,4 +27,6 @@ export const id = {
   ats,
   assets,
   landing,
+  guide,
+  onboarding,
 };

@@ -5,6 +5,7 @@ import { useDisclosure } from "@mantine/hooks";
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 /**
  * The way into the guide, and the drawer it opens.
@@ -28,6 +29,7 @@ const GuideDrawer = lazy(() =>
 );
 
 export const GuideButton: React.FC = () => {
+  const { t } = useTranslation("guide");
   const [opened, { open, close }] = useDisclosure(false);
   const [everOpened, setEverOpened] = useState(false);
 
@@ -46,7 +48,7 @@ export const GuideButton: React.FC = () => {
           size="compact-xs"
           variant="default"
         >
-          Guide
+          {t("button")}
         </Button>
       </OnboardingTour.Target>
 
