@@ -4,6 +4,7 @@ import { BUILTIN_FONTS } from "@/features/templates/defaults";
 import { DOCUMENT_LOCALES } from "@/features/templates/renderer/locales";
 import { useFonts } from "@/features/assets/queries";
 import { patchDesign, setLocale } from "@/features/editor/mutations";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import {
   ColorField,
@@ -67,6 +68,8 @@ const localeOptions = (
         { value: locale, label: locale },
       ];
 
+/** The typefaces, by their own names. A typeface is called what it is called in
+ * every language, so these are not messages. */
 const BUILTIN_OPTIONS: Array<{ value: FontKey; label: string }> = [
   { value: "serif", label: "Source Serif 4" },
   { value: "sans", label: "Instrument Sans" },
@@ -119,33 +122,35 @@ const fontRefFor = (
     : { family: stored.family, source: "custom", fontId };
 };
 
+/** The paper sizes are called Letter and A4 everywhere. */
 const PAPER_SIZES: Array<{ value: PaperSize; label: string }> = [
   { value: "Letter", label: "Letter" },
   { value: "A4", label: "A4" },
 ];
 
-const AVATAR_SHAPES: Array<{
-  value: DesignConfig["image"]["avatarShape"];
-  label: string;
-}> = [
-  { value: "circle", label: "Circle" },
-  { value: "rounded", label: "Rounded" },
-  { value: "square", label: "Square" },
-];
+/**
+ * The options that have words, by message key.
+ *
+ * Keys and not labels, because a list built once at module load would be fixed
+ * in whichever language was current then. The component says them, at render.
+ */
+const AVATAR_SHAPES = ["circle", "rounded", "square"] as const satisfies Array<
+  DesignConfig["image"]["avatarShape"]
+>;
 
-const WEIGHTS: Array<{ value: string; label: string }> = [
-  { value: "300", label: "Light" },
-  { value: "400", label: "Regular" },
-  { value: "500", label: "Medium" },
-  { value: "600", label: "Semibold" },
-  { value: "700", label: "Bold" },
-];
+const WEIGHTS = [
+  ["300", "light"],
+  ["400", "regular"],
+  ["500", "medium"],
+  ["600", "semibold"],
+  ["700", "bold"],
+] as const;
 
 const MARGIN_EDGES = [
-  ["top", "Top margin"],
-  ["right", "Right margin"],
-  ["bottom", "Bottom margin"],
-  ["left", "Left margin"],
+  ["top", "marginTop"],
+  ["right", "marginRight"],
+  ["bottom", "marginBottom"],
+  ["left", "marginLeft"],
 ] as const;
 
 export const StylePanel: React.FC<StylePanelProps> = ({
@@ -153,6 +158,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   locale,
   apply,
 }) => {
+  const { t } = useTranslation("style");
+
   /**
    * Uploaded fonts join the same two selects rather than getting a list of their
    * own: from the user's side there is one decision (what this resume is set in),
@@ -170,9 +177,22 @@ export const StylePanel: React.FC<StylePanelProps> = ({
       label:
         font.weight === 400 && font.style === "normal"
           ? font.family
-          : `${font.family} ${font.weight}${font.style === "italic" ? " italic" : ""}`,
+          : t(font.style === "italic" ? "fontVariantItalic" : "fontVariant", {
+              family: font.family,
+              weight: font.weight,
+            }),
     })),
   ];
+
+  const weightOptions = WEIGHTS.map(([value, key]) => ({
+    value,
+    label: t(`weights.${key}`),
+  }));
+
+  const shapeOptions = AVATAR_SHAPES.map((value) => ({
+    value,
+    label: t(`avatarShapes.${value}`),
+  }));
 
   /**
    * Dragging a slider or holding a stepper produces a stream of edits.
@@ -193,19 +213,19 @@ export const StylePanel: React.FC<StylePanelProps> = ({
 
   return (
     <Box>
-      <ControlGroup title="Paper">
+      <ControlGroup title={t("groups.paper")}>
         <SelectField
           data={PAPER_SIZES}
-          label="Size"
+          label={t("fields.size")}
           onChange={(size) => patch({ paper: { size } })}
           value={paper.size}
         />
 
-        {MARGIN_EDGES.map(([edge, label]) => (
+        {MARGIN_EDGES.map(([edge, key]) => (
           <NumberField
-            hint="The printed margin. The paginator measures against it, so changing it re-flows the pages."
+            hint={t("hints.margin")}
             key={edge}
-            label={label}
+            label={t(`fields.${key}`)}
             max={3}
             min={0}
             onChange={(value) =>
@@ -221,10 +241,10 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         ))}
       </ControlGroup>
 
-      <ControlGroup title="Typography">
+      <ControlGroup title={t("groups.typography")}>
         <SelectField
           data={fontOptions}
-          label="Body font"
+          label={t("fields.bodyFont")}
           onChange={(key) => {
             const bodyFont = fontRefFor(key, fonts);
 
@@ -236,7 +256,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
         <SelectField
           data={fontOptions}
-          label="Heading font"
+          label={t("fields.headingFont")}
           onChange={(key) => {
             const headingFont = fontRefFor(key, fonts);
 
@@ -248,8 +268,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
 
         <NumberField
-          hint="Points, not pixels, a resume is a print document."
-          label="Body size"
+          hint={t("hints.bodySize")}
+          label={t("fields.bodySize")}
           max={24}
           min={6}
           onChange={(baseSize) =>
@@ -261,8 +281,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
 
         <SliderField
-          hint="Every heading size is this ratio applied to the body size, so the whole ramp stays proportional."
-          label="Scale"
+          hint={t("hints.scale")}
+          label={t("fields.scale")}
           max={1.6}
           min={1}
           onChange={(scale) => patch({ typography: { scale } }, "design:scale")}
@@ -271,7 +291,7 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
 
         <SliderField
-          label="Line height"
+          label={t("fields.lineHeight")}
           max={2}
           min={1}
           onChange={(lineHeight) =>
@@ -282,8 +302,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
 
         <SelectField
-          data={WEIGHTS}
-          label="Body weight"
+          data={weightOptions}
+          label={t("fields.bodyWeight")}
           onChange={(value) =>
             patch({
               typography: {
@@ -294,8 +314,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           value={String(typography.weights.body)}
         />
         <SelectField
-          data={WEIGHTS}
-          label="Heading weight"
+          data={weightOptions}
+          label={t("fields.headingWeight")}
           onChange={(value) =>
             patch({
               typography: {
@@ -307,30 +327,30 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
       </ControlGroup>
 
-      <ControlGroup title="Colour">
+      <ControlGroup title={t("groups.colour")}>
         <ColorField
-          label="Body text"
+          label={t("fields.bodyText")}
           onChange={(text) => patch({ colors: { text } }, "design:color.text")}
           value={colors.text}
         />
         <ColorField
-          label="Headings"
+          label={t("fields.headings")}
           onChange={(heading) =>
             patch({ colors: { heading } }, "design:color.heading")
           }
           value={colors.heading}
         />
         <ColorField
-          hint="Section headings and their icons. The one saturated colour on the page."
-          label="Accent"
+          hint={t("hints.accent")}
+          label={t("fields.accent")}
           onChange={(accent) =>
             patch({ colors: { accent } }, "design:color.accent")
           }
           value={colors.accent}
         />
         <ColorField
-          hint="Dates, locations and secondary lines."
-          label="Muted"
+          hint={t("hints.muted")}
+          label={t("fields.muted")}
           onChange={(muted) =>
             patch({ colors: { muted } }, "design:color.muted")
           }
@@ -338,10 +358,10 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
       </ControlGroup>
 
-      <ControlGroup title="Spacing">
+      <ControlGroup title={t("groups.spacing")}>
         <NumberField
-          hint="Air above each section heading."
-          label="Section"
+          hint={t("hints.spaceSection")}
+          label={t("fields.section")}
           max={5}
           min={0}
           onChange={(section) =>
@@ -352,8 +372,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           value={spacing.section}
         />
         <NumberField
-          hint="Air between blocks inside a section."
-          label="Block"
+          hint={t("hints.spaceBlock")}
+          label={t("fields.block")}
           max={5}
           min={0}
           onChange={(paragraph) =>
@@ -364,8 +384,8 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           value={spacing.paragraph}
         />
         <NumberField
-          hint="Gap under a heading, before its first block."
-          label="Under heading"
+          hint={t("hints.spaceHeading")}
+          label={t("fields.underHeading")}
           max={5}
           min={0}
           onChange={(heading) =>
@@ -377,15 +397,15 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
       </ControlGroup>
 
-      <ControlGroup title="Rules">
+      <ControlGroup title={t("groups.rules")}>
         <SwitchField
           checked={rules.showDividers}
-          label="Dividers"
+          label={t("fields.dividers")}
           onChange={(showDividers) => patch({ rules: { showDividers } })}
         />
         <NumberField
           decimalScale={1}
-          label="Thickness"
+          label={t("fields.thickness")}
           max={8}
           min={0}
           onChange={(width) => patch({ rules: { width } }, "design:rule.width")}
@@ -394,16 +414,16 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           value={rules.width}
         />
         <ColorField
-          label="Colour"
+          label={t("fields.colour")}
           onChange={(color) => patch({ rules: { color } }, "design:rule.color")}
           value={rules.color}
         />
       </ControlGroup>
 
-      <ControlGroup title="Icons">
+      <ControlGroup title={t("groups.icons")}>
         <NumberField
           decimalScale={0}
-          label="Size"
+          label={t("fields.size")}
           max={48}
           min={6}
           onChange={(size) => patch({ icons: { size } }, "design:icon.size")}
@@ -412,23 +432,23 @@ export const StylePanel: React.FC<StylePanelProps> = ({
           value={icons.size}
         />
         <ColorField
-          label="Colour"
+          label={t("fields.colour")}
           onChange={(color) => patch({ icons: { color } }, "design:icon.color")}
           value={icons.color}
         />
       </ControlGroup>
 
-      <ControlGroup title="Photo">
+      <ControlGroup title={t("groups.photo")}>
         <SelectField
-          data={AVATAR_SHAPES}
-          label="Shape"
+          data={shapeOptions}
+          label={t("fields.shape")}
           onChange={(avatarShape) => patch({ image: { avatarShape } })}
           value={image.avatarShape}
         />
         <NumberField
           decimalScale={0}
-          hint="Applies once a photo is attached, from the Assets tab or the Images page."
-          label="Size"
+          hint={t("hints.photoSize")}
+          label={t("fields.size")}
           max={300}
           min={24}
           onChange={(avatarSize) =>
@@ -440,22 +460,22 @@ export const StylePanel: React.FC<StylePanelProps> = ({
         />
       </ControlGroup>
 
-      <ControlGroup title="Page breaks">
+      <ControlGroup title={t("groups.pageBreaks")}>
         <SwitchField
           checked={keepHeadings}
-          hint="Stops a section heading being the last thing on a page. Off packs the pages tighter, at the cost of the one break every reader notices."
-          label="Keep headings with content"
+          hint={t("hints.keepHeadings")}
+          label={t("fields.keepHeadings")}
           onChange={(keepHeadingWithContent) =>
             patch({ pagination: { keepHeadingWithContent } })
           }
         />
       </ControlGroup>
 
-      <ControlGroup title="Language">
+      <ControlGroup title={t("groups.language")}>
         <SelectField
           data={localeOptions(locale)}
-          hint="Formats month names and the end of an ongoing role, and sets the exported document's language. It does not translate what you wrote."
-          label="Document"
+          hint={t("hints.language")}
+          label={t("fields.document")}
           onChange={(next) => apply(setLocale(next))}
           value={locale}
         />

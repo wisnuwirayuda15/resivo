@@ -4,6 +4,7 @@ import { editor } from "./editor";
 import { library } from "./library";
 import { settings } from "./settings";
 import { shell } from "./shell";
+import { style } from "./style";
 import { templates } from "./templates";
 
 /** Bahasa Indonesia. Each namespace is checked against English where it is
@@ -17,4 +18,5 @@ export const id = {
   library,
   templates,
   editor,
+  style,
 };

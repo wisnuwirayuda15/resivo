@@ -12,6 +12,8 @@ import { DocumentIcon, Icon } from "@/features/icons/IconRenderer";
 import { IconPicker } from "@/features/icons/IconPicker";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
+import { sectionTitle } from "@/features/resume/model/sectionTitles";
 import { SECTION_KINDS } from "@/features/resume/model/document";
 import { plainText, text } from "@/features/resume/model/index";
 import {
@@ -28,11 +30,7 @@ import { HeaderPanel } from "./HeaderPanel";
 import { isPlainInline } from "./plainInline";
 
 import type { Recipe } from "@/features/editor/mutations";
-import type {
-  ResumeContent,
-  Section,
-  SectionKind,
-} from "@/features/resume/model/document";
+import type { ResumeContent, Section } from "@/features/resume/model/document";
 
 /**
  * The Sections tab, the document's outline, with the header above it.
@@ -46,23 +44,10 @@ import type {
 
 interface SectionsPanelProps {
   content: ResumeContent;
+  /** The document's language, which names the sections it adds. */
+  locale: string;
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
 }
-
-/** Sentence case for the "add section" menu; the model stores kinds lowercase. */
-const KIND_LABELS: Record<SectionKind, string> = {
-  summary: "Summary",
-  experience: "Experience",
-  education: "Education",
-  skills: "Skills",
-  projects: "Projects",
-  certifications: "Certifications",
-  awards: "Awards",
-  publications: "Publications",
-  languages: "Languages",
-  interests: "Interests",
-  custom: "Custom section",
-};
 
 const SectionRow: React.FC<{
   section: Section;
@@ -71,6 +56,7 @@ const SectionRow: React.FC<{
   apply: SectionsPanelProps["apply"];
   onRequestRemove: () => void;
 }> = ({ section, index, count, apply, onRequestRemove }) => {
+  const { t } = useTranslation("style");
   const label = plainText(section.title);
   const editable = isPlainInline(section.title);
   const blocks = section.blocks.length;
@@ -79,9 +65,9 @@ const SectionRow: React.FC<{
   return (
     <li className="border-line-soft hover:bg-hover flex items-center gap-1 border-b px-2 py-1.5 last:border-b-0">
       <Box className="flex flex-none flex-col">
-        <Tooltip label="Move up">
+        <Tooltip label={t("sections.moveUp")}>
           <UnstyledButton
-            aria-label={`Move ${label} up`}
+            aria-label={t("sections.moveNameUp", { name: label })}
             className="text-subtle hover:text-body hover:bg-active flex h-3.5 w-4 items-center justify-center rounded-[3px] disabled:opacity-30"
             disabled={index === 0}
             onClick={() => apply(moveSection(index, index - 1))}
@@ -89,9 +75,9 @@ const SectionRow: React.FC<{
             <Icon name="caret-up" size={10} />
           </UnstyledButton>
         </Tooltip>
-        <Tooltip label="Move down">
+        <Tooltip label={t("sections.moveDown")}>
           <UnstyledButton
-            aria-label={`Move ${label} down`}
+            aria-label={t("sections.moveNameDown", { name: label })}
             className="text-subtle hover:text-body hover:bg-active flex h-3.5 w-4 items-center justify-center rounded-[3px] disabled:opacity-30"
             disabled={index === count - 1}
             onClick={() => apply(moveSection(index, index + 1))}
@@ -104,7 +90,7 @@ const SectionRow: React.FC<{
       <Box className="min-w-0 flex-1">
         {editable ? (
           <TextInput
-            aria-label={`${label} title`}
+            aria-label={t("sections.titleOf", { name: label })}
             onChange={(event) =>
               apply(
                 setSectionTitle(section.id, text(event.currentTarget.value)),
@@ -118,18 +104,14 @@ const SectionRow: React.FC<{
             variant="unstyled"
           />
         ) : (
-          <Tooltip
-            label="This title contains formatting. Edit it where the formatting is visible."
-            multiline
-            w={220}
-          >
+          <Tooltip label={t("sections.formattedTitle")} multiline w={220}>
             <Text span className="text-body block truncate text-[12px]">
               {label}
             </Text>
           </Tooltip>
         )}
         <Text span className="text-subtle font-mono text-[10px] tabular-nums">
-          {blocks} {blocks === 1 ? "block" : "blocks"}
+          {t("sections.blocks", { count: blocks })}
         </Text>
       </Box>
 
@@ -137,12 +119,18 @@ const SectionRow: React.FC<{
           to one section, not to the document's style. Empty is the common case,
           so the button shows a dashed placeholder rather than a default glyph
           that would look chosen. */}
-      <Tooltip label={section.icon === undefined ? "Add icon" : "Change icon"}>
+      <Tooltip
+        label={
+          section.icon === undefined
+            ? t("sections.addIcon")
+            : t("sections.changeIcon")
+        }
+      >
         <UnstyledButton
           aria-label={
             section.icon === undefined
-              ? `Add an icon to ${label}`
-              : `Change the icon on ${label}`
+              ? t("sections.addIconTo", { name: label })
+              : t("sections.changeIconOn", { name: label })
           }
           className={cn(
             "rounded-control flex size-[22px] flex-none items-center justify-center",
@@ -186,15 +174,15 @@ const SectionRow: React.FC<{
       <Tooltip
         label={
           section.style?.breakBefore === "page"
-            ? "Starts on a new page"
-            : "Start on a new page"
+            ? t("sections.startsOnNewPage")
+            : t("sections.startOnNewPage")
         }
       >
         <UnstyledButton
           aria-label={
             section.style?.breakBefore === "page"
-              ? `Stop ${label} starting on a new page`
-              : `Start ${label} on a new page`
+              ? t("sections.stopStarting", { name: label })
+              : t("sections.startNamed", { name: label })
           }
           aria-pressed={section.style?.breakBefore === "page"}
           className={cn(
@@ -216,10 +204,16 @@ const SectionRow: React.FC<{
         </UnstyledButton>
       </Tooltip>
 
-      <Tooltip label={section.hidden === true ? "Show" : "Hide"}>
+      <Tooltip
+        label={
+          section.hidden === true ? t("sections.show") : t("sections.hide")
+        }
+      >
         <UnstyledButton
           aria-label={
-            section.hidden === true ? `Show ${label}` : `Hide ${label}`
+            section.hidden === true
+              ? t("sections.showNamed", { name: label })
+              : t("sections.hideNamed", { name: label })
           }
           aria-pressed={section.hidden === true}
           className={cn(
@@ -239,9 +233,9 @@ const SectionRow: React.FC<{
         </UnstyledButton>
       </Tooltip>
 
-      <Tooltip label="Delete section">
+      <Tooltip label={t("sections.deleteTooltip")}>
         <UnstyledButton
-          aria-label={`Delete ${label}`}
+          aria-label={t("sections.deleteNamed", { name: label })}
           className="text-subtle hover:text-danger hover:bg-active rounded-control flex size-[22px] flex-none items-center justify-center"
           onClick={onRequestRemove}
         >
@@ -254,8 +248,10 @@ const SectionRow: React.FC<{
 
 export const SectionsPanel: React.FC<SectionsPanelProps> = ({
   content,
+  locale,
   apply,
 }) => {
+  const { t } = useTranslation("style");
   const [pendingRemoval, setPendingRemoval] = useState<Section | null>(null);
   const sections = content.sections;
 
@@ -283,16 +279,18 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
           <Menu.Target>
             <UnstyledButton className="border-line text-body hover:bg-hover rounded-control flex h-[26px] w-full items-center justify-center gap-1.5 border border-dashed text-[12px]">
               <Icon name="plus" size={12} />
-              Add section
+              {t("sections.add")}
             </UnstyledButton>
           </Menu.Target>
           <Menu.Dropdown>
             {SECTION_KINDS.map((kind) => (
               <Menu.Item
                 key={kind}
-                onClick={() => apply(addSection(kind, KIND_LABELS[kind]))}
+                onClick={() =>
+                  apply(addSection(kind, sectionTitle(kind, locale)))
+                }
               >
-                {KIND_LABELS[kind]}
+                {t(`sections.kinds.${kind}`)}
               </Menu.Item>
             ))}
           </Menu.Dropdown>
@@ -303,7 +301,7 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
           undo-only, undo is a keystroke away but not obvious mid-edit. Hiding
           is the reversible option, and it is one click on the same row. */}
       <ConfirmDialog
-        confirmLabel="Delete section"
+        confirmLabel={t("sections.deleteConfirm")}
         danger
         onCancel={() => setPendingRemoval(null)}
         onConfirm={() => {
@@ -314,12 +312,15 @@ export const SectionsPanel: React.FC<SectionsPanelProps> = ({
           setPendingRemoval(null);
         }}
         opened={pendingRemoval !== null}
-        title="Delete section"
+        title={t("sections.deleteTitle")}
       >
         <Text className="text-body text-[13px]">
           {pendingRemoval === null
             ? null
-            : `"${plainText(pendingRemoval.title)}" and its ${pendingRemoval.blocks.length} ${pendingRemoval.blocks.length === 1 ? "block" : "blocks"} will be removed. Hide it instead if you only want it off this version.`}
+            : t("sections.deleteBody", {
+                title: plainText(pendingRemoval.title),
+                count: pendingRemoval.blocks.length,
+              })}
         </Text>
       </ConfirmDialog>
     </Box>

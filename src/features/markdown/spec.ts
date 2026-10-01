@@ -76,6 +76,33 @@ const SECTION_SYNONYMS: Record<string, SectionKind> = {
   languages: "languages",
   interests: "interests",
   hobbies: "interests",
+
+  // Indonesian, the one other language the app writes section titles in (see
+  // `resume/model/sectionTitles.ts`). Added here so a resume written in it is
+  // read as the same kinds, which is what a template lays a section out by and
+  // what the ATS check reads a heading as.
+  ringkasan: "summary",
+  "ringkasan profil": "summary",
+  profil: "summary",
+  "tentang saya": "summary",
+  tujuan: "summary",
+  pengalaman: "experience",
+  "pengalaman kerja": "experience",
+  "pengalaman profesional": "experience",
+  "riwayat pekerjaan": "experience",
+  pendidikan: "education",
+  "riwayat pendidikan": "education",
+  keahlian: "skills",
+  keterampilan: "skills",
+  "keahlian teknis": "skills",
+  proyek: "projects",
+  sertifikasi: "certifications",
+  sertifikat: "certifications",
+  penghargaan: "awards",
+  publikasi: "publications",
+  bahasa: "languages",
+  minat: "interests",
+  hobi: "interests",
 };
 
 export const sectionKindFromTitle = (title: string): SectionKind => {

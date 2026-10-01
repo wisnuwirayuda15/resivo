@@ -17,6 +17,7 @@ import { templateList } from "@/features/templates/catalog";
 import { useTemplateText } from "@/features/templates/useTemplateText";
 import { setTemplate } from "@/features/editor/mutations";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import type { Recipe } from "@/features/editor/mutations";
 import type {
@@ -82,6 +83,8 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
 }) => {
   const [pending, setPending] = useState<TemplateId | null>(null);
   const text = useTemplateText();
+  const { t } = useTranslation("style");
+  const { t: tc } = useTranslation("common");
 
   const select = (next: TemplateId) => {
     if (next === templateId) {
@@ -140,26 +143,25 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
         onClose={() => setPending(null)}
         opened={pending !== null}
         size={440}
-        title="Keep your style changes?"
+        title={t("template.keepTitle")}
       >
         <Stack gap="lg">
           <Text className="text-body text-[13px] leading-normal">
-            You have changed the style tokens on this resume. Switching to{" "}
-            {pending === null ? "" : text(pending).name} can keep those changes,
-            or replace them with that template&rsquo;s own defaults. Your
-            content is untouched either way.
+            {t("template.keepBody", {
+              name: pending === null ? "" : text(pending).name,
+            })}
           </Text>
           <Group gap="xs" justify="flex-end">
             <Button onClick={() => setPending(null)} variant="subtle">
-              Cancel
+              {tc("cancel")}
             </Button>
             {/* Replacing is the destructive option, so keeping is the focused
                 default, a stray Enter must not discard styling work. */}
             <Button onClick={() => commit(true)} variant="default">
-              Use template defaults
+              {t("template.useDefaults")}
             </Button>
             <Button data-autofocus onClick={() => commit(false)}>
-              Keep my changes
+              {t("template.keep")}
             </Button>
           </Group>
         </Stack>

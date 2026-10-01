@@ -4,6 +4,7 @@ import { editor } from "./editor";
 import { library } from "./library";
 import { settings } from "./settings";
 import { shell } from "./shell";
+import { style } from "./style";
 import { templates } from "./templates";
 
 /**
@@ -21,4 +22,5 @@ export const en = {
   library,
   templates,
   editor,
+  style,
 } as const;

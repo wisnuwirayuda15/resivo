@@ -12,6 +12,7 @@ import {
   updateContactLabel,
 } from "@/features/editor/mutations";
 import { cn } from "@/lib/utils";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { ControlGroup } from "./controls";
 import { isPlainInline } from "./plainInline";
@@ -49,6 +50,7 @@ const ContactRow: React.FC<{
   index: number;
   apply: HeaderPanelProps["apply"];
 }> = ({ contact, index, apply }) => {
+  const { t } = useTranslation("style");
   const label = plainText(contact.label);
   const editable = isPlainInline(contact.label);
   const [picking, setPicking] = useState(false);
@@ -57,19 +59,23 @@ const ContactRow: React.FC<{
   // Named by position, because a contact has no name of its own and an empty
   // one has no text either, "Delete contact" on four identical rows tells a
   // screen reader nothing about which.
-  const named = `contact ${index + 1}`;
+  const named = t("contacts.named", { number: index + 1 });
 
   return (
     <li className="border-line-soft flex flex-col gap-1 border-b px-2 py-1.5 last:border-b-0">
       <Box className="flex items-center gap-1">
         <Tooltip
-          label={contact.icon === undefined ? "Add icon" : "Change icon"}
+          label={
+            contact.icon === undefined
+              ? t("contacts.addIcon")
+              : t("contacts.changeIcon")
+          }
         >
           <UnstyledButton
             aria-label={
               contact.icon === undefined
-                ? `Add an icon to ${named}`
-                : `Change the icon on ${named}`
+                ? t("contacts.addIconTo", { name: named })
+                : t("contacts.changeIconOn", { name: named })
             }
             className={cn(
               "rounded-control flex size-[22px] flex-none items-center justify-center",
@@ -90,7 +96,7 @@ const ContactRow: React.FC<{
         <Box className="min-w-0 flex-1">
           {editable ? (
             <TextInput
-              aria-label={`Label of ${named}`}
+              aria-label={t("contacts.labelOf", { name: named })}
               onChange={(event) =>
                 apply(
                   updateContactLabel(
@@ -100,16 +106,12 @@ const ContactRow: React.FC<{
                   { coalesce: `contact:label:${contact.id}` },
                 )
               }
-              placeholder="you@example.com"
+              placeholder={t("contacts.labelPlaceholder")}
               value={label}
               variant="unstyled"
             />
           ) : (
-            <Tooltip
-              label="This contact contains formatting. Edit it where the formatting is visible."
-              multiline
-              w={220}
-            >
+            <Tooltip label={t("contacts.formatted")} multiline w={220}>
               <Text span className="text-body block truncate text-[12px]">
                 {label}
               </Text>
@@ -117,9 +119,15 @@ const ContactRow: React.FC<{
           )}
         </Box>
 
-        <Tooltip label={contact.href === undefined ? "Add a link" : "Link"}>
+        <Tooltip
+          label={
+            contact.href === undefined
+              ? t("contacts.addLink")
+              : t("contacts.link")
+          }
+        >
           <UnstyledButton
-            aria-label={`Link for ${named}`}
+            aria-label={t("contacts.linkFor", { name: named })}
             aria-pressed={linking}
             className={cn(
               "rounded-control flex size-[22px] flex-none items-center justify-center",
@@ -133,9 +141,9 @@ const ContactRow: React.FC<{
           </UnstyledButton>
         </Tooltip>
 
-        <Tooltip label="Delete contact">
+        <Tooltip label={t("contacts.deleteTooltip")}>
           <UnstyledButton
-            aria-label={`Delete ${named}`}
+            aria-label={t("contacts.deleteNamed", { name: named })}
             className="text-subtle hover:text-danger hover:bg-active rounded-control flex size-[22px] flex-none items-center justify-center"
             onClick={() => apply(removeContact(contact.id))}
           >
@@ -148,14 +156,14 @@ const ContactRow: React.FC<{
           four rows each carrying an empty URL field would bury the labels. */}
       {linking ? (
         <TextInput
-          aria-label={`Link URL for ${named}`}
+          aria-label={t("contacts.linkUrlFor", { name: named })}
           leftSection={<Icon name="link-simple" size={12} />}
           onChange={(event) =>
             apply(setContactHref(contact.id, event.currentTarget.value), {
               coalesce: `contact:href:${contact.id}`,
             })
           }
-          placeholder="https://example.com"
+          placeholder={t("contacts.urlPlaceholder")}
           value={contact.href ?? ""}
         />
       ) : null}
@@ -180,32 +188,33 @@ const ContactRow: React.FC<{
   );
 };
 
-export const HeaderPanel: React.FC<HeaderPanelProps> = ({ header, apply }) => (
-  <ControlGroup title="Contacts">
-    {header.contacts.length === 0 ? (
-      <Text className="text-muted text-[12px]">
-        Email, phone, a link, whatever belongs under your name. They print as
-        one line, separated by the template.
-      </Text>
-    ) : (
-      <ul className="border-line-soft rounded-control list-none border">
-        {header.contacts.map((contact, index) => (
-          <ContactRow
-            apply={apply}
-            contact={contact}
-            index={index}
-            key={contact.id}
-          />
-        ))}
-      </ul>
-    )}
+export const HeaderPanel: React.FC<HeaderPanelProps> = ({ header, apply }) => {
+  const { t } = useTranslation("style");
 
-    <UnstyledButton
-      className="border-line text-body hover:bg-hover rounded-control mt-1 flex h-[26px] w-full items-center justify-center gap-1.5 border border-dashed text-[12px]"
-      onClick={() => apply(addContact())}
-    >
-      <Icon name="plus" size={12} />
-      Add contact
-    </UnstyledButton>
-  </ControlGroup>
-);
+  return (
+    <ControlGroup title={t("contacts.title")}>
+      {header.contacts.length === 0 ? (
+        <Text className="text-muted text-[12px]">{t("contacts.empty")}</Text>
+      ) : (
+        <ul className="border-line-soft rounded-control list-none border">
+          {header.contacts.map((contact, index) => (
+            <ContactRow
+              apply={apply}
+              contact={contact}
+              index={index}
+              key={contact.id}
+            />
+          ))}
+        </ul>
+      )}
+
+      <UnstyledButton
+        className="border-line text-body hover:bg-hover rounded-control mt-1 flex h-[26px] w-full items-center justify-center gap-1.5 border border-dashed text-[12px]"
+        onClick={() => apply(addContact())}
+      >
+        <Icon name="plus" size={12} />
+        {t("contacts.add")}
+      </UnstyledButton>
+    </ControlGroup>
+  );
+};
