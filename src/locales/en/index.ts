@@ -1,3 +1,4 @@
+import { ats } from "./ats";
 import { commands } from "./commands";
 import { common } from "./common";
 import { editor } from "./editor";
@@ -23,4 +24,5 @@ export const en = {
   templates,
   editor,
   style,
+  ats,
 } as const;

@@ -76,9 +76,10 @@ const dateOrder: AtsRule = (document) =>
       ? [
           makeIssue("ats.date-order", entry.id, {
             severity: "error",
-            message: "The end date is before the start date.",
-            why: "A parser that reads dates computes tenure from them, and a negative span is dropped or read as a typo.",
-            where: `${sectionLabel(section)}, ${entryLabel(entry)}`,
+            params: {
+              section: sectionLabel(section),
+              entry: entryLabel(entry),
+            },
           }),
         ]
       : [];
@@ -98,9 +99,10 @@ const dateStartMissing: AtsRule = (document) =>
       ? [
           makeIssue("ats.date-start-missing", entry.id, {
             severity: "warning",
-            message: "A date range has an end and no start.",
-            why: "With one end missing a system cannot work out how long the role lasted, so it often records none.",
-            where: `${sectionLabel(section)}, ${entryLabel(entry)}`,
+            params: {
+              section: sectionLabel(section),
+              entry: entryLabel(entry),
+            },
           }),
         ]
       : [];
@@ -125,9 +127,10 @@ const dateUnparsed: AtsRule = (document) =>
       ? [
           makeIssue("ats.date-unparsed", entry.id, {
             severity: "warning",
-            message: "A date is written in words, not as a year or a month.",
-            why: "Systems read dates like 2021 or 2021-03 and give up on free text such as Summer 2019, so the role arrives undated.",
-            where: `${sectionLabel(section)}, ${entryLabel(entry)}`,
+            params: {
+              section: sectionLabel(section),
+              entry: entryLabel(entry),
+            },
           }),
         ]
       : [];
@@ -165,9 +168,7 @@ const dateFormatMixed: AtsRule = (document) =>
       ? [
           makeIssue("ats.date-format-mixed", section.id, {
             severity: "info",
-            message: `${sectionLabel(section)} mixes years and months.`,
-            why: "Dates written the same way throughout read as one timeline, and a system compares them more reliably.",
-            where: sectionLabel(section),
+            params: { section: sectionLabel(section) },
           }),
         ]
       : [];
@@ -212,9 +213,11 @@ const dateGap: AtsRule = (document) => {
       issues.push(
         makeIssue("ats.date-gap", job.entry.id, {
           severity: "info",
-          message: `There is a gap of about ${start - latestEnd} months before this role.`,
-          why: "A recruiter reading the timeline will ask about a long gap, and a line saying what it was answers it first.",
-          where: `${sectionLabel(job.section)}, ${entryLabel(job.entry)}`,
+          params: {
+            section: sectionLabel(job.section),
+            entry: entryLabel(job.entry),
+            months: start - latestEnd,
+          },
         }),
       );
     }

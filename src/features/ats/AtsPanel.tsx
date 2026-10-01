@@ -7,9 +7,11 @@ import {
   pageCountFor,
   useMeasuredPages,
 } from "@/features/preview/measuredPages";
+import { useTranslation } from "@/lib/i18n/useTranslation";
 import { cn } from "@/lib/utils";
 
 import { checkDocument } from "./check";
+import { describeIssue } from "./describe";
 import { NO_DISMISSALS, useAtsDismissals } from "./dismissals";
 import { combineFixes, fixableIssues } from "./fixes";
 
@@ -32,6 +34,10 @@ import type { AtsIssue, Severity } from "./types";
  *
  * Every fix goes through `apply`, the same door as every other edit, so the
  * preview updates because the store did and one undo takes a fix back.
+ *
+ * The checker returns rules and parameters and no sentences. They are chosen
+ * here, when an issue is drawn, so switching language re-words the list without
+ * checking the document again.
  */
 
 interface AtsPanelProps {
@@ -39,41 +45,30 @@ interface AtsPanelProps {
   apply: (recipe: Recipe, options?: { coalesce?: string }) => void;
 }
 
-const SEVERITY: Record<
-  Severity,
-  { icon: string; className: string; word: string; plural: string }
-> = {
-  error: {
-    icon: "warning-circle",
-    className: "text-danger-text",
-    word: "error",
-    plural: "errors",
-  },
-  warning: {
-    icon: "warning",
-    className: "text-warning-text",
-    word: "warning",
-    plural: "warnings",
-  },
-  info: {
-    icon: "info",
-    className: "text-muted",
-    word: "suggestion",
-    plural: "suggestions",
-  },
+/** What a severity looks like. Its name is a message, in `tab.severity`. */
+const SEVERITY: Record<Severity, { icon: string; className: string }> = {
+  error: { icon: "warning-circle", className: "text-danger-text" },
+  warning: { icon: "warning", className: "text-warning-text" },
+  info: { icon: "info", className: "text-muted" },
 };
 
 const SEVERITIES: ReadonlyArray<Severity> = ["error", "warning", "info"];
 
-const count = (n: number, word: string, plural: string): string =>
-  `${n} ${n === 1 ? word : plural}`;
+/** The key of a severity's count in the summary line, which is plural. */
+const SUMMARY_KEY = {
+  error: "errors",
+  warning: "warnings",
+  info: "infos",
+} as const satisfies Record<Severity, string>;
 
 const IssueRow: React.FC<{
   issue: AtsIssue;
   onFix: (recipe: Recipe) => void;
   onDismiss: () => void;
 }> = ({ issue, onFix, onDismiss }) => {
+  const { t } = useTranslation("ats");
   const severity = SEVERITY[issue.severity];
+  const text = describeIssue(t, issue);
 
   return (
     <li className="border-line-soft flex gap-2 border-b px-3 py-2.5 last:border-b-0">
@@ -87,27 +82,27 @@ const IssueRow: React.FC<{
       <Box className="flex min-w-0 flex-1 flex-col gap-1">
         <Text className="text-body text-[12px] leading-snug">
           <Text className="sr-only" span>
-            {SEVERITY[issue.severity].word}:{" "}
+            {t(`tab.severity.${issue.severity}`)}:{" "}
           </Text>
-          {issue.message}
+          {text.message}
         </Text>
-        <Text className="text-muted text-[11px] leading-snug">{issue.why}</Text>
-        <Text className="text-subtle font-mono text-[10px]">{issue.where}</Text>
+        <Text className="text-muted text-[11px] leading-snug">{text.why}</Text>
+        <Text className="text-subtle font-mono text-[10px]">{text.where}</Text>
 
         <Box className="mt-0.5 flex items-center gap-2">
-          {issue.fix === undefined ? null : (
+          {issue.fix === undefined || text.fix === undefined ? null : (
             <Button
-              aria-label={`${issue.fix.label}, ${issue.where}`}
+              aria-label={`${text.fix}, ${text.where}`}
               onClick={() => issue.fix !== undefined && onFix(issue.fix.recipe)}
               variant="default"
             >
-              {issue.fix.label}
+              {text.fix}
             </Button>
           )}
 
-          <Tooltip label="Dismiss for now">
+          <Tooltip label={t("tab.dismiss")}>
             <UnstyledButton
-              aria-label={`Dismiss: ${issue.message}`}
+              aria-label={t("tab.dismissIssue", { message: text.message })}
               className="text-subtle hover:text-body hover:bg-active rounded-control ml-auto flex size-[22px] items-center justify-center"
               onClick={onDismiss}
             >
@@ -121,6 +116,7 @@ const IssueRow: React.FC<{
 };
 
 export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
+  const { t } = useTranslation("ats");
   const resumeId = useEditorStore((state) => state.resumeId) ?? "";
   const dismissed = useAtsDismissals(
     (state) => state.byResume[resumeId] ?? NO_DISMISSALS,
@@ -149,12 +145,7 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
 
     return n === 0
       ? []
-      : [
-          {
-            severity,
-            text: count(n, SEVERITY[severity].word, SEVERITY[severity].plural),
-          },
-        ];
+      : [{ severity, text: t(`tab.${SUMMARY_KEY[severity]}`, { count: n }) }];
   });
 
   const fixAll = (): void => {
@@ -178,11 +169,10 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
             />
             <Box>
               <Text className="text-body text-[12px] font-medium">
-                No issues we recognise
+                {t("tab.clean")}
               </Text>
               <Text className="text-muted mt-0.5 text-[11px] leading-snug">
-                This looks for common problems. It cannot promise how a
-                particular system will read the file.
+                {t("tab.disclaimer")}
               </Text>
             </Box>
           </Box>
@@ -205,11 +195,11 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
 
             {fixable.length === 0 ? null : (
               <Button
-                aria-label={`Fix all ${fixable.length}`}
+                aria-label={t("tab.fixAllLabel", { count: fixable.length })}
                 onClick={fixAll}
                 variant="default"
               >
-                {`Fix ${fixable.length}`}
+                {t("tab.fixAll", { count: fixable.length })}
               </Button>
             )}
           </Box>
@@ -224,12 +214,12 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
           className="text-muted border-line-soft border-b px-3 py-2 text-[11px] leading-snug"
           role="note"
         >
-          Length is not checked here. Open the Paper tab to measure it.
+          {t("tab.lengthNotChecked")}
         </Text>
       ) : null}
 
       {shown.length === 0 ? null : (
-        <ul aria-label="ATS issues" className="m-0 list-none p-0">
+        <ul aria-label={t("tab.issues")} className="m-0 list-none p-0">
           {shown.map((issue) => (
             <IssueRow
               issue={issue}
@@ -244,21 +234,20 @@ export const AtsPanel: React.FC<AtsPanelProps> = ({ document, apply }) => {
       {hiddenCount === 0 ? null : (
         <Box className="border-line-soft flex items-center justify-between border-t px-3 py-2">
           <Text className="text-subtle text-[11px]">
-            {count(hiddenCount, "issue", "issues")} dismissed
+            {t("tab.dismissed", { count: hiddenCount })}
           </Text>
           <UnstyledButton
             className="text-accent text-[11px] hover:underline"
             onClick={() => restoreAll(resumeId)}
           >
-            Show again
+            {t("tab.showAgain")}
           </UnstyledButton>
         </Box>
       )}
 
       {shown.length === 0 ? null : (
         <Text className="text-subtle border-line-soft border-t px-3 py-3 text-[11px] leading-snug">
-          This looks for common problems. It cannot promise how a particular
-          system will read the file.
+          {t("tab.disclaimer")}
         </Text>
       )}
     </Box>

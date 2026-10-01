@@ -10,8 +10,13 @@ import {
 import { createSampleDocument } from "@/features/resume/sample";
 import { templateDefaults } from "@/features/templates/defaults";
 
+import i18n from "@/lib/i18n";
+import { SUPPORTED_LANGUAGES } from "@/lib/i18n/language";
+
 import { checkDocument, RULES } from "./check";
 import { contrastOnPaper } from "./contrast";
+import { describeIssue } from "./describe";
+import { ATS_RULE_NAMES, ruleName } from "./types";
 
 import type {
   Block,
@@ -66,7 +71,7 @@ describe("checkDocument", () => {
     expect(checkDocument(createSampleDocument(id))).toEqual([]);
   });
 
-  it("gives every rule's issue an id, a message, a reason and a place", () => {
+  it("gives every issue an id, and words in each language", () => {
     const messy = createEmptyDocument();
 
     messy.customCss = ".a { display: none }";
@@ -78,9 +83,28 @@ describe("checkDocument", () => {
 
     for (const issue of issues) {
       expect(issue.id).toMatch(/^ats\.[a-z-]+:.+/);
-      expect(issue.message).not.toBe("");
-      expect(issue.why).not.toBe("");
-      expect(issue.where).not.toBe("");
+      expect(ATS_RULE_NAMES).toContain(ruleName(issue.rule));
+
+      for (const language of SUPPORTED_LANGUAGES) {
+        const words = describeIssue(i18n.getFixedT(language, "ats"), issue);
+
+        expect(words.message, `${language} ${issue.rule}`).not.toBe("");
+        expect(words.why, `${language} ${issue.rule}`).not.toBe("");
+        expect(words.where, `${language} ${issue.rule}`).not.toBe("");
+        // A key that was not found comes back as the key, which would pass the
+        // checks above.
+        expect(words.message).not.toMatch(/^rules\./);
+      }
+    }
+  });
+
+  it("has words for every rule and for no rule that does not exist", () => {
+    for (const language of SUPPORTED_LANGUAGES) {
+      const filed = Object.keys(
+        i18n.getResourceBundle(language, "ats").rules as object,
+      ).sort();
+
+      expect(filed, language).toEqual([...ATS_RULE_NAMES].sort());
     }
   });
 
@@ -102,21 +126,6 @@ describe("checkDocument", () => {
 
   it("has one function per rule and nothing it runs twice", () => {
     expect(new Set(RULES).size).toBe(RULES.length);
-  });
-
-  it("never writes a dash that the house style bans into its copy", () => {
-    const messy = createEmptyDocument();
-
-    messy.customCss = ".a { display: none }";
-
-    for (const issue of checkDocument(messy)) {
-      const copy = `${issue.message}${issue.why}${issue.where}`;
-
-      // Written as char codes: a formatter turns an escape back into the
-      // character, and the character in this file fails the dash test.
-      expect(copy).not.toContain(String.fromCharCode(0x2013));
-      expect(copy).not.toContain(String.fromCharCode(0x2014));
-    }
   });
 });
 
@@ -199,7 +208,8 @@ describe("structure rules", () => {
     );
 
     expect(found).toHaveLength(1);
-    expect(found[0]?.fix?.label).toBe("Hide section");
+    expect(found[0]?.fix).toBeDefined();
+    expect(found[0]?.params).toEqual({ section: "Interests" });
   });
 
   it("ignores a hidden section altogether", () => {
@@ -262,7 +272,7 @@ describe("structure rules", () => {
       (issue) => issue.rule === "ats.columns-two",
     );
 
-    expect(found?.fix?.label).toBe("Use one column");
+    expect(found?.fix).toBeDefined();
   });
 
   it("flags tables, raw blocks and images without alt text", () => {
@@ -391,7 +401,7 @@ describe("date rules", () => {
 
     expect(found).toHaveLength(1);
     expect(found[0]?.id).toBe("ats.date-gap:b");
-    expect(found[0]?.message).toContain("11 months");
+    expect(found[0]?.params["months"]).toBe(11);
   });
 
   it("does not flag a gap of six months or less, or overlapping roles", () => {
@@ -431,7 +441,8 @@ describe("typography rules", () => {
       (issue) => issue.rule === "ats.font-size-small",
     );
 
-    expect(found?.fix?.label).toBe("Set to 10pt");
+    expect(found?.fix).toBeDefined();
+    expect(found?.params).toMatchObject({ size: 8, fixSize: 10 });
   });
 
   it("accepts the technical template's own 10pt", () => {
@@ -619,7 +630,7 @@ describe("length rule", () => {
     const found = withPages(3);
 
     expect(found).toHaveLength(1);
-    expect(found[0]?.message).toBe("The resume runs to 3 pages.");
+    expect(found[0]?.params).toEqual({ count: 3 });
     expect(found[0]?.severity).toBe("warning");
   });
 

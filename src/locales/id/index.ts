@@ -1,3 +1,4 @@
+import { ats } from "./ats";
 import { commands } from "./commands";
 import { common } from "./common";
 import { editor } from "./editor";
@@ -19,4 +20,5 @@ export const id = {
   templates,
   editor,
   style,
+  ats,
 };

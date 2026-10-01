@@ -49,11 +49,11 @@ const fontSizeSmall: AtsRule = (document) =>
     ? [
         makeIssue("ats.font-size-small", "body", {
           severity: "warning",
-          message: `Body text is ${document.design.typography.baseSize}pt.`,
-          why: "Small print is hard for a person to read and hard for a scan to recover, and recruiters skim at a glance.",
-          where: "Style, body size",
+          params: {
+            size: document.design.typography.baseSize,
+            fixSize: FIX_BODY_PT,
+          },
           fix: {
-            label: `Set to ${FIX_BODY_PT}pt`,
             recipe: patchDesign({ typography: { baseSize: FIX_BODY_PT } }),
           },
         }),
@@ -80,11 +80,7 @@ const marginsNarrow: AtsRule = (document) => {
   return [
     makeIssue("ats.margins-narrow", "paper", {
       severity: "warning",
-      message: "A page margin is under 0.4 inches.",
-      why: "Printers clip near the edge of the sheet, so text set that close can be cut off on paper.",
-      where: "Style, paper margins",
       fix: {
-        label: "Raise to 0.5 in",
         recipe: patchDesign({ paper: { margin: raised } }),
       },
     }),
@@ -112,13 +108,10 @@ const contrastLow: AtsRule = (document) => {
     return [
       makeIssue("ats.contrast-low", token, {
         severity: "warning",
-        message: `The ${token} colour has a contrast of ${ratio.toFixed(1)} to 1 on the paper.`,
-        why: "Pale text is hard to read and may print or scan out entirely. The usual minimum for body text is 4.5 to 1.",
-        where: `Style, ${token} colour`,
+        params: { ratio: ratio.toFixed(1), context: token },
         ...(canRestore
           ? {
               fix: {
-                label: "Restore template colour",
                 recipe: patchDesign({ colors: { [token]: restored } }),
               },
             }
@@ -148,11 +141,8 @@ const fontCustom: AtsRule = (document) => {
     return [
       makeIssue("ats.font-custom", slot, {
         severity: "info",
-        message: `The ${name} font is one you uploaded.`,
-        why: "An uploaded font is embedded in the PDF and the HTML here, but a system that re-renders the text may substitute its own, so the plain fonts are the safer choice.",
-        where: `Style, ${name} font`,
+        params: { context: name },
         fix: {
-          label: "Use the template font",
           recipe: patchDesign({
             typography: { [slot]: defaults[slot] ?? defaults.bodyFont },
           }),

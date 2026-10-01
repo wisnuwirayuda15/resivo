@@ -2,6 +2,7 @@ import { plainText } from "@/features/resume/model/factory";
 
 import {
   effectiveKind,
+  entryLabel,
   makeIssue,
   sectionLabel,
   visibleSections,
@@ -46,9 +47,7 @@ const bulletLong: AtsRule = (document) =>
           ? [
               makeIssue("ats.bullet-long", `${block.id}:${index}`, {
                 severity: "info",
-                message: "A bullet runs past about three lines.",
-                why: "Long bullets are skimmed past, so the point they make is the one a recruiter is least likely to see.",
-                where: sectionLabel(section),
+                params: { section: sectionLabel(section) },
               }),
             ]
           : [],
@@ -65,9 +64,7 @@ const summaryLong: AtsRule = (document) =>
             ? [
                 makeIssue("ats.summary-long", block.id, {
                   severity: "info",
-                  message: "The summary is longer than a short paragraph.",
-                  why: "A summary is read first and fast, so one that runs long defeats the reason it is at the top.",
-                  where: sectionLabel(section),
+                  params: { section: sectionLabel(section) },
                 }),
               ]
             : [],
@@ -85,9 +82,10 @@ const entryEmpty: AtsRule = (document) =>
             ? [
                 makeIssue("ats.entry-empty", block.id, {
                   severity: "info",
-                  message: "A role has no description.",
-                  why: "A title and dates say where someone was, and the bullets are where a system finds the skills to match.",
-                  where: `${sectionLabel(section)}, ${plainText(block.title).trim() || "Untitled entry"}`,
+                  params: {
+                    section: sectionLabel(section),
+                    entry: entryLabel(block),
+                  },
                 }),
               ]
             : [],

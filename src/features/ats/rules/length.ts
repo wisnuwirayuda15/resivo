@@ -21,9 +21,7 @@ const pageCount: AtsRule = (_document, { pageCount: measured }) =>
     ? [
         makeIssue("ats.page-count", "document", {
           severity: "warning",
-          message: `The resume runs to ${measured} pages.`,
-          why: "Screening is a quick first pass, so what falls on a third page is rarely reached, and long resumes are often set aside unread.",
-          where: "Whole document",
+          params: { count: measured },
         }),
       ]
     : [];

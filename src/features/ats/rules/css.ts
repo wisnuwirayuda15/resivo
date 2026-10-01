@@ -21,20 +21,21 @@ const stripComments = (css: string): string =>
 /** Ends a declaration: a semicolon, a closing brace, `!important`, or the end. */
 const END = String.raw`\s*(?:[;}!]|$)`;
 
-const HIDING: Array<{ key: string; label: string; pattern: RegExp }> = [
+/**
+ * The five ways a stylesheet hides text. The key is also the `context` that picks
+ * the sentence naming it, so the words are in the messages and not here.
+ */
+const HIDING: Array<{ key: string; pattern: RegExp }> = [
   {
     key: "display-none",
-    label: "display: none",
     pattern: /display\s*:\s*none/i,
   },
   {
     key: "visibility-hidden",
-    label: "visibility: hidden",
     pattern: /visibility\s*:\s*hidden/i,
   },
   {
     key: "font-size-zero",
-    label: "a font size of 0",
     pattern: new RegExp(
       String.raw`font-size\s*:\s*0(?:px|pt|em|rem|%)?${END}`,
       "i",
@@ -42,12 +43,10 @@ const HIDING: Array<{ key: string; label: string; pattern: RegExp }> = [
   },
   {
     key: "opacity-zero",
-    label: "an opacity of 0",
     pattern: new RegExp(String.raw`opacity\s*:\s*0(?:\.0+)?${END}`, "i"),
   },
   {
     key: "color-transparent",
-    label: "transparent text",
     pattern: /(?:^|[;{\s])color\s*:\s*transparent/i,
   },
 ];
@@ -55,14 +54,12 @@ const HIDING: Array<{ key: string; label: string; pattern: RegExp }> = [
 const cssHidesText: AtsRule = (document) => {
   const css = stripComments(document.customCss);
 
-  return HIDING.flatMap(({ key, label, pattern }) =>
+  return HIDING.flatMap(({ key, pattern }) =>
     pattern.test(css)
       ? [
           makeIssue("ats.css-hides-text", key, {
             severity: "warning",
-            message: `The custom CSS uses ${label}.`,
-            why: "Hidden text is read by a parser and never by a person, and some systems score the pattern as keyword stuffing.",
-            where: "Custom CSS",
+            params: { context: key },
           }),
         ]
       : [],
@@ -82,9 +79,6 @@ const cssGeneratedContent: AtsRule = (document) =>
     ? [
         makeIssue("ats.css-generated-content", "css", {
           severity: "info",
-          message: "The custom CSS adds text with ::before or ::after.",
-          why: "Text a stylesheet generates is drawn on the page and is not in the file, so a parser never reads it.",
-          where: "Custom CSS",
         }),
       ]
     : [];

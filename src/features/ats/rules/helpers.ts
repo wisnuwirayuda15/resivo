@@ -7,24 +7,39 @@ import type {
   Section,
   SectionKind,
 } from "@/features/resume/model/document";
-import type { AtsFix, AtsIssue, Severity } from "../types";
+import type {
+  AtsFix,
+  AtsIssue,
+  AtsParams,
+  AtsRuleId,
+  Severity,
+} from "../types";
 
 /**
  * Pieces every rule file needs.
  */
 
-/** Builds an issue, deriving its id from the rule and the thing it points at. */
+/**
+ * Builds an issue, deriving its id from the rule and the thing it points at.
+ *
+ * No sentences: an issue is what was found and where, as parameters, and its
+ * words are looked up by rule name when it is shown.
+ */
 export const makeIssue = (
-  rule: string,
+  rule: AtsRuleId,
   target: string,
   fields: {
     severity: Severity;
-    message: string;
-    why: string;
-    where: string;
+    params?: AtsParams;
     fix?: AtsFix;
   },
-): AtsIssue => ({ id: `${rule}:${target}`, rule, ...fields });
+): AtsIssue => ({
+  id: `${rule}:${target}`,
+  rule,
+  severity: fields.severity,
+  params: fields.params ?? {},
+  ...(fields.fix === undefined ? {} : { fix: fields.fix }),
+});
 
 /**
  * The sections that reach the printed page. A hidden section is skipped by the
@@ -46,17 +61,16 @@ export const effectiveKind = (section: Section): SectionKind =>
     ? sectionKindFromTitle(plainText(section.title))
     : section.kind;
 
-export const sectionLabel = (section: Section): string => {
-  const title = plainText(section.title).trim();
+/**
+ * A section's title, or "" for one with none. Never a placeholder word: the
+ * checker has no language, and the panel says "Untitled section" in its own.
+ */
+export const sectionLabel = (section: Section): string =>
+  plainText(section.title).trim();
 
-  return title === "" ? "Untitled section" : title;
-};
-
-export const entryLabel = (entry: EntryBlock): string => {
-  const title = plainText(entry.title).trim();
-
-  return title === "" ? "Untitled entry" : title;
-};
+/** An entry's title, or "" for one with none, for the same reason. */
+export const entryLabel = (entry: EntryBlock): string =>
+  plainText(entry.title).trim();
 
 /** Every entry in the visible sections, with the section it sits in. */
 export const visibleEntries = (

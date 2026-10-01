@@ -31,9 +31,7 @@ const sectionTitleEmpty: AtsRule = (document) =>
       ? [
           makeIssue("ats.section-title-empty", section.id, {
             severity: "error",
-            message: "A section has no heading.",
-            why: "Parsers split a resume into sections by their headings, and content under no heading is attributed to nothing.",
-            where: `Section ${index + 1}`,
+            params: { number: index + 1 },
           }),
         ]
       : [],
@@ -45,11 +43,8 @@ const sectionEmpty: AtsRule = (document) =>
       ? [
           makeIssue("ats.section-empty", section.id, {
             severity: "warning",
-            message: `The ${sectionLabel(section)} section is empty.`,
-            why: "A heading with nothing under it prints as a gap, and a recruiter reads it as something left unfinished.",
-            where: sectionLabel(section),
+            params: { section: sectionLabel(section) },
             fix: {
-              label: "Hide section",
               recipe: setSectionHidden(section.id, true),
             },
           }),
@@ -69,9 +64,6 @@ const coreSectionsMissing: AtsRule = (document) => {
     : [
         makeIssue("ats.core-sections-missing", "document", {
           severity: "warning",
-          message: "No Experience, Education or Projects section has content.",
-          why: "These are the sections a system scores a candidate on, so a resume without them has little to rank.",
-          where: "Document",
         }),
       ];
 };
@@ -90,9 +82,7 @@ const sectionTitleUnusual: AtsRule = (document) =>
           ? [
               makeIssue("ats.section-title-unusual", section.id, {
                 severity: "info",
-                message: `"${sectionLabel(section)}" is not a heading a parser is likely to know.`,
-                why: "Systems recognise a short list of headings, such as Experience and Education, and file anything else less reliably.",
-                where: sectionLabel(section),
+                params: { section: sectionLabel(section) },
               }),
             ]
           : [],
@@ -105,11 +95,8 @@ const columnsTwo: AtsRule = (document) =>
       ? [
           makeIssue("ats.columns-two", section.id, {
             severity: "warning",
-            message: `${sectionLabel(section)} is set in two columns.`,
-            why: "Many parsers read straight down the page, so two columns can come out interleaved, one line of each at a time.",
-            where: sectionLabel(section),
+            params: { section: sectionLabel(section) },
             fix: {
-              label: "Use one column",
               recipe: setSectionColumns(section.id, 1),
             },
           }),
@@ -124,9 +111,7 @@ const tableUsed: AtsRule = (document) =>
         ? [
             makeIssue("ats.table-used", block.id, {
               severity: "warning",
-              message: "A table is used.",
-              why: "Parsers often flatten a table cell by cell and lose which value belonged to which heading.",
-              where: sectionLabel(section),
+              params: { section: sectionLabel(section) },
             }),
           ]
         : [],
@@ -140,10 +125,7 @@ const rawBlock: AtsRule = (document) =>
         ? [
             makeIssue("ats.raw-block", block.id, {
               severity: "info",
-              message:
-                "Markdown this app does not typeset is printed as plain text.",
-              why: "Raw HTML, footnotes and link definitions are kept verbatim, so they show up in the file as the markup itself.",
-              where: sectionLabel(section),
+              params: { section: sectionLabel(section) },
             }),
           ]
         : [],
@@ -157,9 +139,7 @@ const imageAltMissing: AtsRule = (document) =>
         ? [
             makeIssue("ats.image-alt-missing", block.id, {
               severity: "warning",
-              message: "An image has no alt text.",
-              why: "A parser cannot read an image, and the alt text is the only part of it that reaches the text layer.",
-              where: sectionLabel(section),
+              params: { section: sectionLabel(section) },
             }),
           ]
         : [],
@@ -172,9 +152,6 @@ const avatarPresent: AtsRule = (document) =>
     : [
         makeIssue("ats.avatar-present", "header", {
           severity: "info",
-          message: "The header carries a photo.",
-          why: "A photo is ignored by a parser, and some employers would rather not receive one at all.",
-          where: "Header",
         }),
       ];
 

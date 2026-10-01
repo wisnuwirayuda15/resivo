@@ -41,9 +41,6 @@ const nameMissing: AtsRule = (document) =>
     ? [
         makeIssue("ats.name-missing", "header", {
           severity: "error",
-          message: "The resume has no name.",
-          why: "A parser reads the first line as the candidate's name, and a resume without one is filed under nobody.",
-          where: "Header",
         }),
       ]
     : [];
@@ -54,9 +51,6 @@ const emailMissing: AtsRule = (document) =>
     : [
         makeIssue("ats.email-missing", "header", {
           severity: "warning",
-          message: "No email address in the contact details.",
-          why: "Most systems create the candidate record from the email, and a resume without one often cannot be matched or contacted.",
-          where: "Header, contact details",
         }),
       ];
 
@@ -66,9 +60,6 @@ const phoneMissing: AtsRule = (document) =>
     : [
         makeIssue("ats.phone-missing", "header", {
           severity: "info",
-          message: "No phone number in the contact details.",
-          why: "Recruiters often phone first, and some systems hold the number as a second way to match a candidate.",
-          where: "Header, contact details",
         }),
       ];
 
@@ -78,9 +69,7 @@ const contactIconOnly: AtsRule = (document) =>
       ? [
           makeIssue("ats.contact-icon-only", contact.id, {
             severity: "error",
-            message: "A contact shows an icon and no text.",
-            why: "A parser reads text, not pictures, so the detail the icon stands for is lost.",
-            where: `Header, contact ${index + 1}`,
+            params: { number: index + 1 },
           }),
         ]
       : [],
