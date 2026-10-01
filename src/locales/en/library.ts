@@ -46,6 +46,30 @@ export const library = {
     archive: "Archive",
     restore: "Restore",
     delete: "Delete",
+    exportZip: "Export as zip",
+    exportFailed: "The bundle for {{title}} could not be written.",
+  },
+  bundle: {
+    rejected: {
+      notZip: "That file is not a zip archive, so it is not a Resivo bundle.",
+      notBundle:
+        "That zip is not a Resivo resume bundle. A bundle holds a manifest that names it.",
+      newer:
+        "That bundle was written by a newer version of Resivo (format {{version}}, this build reads {{supported}}). Update before importing it. Nothing was changed.",
+      missing: "The bundle is missing {{name}}. Nothing was changed.",
+      unreadable:
+        "The bundle could not be read: {{detail}}. Nothing was changed.",
+      document:
+        "The resume inside the bundle is not valid: {{detail}} Nothing was changed.",
+      corrupt:
+        "{{name}} does not match the checksum recorded in the bundle, so it is damaged. Nothing was changed.",
+      tooLarge:
+        "That bundle is {{size}}. The limit is {{limit}}, and a resume is far smaller.",
+      entryTooLarge:
+        "{{name}} inside the bundle is {{size}}, over the {{limit}} limit for one file.",
+      tooManyEntries:
+        "The bundle holds more than {{limit}} files, which no resume does.",
+    },
   },
   delete: {
     title: 'Delete "{{title}}"?',
@@ -77,8 +101,12 @@ export const library = {
     tooBig:
       "{{name}} is {{size}} KB. A resume file is a few kilobytes; this is probably not one.",
     empty: "{{name}} is empty.",
+    bundleHint:
+      "A bundle keeps its own template and style, so the template chosen above is not used.",
+    templateChanged:
+      "The template has changed since this bundle was exported (revision {{from}}, now {{to}}), so a page may break differently from the original.",
     importHint:
-      "Markdown, JSON Resume or plain text. What the file calls things decides the sections, so check them over once it opens.",
+      "Markdown, JSON Resume, plain text, or a Resivo bundle (.zip). The headings in a text file decide its sections, so check them over once it opens.",
     readClean: "Read with nothing left over.",
     dropped: "Left out, because a resume here has no place for it: {{fields}}.",
     droppedFields: {

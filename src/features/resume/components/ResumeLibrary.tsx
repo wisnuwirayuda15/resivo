@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Box, Skeleton, Text } from "@mantine/core";
+import { notifications } from "@mantine/notifications";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
@@ -12,6 +13,7 @@ import {
   useArchiveResume,
   useDeleteResume,
   useDuplicateResume,
+  useExportResumeBundle,
   useGroups,
   useRestoreResume,
   useUpdateResume,
@@ -66,6 +68,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
   );
 
   const duplicate = useDuplicateResume();
+  const exportBundle = useExportResumeBundle();
   const archive = useArchiveResume();
   const restore = useRestoreResume();
   const remove = useDeleteResume();
@@ -123,6 +126,15 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
             onRename={() => setRenaming(resume)}
             groups={groups.data ?? []}
             onDuplicate={() => duplicate.mutate(resume.id)}
+            onExportBundle={() =>
+              exportBundle.mutate(resume.id, {
+                onError: () =>
+                  notifications.show({
+                    color: "red",
+                    message: t("card.exportFailed", { title: resume.title }),
+                  }),
+              })
+            }
             onMove={(groupId) =>
               update.mutate({ id: resume.id, changes: { groupId } })
             }

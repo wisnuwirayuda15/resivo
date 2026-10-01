@@ -62,6 +62,22 @@ modules, the Indonesian ones are typed against the English, and a test fails on
 a missing key, a changed placeholder or a sentence left untranslated. A lint
 rule rejects text written straight into JSX.
 
+**One resume as a zip.** The Export as zip item on a card, and the Bundle entry in
+the editor's export menu, write one resume with everything it needs: the
+document with its template, tokens and custom CSS, and the images and fonts it
+uses as the files they are. Import it from the new-resume dialog on another
+device and it is the same resume; a test compares the HTML export before and
+after and requires the two to be identical. It is for moving or keeping one
+resume, where the backup in Settings is for the whole device, and it is a zip
+rather than JSON with base64 so the assets are not a third larger and any
+archive tool opens it. What "the same" rests on is the template: the bundle
+records which revision of it drew the resume, and an import says so when the
+CSS has changed since, because that is the one thing that can break a page
+differently. A bundle is read as untrusted input: only the files it should have
+are read, sizes are checked from what the archive declares before anything is
+inflated, every image and font goes through the same checks as an upload, and
+nothing is written until all of it has passed.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 

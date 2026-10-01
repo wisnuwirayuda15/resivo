@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { groupRepo, resumeRepo } from "@/database/index";
+import { downloadBlob, safeFilename } from "@/lib/download";
 
 import type { QueryClient } from "@tanstack/react-query";
+import type { ParsedBundle } from "@/features/bundle/importBundle";
 import type {
   CreateResumeInput,
   ResumeRecord,
@@ -208,6 +210,59 @@ export const useUpdateResume = () => {
     onSuccess: () => invalidateLibrary(client),
   });
 };
+
+/**
+ * Imports a parsed bundle as a new resume.
+ *
+ * The module is loaded here, on the first import, so the zip library is not part
+ * of what the library page opens with.
+ */
+export const useImportBundle = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (input: {
+      parsed: ParsedBundle;
+      title?: string;
+      groupId?: string;
+    }) => {
+      const { restoreResumeBundle } =
+        await import("@/features/bundle/importBundle");
+
+      return restoreResumeBundle(input.parsed, {
+        ...(input.title === undefined ? {} : { title: input.title }),
+        ...(input.groupId === undefined ? {} : { groupId: input.groupId }),
+      });
+    },
+    onSuccess: () => invalidateLibrary(client),
+  });
+};
+
+/**
+ * Writes a resume's bundle and hands it to the browser.
+ *
+ * Reads the stored resume rather than taking the one on the card, which is a
+ * summary, and builds from what is saved: the library has no editor open, so
+ * there is no newer live document to prefer.
+ */
+export const useExportResumeBundle = () =>
+  useMutation({
+    mutationFn: async (id: string) => {
+      const record = await resumeRepo.getResume(id);
+
+      if (record === undefined) {
+        throw new Error("That resume is no longer here.");
+      }
+
+      const { buildResumeBundle } =
+        await import("@/features/bundle/exportBundle");
+
+      downloadBlob(
+        await buildResumeBundle(record, Date.now()),
+        safeFilename(record.title, "zip"),
+      );
+    },
+  });
 
 export const useDuplicateResume = () => {
   const client = useQueryClient();

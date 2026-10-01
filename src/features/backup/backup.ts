@@ -243,7 +243,7 @@ export const restoreBackup = async (
  * whose id was taken. Structured-cloned first so the backup object is left
  * untouched and a failed restore cannot leave a half-rewritten document behind.
  */
-const remapAssets = <T>(
+export const remapAssets = <T>(
   document: T,
   images: ReadonlyMap<string, string>,
   fonts: ReadonlyMap<string, string>,

@@ -41,6 +41,30 @@ export const library = {
     archive: "Arsipkan",
     restore: "Pulihkan",
     delete: "Hapus",
+    exportZip: "Ekspor sebagai zip",
+    exportFailed: "Bundel untuk {{title}} tidak dapat ditulis.",
+  },
+  bundle: {
+    rejected: {
+      notZip: "Berkas itu bukan arsip zip, jadi bukan bundel Resivo.",
+      notBundle:
+        "Zip itu bukan bundel resume Resivo. Bundel memuat manifes yang menamainya.",
+      newer:
+        "Bundel itu ditulis oleh Resivo versi lebih baru (format {{version}}, build ini membaca {{supported}}). Perbarui sebelum mengimpornya. Tidak ada yang diubah.",
+      missing: "Bundel tidak memuat {{name}}. Tidak ada yang diubah.",
+      unreadable:
+        "Bundel tidak dapat dibaca: {{detail}}. Tidak ada yang diubah.",
+      document:
+        "Resume di dalam bundel tidak valid: {{detail}} Tidak ada yang diubah.",
+      corrupt:
+        "{{name}} tidak cocok dengan checksum yang tercatat di bundel, jadi rusak. Tidak ada yang diubah.",
+      tooLarge:
+        "Bundel itu berukuran {{size}}. Batasnya {{limit}}, dan sebuah resume jauh lebih kecil.",
+      entryTooLarge:
+        "{{name}} di dalam bundel berukuran {{size}}, melebihi batas {{limit}} untuk satu berkas.",
+      tooManyEntries:
+        "Bundel memuat lebih dari {{limit}} berkas, yang tidak dimiliki resume mana pun.",
+    },
   },
   delete: {
     title: 'Hapus "{{title}}"?',
@@ -73,8 +97,12 @@ export const library = {
     tooBig:
       "{{name}} berukuran {{size}} KB. Berkas resume hanya beberapa kilobita, jadi ini kemungkinan bukan resume.",
     empty: "{{name}} kosong.",
+    bundleHint:
+      "Bundel membawa template dan gayanya sendiri, jadi template yang dipilih di atas tidak dipakai.",
+    templateChanged:
+      "Template telah berubah sejak bundel ini diekspor (revisi {{from}}, sekarang {{to}}), jadi halaman mungkin terpisah berbeda dari aslinya.",
     importHint:
-      "Markdown, JSON Resume, atau teks biasa. Nama yang dipakai berkas menentukan bagian-bagiannya, jadi periksa sekali setelah terbuka.",
+      "Markdown, JSON Resume, teks biasa, atau bundel Resivo (.zip). Judul dalam berkas teks menentukan bagian-bagiannya, jadi periksa sekali setelah terbuka.",
     readClean: "Terbaca tanpa sisa.",
     dropped:
       "Tidak disertakan, karena resume di sini tidak punya tempat untuknya: {{fields}}.",

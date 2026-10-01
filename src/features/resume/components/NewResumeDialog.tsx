@@ -20,6 +20,7 @@ import {
   useUiLanguage,
 } from "@/lib/i18n/useTranslation";
 import { Icon } from "@/features/icons/IconRenderer";
+import { looksLikeZip } from "@/features/bundle/format";
 import { importDocument } from "@/features/interchange/index";
 import { createEmptyDocument } from "../model/index";
 import { createStartingDocument } from "../sample";
@@ -32,8 +33,9 @@ import {
 } from "@/features/settings/queries";
 
 import { TemplateTile } from "./TemplateTile";
-import { useCreateResume, useGroups } from "../queries";
+import { useCreateResume, useGroups, useImportBundle } from "../queries";
 
+import type { ParsedBundle } from "@/features/bundle/importBundle";
 import type { DroppedField, ImportFormat } from "@/features/interchange/index";
 import type { ResumeStart } from "../sample";
 import type { TemplateId } from "../model/document";
@@ -49,7 +51,10 @@ import type { TemplateId } from "../model/document";
 interface ImportedFile {
   filename: string;
   source: string;
-  format: ImportFormat;
+  format: ImportFormat | "bundle";
+  /** Set for a bundle, which is read whole rather than kept as text: it carries
+   * its own template and style, so there is nothing to redo at submit. */
+  bundle?: ParsedBundle;
   /** Counted, not listed: the file is not open yet, so there is nowhere to point
    * at. The editor shows each one against its line once the resume exists. */
   warningCount: number;
@@ -78,7 +83,8 @@ const documentFrom = (
   source: string,
 ) => importDocument(filename, source, createEmptyDocument(templateId));
 
-const FORMAT_ICONS: Record<ImportFormat, string> = {
+const FORMAT_ICONS: Record<ImportFormat | "bundle", string> = {
+  bundle: "file-zip",
   markdown: "markdown-logo",
   "json-resume": "brackets-curly",
   text: "text-align-left",
@@ -133,6 +139,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 
   const groups = useGroups();
   const createResume = useCreateResume();
+  const importBundle = useImportBundle();
   const lastTemplate = useLastTemplate();
   const rememberTemplate = useRememberTemplate();
   const lastStart = useLastResumeStart();
@@ -166,12 +173,43 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
    * submitted), so a file that turns out to be empty or unreadable costs
    * nothing but a message.
    */
+  const readBundle = async (file: File) => {
+    try {
+      // Loaded here, so the zip library is not part of the library page.
+      const { readResumeBundle } =
+        await import("@/features/bundle/importBundle");
+      const parsed = await readResumeBundle(file);
+
+      setImported({
+        filename: file.name,
+        source: "",
+        format: "bundle",
+        bundle: parsed,
+        warningCount: 0,
+        dropped: [],
+        fullName: parsed.document.meta.fullName,
+      });
+      setTitle((current) => (current.trim() === "" ? parsed.title : current));
+    } catch (cause) {
+      setImportError(
+        errorText(cause, t("create.errors.invalid", { detail: "" })),
+      );
+    }
+  };
+
   const importFile = async (file: File | null) => {
     if (file === null) {
       return;
     }
 
     setImportError(null);
+
+    // A zip is a bundle whatever it is called, and it is the one kind of file
+    // the size limit below does not apply to: it has limits of its own.
+    if (looksLikeZip(new Uint8Array(await file.slice(0, 2).arrayBuffer()))) {
+      await readBundle(file);
+      return;
+    }
 
     if (file.size > MAX_IMPORT_BYTES) {
       setImportError(
@@ -221,6 +259,21 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   };
 
   const submit = async () => {
+    // A bundle is a resume already, so it is stored as it came rather than built
+    // from a template and a start. It remembers neither: the template was not
+    // chosen here, and the dialog should offer next time what was chosen last.
+    if (imported?.bundle !== undefined) {
+      const { resume } = await importBundle.mutateAsync({
+        parsed: imported.bundle,
+        ...(title.trim() === "" ? {} : { title: title.trim() }),
+        ...(groupId === UNGROUPED ? {} : { groupId }),
+      });
+
+      close();
+      onCreated(resume.id);
+      return;
+    }
+
     const created = await createResume.mutateAsync({
       // An untitled resume is normal, the repository supplies the placeholder
       // rather than this dialog insisting on a name up front.
@@ -365,14 +418,26 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
                     .map((field) => t(`create.droppedFields.${field}`))
                     .join(", "),
                 })}`}
+            {imported.bundle === undefined
+              ? null
+              : ` ${t("create.bundleHint")}`}
+            {imported.bundle?.templateChanged === undefined
+              ? null
+              : ` ${t("create.templateChanged", imported.bundle.templateChanged)}`}
           </Alert>
         )}
+
+        {imported === null ? (
+          <Text className="text-muted -mt-2 text-[12px] leading-snug">
+            {t("create.importHint")}
+          </Text>
+        ) : null}
 
         <Group justify="flex-end" gap="xs">
           {/* Import is an alternative starting point, not a separate flow: the
               template, name and group above still apply to what it produces. */}
           <FileButton
-            accept=".md,.markdown,.txt,.json,text/markdown,text/plain,application/json"
+            accept=".md,.markdown,.txt,.json,.zip,text/markdown,text/plain,application/json,application/zip"
             onChange={(file) => void importFile(file)}
           >
             {(props) => (
@@ -398,7 +463,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
           </Button>
           <Button
             onClick={() => void submit()}
-            loading={createResume.isPending}
+            loading={createResume.isPending || importBundle.isPending}
           >
             {t("create.submit")}
           </Button>

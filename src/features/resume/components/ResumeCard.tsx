@@ -17,6 +17,7 @@ interface ResumeCardProps {
   groups: ReadonlyArray<GroupRecord>;
   onRename: () => void;
   onDuplicate: () => void;
+  onExportBundle: () => void;
   onMove: (groupId: string) => void;
   onArchive: () => void;
   onRestore: () => void;
@@ -35,6 +36,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
   groups,
   onRename,
   onDuplicate,
+  onExportBundle,
   onMove,
   onArchive,
   onRestore,
@@ -111,6 +113,12 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
               onClick={onDuplicate}
             >
               {t("card.duplicate")}
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<Icon name="file-zip" size={15} />}
+              onClick={onExportBundle}
+            >
+              {t("card.exportZip")}
             </Menu.Item>
             {destinations.length === 0 ? null : (
               <Menu.Sub>

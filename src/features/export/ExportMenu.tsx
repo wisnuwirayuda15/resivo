@@ -29,6 +29,7 @@ const ICONS: Record<string, string> = {
   markdown: "markdown-logo",
   "json-resume": "brackets-curly",
   text: "text-align-left",
+  bundle: "file-zip",
 };
 
 interface ExportMenuProps {

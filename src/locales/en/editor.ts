@@ -58,6 +58,9 @@ export const editor = {
       text: {
         hint: "Plain text with no styling, for a form that asks you to paste your resume.",
       },
+      bundle: {
+        hint: "This resume with its images, fonts and style. Import it anywhere and it looks the same.",
+      },
     },
     failed: "The export could not be written.",
   },

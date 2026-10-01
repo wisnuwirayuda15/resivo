@@ -29,8 +29,9 @@ export interface ResumeTemplate {
   id: TemplateId;
   /**
    * Bumped when this template's markup or CSS changes in a way that reflows an
-   * existing resume. Nothing consumes it yet; it is what a future "re-paginate
-   * cached page counts" step would key off.
+   * existing resume. A resume bundle records it, and an import reports when the
+   * revision that drew the resume is not the one this build has, which is the one
+   * way a bundle can fail to look the same.
    */
   version: number;
   /** Appended last inside `@layer template`, so restating a rule overrides the

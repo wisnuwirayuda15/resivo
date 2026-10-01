@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 724 tests in 44 files
-bun run test:e2e         # playwright, 82 specs, chromium only
+bun run test             # vitest, 749 tests in 45 files
+bun run test:e2e         # playwright, 85 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -154,6 +154,18 @@ words are looked up when shown; `checkDocument` stays pure and language-free.
 Indonesian sentence still in English. `AI_PROMPT` and the SEO tags stay English
 on purpose.
 
+**A bundle's "looks the same" rests on the template's `version`.** A bundle
+(`features/bundle/`) records the revision of the template that drew it, and an
+import tells the person when it differs, because `ResumeTemplate.version` in
+`templates/registry.ts` is the only thing that says a template's CSS moved.
+Bump it when you change a template's CSS or markup in a way that reflows an
+existing resume. Reading a bundle is split from writing it on purpose:
+`readResumeBundle` does everything that can refuse (zip, sizes, manifest,
+`migrateDocument`, image and font checks) and writes nothing, and
+`restoreResumeBundle` only writes, in one transaction, because Dexie cannot
+hold a transaction across an await on anything that is not Dexie. Keep decoding
+and hashing in the first.
+
 **SEO: three routes are indexable** (`/`, `/templates`, `/about`) and every
 route behind the app shell sends `noindex`, because they render one browser's
 IndexedDB and a crawler would only ever see an empty shell. Build the tags with
@@ -194,6 +206,7 @@ src/
     ats/           the ATS check: pure rules over the document, and the tab
     export/        PDF, HTML, Markdown, JSON Resume and plain text adapters
     interchange/   reading a file into a document, and JSON Resume and text out
+    bundle/        one resume as a zip with its images and fonts, both ways
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /
     pwa/           installing, and whether the app is cached here

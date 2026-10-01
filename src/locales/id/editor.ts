@@ -53,6 +53,9 @@ export const editor = {
       text: {
         hint: "Teks biasa tanpa gaya, untuk formulir yang meminta Anda menempelkan resume.",
       },
+      bundle: {
+        hint: "Resume ini beserta gambar, font, dan gayanya. Impor di mana saja dan tampilannya sama.",
+      },
     },
     failed: "Ekspor tidak dapat ditulis.",
   },

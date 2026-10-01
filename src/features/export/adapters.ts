@@ -36,7 +36,7 @@ export interface ExportContext {
 }
 
 export interface ExportAdapter {
-  format: "html" | "markdown" | "json-resume" | "text";
+  format: "html" | "markdown" | "json-resume" | "text" | "bundle";
   label: string;
   mimeType: string;
   extension: string;
@@ -133,9 +133,28 @@ const textAdapter: ExportAdapter = {
     ),
 };
 
+const bundleAdapter: ExportAdapter = {
+  format: "bundle",
+  label: "Bundle (.zip)",
+  mimeType: "application/zip",
+  extension: "zip",
+  /**
+   * The one format that reads back to the same resume: the document with its
+   * template, tokens and CSS, and the images and fonts as files. Loaded when it
+   * is asked for, so the zip library is not part of what the editor opens with.
+   */
+  run: async ({ document, title }) => {
+    const { buildResumeBundle } =
+      await import("@/features/bundle/exportBundle");
+
+    return buildResumeBundle({ title, document }, Date.now());
+  },
+};
+
 export const exportAdapters: Array<ExportAdapter> = [
   htmlAdapter,
   markdownAdapter,
   jsonResumeAdapter,
   textAdapter,
+  bundleAdapter,
 ];
