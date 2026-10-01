@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 782 tests in 48 files
-bun run test:e2e         # playwright, 86 specs, chromium only
+bun run test             # vitest, 818 tests in 51 files
+bun run test:e2e         # playwright, 90 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -166,6 +166,20 @@ existing resume. Reading a bundle is split from writing it on purpose:
 hold a transaction across an await on anything that is not Dexie. Keep decoding
 and hashing in the first.
 
+**A cover letter is `ResumeDocument.kind`, and four places read it.** There is
+no second table, route or editor. `kind ?? "resume"` is how to read it, and it
+is written only for a letter, so every older row is valid as it stands. The four
+places: `preview/flow.ts` leaves out the section heading item (otherwise the
+untitled section leaves an empty box above the first paragraph);
+`templates/defaults.ts` takes the kind (`templateDefaults(id, kind)`,
+`designMatchesTemplate(design, id, kind)`), and a new call site that seeds or
+compares a design has to pass it or a letter will look customised the moment it
+is made; `ats/check.ts` chooses `LETTER_RULES`; and the library files by
+`ResumeSummary.kind`. A letter's one section has an empty title on purpose,
+which the Markdown writes as a bare `##` and reads back as the same section.
+`kind` survives `applyMarkdown` and `documentFromMarkdown` because both
+spread the document or base they are given; it is not in the Markdown itself.
+
 **SEO: three routes are indexable** (`/`, `/templates`, `/about`) and every
 route behind the app shell sends `noindex`, because they render one browser's
 IndexedDB and a crawler would only ever see an empty shell. Build the tags with
@@ -208,6 +222,7 @@ src/
     interchange/   reading a file into a document, and JSON Resume and text out
     bundle/        one resume as a zip with its images and fonts, both ways
     versions/      a version per job: the comparison, its drawer, the dialog
+                   (cover letters have no folder: they are `kind` on a document)
     guide/         the writing guide, and the prompt for a model
     landing/       the marketing page at /
     pwa/           installing, and whether the app is cached here

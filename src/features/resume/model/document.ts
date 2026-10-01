@@ -452,8 +452,25 @@ export interface ResumeMeta {
   locale: string;
 }
 
+/**
+ * What a document is. A cover letter is the same thing as a resume to everything
+ * that stores, edits, paginates and exports one (same table, same route, same
+ * editor, same pipeline) and differs in four places that read this field: the
+ * flow leaves out section headings, the design defaults are a letter's, the ATS
+ * check asks different questions, and the library files it separately.
+ */
+export const DOCUMENT_KINDS = ["resume", "coverLetter"] as const;
+export type DocumentKind = (typeof DOCUMENT_KINDS)[number];
+
 export interface ResumeDocument {
   schemaVersion: number;
+  /**
+   * Absent means `resume`, which is every document written before this field
+   * existed. Optional rather than defaulted by a migration so those rows stay
+   * valid as they are and nothing needs a version bump; read it as
+   * `kind ?? "resume"`.
+   */
+  kind?: DocumentKind;
   templateId: TemplateId;
   meta: ResumeMeta;
   content: ResumeContent;

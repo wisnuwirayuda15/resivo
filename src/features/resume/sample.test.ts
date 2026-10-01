@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { parseDocument, serializeDocument } from "@/features/markdown/index";
 import { plainText } from "./model/index";
 import {
+  SAMPLE_LETTER_SOURCE,
   SAMPLE_SOURCE,
   createSampleDocument,
+  createSampleLetter,
   createStartingDocument,
 } from "./sample";
 
@@ -123,5 +125,49 @@ describe("createStartingDocument", () => {
 
     expect(sample.meta.locale).toBe("en");
     expect(plainText(sample.content.header.name)).toBe("Ada Lovelace");
+  });
+});
+
+describe("the example cover letter", () => {
+  it("parses with no warnings", () => {
+    expect(parseDocument(SAMPLE_LETTER_SOURCE).warnings).toEqual([]);
+  });
+
+  it("round-trips back to its own source", () => {
+    expect(serializeDocument(createSampleLetter())).toBe(SAMPLE_LETTER_SOURCE);
+  });
+
+  it("is a letter: one untitled section of paragraphs, and a letter's design", () => {
+    const letter = createSampleLetter("modern");
+
+    expect(letter.kind).toBe("coverLetter");
+    expect(letter.content.sections).toHaveLength(1);
+    expect(plainText(letter.content.sections[0]?.title ?? [])).toBe("");
+    expect(
+      letter.content.sections[0]?.blocks.every(
+        (block) => block.kind === "paragraph",
+      ),
+    ).toBe(true);
+    expect(letter.design.paper.margin.left).toBe(1);
+    expect(letter.design.typography.lineHeight).toBe(1.5);
+  });
+
+  it("is chosen by kind, for the example and for a blank page", () => {
+    expect(
+      createStartingDocument("sample", "classic", "en", "coverLetter").kind,
+    ).toBe("coverLetter");
+
+    const blank = createStartingDocument(
+      "blank",
+      "classic",
+      "en",
+      "coverLetter",
+    );
+
+    expect(blank.kind).toBe("coverLetter");
+    expect(blank.content.sections).toHaveLength(1);
+    expect(blank.content.sections[0]?.blocks).toEqual([]);
+    // A resume is untouched by all of this.
+    expect(createStartingDocument("sample", "classic").kind).toBeUndefined();
   });
 });

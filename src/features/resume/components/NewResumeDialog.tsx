@@ -38,7 +38,7 @@ import { useCreateResume, useGroups, useImportBundle } from "../queries";
 import type { ParsedBundle } from "@/features/bundle/importBundle";
 import type { DroppedField, ImportFormat } from "@/features/interchange/index";
 import type { ResumeStart } from "../sample";
-import type { TemplateId } from "../model/document";
+import type { DocumentKind, TemplateId } from "../model/document";
 
 /**
  * A file the dialog has read but not yet turned into a resume.
@@ -79,9 +79,11 @@ const MAX_IMPORT_BYTES = 1024 * 1024;
  */
 const documentFrom = (
   templateId: TemplateId,
+  kind: DocumentKind,
   filename: string,
   source: string,
-) => importDocument(filename, source, createEmptyDocument(templateId));
+) =>
+  importDocument(filename, source, createEmptyDocument(templateId, "en", kind));
 
 const FORMAT_ICONS: Record<ImportFormat | "bundle", string> = {
   bundle: "file-zip",
@@ -101,6 +103,9 @@ interface NewResumeDialogProps {
   onCreated: (resumeId: string) => void;
   /** Preselects a group when opened from inside one. */
   defaultGroupId?: string;
+  /** Preselects a letter, when opened from the cover letters view or by the
+   * command that makes one. */
+  defaultKind?: DocumentKind;
 }
 
 /**
@@ -115,6 +120,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   onClose,
   onCreated,
   defaultGroupId,
+  defaultKind,
 }) => {
   const { t } = useTranslation("library");
   const { t: tc } = useTranslation("common");
@@ -131,6 +137,10 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
    * under the pointer.
    */
   const [picked, setPicked] = useState<TemplateId | null>(null);
+  /** Resume or letter, derived like the template and the start: the question is
+   * asked of the person, and what they were looking at is the answer until they
+   * say otherwise. */
+  const [pickedKind, setPickedKind] = useState<DocumentKind | null>(null);
   /** The starting point, derived from the remembered one for the same reason. */
   const [pickedStart, setPickedStart] = useState<ResumeStart | null>(null);
   const [groupId, setGroupId] = useState(defaultGroupId ?? UNGROUPED);
@@ -145,6 +155,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   const lastStart = useLastResumeStart();
   const rememberStart = useRememberResumeStart();
 
+  const kind: DocumentKind = pickedKind ?? defaultKind ?? "resume";
   const templateId = picked ?? lastTemplate.data ?? "classic";
   const setTemplateId = setPicked;
 
@@ -161,6 +172,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     setTitle("");
     setPicked(null);
     setPickedStart(null);
+    setPickedKind(null);
     setGroupId(defaultGroupId ?? UNGROUPED);
     setImported(null);
     setImportError(null);
@@ -231,7 +243,7 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
     let parsed: ReturnType<typeof documentFrom>;
 
     try {
-      parsed = documentFrom(templateId, file.name, source);
+      parsed = documentFrom(templateId, kind, file.name, source);
     } catch (cause) {
       setImportError(
         errorText(cause, t("create.errors.invalid", { detail: "" })),
@@ -290,8 +302,8 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
        */
       document:
         imported === null
-          ? createStartingDocument(start, templateId, uiLanguage)
-          : documentFrom(templateId, imported.filename, imported.source)
+          ? createStartingDocument(start, templateId, uiLanguage, kind)
+          : documentFrom(templateId, kind, imported.filename, imported.source)
               .document,
     });
 
@@ -312,6 +324,20 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
   return (
     <Modal opened={opened} onClose={close} title={t("create.title")} size={620}>
       <Stack gap="lg">
+        <SegmentedControl
+          aria-label={t("create.kind")}
+          data={[
+            { value: "resume", label: t("create.kindResume") },
+            { value: "coverLetter", label: t("create.kindLetter") },
+          ]}
+          // An imported file already is one or the other, so the choice is shown
+          // as inapplicable rather than left looking as though it still decides.
+          disabled={imported !== null}
+          fullWidth
+          onChange={(value) => setPickedKind(value)}
+          value={kind}
+        />
+
         <Box>
           <Text
             className="text-muted mb-2 text-[12px] font-medium"
@@ -344,8 +370,20 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
 
           <SegmentedControl
             data={[
-              { value: "sample", label: t("create.example") },
-              { value: "blank", label: t("create.blank") },
+              {
+                value: "sample",
+                label:
+                  kind === "coverLetter"
+                    ? t("create.exampleLetter")
+                    : t("create.example"),
+              },
+              {
+                value: "blank",
+                label:
+                  kind === "coverLetter"
+                    ? t("create.blankLetter")
+                    : t("create.blank"),
+              },
             ]}
             // An imported file is the starting point, so the choice is shown
             // as inapplicable rather than left looking as though it still
@@ -360,8 +398,16 @@ export const NewResumeDialog: React.FC<NewResumeDialogProps> = ({
             {imported !== null
               ? t("create.importedHint")
               : start === "sample"
-                ? t("create.exampleHint")
-                : t("create.blankHint")}
+                ? t(
+                    kind === "coverLetter"
+                      ? "create.exampleLetterHint"
+                      : "create.exampleHint",
+                  )
+                : t(
+                    kind === "coverLetter"
+                      ? "create.blankLetterHint"
+                      : "create.blankHint",
+                  )}
           </Text>
         </Box>
 

@@ -5,6 +5,7 @@ export const guide = {
   title: "Panduan menulis",
   button: "Panduan",
   tabs: "Panduan",
+  copyLetterPrompt: "Salin prompt untuk surat lamaran",
   copyPrompt: "Salin prompt AI",
   copyGuide: "Salin panduan ini",
   copied: "Tersalin",
@@ -64,6 +65,29 @@ export const guide = {
           body: [
             "CommonMark dan GFM, dan semuanya ditata: judul, daftar butir dan bernomor di kedalaman berapa pun, daftar tugas, tabel, kutipan, blok kode, pemisah tematik, serta tebal, miring, dan tautan di dalam baris.",
             "Yang tidak dapat diwakili model (HTML mentah, catatan kaki, definisi rujukan tautan) disimpan apa adanya dan dilaporkan sebagai peringatan, bukan dibuang diam-diam. Teks yang datang di atas judul pertama masuk ke bagian tanpa judul, bukan ditolak.",
+          ],
+        },
+      },
+    },
+    letters: {
+      title: "Surat lamaran",
+      intro:
+        "Surat lamaran adalah dokumen seperti yang lain di sini, dengan format berkas yang sama: nama dan kontak Anda di atas, lalu paragraf. Satu-satunya perbedaan adalah ia tidak punya judul bagian untuk digambar.",
+      sections: {
+        shape: {
+          title: "Bentuk sebuah surat",
+          body: [
+            "Header-nya sama dengan resume: `#` adalah nama pengirim, dan baris `::contact` adalah rincian yang akan dipakai untuk membalas.",
+            "Lalu satu baris yang hanya berisi `##`. Itu adalah satu-satunya bagian surat, dan ia tidak punya judul: kertas tidak menggambar apa pun untuknya, dan Markdown menuliskannya kembali persis seperti adanya, jadi biarkan di tempatnya.",
+            "Semua sesudahnya adalah paragraf, satu per baris dengan baris kosong di antaranya: tanggal, penerima, salam, isi, penutup, dan nama Anda. Menulis alamat sebagai beberapa paragraf pendek tidak masalah, dan jaraknya seperti beberapa paragraf.",
+          ],
+        },
+        habits: {
+          title: "Panjang, dan apa yang diperiksa pada surat",
+          body: [
+            "Surat adalah satu halaman. Tab ATS memintanya, dan menyatakannya dengan kata-kata ketika surat melewati sekitar 450 kata.",
+            "Ia tidak meminta bagian Pengalaman atau tanggal dari surat, karena surat tidak punya. Ia tetap membaca nama dan kontak Anda, ukuran huruf dan margin, dan apakah ada teks yang disembunyikan.",
+            "Surat dimulai dari isi yang lebih besar, margin satu inci, dan jarak antarparagraf yang lebih longgar daripada resume, dan mempertahankan template yang Anda pilih untuk huruf dan warnanya.",
           ],
         },
       },

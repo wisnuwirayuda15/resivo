@@ -15,6 +15,11 @@ export const commands = {
     description: "Pick a template, or import a file",
     keywords: "create add import",
   },
+  newLetter: {
+    label: "New cover letter",
+    description: "Write a letter to go with a resume",
+    keywords: "create add letter application",
+  },
   newGroup: {
     label: "New group",
     description: "A folder for a set of resumes",

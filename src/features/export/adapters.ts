@@ -40,6 +40,12 @@ export interface ExportAdapter {
   label: string;
   mimeType: string;
   extension: string;
+  /**
+   * Whether this format means anything for the document. Absent means yes. JSON
+   * Resume is the one that says no: it has sections named experience and
+   * education and nowhere to put a letter's paragraphs.
+   */
+  supports?: (document: ResumeDocument) => boolean;
   run: (context: ExportContext) => Promise<Blob>;
 }
 
@@ -103,6 +109,7 @@ const jsonResumeAdapter: ExportAdapter = {
   label: "JSON Resume",
   mimeType: "application/json;charset=utf-8",
   extension: "json",
+  supports: (document) => document.kind !== "coverLetter",
   /**
    * The content in the format other tools read, not a dump of this app's own
    * document: that one is the backup's business, and carries ids and style

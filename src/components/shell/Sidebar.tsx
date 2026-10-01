@@ -7,8 +7,14 @@ import { UNGROUPED } from "@/database/index";
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { GroupRow } from "@/features/resume/components/GroupRow";
-import { useGroupCounts, useGroups } from "@/features/resume/queries";
+import {
+  useGroupCounts,
+  useGroups,
+  useResumes,
+} from "@/features/resume/queries";
 import { cn } from "@/lib/utils";
+
+import type { DocumentKind } from "@/features/resume/model/document";
 
 import { Logo, LogoMark } from "./Logo";
 import {
@@ -28,6 +34,8 @@ interface SidebarProps {
   activeGroupId?: string;
   /** True when the library route is showing everything. */
   allActive: boolean;
+  /** Set when the library route is showing only cover letters. */
+  activeKind?: DocumentKind | undefined;
   /** Asked for the rail. Honoured only where the sidebar is permanent. */
   collapsed: boolean;
 }
@@ -74,6 +82,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
   activeGroupId,
   allActive,
+  activeKind,
   collapsed,
 }) => {
   const { t } = useTranslation("shell");
@@ -97,6 +106,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   );
   const ungroupedCount = counts.data?.get(UNGROUPED);
   const hasGroups = (groups.data?.length ?? 0) > 0;
+  const letterCount = (useResumes().data ?? []).filter(
+    (resume) => resume.kind === "coverLetter",
+  ).length;
 
   return (
     <>
@@ -148,6 +160,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
             active={allActive}
             onNavigate={onNavigate}
           />
+          {/* Only once there is a letter to find, the way the ungrouped row
+              waits for a group: a row that always says zero is clutter. */}
+          {letterCount > 0 || activeKind === "coverLetter" ? (
+            rail ? null : (
+              <Link
+                to="/resumes"
+                search={{ kind: "coverLetter" }}
+                onClick={onNavigate}
+                className={navItemClassName(activeKind === "coverLetter")}
+                aria-current={activeKind === "coverLetter" ? "page" : undefined}
+              >
+                <NavItemContent
+                  icon="envelope-simple"
+                  label={t("sidebar.coverLetters")}
+                  count={letterCount}
+                />
+              </Link>
+            )
+          ) : null}
           <NavLink
             collapsed={rail}
             icon="archive"

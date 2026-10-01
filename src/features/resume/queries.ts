@@ -265,6 +265,16 @@ export const useExportResumeBundle = () =>
     },
   });
 
+export const useCreateLetter = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: (input: { sourceId: string; title: string }) =>
+      resumeRepo.createLetterFrom(input.sourceId, input.title),
+    onSuccess: () => invalidateLibrary(client),
+  });
+};
+
 export const useCreateVersion = () => {
   const client = useQueryClient();
 

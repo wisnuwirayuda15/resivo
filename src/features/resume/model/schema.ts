@@ -6,6 +6,7 @@ import {
   MARKS,
   PAPER_SIZES,
   SECTION_KINDS,
+  DOCUMENT_KINDS,
   TEMPLATE_IDS,
 } from "./document";
 
@@ -303,6 +304,7 @@ export const documentSchema = z.object({
    * which can explain the version mismatch rather than guessing at the shape.
    */
   schemaVersion: z.number().int().min(1).max(DOCUMENT_VERSION),
+  kind: z.enum(DOCUMENT_KINDS).optional(),
   templateId: z.enum(TEMPLATE_IDS),
   meta: metaSchema,
   content: contentSchema,

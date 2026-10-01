@@ -15,6 +15,7 @@ export const guide = {
   button: "Guide",
   tabs: "Guide",
   copyPrompt: "Copy the AI prompt",
+  copyLetterPrompt: "Copy the prompt for a cover letter",
   copyGuide: "Copy this guide",
   copied: "Copied",
   promptNote:
@@ -73,6 +74,29 @@ export const guide = {
           body: [
             "CommonMark and GFM, and all of it is typeset: headings, bullet and numbered lists at any depth, task lists, tables, quotes, code fences, thematic breaks, and bold, italic and links inline.",
             "What the model cannot represent (raw HTML, footnotes, link reference definitions) is kept verbatim and reported as a warning rather than silently dropped. Text that arrives above the first heading goes into an untitled section instead of being refused.",
+          ],
+        },
+      },
+    },
+    letters: {
+      title: "Cover letters",
+      intro:
+        "A cover letter is a document like any other here, and the same file format: your name and contacts at the top, then paragraphs. The only difference is that it has no section headings to draw.",
+      sections: {
+        shape: {
+          title: "The shape of a letter",
+          body: [
+            "The header is the same as a resume's: `#` is the sender's name, and the `::contact` lines are the details a reply would use.",
+            "Then a line with only `##`. That is the letter's one section, and it has no title: the paper draws nothing for it, and the Markdown writes it back exactly as it is, so leave it where it is.",
+            "Everything after it is paragraphs, one to a line with a blank line between: the date, the recipient, the greeting, the body, the closing and your name. Setting an address as several short paragraphs is fine, and is spaced like several.",
+          ],
+        },
+        habits: {
+          title: "Length, and what a letter is checked for",
+          body: [
+            "A letter is one page. The ATS tab asks for that, and says so in words when the letter runs past about 450 of them.",
+            "It does not ask a letter for an Experience section or for dates, because a letter has none. It still reads your name and contacts, the type size and the margins, and whether any text is hidden.",
+            "A letter starts from a larger body, an inch of margin and more space between paragraphs than a resume has, and keeps whatever template you chose for its type and colour.",
           ],
         },
       },

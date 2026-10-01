@@ -22,6 +22,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import type { Recipe } from "@/features/editor/mutations";
 import type {
   DesignConfig,
+  DocumentKind,
   TemplateId,
 } from "@/features/resume/model/document";
 
@@ -41,6 +42,8 @@ import type {
 interface TemplateSwitcherProps {
   templateId: TemplateId;
   design: DesignConfig;
+  /** What the open document is, since a letter's defaults are not a resume's. */
+  kind?: DocumentKind;
   apply: (recipe: Recipe) => void;
 }
 
@@ -79,6 +82,7 @@ const TemplateSwatch: React.FC<{ id: TemplateId }> = ({ id }) => {
 export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
   templateId,
   design,
+  kind = "resume",
   apply,
 }) => {
   const [pending, setPending] = useState<TemplateId | null>(null);
@@ -91,7 +95,7 @@ export const TemplateSwitcher: React.FC<TemplateSwitcherProps> = ({
       return;
     }
 
-    if (designMatchesTemplate(design, templateId)) {
+    if (designMatchesTemplate(design, templateId, kind)) {
       apply(setTemplate(next, { resetDesign: true }));
       return;
     }

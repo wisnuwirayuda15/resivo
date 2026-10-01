@@ -13,6 +13,7 @@ import { RenameResumeDialog } from "./RenameResumeDialog";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import {
   useArchiveResume,
+  useCreateLetter,
   useDeleteResume,
   useDuplicateResume,
   useExportResumeBundle,
@@ -75,6 +76,7 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
 
   const duplicate = useDuplicateResume();
   const exportBundle = useExportResumeBundle();
+  const createLetter = useCreateLetter();
   const archive = useArchiveResume();
   const restore = useRestoreResume();
   const remove = useDeleteResume();
@@ -154,6 +156,24 @@ export const ResumeLibrary: React.FC<ResumeLibraryProps> = ({
             resume={resume}
             versionCount={versionCounts.get(resume.id) ?? 0}
             onCreateVersion={() => setVersioning(resume)}
+            onCreateLetter={() =>
+              createLetter.mutate(
+                {
+                  sourceId: resume.id,
+                  title: t("card.letterTitle", { title: resume.title }),
+                },
+                {
+                  onSuccess: (created) => {
+                    if (created !== undefined) {
+                      void navigate({
+                        to: "/resumes/$resumeId",
+                        params: { resumeId: created.id },
+                      });
+                    }
+                  },
+                },
+              )
+            }
             onRename={() => setRenaming(resume)}
             groups={groups.data ?? []}
             onDuplicate={() => duplicate.mutate(resume.id)}

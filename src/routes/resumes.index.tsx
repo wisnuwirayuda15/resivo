@@ -26,6 +26,9 @@ import type { SortKey } from "@/features/resume/components/ResumeLibrary";
  */
 const searchSchema = z.object({
   group: z.string().optional(),
+  /** Only letters. A resume view is the library without this, and not a second
+   * value, so the address of "everything" stays what it was. */
+  kind: z.enum(["coverLetter"]).optional(),
   q: z.string().optional(),
   sort: z.enum(["edited", "created", "title"]).default("edited"),
 });
@@ -46,7 +49,7 @@ const SORT_OPTIONS = [
 
 const LibraryRoute: React.FC = () => {
   const { t } = useTranslation("library");
-  const { group, q, sort } = Route.useSearch();
+  const { group, kind, q, sort } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const [newResumeOpen, setNewResumeOpen] = useState(false);
 
@@ -59,10 +62,14 @@ const LibraryRoute: React.FC = () => {
       : (groups.data?.find((candidate) => candidate.id === group)?.name ??
         t("group.ungrouped"));
 
-  const visible =
+  const inGroup =
     group === undefined
       ? resumes.data
       : resumes.data?.filter((resume) => resume.groupId === group);
+  const visible =
+    kind === undefined
+      ? inGroup
+      : inGroup?.filter((resume) => resume.kind === kind);
 
   const setSearch = (patch: { q?: string | undefined; sort?: SortKey }) =>
     navigate({
@@ -72,9 +79,14 @@ const LibraryRoute: React.FC = () => {
 
   return (
     <Shell
-      title={groupName ?? t("title.all")}
+      title={
+        kind === "coverLetter"
+          ? t("title.letters")
+          : (groupName ?? t("title.all"))
+      }
       activeGroupId={group}
-      allActive={group === undefined}
+      activeKind={kind}
+      allActive={group === undefined && kind === undefined}
       actions={
         <>
           {/* Flexible below `sm`, where 200px of search would leave the title
@@ -203,6 +215,7 @@ const LibraryRoute: React.FC = () => {
           opened={newResumeOpen}
           onClose={() => setNewResumeOpen(false)}
           {...(group === undefined ? {} : { defaultGroupId: group })}
+          {...(kind === undefined ? {} : { defaultKind: kind })}
           onCreated={(resumeId) =>
             navigate({ to: "/resumes/$resumeId", params: { resumeId } })
           }

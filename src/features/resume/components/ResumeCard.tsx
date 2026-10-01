@@ -20,6 +20,7 @@ interface ResumeCardProps {
   onRename: () => void;
   onDuplicate: () => void;
   onCreateVersion: () => void;
+  onCreateLetter: () => void;
   onExportBundle: () => void;
   onMove: (groupId: string) => void;
   onArchive: () => void;
@@ -41,6 +42,7 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
   onRename,
   onDuplicate,
   onCreateVersion,
+  onCreateLetter,
   onExportBundle,
   onMove,
   onArchive,
@@ -67,7 +69,11 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
         to="/resumes/$resumeId"
       >
         <Box className="bg-sunken rounded-t-card flex justify-center px-4 pt-5 pb-4">
-          <PaperMiniature size="card" templateId={resume.templateId} />
+          <PaperMiniature
+            kind={resume.kind}
+            size="card"
+            templateId={resume.templateId}
+          />
         </Box>
 
         <Box className="px-3.5 pt-3 pb-3.5">
@@ -85,6 +91,14 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             {t("card.edited")} <RelativeTime value={resume.updatedAt} /> ·{" "}
             {templateText(resume.templateId).name}
           </Text>
+          {resume.kind === "coverLetter" ? (
+            <Text
+              className="text-accent mt-1 truncate text-[11px]"
+              component="div"
+            >
+              {t("card.letterBadge")}
+            </Text>
+          ) : null}
           {/* What a version is for, or how many there are of this one. Said
               under the metadata and not in place of it, so a card is still a
               card whether or not it belongs to a family. */}
@@ -143,6 +157,14 @@ export const ResumeCard: React.FC<ResumeCardProps> = ({
             >
               {t("version.action")}
             </Menu.Item>
+            {resume.kind === "coverLetter" ? null : (
+              <Menu.Item
+                leftSection={<Icon name="envelope-simple" size={15} />}
+                onClick={onCreateLetter}
+              >
+                {t("card.createLetter")}
+              </Menu.Item>
+            )}
             <Menu.Item
               leftSection={<Icon name="file-zip" size={15} />}
               onClick={onExportBundle}

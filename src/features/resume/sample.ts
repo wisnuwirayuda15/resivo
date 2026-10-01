@@ -2,7 +2,11 @@ import { documentFromMarkdown } from "@/features/markdown/index";
 
 import { createEmptyDocument } from "./model/index";
 
-import type { ResumeDocument, TemplateId } from "./model/document";
+import type {
+  DocumentKind,
+  ResumeDocument,
+  TemplateId,
+} from "./model/document";
 
 /**
  * The example resume, written in the format it teaches.
@@ -101,6 +105,54 @@ export const createSampleDocument = (
   documentFromMarkdown(createEmptyDocument(templateId), SAMPLE_SOURCE).document;
 
 /**
+ * The example cover letter, from the same person to the same engineer.
+ *
+ * Written in the format it teaches, and held to the same two tests as the resume
+ * above (it parses without a warning, and it is its own serialization). The bare
+ * `##` is the letter's one untitled section: the flow draws no heading for it,
+ * and the Markdown writes it as it is, so the line is the first thing worth
+ * explaining and the guide does.
+ *
+ * One paragraph per line, for the reason the resume gives. The recipient is one
+ * line because a paragraph is the only block that can hold it, and a letter's
+ * address block set as four paragraphs would be spaced like four.
+ */
+export const SAMPLE_LETTER_SOURCE = `# Ada Lovelace
+
+Mathematician
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[+44 20 7946 0958]{icon="phone"}
+::contact[London, UK]{icon="map-pin"}
+
+##
+
+14 March 1843
+
+Charles Babbage, Difference Engine Co., London
+
+Dear Mr. Babbage,
+
+I am writing about the Analytical Engine, and to ask whether I might join the work on it. I have translated Menabrea's account of the machine, and in the course of it I found there was more to say than he had set down.
+
+My notes are three times the length of the memoir. The longest of them describes how the engine could compute the Bernoulli numbers, which I believe is the first program written for a machine that does not yet exist. I would welcome the chance to show you how it was done, and what else I think the engine could be made to do.
+
+Thank you for your time, and for the machine.
+
+Yours sincerely,
+
+Ada Lovelace
+`;
+
+export const createSampleLetter = (
+  templateId: TemplateId = "classic",
+): ResumeDocument =>
+  documentFromMarkdown(
+    createEmptyDocument(templateId, "en", "coverLetter"),
+    SAMPLE_LETTER_SOURCE,
+  ).document;
+
+/**
  * What a new resume starts as.
  *
  * Two, and only two. A gallery of starting points is a second template picker
@@ -120,7 +172,15 @@ export const createStartingDocument = (
   start: ResumeStart,
   templateId: TemplateId,
   locale = "en",
-): ResumeDocument =>
-  start === "blank"
+  kind: DocumentKind = "resume",
+): ResumeDocument => {
+  if (kind === "coverLetter") {
+    return start === "blank"
+      ? createEmptyDocument(templateId, locale, kind)
+      : createSampleLetter(templateId);
+  }
+
+  return start === "blank"
     ? createEmptyDocument(templateId, locale)
     : createSampleDocument(templateId);
+};

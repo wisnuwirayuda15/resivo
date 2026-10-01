@@ -2,8 +2,8 @@ import { contactRules } from "./rules/contact";
 import { contentRules } from "./rules/content";
 import { cssRules } from "./rules/css";
 import { dateRules } from "./rules/dates";
-import { lengthRules } from "./rules/length";
-import { structureRules } from "./rules/structure";
+import { lengthRules, letterLengthRules } from "./rules/length";
+import { letterStructureRules, structureRules } from "./rules/structure";
 import { typographyRules } from "./rules/typography";
 
 import type { ResumeDocument } from "@/features/resume/model/document";
@@ -31,6 +31,20 @@ export const RULES: ReadonlyArray<AtsRule> = [
   ...lengthRules,
 ];
 
+/**
+ * What is asked of a cover letter. The questions about identity, type and
+ * hidden text are the same as for a resume (a parser reads the letter's header
+ * and a recruiter reads its body at the same size), and the ones about sections,
+ * dates, entries and bullets have nothing to look at, so they are not asked.
+ */
+export const LETTER_RULES: ReadonlyArray<AtsRule> = [
+  ...contactRules,
+  ...letterStructureRules,
+  ...typographyRules,
+  ...cssRules,
+  ...letterLengthRules,
+];
+
 /** Nothing measured. What a caller without a paper to ask gets. */
 export const NO_CONTEXT: AtsContext = { pageCount: null };
 
@@ -51,6 +65,6 @@ export const checkDocument = (
   document: ResumeDocument,
   context: AtsContext = NO_CONTEXT,
 ): Array<AtsIssue> =>
-  RULES.flatMap((rule) => rule(document, context)).sort(
-    (a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity],
-  );
+  (document.kind === "coverLetter" ? LETTER_RULES : RULES)
+    .flatMap((rule) => rule(document, context))
+    .sort((a, b) => SEVERITY_ORDER[a.severity] - SEVERITY_ORDER[b.severity]);

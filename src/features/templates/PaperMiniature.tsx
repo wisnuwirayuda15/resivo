@@ -2,7 +2,10 @@ import { Box } from "@mantine/core";
 
 import { cn } from "@/lib/utils";
 
-import type { TemplateId } from "@/features/resume/model/document";
+import type {
+  DocumentKind,
+  TemplateId,
+} from "@/features/resume/model/document";
 
 /**
  * A resume shown as ruled bars rather than as type.
@@ -90,12 +93,15 @@ const LINES = [0, 1, 2];
 
 interface PaperMiniatureProps {
   templateId: TemplateId;
+  /** A letter is drawn as a header and a run of paragraphs, with no headings. */
+  kind?: DocumentKind;
   size: PaperMiniatureSize;
   className?: string;
 }
 
 export const PaperMiniature: React.FC<PaperMiniatureProps> = ({
   templateId,
+  kind = "resume",
   size,
   className,
 }) => {
@@ -127,29 +133,49 @@ export const PaperMiniature: React.FC<PaperMiniatureProps> = ({
         </Box>
       </Box>
 
-      {Array.from({ length: metrics.sections }, (_, section) => (
-        <Box className={metrics.section} key={section}>
-          <Box className={cn(metrics.heading, "bg-[var(--paper-accent)]")} />
-          <Box
-            className={cn(
-              "mt-[2px]",
-              boldRule
-                ? "h-[2px] bg-[var(--paper-accent)]"
-                : "h-px bg-[var(--paper-rule)]",
-            )}
-          />
-          {LINES.map((line) => (
+      {kind === "coverLetter" ? (
+        <Box className={metrics.section}>
+          {Array.from({ length: 3 * metrics.sections }, (_, line) => (
             <Box
               className={cn(
                 metrics.line,
                 "bg-[var(--paper-ink-muted)] opacity-50",
-                line === LINES.length - 1 ? "w-[64%]" : "w-full",
+                // A paragraph ends on a short line, and a gap follows it.
+                line % 3 === 2 ? "mb-[3px] w-[60%]" : "w-full",
               )}
               key={line}
             />
           ))}
         </Box>
-      ))}
+      ) : null}
+
+      {kind === "coverLetter"
+        ? null
+        : Array.from({ length: metrics.sections }, (_, section) => (
+            <Box className={metrics.section} key={section}>
+              <Box
+                className={cn(metrics.heading, "bg-[var(--paper-accent)]")}
+              />
+              <Box
+                className={cn(
+                  "mt-[2px]",
+                  boldRule
+                    ? "h-[2px] bg-[var(--paper-accent)]"
+                    : "h-px bg-[var(--paper-rule)]",
+                )}
+              />
+              {LINES.map((line) => (
+                <Box
+                  className={cn(
+                    metrics.line,
+                    "bg-[var(--paper-ink-muted)] opacity-50",
+                    line === LINES.length - 1 ? "w-[64%]" : "w-full",
+                  )}
+                  key={line}
+                />
+              ))}
+            </Box>
+          ))}
     </Box>
   );
 };

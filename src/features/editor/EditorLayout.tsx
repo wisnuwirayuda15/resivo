@@ -162,7 +162,13 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
       className="h-full"
       document={document}
       onPaperSizeChange={(size) => apply(patchDesign({ paper: { size } }))}
-      title={document.meta.fullName}
+      // The file name an export is given. A letter is named for being one, so
+      // the two documents of one person do not both download as their name.
+      title={
+        document.kind === "coverLetter"
+          ? t("export.letterFile", { name: document.meta.fullName })
+          : document.meta.fullName
+      }
     />
   );
 

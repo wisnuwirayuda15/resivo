@@ -49,6 +49,7 @@ export const ATS_RULE_NAMES = [
   "summary-long",
   "entry-empty",
   "page-count",
+  "letter-long",
 ] as const;
 
 export type AtsRuleName = (typeof ATS_RULE_NAMES)[number];

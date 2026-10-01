@@ -711,7 +711,7 @@ export const setTemplate =
     draft.templateId = templateId;
 
     if (options.resetDesign) {
-      draft.design = templateDefaults(templateId);
+      draft.design = templateDefaults(templateId, draft.kind);
     }
   };
 

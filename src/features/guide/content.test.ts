@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { parseDocument } from "@/features/markdown/index";
+import { parseDocument, serializeDocument } from "@/features/markdown/index";
+import { createSampleLetter } from "@/features/resume/sample";
 import { sanitizeCss } from "@/features/css/sanitize";
 import {
   CONTACT_DIRECTIVE,
@@ -16,6 +17,7 @@ import { SUPPORTED_LANGUAGES } from "@/lib/i18n/language";
 
 import {
   AI_PROMPT,
+  AI_PROMPT_LETTER,
   GUIDE,
   guideMarkdown,
   guideWords,
@@ -134,6 +136,28 @@ describe("the writing guide", () => {
     }
 
     expect(AI_PROMPT).toContain(`Do not write \`::${IMAGE_DIRECTIVE}\``);
+  });
+
+  describe("the cover letter prompt", () => {
+    it("states the letter format: a sender, contacts, and one untitled section", () => {
+      expect(AI_PROMPT_LETTER).toContain(`::${CONTACT_DIRECTIVE}[`);
+      expect(AI_PROMPT_LETTER).toContain("A line containing only `##`");
+    });
+
+    it("forbids what a letter has no use for, and inventing what the author never gave", () => {
+      expect(AI_PROMPT_LETTER).toContain(
+        `Do not use \`::${ENTRY_DIRECTIVE}\`, \`::${TAGS_DIRECTIVE}\` or \`::${IMAGE_DIRECTIVE}\``,
+      );
+      expect(AI_PROMPT_LETTER).toContain("Do not invent a recipient");
+    });
+
+    it("describes a document the codec reads back without a warning", () => {
+      // The shape the prompt asks for is the shape the example letter has, and
+      // that is what is parsed here.
+      const letter = createSampleLetter();
+
+      expect(parseDocument(serializeDocument(letter)).warnings).toEqual([]);
+    });
   });
 
   describe.each(SUPPORTED_LANGUAGES)(

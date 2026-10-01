@@ -171,3 +171,15 @@ export const structureRules: Array<AtsRule> = [
   imageAltMissing,
   avatarPresent,
 ];
+
+/**
+ * What still applies to a letter. The section rules do not: a letter has one
+ * section with no title on purpose, and no summary, experience or education to be
+ * missing. A table, a block of raw source and an image with no description are as
+ * much trouble in a letter as in a resume.
+ */
+export const letterStructureRules: Array<AtsRule> = [
+  tableUsed,
+  rawBlock,
+  imageAltMissing,
+];

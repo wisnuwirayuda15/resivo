@@ -122,16 +122,27 @@ export const documentFlow = (
       pendingBreak = true;
     }
 
-    push({
-      id: `section:${section.id}`,
-      type: "sectionHeading",
-      sectionId: section.id,
-      // Nothing follows an empty section's heading, so there is nothing to keep
-      // it with; forcing a break would only push a lone heading to the next page.
-      ...(section.blocks.length > 0 && keepHeadings
-        ? { keepWithNext: true }
-        : {}),
-    });
+    /**
+     * A letter has no section headings to draw. Without this the untitled
+     * section still contributed a heading item, which renders as an empty box
+     * the height of a section's spacing at the top of the page, and the letter
+     * began a third of an inch lower than its margin said.
+     *
+     * A forced break set above is not lost: it stays pending and lands on the
+     * section's first block.
+     */
+    if (document.kind !== "coverLetter") {
+      push({
+        id: `section:${section.id}`,
+        type: "sectionHeading",
+        sectionId: section.id,
+        // Nothing follows an empty section's heading, so there is nothing to keep
+        // it with; forcing a break would only push a lone heading to the next page.
+        ...(section.blocks.length > 0 && keepHeadings
+          ? { keepWithNext: true }
+          : {}),
+      });
+    }
 
     for (const block of section.blocks) {
       push({

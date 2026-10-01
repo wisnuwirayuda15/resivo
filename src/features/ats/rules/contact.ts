@@ -2,7 +2,10 @@ import { plainText } from "@/features/resume/model/factory";
 
 import { makeIssue } from "./helpers";
 
-import type { ContactItem } from "@/features/resume/model/document";
+import type {
+  ContactItem,
+  ResumeDocument,
+} from "@/features/resume/model/document";
 import type { AtsRule } from "../types";
 
 /**
@@ -36,11 +39,21 @@ const isPhone = (contact: ContactItem): boolean =>
   contact.href?.toLowerCase().startsWith("tel:") === true ||
   digitCount(labelOf(contact)) >= PHONE_MIN_DIGITS;
 
+/**
+ * Params that pick the wording for a letter, where a sentence says "resume".
+ * Nothing for a resume, so its issues carry the params they always did.
+ */
+const letterContext = (
+  document: ResumeDocument,
+): { params?: { context: string } } =>
+  document.kind === "coverLetter" ? { params: { context: "letter" } } : {};
+
 const nameMissing: AtsRule = (document) =>
   plainText(document.content.header.name).trim() === ""
     ? [
         makeIssue("ats.name-missing", "header", {
           severity: "error",
+          ...letterContext(document),
         }),
       ]
     : [];
@@ -51,6 +64,7 @@ const emailMissing: AtsRule = (document) =>
     : [
         makeIssue("ats.email-missing", "header", {
           severity: "warning",
+          ...letterContext(document),
         }),
       ];
 

@@ -39,12 +39,17 @@ export const ats = {
   rules: {
     "name-missing": {
       message: "The resume has no name.",
+      message_letter: "The letter has no sender name.",
       why: "A parser reads the first line as the candidate's name, and a resume without one is filed under nobody.",
+      why_letter:
+        "The name at the top is how the letter is filed and how a reader knows whom it is from. Without one it is signed by nobody.",
       where: "Header",
     },
     "email-missing": {
       message: "No email address in the contact details.",
       why: "Most systems create the candidate record from the email, and a resume without one often cannot be matched or contacted.",
+      why_letter:
+        "A reply goes to the address in the header, and a letter without one cannot be answered.",
       where: "Header, contact details",
     },
     "phone-missing": {
@@ -196,7 +201,15 @@ export const ats = {
     },
     "page-count": {
       message: "The resume runs to {{count}} pages.",
+      message_letter: "The letter runs to {{count}} pages.",
       why: "Screening is a quick first pass, so what falls on a third page is rarely reached, and long resumes are often set aside unread.",
+      why_letter:
+        "A cover letter is read in seconds and is expected to fit on one page. A second page is rarely reached.",
+      where: "Whole document",
+    },
+    "letter-long": {
+      message: "The letter is about {{count}} words.",
+      why: "A letter is read at a glance. Past roughly 450 words it either needs a smaller type or a second page, and what it says is easier to find in fewer.",
       where: "Whole document",
     },
   },

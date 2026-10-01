@@ -12,6 +12,11 @@ export const commands = {
     description: "Pilih template, atau impor berkas",
     keywords: "buat tambah impor create add import",
   },
+  newLetter: {
+    label: "Surat lamaran baru",
+    description: "Tulis surat untuk menyertai resume",
+    keywords: "buat tambah surat lamaran letter application",
+  },
   newGroup: {
     label: "Grup baru",
     description: "Folder untuk sekumpulan resume",

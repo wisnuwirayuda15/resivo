@@ -18,6 +18,7 @@ import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 
 import {
   AI_PROMPT,
+  AI_PROMPT_LETTER,
   GUIDE,
   guideMarkdown,
   guideWords,
@@ -194,6 +195,12 @@ export const GuideDrawer: React.FC<GuideDrawerProps> = ({
               label={t("copyPrompt")}
               primary
               value={AI_PROMPT}
+            />
+            <Copy
+              copiedLabel={t("copied")}
+              icon="envelope-simple"
+              label={t("copyLetterPrompt")}
+              value={AI_PROMPT_LETTER}
             />
             <Copy
               copiedLabel={t("copied")}

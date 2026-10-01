@@ -57,6 +57,7 @@ export const editor = {
         hint: "Resume ini beserta gambar, font, dan gayanya. Impor di mana saja dan tampilannya sama.",
       },
     },
+    letterFile: "Surat lamaran {{name}}",
     failed: "Ekspor tidak dapat ditulis.",
   },
   versions: {
@@ -124,11 +125,11 @@ export const editor = {
     delete: "Hapus",
   },
   route: {
-    couldNotOpen: "Resume ini tidak dapat dibuka",
+    couldNotOpen: "Dokumen ini tidak dapat dibuka",
     couldNotRead: "Dokumen yang tersimpan tidak dapat dibaca.",
-    notFound: "Resume tidak ditemukan",
+    notFound: "Dokumen tidak ditemukan",
     notFoundBody:
       "Mungkin sudah dihapus di perangkat ini. Kembali ke pustaka untuk melihat apa yang ada.",
-    untitled: "Resume",
+    untitled: "Tanpa judul",
   },
 } satisfies Widen<typeof en>;

@@ -90,6 +90,22 @@ template or style differs. Cards say what a version is for and how many a
 resume has, and search finds the company or role. Deleting the original keeps
 its versions as ordinary resumes that still say what they were written for.
 
+**Cover letters.** A letter is a document of its own kind, made from the same
+dialog, with an example or a blank page, or from a resume's menu, which copies
+the header and, for a version, the company as the recipient. It lives in the
+same table, route and editor as a resume and is paginated and exported by the
+same pipeline; what differs is four small things. The paper draws no section
+headings for it, so nothing sits above the first paragraph. Its design starts as
+a letter's (an inch of margin, an 11pt body, lines 1.5 apart, a paragraph's worth
+of space between paragraphs) over whichever template you picked. The ATS tab
+asks it letter questions: a name, an email, type and margins, hidden text, one
+page and about 450 words, and not the sections, dates and entries a resume has.
+And the library files it apart, behind a Cover letters row in the sidebar. The
+guide has a chapter for letters and a prompt to copy for writing one with an
+assistant, which tells the model not to invent a recipient, a company or an
+achievement. JSON Resume is not offered for a letter, because it has nowhere to
+put one.
+
 **Library.** Multiple resumes, organised into groups, with search, sort,
 duplicate and archive. Archived resumes are hidden, never deleted.
 

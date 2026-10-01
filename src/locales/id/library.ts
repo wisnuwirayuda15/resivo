@@ -4,6 +4,7 @@ import type { library as en } from "../en/library";
 export const library = {
   title: {
     all: "Semua resume",
+    letters: "Surat lamaran",
     archived: "Diarsipkan",
   },
   search: {
@@ -41,6 +42,9 @@ export const library = {
     archive: "Arsipkan",
     restore: "Pulihkan",
     delete: "Hapus",
+    letterBadge: "Surat lamaran",
+    createLetter: "Buat surat lamaran",
+    letterTitle: "Surat lamaran {{title}}",
     exportZip: "Ekspor sebagai zip",
     exportFailed: "Bundel untuk {{title}} tidak dapat ditulis.",
   },
@@ -86,6 +90,15 @@ export const library = {
       "Resume jadi untuk disunting, lengkap dengan entri, tanggal, dan daftar keahlian yang sudah tertulis.",
     blankHint:
       "Empat bagian yang hampir selalu ada di resume, semuanya kosong.",
+    kind: "Jenis dokumen",
+    kindResume: "Resume",
+    kindLetter: "Surat lamaran",
+    exampleLetter: "Surat contoh",
+    blankLetter: "Surat kosong",
+    exampleLetterHint:
+      "Surat jadi untuk ditulis ulang, lengkap dengan salam, tiga paragraf, dan penutup yang sudah ada.",
+    blankLetterHint:
+      "Nama dan kontak Anda di atas dan satu halaman kosong untuk menulis.",
     importedHint: "Berkas yang diimpor menentukan isi halaman.",
     name: "Nama",
     namePlaceholder: "Lamaran Staff Engineer 2026",

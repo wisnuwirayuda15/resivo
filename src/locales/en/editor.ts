@@ -62,6 +62,7 @@ export const editor = {
         hint: "This resume with its images, fonts and style. Import it anywhere and it looks the same.",
       },
     },
+    letterFile: "{{name}} cover letter",
     failed: "The export could not be written.",
   },
   versions: {
@@ -128,11 +129,11 @@ export const editor = {
     delete: "Delete",
   },
   route: {
-    couldNotOpen: "This resume could not be opened",
+    couldNotOpen: "This document could not be opened",
     couldNotRead: "The stored document could not be read.",
-    notFound: "Resume not found",
+    notFound: "Document not found",
     notFoundBody:
       "It may have been deleted on this device. Go back to the library to see what is there.",
-    untitled: "Resume",
+    untitled: "Untitled",
   },
 } as const;

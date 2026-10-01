@@ -3,6 +3,7 @@ import { assertNever } from "@/lib/assert-never";
 
 import type {
   DesignConfig,
+  DocumentKind,
   FontRef,
   TemplateId,
 } from "@/features/resume/model/document";
@@ -77,7 +78,10 @@ const base = (): DesignConfig => ({
  * Deep-clones so callers can freely mutate the document they are handed, a
  * shared nested object would otherwise leak edits across resumes.
  */
-export const templateDefaults = (templateId: TemplateId): DesignConfig => {
+export const templateDefaults = (
+  templateId: TemplateId,
+  kind: DocumentKind = "resume",
+): DesignConfig => {
   const design = base();
 
   switch (templateId) {
@@ -157,6 +161,30 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
       return assertNever(templateId);
   }
 
+  return kind === "coverLetter" ? asLetter(design) : design;
+};
+
+/**
+ * A template's tokens, adjusted for a letter.
+ *
+ * A letter is read start to finish and not scanned, so it is set the way a letter
+ * is: an inch of margin, a body no smaller than 11pt, lines 1.5 apart and a
+ * paragraph's worth of space between paragraphs. A letter that kept the resume's
+ * 9.5pt and 0.5in would be the densest page the recipient is sent.
+ *
+ * Applied last, over whichever template, so the template still decides the
+ * faces and the colours, and a letter in Compact is a letter in its type and
+ * not its measures. Every place that asks what a template's defaults are takes
+ * the kind (the switch, the "keep your customisations" check, the ATS fixes that
+ * restore a colour), because otherwise a letter would look customised the moment
+ * it was made.
+ */
+const asLetter = (design: DesignConfig): DesignConfig => {
+  design.typography.baseSize = Math.max(design.typography.baseSize, 11);
+  design.typography.lineHeight = 1.5;
+  design.paper.margin = { top: 1, right: 1, bottom: 1, left: 1 };
+  design.spacing.paragraph = 0.7;
+
   return design;
 };
 
@@ -177,8 +205,9 @@ export const templateDefaults = (templateId: TemplateId): DesignConfig => {
 export const designMatchesTemplate = (
   design: DesignConfig,
   templateId: TemplateId,
+  kind: DocumentKind = "resume",
 ): boolean => {
-  const seeded = templateDefaults(templateId);
+  const seeded = templateDefaults(templateId, kind);
 
   return deepEqual(
     { ...design, paper: { ...design.paper, size: seeded.paper.size } },

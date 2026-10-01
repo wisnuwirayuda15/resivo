@@ -88,7 +88,7 @@ const marginsNarrow: AtsRule = (document) => {
 };
 
 const contrastLow: AtsRule = (document) => {
-  const defaults = templateDefaults(document.templateId).colors;
+  const defaults = templateDefaults(document.templateId, document.kind).colors;
 
   return TEXT_TOKENS.flatMap((token) => {
     const ratio = contrastOnPaper(document.design.colors[token]);
@@ -124,7 +124,10 @@ const contrastLow: AtsRule = (document) => {
 type FontSlot = "bodyFont" | "headingFont";
 
 const fontCustom: AtsRule = (document) => {
-  const defaults = templateDefaults(document.templateId).typography;
+  const defaults = templateDefaults(
+    document.templateId,
+    document.kind,
+  ).typography;
   const slots: Array<{ slot: FontSlot; name: string }> = [
     { slot: "bodyFont", name: "body" },
     { slot: "headingFont", name: "heading" },

@@ -6,6 +6,7 @@ import { sectionTitle } from "./sectionTitles";
 
 import type {
   ContactItem,
+  DocumentKind,
   IconRef,
   InlineText,
   ResumeDocument,
@@ -83,8 +84,12 @@ export const createSection = (
 export const createEmptyDocument = (
   templateId: TemplateId = "classic",
   locale = "en",
+  kind: DocumentKind = "resume",
 ): ResumeDocument => ({
   schemaVersion: DOCUMENT_VERSION,
+  // Written only for a letter, so a resume is byte for byte what it was before
+  // the field existed.
+  ...(kind === "coverLetter" ? { kind } : {}),
   templateId,
   meta: { fullName: "", locale },
   content: {
@@ -92,14 +97,21 @@ export const createEmptyDocument = (
       name: [],
       contacts: [],
     },
-    sections: [
-      createSection("summary", sectionTitle("summary", locale)),
-      createSection("experience", sectionTitle("experience", locale)),
-      createSection("education", sectionTitle("education", locale)),
-      createSection("skills", sectionTitle("skills", locale)),
-    ],
+    sections:
+      kind === "coverLetter"
+        ? // One section with no title: a letter is a run of paragraphs, and the
+          // flow draws no heading for it. The title is empty and not hidden
+          // because the Markdown writes a bare `##` for it, which reads back as
+          // the same section.
+          [createSection("custom", "")]
+        : [
+            createSection("summary", sectionTitle("summary", locale)),
+            createSection("experience", sectionTitle("experience", locale)),
+            createSection("education", sectionTitle("education", locale)),
+            createSection("skills", sectionTitle("skills", locale)),
+          ],
   },
-  design: templateDefaults(templateId),
+  design: templateDefaults(templateId, kind),
   customCss: "",
 });
 

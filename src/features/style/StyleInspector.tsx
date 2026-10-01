@@ -102,6 +102,7 @@ export const StyleInspector: React.FC<StyleInspectorProps> = ({
                 <TemplateSwitcher
                   apply={apply}
                   design={document.design}
+                  kind={document.kind ?? "resume"}
                   templateId={document.templateId}
                 />
               </ControlGroup>

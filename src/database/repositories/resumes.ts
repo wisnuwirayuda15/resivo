@@ -1,11 +1,13 @@
 import { createId } from "@/lib/id";
 import { createEmptyDocument, syncMeta } from "@/features/resume/model/index";
+import { letterFromResume } from "@/features/resume/model/letterStarter";
 
 import { getDb } from "../db";
 import { migrateDocument } from "../migrations/documents";
 import { NOT_ARCHIVED, UNGROUPED } from "../records";
 
 import type {
+  DocumentKind,
   ResumeDocument,
   TemplateId,
 } from "@/features/resume/model/document";
@@ -25,6 +27,9 @@ export type ResumeSummary = Omit<ResumeRecord, "document"> & {
   fullName: string;
   headline?: string;
   templateId: TemplateId;
+  /** Always set here, so the library never has to remember that a missing kind
+   * means a resume. */
+  kind: DocumentKind;
 };
 
 const toSummary = (record: ResumeRecord): ResumeSummary => {
@@ -37,6 +42,7 @@ const toSummary = (record: ResumeRecord): ResumeSummary => {
       ? {}
       : { headline: document.meta.headline }),
     templateId: document.templateId,
+    kind: document.kind ?? "resume",
   };
 };
 
@@ -249,6 +255,33 @@ export const createVersion = async (
     document: structuredClone(source.document),
     baseId: source.baseId ?? source.id,
     target,
+  });
+};
+
+/**
+ * A cover letter begun from a resume or a version of one.
+ *
+ * It takes the header and, when the source was written for a job, that job as
+ * the recipient and as its own target, so the letter is found by the same
+ * company in the library. It is not a version: nothing links it to the resume,
+ * because the two are not comparable and a letter has no "base" in the sense a
+ * tailored resume does.
+ */
+export const createLetterFrom = async (
+  sourceId: string,
+  title: string,
+): Promise<ResumeRecord | undefined> => {
+  const source = await getResume(sourceId);
+
+  if (source === undefined) {
+    return undefined;
+  }
+
+  return createResume({
+    title,
+    groupId: source.groupId,
+    document: letterFromResume(source.document, source.target?.company),
+    ...(source.target === undefined ? {} : { target: source.target }),
   });
 };
 

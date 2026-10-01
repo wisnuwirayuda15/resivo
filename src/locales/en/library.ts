@@ -9,6 +9,7 @@
 export const library = {
   title: {
     all: "All resumes",
+    letters: "Cover letters",
     archived: "Archived",
   },
   search: {
@@ -46,6 +47,9 @@ export const library = {
     archive: "Archive",
     restore: "Restore",
     delete: "Delete",
+    letterBadge: "Cover letter",
+    createLetter: "Create cover letter",
+    letterTitle: "{{title}} cover letter",
     exportZip: "Export as zip",
     exportFailed: "The bundle for {{title}} could not be written.",
   },
@@ -90,6 +94,15 @@ export const library = {
     exampleHint:
       "A finished resume to edit over, with entries, dates and a skills list already written.",
     blankHint: "The four sections almost every resume has, each empty.",
+    kind: "Kind of document",
+    kindResume: "Resume",
+    kindLetter: "Cover letter",
+    exampleLetter: "Example letter",
+    blankLetter: "Blank letter",
+    exampleLetterHint:
+      "A finished letter to write over, with a greeting, three paragraphs and a sign-off already there.",
+    blankLetterHint:
+      "Your name and contacts at the top and one empty page to write on.",
     importedHint: "The imported file decides what is on the page.",
     name: "Name",
     namePlaceholder: "Staff Engineer 2026",

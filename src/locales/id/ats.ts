@@ -33,11 +33,16 @@ export const ats = {
   rules: {
     "name-missing": {
       message: "Resume ini tidak memiliki nama.",
+      message_letter: "Surat ini tidak memiliki nama pengirim.",
+      why_letter:
+        "Nama di bagian atas adalah cara surat diarsipkan dan cara pembaca tahu dari siapa surat itu. Tanpanya surat ditandatangani oleh siapa pun.",
       why: "Parser membaca baris pertama sebagai nama kandidat, dan resume tanpa nama tersimpan atas nama siapa pun.",
       where: "Header",
     },
     "email-missing": {
       message: "Tidak ada alamat email di kontak.",
+      why_letter:
+        "Balasan dikirim ke alamat di header, dan surat tanpa alamat tidak dapat dibalas.",
       why: "Kebanyakan sistem membuat catatan kandidat dari email, dan resume tanpa email sering tidak dapat dicocokkan atau dihubungi.",
       where: "Header, kontak",
     },
@@ -192,7 +197,15 @@ export const ats = {
     },
     "page-count": {
       message: "Resume ini mencapai {{count}} halaman.",
+      message_letter: "Surat ini mencapai {{count}} halaman.",
+      why_letter:
+        "Surat lamaran dibaca dalam hitungan detik dan diharapkan muat di satu halaman. Halaman kedua jarang terbaca.",
       why: "Penyaringan adalah tahap pertama yang cepat, jadi yang jatuh di halaman ketiga jarang terbaca, dan resume yang panjang sering disisihkan tanpa dibaca.",
+      where: "Seluruh dokumen",
+    },
+    "letter-long": {
+      message: "Surat ini sekitar {{count}} kata.",
+      why: "Surat dibaca sekilas. Melewati sekitar 450 kata, ia memerlukan huruf lebih kecil atau halaman kedua, dan isinya lebih mudah ditemukan dalam lebih sedikit kata.",
       where: "Seluruh dokumen",
     },
   },

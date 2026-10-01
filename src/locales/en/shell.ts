@@ -17,6 +17,7 @@ export const shell = {
   sidebar: {
     newResume: "New resume",
     allResumes: "All resumes",
+    coverLetters: "Cover letters",
     archived: "Archived",
     groups: "Groups",
     ungrouped: "Ungrouped",

@@ -122,20 +122,22 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
           <Menu.Divider />
           <Menu.Label>{t("export.file")}</Menu.Label>
 
-          {exportAdapters.map((adapter) => (
-            <Menu.Item
-              key={adapter.format}
-              leftSection={
-                <Icon name={ICONS[adapter.format] ?? "file-text"} size={14} />
-              }
-              onClick={() => void run(adapter.format)}
-            >
-              <Text className="text-[13px]">{adapter.label}</Text>
-              <Text className="text-subtle text-[11px]">
-                {t(`export.formats.${adapter.format}.hint`)}
-              </Text>
-            </Menu.Item>
-          ))}
+          {exportAdapters
+            .filter((adapter) => adapter.supports?.(resume) ?? true)
+            .map((adapter) => (
+              <Menu.Item
+                key={adapter.format}
+                leftSection={
+                  <Icon name={ICONS[adapter.format] ?? "file-text"} size={14} />
+                }
+                onClick={() => void run(adapter.format)}
+              >
+                <Text className="text-[13px]">{adapter.label}</Text>
+                <Text className="text-subtle text-[11px]">
+                  {t(`export.formats.${adapter.format}.hint`)}
+                </Text>
+              </Menu.Item>
+            ))}
         </Menu.Dropdown>
       </Menu>
     </Box>

@@ -32,6 +32,7 @@ import type { SpotlightActionGroupData } from "@mantine/spotlight";
 
 interface CommandPaletteProps {
   onNewResume: () => void;
+  onNewLetter: () => void;
   onNewGroup: () => void;
   onShowShortcuts: () => void;
   onStartTour: () => void;
@@ -40,6 +41,7 @@ interface CommandPaletteProps {
 
 export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onNewResume,
+  onNewLetter,
   onNewGroup,
   onShowShortcuts,
   onStartTour,
@@ -65,6 +67,14 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           keywords: t("newResume.keywords"),
           leftSection: <Icon name="file-plus" size={16} />,
           onClick: onNewResume,
+        },
+        {
+          id: "new-letter",
+          label: t("newLetter.label"),
+          description: t("newLetter.description"),
+          keywords: t("newLetter.keywords"),
+          leftSection: <Icon name="envelope-simple" size={16} />,
+          onClick: onNewLetter,
         },
         {
           id: "new-group",

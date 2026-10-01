@@ -16,6 +16,7 @@ import { Sidebar } from "./Sidebar";
 import { applySidebarCollapsed, readSidebarCollapsed } from "./sidebarState";
 
 import type { ReactNode } from "react";
+import type { DocumentKind } from "@/features/resume/model/document";
 
 interface ShellProps {
   title: string;
@@ -24,6 +25,8 @@ interface ShellProps {
   activeGroupId?: string;
   /** True when the current view is the unfiltered library. */
   allActive?: boolean;
+  /** Set when the library is showing only cover letters. */
+  activeKind?: DocumentKind;
 }
 
 /**
@@ -47,12 +50,15 @@ export const Shell: React.FC<ShellProps> = ({
   children,
   activeGroupId,
   allActive = false,
+  activeKind,
 }) => {
   const { t } = useTranslation("shell");
   const navigate = useNavigate();
   const [navOpened, { toggle: toggleNav, close: closeNav }] =
     useDisclosure(false);
   const [newResumeOpen, setNewResumeOpen] = useState(false);
+  /** Set by the command that makes a letter, and cleared when the dialog goes. */
+  const [newKind, setNewKind] = useState<DocumentKind | undefined>(undefined);
   const [newGroupOpen, setNewGroupOpen] = useState(false);
   // Owned here rather than in the app bar, so the same sheet can be opened from
   // anywhere that needs to.
@@ -165,6 +171,7 @@ export const Shell: React.FC<ShellProps> = ({
                 setNewResumeOpen(true);
                 closeNav();
               }}
+              activeKind={activeKind}
               onNewGroup={() => {
                 setNewGroupOpen(true);
                 closeNav();
@@ -202,7 +209,11 @@ export const Shell: React.FC<ShellProps> = ({
         <ClientOnly>
           <NewResumeDialog
             opened={newResumeOpen}
-            onClose={() => setNewResumeOpen(false)}
+            {...(newKind === undefined ? {} : { defaultKind: newKind })}
+            onClose={() => {
+              setNewResumeOpen(false);
+              setNewKind(undefined);
+            }}
             onCreated={(id) =>
               navigate({ to: "/resumes/$resumeId", params: { resumeId: id } })
             }
@@ -215,6 +226,10 @@ export const Shell: React.FC<ShellProps> = ({
           <CommandPalette
             onNewGroup={() => setNewGroupOpen(true)}
             onNewResume={() => setNewResumeOpen(true)}
+            onNewLetter={() => {
+              setNewKind("coverLetter");
+              setNewResumeOpen(true);
+            }}
             onShowShortcuts={shortcuts.open}
             onStartTour={() => setTourRequests((count) => count + 1)}
             onToggleSidebar={toggleSidebar}
