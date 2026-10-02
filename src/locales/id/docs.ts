@@ -24,6 +24,10 @@ export const docs = {
     previous: "Sebelumnya",
     next: "Berikutnya",
   },
+  code: {
+    copy: "Salin kode",
+    copied: "Tersalin",
+  },
   notFound: {
     title: "Halaman itu tidak ada di dokumentasi",
     body: "Mungkin halamannya sudah dipindah, atau tautannya keliru. Beranda dokumentasi memuat semua yang ada.",

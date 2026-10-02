@@ -8,8 +8,10 @@
  * the app's light scheme is a black rectangle, and every theme picks its own
  * hues regardless of the ones the design system already has.
  *
- * So this maps the classes the two registered grammars actually emit onto the
- * app's semantic tokens. Those are already scheme-aware, which is why there is
+ * So this maps the classes the registered grammars actually emit onto the
+ * app's semantic tokens. The guide registers two (Markdown and CSS); the docs
+ * compile six (those, the `resume` dialect, Shell and JSON) at build time and
+ * ship only the resulting spans, so one stylesheet colours both. Those are already scheme-aware, which is why there is
  * no dark variant below: the same four aliases resolve differently under
  * `[data-mantine-color-scheme='dark']`.
  *
@@ -61,6 +63,13 @@
   .hljs-bullet,
   .hljs-symbol {
     color: var(--text-accent);
+  }
+
+  /* Shell: a variable such as `$HOME`. JSON needs nothing beyond the classes
+     above (`attr` for a key, `string`, `number` and `literal` for values). */
+  .hljs-variable,
+  .hljs-template-variable {
+    color: var(--info-text);
   }
 
   .hljs-link {

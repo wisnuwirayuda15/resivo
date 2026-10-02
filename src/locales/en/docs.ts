@@ -26,6 +26,10 @@ export const docs = {
     previous: "Previous",
     next: "Next",
   },
+  code: {
+    copy: "Copy the code",
+    copied: "Copied",
+  },
   notFound: {
     title: "That page is not in the documentation",
     body: "It may have moved, or the link may be wrong. The documentation home lists everything there is.",

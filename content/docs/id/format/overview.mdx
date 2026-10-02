@@ -4,7 +4,7 @@ description: Sebuah CV adalah satu berkas Markdown, dengan satu judul per bagian
 ---
 
 Sebuah CV adalah satu berkas Markdown. Baris pertamanya adalah judul `#` berisi
-nama Anda.
+nama Anda, dan setiap judul `##` sesudahnya memulai satu bagian.
 
 ```resume title="resume.md"
 # Ada Lovelace
@@ -14,6 +14,68 @@ nama Anda.
 ## Ringkasan
 
 Matematikawan dan penulis algoritma pertama yang diterbitkan.
+
+:::entry{start=1842-01 end=1843-12}
+### Penerjemah, catatan Mesin Analitik
+Menulis catatan yang memuat program pertama.
+:::
 ```
 
+## Isi sebuah bagian [#sections]
+
+Sebuah bagian adalah satu judul beserta yang mengikutinya. Ada tiga hal yang perlu diketahui:
+
+- Markdown biasa tetap berlaku: daftar, tabel, tautan, dan penekanan.
+- Direktif diawali titik dua dan menamai bagian yang tidak punya padanan di Markdown.
+- Hanya judul `#` pertama yang diizinkan, karena itulah nama di bagian atas.
+
+| Direktif    | Menulis                       |
+| ----------- | ----------------------------- |
+| `::contact` | Satu baris detail kontak      |
+| `:::entry`  | Pekerjaan, gelar, atau proyek |
+| `::tags`    | Deretan label singkat         |
+
 <Callout title="Catatan">Setiap judul `##` memulai satu bagian.</Callout>
+
+<Callout type="warning" title="Perhatikan titik dua">
+  Titik dua direktif tidak pernah mengikuti kata, jadi `Catatan:` adalah teks
+  dan `:icon` adalah direktif.
+</Callout>
+
+## Coba sendiri [#try]
+
+<Steps>
+<Step>
+
+### Buka editor
+
+Tekan <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> lalu pilih sebuah CV.
+
+</Step>
+<Step>
+
+### Ubah Markdown-nya
+
+Pratinjau mengikuti setiap ketikan.
+
+</Step>
+</Steps>
+
+<Tabs items={["macOS", "Windows"]}>
+<Tab value="macOS">
+
+Gunakan <Kbd>Cmd</Kbd> + <Kbd>K</Kbd>.
+
+</Tab>
+<Tab value="Windows">
+
+Gunakan <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>.
+
+</Tab>
+</Tabs>
+
+```bash
+bun run dev
+```
+
+Baca [beranda dokumentasi](/docs) atau lompat ke [tabelnya](#sections).

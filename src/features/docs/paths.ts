@@ -58,3 +58,29 @@ export const switchLanguageHref = (
 
   return parsed === null ? pathname : docsHref(to, parsed.slugs);
 };
+
+/**
+ * A link written in MDX, made to point at the language being read.
+ *
+ * Authors write `/docs/format/overview` and never a language, so a page reads
+ * the same in every translation and a link cannot name the wrong one. Anything
+ * else (an anchor, an external address, a path outside the docs) is returned as
+ * it was. `/docs` alone and a hash or query after the path are kept.
+ */
+export const localizeInternalHref = (
+  href: string,
+  lang: DocsLanguage,
+): string =>
+  href === "/docs" || /^\/docs(?:[/?#])/.test(href) ? `/${lang}${href}` : href;
+
+/** A docs address split into its path and the `#hash`, which the router takes
+ * separately. The hash is returned without its `#`. */
+export const splitHash = (
+  href: string,
+): { path: string; hash: string | undefined } => {
+  const index = href.indexOf("#");
+
+  return index === -1
+    ? { path: href, hash: undefined }
+    : { path: href.slice(0, index), hash: href.slice(index + 1) };
+};

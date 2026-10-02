@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Text } from "@mantine/core";
 
-import { isDocsLanguage, parseDocsPath } from "../paths";
+import { isDocsLanguage, parseDocsPath, splitHash } from "../paths";
 
 import type { ReactNode } from "react";
 
@@ -29,7 +29,9 @@ export const DocsLink: React.FC<DocsLinkProps> = ({
   onClick,
   "aria-current": ariaCurrent,
 }) => {
-  const parsed = parseDocsPath(href);
+  // A `#hash` on a docs link is the router's own `hash`, not part of the path.
+  const { path, hash } = splitHash(href);
+  const parsed = parseDocsPath(path);
 
   if (parsed === null || !isDocsLanguage(parsed.lang)) {
     return (
@@ -52,6 +54,7 @@ export const DocsLink: React.FC<DocsLinkProps> = ({
       activeOptions={{ exact: true }}
       aria-current={ariaCurrent}
       className={className}
+      hash={hash}
       onClick={onClick}
       params={{ lang: parsed.lang, _splat: parsed.slugs.join("/") }}
       to="/$lang/docs/$"

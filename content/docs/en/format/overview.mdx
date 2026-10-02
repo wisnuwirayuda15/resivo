@@ -3,7 +3,8 @@ title: The shape of the file
 description: A resume is one Markdown file, with a heading per section and a few directives for the parts Markdown has no word for.
 ---
 
-A resume is one Markdown file. The first line is a `#` heading with your name.
+A resume is one Markdown file. The first line is a `#` heading with your name,
+and every `##` heading after it starts a section.
 
 ```resume title="resume.md"
 # Ada Lovelace
@@ -13,6 +14,68 @@ A resume is one Markdown file. The first line is a `#` heading with your name.
 ## Summary
 
 Mathematician and the author of the first published algorithm.
+
+:::entry{start=1842-01 end=1843-12}
+### Translator, Analytical Engine notes
+Wrote the notes that held the first program.
+:::
 ```
 
+## What a section holds [#sections]
+
+A section is a heading and whatever follows it. Three things are worth knowing:
+
+- Ordinary Markdown works: lists, tables, links and emphasis.
+- A directive starts with a colon and names a part Markdown has no word for.
+- The first `#` heading is the only one allowed, because it is the name at the top.
+
+| Directive   | Writes                       |
+| ----------- | ---------------------------- |
+| `::contact` | One line of contact details  |
+| `:::entry`  | A job, a degree or a project |
+| `::tags`    | A row of short labels        |
+
 <Callout title="A note">Each `##` heading starts a section.</Callout>
+
+<Callout type="warning" title="Mind the colons">
+  A directive's colon never follows a word, so `Note:` is text and `:icon` is a
+  directive.
+</Callout>
+
+## Try it [#try]
+
+<Steps>
+<Step>
+
+### Open the editor
+
+Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> and choose a resume.
+
+</Step>
+<Step>
+
+### Edit the Markdown
+
+The preview follows each keystroke.
+
+</Step>
+</Steps>
+
+<Tabs items={["macOS", "Windows"]}>
+<Tab value="macOS">
+
+Use <Kbd>Cmd</Kbd> + <Kbd>K</Kbd>.
+
+</Tab>
+<Tab value="Windows">
+
+Use <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>.
+
+</Tab>
+</Tabs>
+
+```bash
+bun run dev
+```
+
+Read [the home page](/docs) or jump to [the table](#sections).

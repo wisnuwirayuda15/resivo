@@ -8,26 +8,10 @@ import { DocsPager } from "@/features/docs/components/DocsPager";
 import { DocsToc } from "@/features/docs/components/DocsToc";
 import { getDocsPage } from "@/features/docs/loaders";
 import { isDocsLanguage } from "@/features/docs/paths";
+import { docsComponents } from "@/features/docs/mdx/components";
 import { docs } from "@/features/docs/source";
 
-import type { MDXComponents } from "mdx/types";
-
-/**
- * One docs page, inside the layout above it.
- *
- * Still a minimal component map: the real one (headings, code, callouts, tabs)
- * is the article-rendering phase.
- */
-const components: MDXComponents = {
-  Callout: ({
-    children,
-    title,
-  }: {
-    children?: React.ReactNode;
-    title?: string;
-  }) => <Box data-callout={title}>{children}</Box>,
-};
-
+/** One docs page, inside the layout above it. */
 const layoutApi = getRouteApi("/$lang/docs");
 
 const Article: React.FC<{
@@ -49,16 +33,14 @@ const Article: React.FC<{
 
   return (
     <DocsToc lang={lang} toc={toc}>
-      {/* Until the article phase brings a real code block: a long line scrolls
-          inside its own box instead of pushing the page sideways on a phone. */}
-      <Box className="[&_pre]:overflow-x-auto" component="article">
+      <Box component="article">
         <DocsBreadcrumbs lang={lang} tree={pageTree} url={url} />
         <Title order={1}>{title}</Title>
         {description === undefined ? null : (
           <Text className="text-muted mt-2 text-[15px]">{description}</Text>
         )}
         <Box className="mt-6">
-          <Body components={components} />
+          <Body components={docsComponents} />
         </Box>
         <DocsPager lang={lang} tree={pageTree} url={url} />
       </Box>
