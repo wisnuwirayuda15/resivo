@@ -5,6 +5,27 @@
  */
 export const docs = {
   title: "Documentation",
+  header: {
+    logo: "Resivo home",
+    home: "Docs",
+    openApp: "Open the app",
+    language: "Language",
+    lightTheme: "Switch to the light theme",
+    darkTheme: "Switch to the dark theme",
+    openNav: "Open the documentation menu",
+    closeNav: "Close the documentation menu",
+  },
+  nav: {
+    label: "Documentation",
+    skip: "Skip to the content",
+  },
+  page: {
+    breadcrumbs: "Breadcrumbs",
+    onThisPage: "On this page",
+    pager: "More pages",
+    previous: "Previous",
+    next: "Next",
+  },
   notFound: {
     title: "That page is not in the documentation",
     body: "It may have moved, or the link may be wrong. The documentation home lists everything there is.",
