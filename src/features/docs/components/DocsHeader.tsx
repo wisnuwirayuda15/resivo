@@ -15,6 +15,7 @@ import { docsHref } from "../paths";
 import { useDocsTranslation } from "../useDocsTranslation";
 
 import { DocsLink } from "./DocsLink";
+import { DocsSearchTrigger } from "./DocsSearch";
 import { LanguageMenu } from "./LanguageMenu";
 
 import type { DocsLanguage } from "../paths";
@@ -72,6 +73,7 @@ export const DocsHeader: React.FC<DocsHeaderProps> = ({
         </DocsLink>
 
         <Box className="ml-auto flex items-center gap-1 sm:gap-2">
+          <DocsSearchTrigger lang={lang} />
           <LanguageMenu lang={lang} />
 
           <UnstyledButton

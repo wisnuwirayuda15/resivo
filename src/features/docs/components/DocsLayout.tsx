@@ -3,9 +3,12 @@ import { useLocation } from "@tanstack/react-router";
 import { Box, Drawer, ScrollArea, Text } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 
+import { ClientOnly } from "@/components/client-only";
+
 import { useDocsTranslation } from "../useDocsTranslation";
 
 import { DocsHeader } from "./DocsHeader";
+import { DocsSearchDialog } from "./DocsSearch";
 import { SidebarTree } from "./SidebarTree";
 
 import type { Root } from "fumadocs-core/page-tree";
@@ -75,6 +78,10 @@ export const DocsLayout: React.FC<DocsLayoutProps> = ({
           {children}
         </Box>
       </Box>
+
+      <ClientOnly>
+        <DocsSearchDialog lang={lang} />
+      </ClientOnly>
 
       <Drawer
         hiddenFrom="md"

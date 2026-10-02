@@ -26,6 +26,15 @@ export const docs = {
     previous: "Previous",
     next: "Next",
   },
+  search: {
+    trigger: "Search",
+    placeholder: "Search the documentation",
+    hint: "Type to search every page.",
+    nothing: "Nothing found for that. Try a shorter or different word.",
+    error: "Search could not be loaded. Check your connection and try again.",
+    page: "Page",
+    section: "Section",
+  },
   code: {
     copy: "Copy the code",
     copied: "Copied",

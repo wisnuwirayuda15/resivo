@@ -24,6 +24,15 @@ export const docs = {
     previous: "Sebelumnya",
     next: "Berikutnya",
   },
+  search: {
+    trigger: "Cari",
+    placeholder: "Cari di dokumentasi",
+    hint: "Ketik untuk mencari di semua halaman.",
+    nothing: "Tidak ada hasil. Coba kata yang lebih pendek atau berbeda.",
+    error: "Pencarian tidak dapat dimuat. Periksa koneksi Anda lalu coba lagi.",
+    page: "Halaman",
+    section: "Bagian",
+  },
   code: {
     copy: "Salin kode",
     copied: "Tersalin",
