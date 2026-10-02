@@ -117,6 +117,13 @@ test("edits text on the paper, and the Markdown follows", async ({ page }) => {
   const editing = paper(page).locator("[data-editing]").first();
   await expect(editing).toBeVisible();
 
+  // The outline sits 4px outside the field, and a line that fills the measure is
+  // flush with the page body, which used to clip it at the edge. The sides have
+  // to be open and the ends still closed.
+  await expect(
+    paper(page).locator(".rp-page-body[data-paged]").first(),
+  ).toHaveCSS("clip-path", /inset\(0px -8px\)/);
+
   await page.keyboard.press("ControlOrMeta+a");
   await page.keyboard.type("Wrote the very first algorithm.", { delay: 20 });
   // Enter commits: these are single-line fields, so it blurs rather than

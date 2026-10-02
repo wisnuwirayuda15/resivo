@@ -133,6 +133,26 @@
   border-top: 2px solid rgb(14, 124, 118);
 }
 
+/**
+ * Room for the outline below at the edges of the content box.
+ *
+ * The page body clips what overflows it, and an outline is drawn outside the box
+ * it surrounds: 2px of offset and 2px of line put a field's outline 4px past its
+ * text. A paragraph that fills the line is flush with the content box on both
+ * sides, so its outline lost the left and right of the frame (and the text looked
+ * cut off) while the box it was drawn around was fine.
+ *
+ * `clip-path` rather than a wider box or padding, because either would move the
+ * text and the paginator's measurements. Negative insets on the sides only: the
+ * top and bottom still clip at the page body, which is what hides the part of a
+ * tall item that belongs to the next page. Eight is the outline's four, doubled
+ * so a thicker one later does not bring this back. Reset for print below.
+ */
+.rp-page .rp-page-body {
+  overflow: visible;
+  clip-path: inset(0 -8px);
+}
+
 /* An editable field. Outline, never border: a border would take space and move
    the text it surrounds. */
 .rp-editable {
@@ -159,6 +179,11 @@
 @media print {
   .rp-chrome {
     display: none;
+  }
+
+  .rp-page .rp-page-body {
+    overflow: hidden;
+    clip-path: none;
   }
 
   .rp-item[data-over]::before {
