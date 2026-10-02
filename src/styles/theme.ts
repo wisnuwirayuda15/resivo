@@ -170,6 +170,25 @@ export const theme = createTheme({
   },
   defaultRadius: "control",
 
+  /**
+   * What a pressed control does. Mantine's own default nudges it down 1px, which
+   * is `mantine-active` in its global stylesheet; naming a different class
+   * replaces that rule rather than adding to it, so there is one press effect and
+   * not two. Scaled to 0.9 so a press reads on a 30px control, where a 1px shift
+   * is invisible. Tailwind utilities, so they land in the utilities layer and
+   * need no `!important` against anything a component sets itself.
+   *
+   * The transition is here because `scale` is its own property, and Mantine's
+   * buttons only transition `transform` and `opacity`, so the press snapped.
+   * Tailwind's default `transition` list is a superset of what Mantine's buttons
+   * animate (colour, opacity, shadow, transform and scale), so taking over the
+   * property does not drop their hover colour or fade. `duration-fast` (120ms)
+   * is the design system's pace for a state change, written as the variable
+   * because `duration-fast` generates nothing here and falls back to 150ms.
+   */
+  activeClassName:
+    "active:scale-90 transition duration-(--duration-fast) ease-standard",
+
   shadows: {
     xs: "0 1px 1px rgba(18, 18, 16, 0.04)",
     sm: "0 1px 2px rgba(18, 18, 16, 0.06), 0 1px 1px rgba(18, 18, 16, 0.04)",
