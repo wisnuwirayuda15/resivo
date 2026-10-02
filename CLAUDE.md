@@ -15,7 +15,7 @@ bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
 bun run test             # vitest, 818 tests in 51 files
-bun run test:e2e         # playwright, 90 specs, chromium only
+bun run test:e2e         # playwright, 93 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 5 specs
 bun run lint             # eslint
 bun run check            # prettier --check

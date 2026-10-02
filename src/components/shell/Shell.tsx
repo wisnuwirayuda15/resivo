@@ -20,6 +20,8 @@ import type { DocumentKind } from "@/features/resume/model/document";
 
 interface ShellProps {
   title: string;
+  /** Set where the title names something the person can rename in place. */
+  onTitleChange?: (title: string) => void;
   actions?: ReactNode;
   children: ReactNode;
   activeGroupId?: string;
@@ -46,6 +48,7 @@ interface ShellProps {
  */
 export const Shell: React.FC<ShellProps> = ({
   title,
+  onTitleChange,
   actions,
   children,
   activeGroupId,
@@ -188,6 +191,7 @@ export const Shell: React.FC<ShellProps> = ({
         <AppShell.Header className="bg-surface">
           <AppBar
             title={title}
+            {...(onTitleChange === undefined ? {} : { onTitleChange })}
             actions={actions}
             onShowShortcuts={shortcuts.open}
             onStartTour={() => setTourRequests((count) => count + 1)}

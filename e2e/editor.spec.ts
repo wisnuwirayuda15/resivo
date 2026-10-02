@@ -342,6 +342,34 @@ test("a pane divider keeps following the pointer over the preview", async ({
   await expect(frame).toHaveCSS("pointer-events", "auto");
 });
 
+test("the title in the header is renamed in place", async ({ page }) => {
+  const title = page.getByRole("textbox", { name: "Edit title" });
+  await expect(title).toHaveValue("Ada Lovelace");
+
+  await title.fill("Staff Engineer 2026");
+  await title.press("Enter");
+  await expect(title).toHaveValue("Staff Engineer 2026");
+
+  // Written to the database and not only to the field: the library reads it
+  // back from there.
+  await page.getByRole("link", { name: "All resumes" }).first().click();
+  await expect(page.getByText("Staff Engineer 2026")).toBeVisible();
+});
+
+test("Escape abandons a title edit, and an empty title is not saved", async ({
+  page,
+}) => {
+  const title = page.getByRole("textbox", { name: "Edit title" });
+
+  await title.fill("Never kept");
+  await title.press("Escape");
+  await expect(title).toHaveValue("Ada Lovelace");
+
+  await title.fill("   ");
+  await title.press("Enter");
+  await expect(title).toHaveValue("Ada Lovelace");
+});
+
 test("a resume made from inside the editor opens with its own text", async ({
   page,
 }) => {

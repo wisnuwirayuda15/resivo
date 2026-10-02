@@ -13,7 +13,7 @@ import { SaveIndicator } from "@/features/editor/SaveIndicator";
 import { useAutosave } from "@/features/editor/useAutosave";
 import { useDocumentHistoryShortcuts } from "@/features/editor/useDocumentHistoryShortcuts";
 import { useEditorStore } from "@/features/editor/store";
-import { useResume } from "@/features/resume/queries";
+import { useRenameResume, useResume } from "@/features/resume/queries";
 import { VersionChip } from "@/features/versions/VersionChip";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
@@ -125,9 +125,18 @@ const ResumeScreen: React.FC = () => {
   const { t } = useTranslation("editor");
   const { resumeId } = Route.useParams();
   const resume = useResume(resumeId);
+  const rename = useRenameResume();
 
   return (
     <Shell
+      // Only once the record is here: renaming a title that is still the
+      // placeholder would write "Untitled" over a name that has not loaded yet.
+      {...(resume.data
+        ? {
+            onTitleChange: (title: string) =>
+              rename.mutate({ id: resumeId, title }),
+          }
+        : {})}
       // Client-only because the history lives in the editor store, which only
       // exists once a document has been loaded from IndexedDB.
       actions={

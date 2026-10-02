@@ -12,6 +12,7 @@ export const shell = {
     keyboardShortcuts: "Pintasan keyboard",
     about: "Tentang Resivo",
     takeTheTour: "Ikuti tur",
+    editTitle: "Ubah judul",
   },
   sidebar: {
     newResume: "Resume baru",

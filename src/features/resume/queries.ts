@@ -213,6 +213,45 @@ export const useUpdateResume = () => {
 };
 
 /**
+ * Renames a resume from the editor's header.
+ *
+ * Not `useUpdateResume`, which invalidates the whole library: that refetches the
+ * detail row too, and the editor is holding a newer working copy than what is on
+ * disk, so a refetch landing after an autosave patch would put the older
+ * document back in the cache. Only the title is written here, to the detail row
+ * and to the list rows, and the rename shows before the write returns, because
+ * the header is the thing being typed into.
+ */
+export const useRenameResume = () => {
+  const client = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, title }: { id: string; title: string }) =>
+      resumeRepo.updateResume(id, { title }),
+    onMutate: ({ id, title }) => {
+      client.setQueryData<ResumeRecord | null>(
+        resumeKeys.detail(id),
+        (record) =>
+          record === undefined || record === null
+            ? record
+            : { ...record, title },
+      );
+    },
+    // The list is refetched rather than patched: it is re-sorted by edit time,
+    // which this write changes, and that order is the repository's to decide.
+    onSettled: (_result, error, { id }) =>
+      Promise.all([
+        client.invalidateQueries({ queryKey: resumeKeys.list() }),
+        client.invalidateQueries({ queryKey: resumeKeys.archived() }),
+        // On failure only: the optimistic title has to be taken back.
+        error === null
+          ? undefined
+          : client.invalidateQueries({ queryKey: resumeKeys.detail(id) }),
+      ]),
+  });
+};
+
+/**
  * Imports a parsed bundle as a new resume.
  *
  * The module is loaded here, on the first import, so the zip library is not part

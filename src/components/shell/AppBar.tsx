@@ -16,10 +16,14 @@ import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { cn } from "@/lib/utils";
 
+import { EditableTitle } from "./EditableTitle";
+
 import type { ComponentProps, ReactNode } from "react";
 
 interface AppBarProps {
   title: string;
+  /** Makes the title a field. Left out where the title is a fixed name. */
+  onTitleChange?: (title: string) => void;
   /** View-specific controls, right-aligned before the shared ones. */
   actions?: ReactNode;
   /** Navbar toggle, shown only below the navbar breakpoint. */
@@ -83,6 +87,7 @@ const BarButton = ({
  */
 export const AppBar: React.FC<AppBarProps> = ({
   title,
+  onTitleChange,
   actions,
   burger,
   onShowShortcuts,
@@ -120,12 +125,16 @@ export const AppBar: React.FC<AppBarProps> = ({
 
           `truncate` rather than letting it wrap: the bar is one 44px row, and a
           two-line title in it pushes its own baseline off centre. */}
-      <Text
-        className="text-title truncate text-[14px] leading-none font-semibold"
-        component="h1"
-      >
-        {title}
-      </Text>
+      {onTitleChange === undefined ? (
+        <Text
+          className="text-title truncate text-[14px] leading-none font-semibold"
+          component="h1"
+        >
+          {title}
+        </Text>
+      ) : (
+        <EditableTitle onChange={onTitleChange} title={title} />
+      )}
 
       <Box className="flex-1" />
 

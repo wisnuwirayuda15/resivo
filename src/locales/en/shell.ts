@@ -13,6 +13,7 @@ export const shell = {
     keyboardShortcuts: "Keyboard shortcuts",
     about: "About Resivo",
     takeTheTour: "Take the tour",
+    editTitle: "Edit title",
   },
   sidebar: {
     newResume: "New resume",
