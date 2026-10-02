@@ -18,6 +18,7 @@ import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
+import { Route as LangDocsSplatRouteImport } from './routes/$lang.docs.$'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,6 +65,11 @@ const ResumesResumeIdRoute = ResumesResumeIdRouteImport.update({
   path: '/resumes/$resumeId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LangDocsSplatRoute = LangDocsSplatRouteImport.update({
+  id: '/$lang/docs/$',
+  path: '/$lang/docs/$',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/templates': typeof TemplatesRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
+  '/$lang/docs/$': typeof LangDocsSplatRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByTo {
   '/templates': typeof TemplatesRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes': typeof ResumesIndexRoute
+  '/$lang/docs/$': typeof LangDocsSplatRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -98,6 +106,7 @@ export interface FileRoutesById {
   '/templates': typeof TemplatesRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
+  '/$lang/docs/$': typeof LangDocsSplatRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -111,6 +120,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/resumes/$resumeId'
     | '/resumes/'
+    | '/$lang/docs/$'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -122,6 +132,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/resumes/$resumeId'
     | '/resumes'
+    | '/$lang/docs/$'
   id:
     | '__root__'
     | '/'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/templates'
     | '/resumes/$resumeId'
     | '/resumes/'
+    | '/$lang/docs/$'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -145,6 +157,7 @@ export interface RootRouteChildren {
   TemplatesRoute: typeof TemplatesRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
   ResumesIndexRoute: typeof ResumesIndexRoute
+  LangDocsSplatRoute: typeof LangDocsSplatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -212,6 +225,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResumesResumeIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/$lang/docs/$': {
+      id: '/$lang/docs/$'
+      path: '/$lang/docs/$'
+      fullPath: '/$lang/docs/$'
+      preLoaderRoute: typeof LangDocsSplatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -225,6 +245,7 @@ const rootRouteChildren: RootRouteChildren = {
   TemplatesRoute: TemplatesRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,
   ResumesIndexRoute: ResumesIndexRoute,
+  LangDocsSplatRoute: LangDocsSplatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

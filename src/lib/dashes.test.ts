@@ -38,7 +38,7 @@ const SKIP = new Set([
 ]);
 
 /** Text the rule applies to. Binaries and lockfiles are not prose. */
-const TEXT = /\.(ts|tsx|mjs|js|css|md|html|txt|yml|yaml)$/i;
+const TEXT = /\.(ts|tsx|mjs|js|css|md|mdx|html|txt|yml|yaml|json)$/i;
 
 const walk = (dir: string): Array<string> =>
   readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
