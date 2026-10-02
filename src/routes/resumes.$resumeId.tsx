@@ -100,8 +100,17 @@ const ResumeView: React.FC<{ resumeId: string }> = ({ resumeId }) => {
     );
   }
 
-  // One render between the record arriving and the store accepting it.
-  if (document === null) {
+  /**
+   * The editor waits for the store to hold *this* resume, not just any document.
+   *
+   * Between the record arriving and the load effect running, the store still
+   * holds the resume that was open before, and `document === null` alone lets
+   * that through whenever the route is reused for another id (new resume from
+   * inside the editor, a switch from the library's recents). The editor then
+   * mounts against the old document; Monaco is still loading when the store
+   * swaps, and the Markdown pane was left showing the previous resume's text.
+   */
+  if (document === null || openResumeId !== resume.data.id) {
     return (
       <Box className="flex justify-center py-20">
         <Loader size="sm" />

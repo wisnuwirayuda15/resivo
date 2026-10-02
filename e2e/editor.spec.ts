@@ -10,6 +10,7 @@ import {
   paper,
   markdownPaneText,
   paperText,
+  pickSegment,
   typeMarkdown,
 } from "./app";
 
@@ -339,4 +340,31 @@ test("a pane divider keeps following the pointer over the preview", async ({
 
   // And the frame is clickable again, the paper is an editing surface.
   await expect(frame).toHaveCSS("pointer-events", "auto");
+});
+
+test("a resume made from inside the editor opens with its own text", async ({
+  page,
+}) => {
+  await typeMarkdown(page, "# Grace Hopper\n\n## Summary\n\nCompiler pioneer.");
+  await expect.poll(() => paperText(page)).toContain("Compiler pioneer.");
+
+  // The sidebar's button: the only one by this name in the editor, which has no
+  // "New resume" in its bar.
+  await page.getByRole("button", { name: "New resume" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "New resume" });
+  await expect(dialog).toBeVisible();
+  await pickSegment(dialog, "Blank page");
+  await dialog.getByLabel("Name").fill("Second");
+  await dialog.getByRole("button", { name: "Create resume" }).click();
+
+  await expect(page.getByRole("textbox", { name: "Edit title" })).toHaveValue(
+    "Second",
+  );
+  await expectPaperReady(page);
+
+  // The pane is polled: Monaco mounts after the route does, and the bug this
+  // guards was the pane keeping the text it was first handed.
+  await expect.poll(() => markdownPaneText(page)).not.toContain("Grace Hopper");
+  expect(await paperText(page)).not.toContain("Compiler pioneer.");
 });

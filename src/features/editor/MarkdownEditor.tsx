@@ -81,6 +81,18 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
   const [focusTick, setFocusTick] = useState(false);
 
   /**
+   * Whether Monaco has mounted, which is also a trigger for the effect below.
+   *
+   * The editor is lazy and mounts a while after this component does, and until
+   * then `editorRef` is null and the synchronization has nothing to compare. A
+   * model that changed in that gap (the store swapping resumes under a freshly
+   * opened editor) was never looked at again, because nothing in the effect's
+   * dependencies moved afterwards, so the buffer kept the text it was created
+   * with.
+   */
+  const [mounted, setMounted] = useState(false);
+
+  /**
    * The view state to put back after the buffer is replaced.
    *
    * `@monaco-editor/react` applies a changed `value` as one full-range
@@ -121,7 +133,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
 
     viewStateRef.current = instance.saveViewState();
     setValue(serialized);
-  }, [focusTick, serialized]);
+  }, [focusTick, mounted, serialized]);
 
   /**
    * Runs after the child editor has applied the new `value`, child effects
@@ -241,6 +253,7 @@ export const MarkdownEditor: React.FC<MarkdownEditorProps> = ({
       onChange={handleChange}
       onMount={(instance) => {
         editorRef.current = instance;
+        setMounted(true);
 
         instance.onDidFocusEditorText(() => setFocusTick((tick) => !tick));
 
