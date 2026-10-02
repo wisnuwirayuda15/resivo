@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 
 import { EmptyState } from "@/components/EmptyState";
+import { useRouteLanguage } from "@/lib/i18n/useRouteLanguage";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 import { Providers } from "@/components/providers";
 import { SIDEBAR_RESTORE_SCRIPT } from "@/components/shell/sidebarState";
@@ -160,6 +161,10 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   const { queryClient } = Route.useRouteContext();
+  // English everywhere but the docs, whose address names its language, so the
+  // server's own markup already says `id` on `/id/docs` for a screen reader and
+  // a crawler, which never run the effect in `LanguageSync`.
+  const routeLanguage = useRouteLanguage();
 
   return (
     /**
@@ -169,7 +174,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
      * `prefers-color-scheme` before React hydrates. Without it, every visit in
      * dark mode would warn.
      */
-    <html lang="en" {...mantineHtmlProps}>
+    <html lang={routeLanguage ?? "en"} {...mantineHtmlProps}>
       <head>
         {/* The browser chrome, per scheme.
 
