@@ -1,0 +1,61 @@
+---
+title: Install and work offline
+description: Install Resivo like an app, what is cached so it opens with no network, how to read the status in Settings, and what works offline in the docs.
+---
+
+Resivo is a website that can also be installed, and that keeps a copy of itself on
+your device. Together they mean it opens and runs with no network. Your resumes are
+on the device either way, so what offline depends on is the app itself.
+
+## Installing [#install]
+
+Under **Settings**, **Install on this device** says where things stand:
+
+- If the browser has offered to install it, **Install Resivo** is there. Installing
+  puts Resivo in your dock, taskbar or home screen, with a window of its own and no
+  address bar. It opens at your resumes and not at the landing page. Nothing is
+  uploaded, and nothing changes about where your data is kept.
+- If it is installed, the page says so, and that it is running in its own window.
+- If the browser has not offered, the page says so. Where installing is supported
+  the address bar carries an install icon, and on an iPhone or iPad it is Share,
+  then Add to Home Screen.
+
+Installing is optional. Offline works in a normal tab as well.
+
+## Whether it is cached [#cache]
+
+The same section says whether the app is stored on this device:
+
+- It is cached, so it opens and runs with no network at all.
+- It has just been cached, and the next time it is opened it will work with no
+  network.
+- It is not cached yet, so opening it still needs a connection. Your resumes are
+  stored here either way. A copy is not kept when running the app in development.
+
+## How the copy is kept [#how]
+
+Resivo uses a service worker, which is a small script the browser runs to answer
+requests from its cache. It follows four rules:
+
+- A page is fetched from the network first, so a new version arrives on your first
+  visit after it is released, and the cached page is used only when the network is
+  not there.
+- The app's scripts and styles have names that change when their contents change,
+  so they are kept and reused without asking.
+- The icons and the app's manifest, and the docs' search index and page data, are
+  shown from the cache and refreshed in the background.
+- It does not take over a page that is already open, or replace what a running
+  page was using. An update waits for the next time you open the app.
+
+## Offline in the docs [#docs]
+
+Only what you have opened is kept. A docs page you have visited opens offline, and
+search works offline once you have searched. A docs page you never opened cannot be
+fetched with no network, so it takes you to the docs home for that language when
+that was opened. The Markdown copies of pages, `llms.txt` and the assistant
+connection are never kept, because they are for tools and need the network.
+
+## Leaving no trace [#clear]
+
+Clearing the browser's site data for Resivo removes the cached app and your
+resumes together. Make a backup first. See [Backup and restore](/docs/data/backup-restore).

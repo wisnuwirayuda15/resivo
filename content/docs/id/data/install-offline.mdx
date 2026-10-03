@@ -1,0 +1,68 @@
+---
+title: Pasang dan pakai luring
+description: Pasang Resivo seperti aplikasi, apa yang disimpan di cache agar terbuka tanpa jaringan, cara membaca statusnya di Pengaturan, dan apa yang berfungsi luring.
+---
+
+Resivo adalah situs web yang juga dapat dipasang, dan yang menyimpan salinan
+dirinya di perangkat Anda. Keduanya berarti ia terbuka dan berjalan tanpa jaringan.
+Resume Anda ada di perangkat dalam kedua kasus, jadi yang bergantung pada luring
+adalah aplikasinya sendiri.
+
+## Memasang [#install]
+
+Di **Pengaturan**, **Pasang di perangkat ini** menyebut keadaannya:
+
+- Bila browser sudah menawarkan untuk memasang, **Pasang Resivo** ada di sana.
+  Memasang menaruh Resivo di dock, taskbar, atau layar utama Anda, dengan jendela
+  sendiri dan tanpa bilah alamat. Ia terbuka di resume Anda dan bukan di halaman
+  landing. Tidak ada yang diunggah, dan tidak ada yang berubah tentang di mana data
+  Anda disimpan.
+- Bila sudah terpasang, halaman mengatakannya, dan bahwa ia berjalan di jendelanya
+  sendiri.
+- Bila browser belum menawarkan, halaman mengatakannya. Di tempat yang mendukung
+  pemasangan, bilah alamat memuat ikon pasang, dan di iPhone atau iPad, pilih
+  Bagikan, lalu Tambah ke Layar Utama.
+
+Memasang itu opsional. Luring juga berfungsi di tab biasa.
+
+## Apakah ia tersimpan di cache [#cache]
+
+Bagian yang sama menyebut apakah aplikasi tersimpan di perangkat ini:
+
+- Ia tersimpan di cache, jadi ia terbuka dan berjalan tanpa jaringan sama sekali.
+- Ia baru saja tersimpan di cache, dan saat dibuka berikutnya ia akan berfungsi
+  tanpa jaringan.
+- Ia belum tersimpan di cache, jadi membukanya masih memerlukan koneksi. Resume Anda
+  tersimpan di sini dalam kedua kasus. Salinan tidak disimpan saat aplikasi
+  dijalankan dalam mode pengembangan.
+
+## Cara salinan disimpan [#how]
+
+Resivo memakai service worker, yaitu skrip kecil yang dijalankan browser untuk
+menjawab permintaan dari cache-nya. Ia mengikuti empat aturan:
+
+- Halaman diambil dari jaringan lebih dulu, jadi versi baru tiba pada kunjungan
+  pertama Anda setelah dirilis, dan halaman dari cache dipakai hanya bila jaringan
+  tidak ada.
+- Skrip dan gaya aplikasi memiliki nama yang berubah saat isinya berubah, jadi
+  disimpan dan dipakai ulang tanpa bertanya.
+- Ikon dan manifes aplikasi, serta indeks pencarian dan data halaman dokumentasi,
+  ditampilkan dari cache dan disegarkan di latar belakang.
+- Ia tidak mengambil alih halaman yang sudah terbuka, atau mengganti apa yang
+  dipakai halaman yang sedang berjalan. Pembaruan menunggu saat berikutnya Anda
+  membuka aplikasi.
+
+## Luring di dokumentasi [#docs]
+
+Hanya yang pernah Anda buka yang disimpan. Halaman dokumentasi yang pernah Anda
+kunjungi terbuka luring, dan pencarian berfungsi luring setelah Anda mencari. Halaman
+dokumentasi yang tidak pernah Anda buka tidak dapat diambil tanpa jaringan, jadi ia
+membawa Anda ke beranda dokumentasi untuk bahasa itu bila beranda itu pernah dibuka.
+Salinan Markdown halaman, `llms.txt`, dan sambungan asisten tidak pernah disimpan,
+karena semuanya untuk perangkat lain dan memerlukan jaringan.
+
+## Tanpa jejak [#clear]
+
+Membersihkan data situs browser untuk Resivo menghapus aplikasi yang tersimpan dan
+resume Anda sekaligus. Buat cadangan dulu. Lihat
+[Cadangkan dan pulihkan](/docs/data/backup-restore).

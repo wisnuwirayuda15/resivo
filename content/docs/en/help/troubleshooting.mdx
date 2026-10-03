@@ -1,0 +1,91 @@
+---
+title: Troubleshooting
+description: What to check when resumes seem gone, a change is not saved, an export looks wrong, a file is refused or offline fails, and the usual cause of each.
+---
+
+Start with the symptom. Most causes are the same few, and most follow from where
+Resivo keeps things. See [Local first](/docs/getting-started/local-first).
+
+## My resumes are gone [#gone]
+
+Resumes live in one browser on one device, so they are missing when you are not
+looking at that browser. Check, in this order:
+
+- Are you in the same browser and the same profile? Another browser, another
+  profile and another device each start empty.
+- Is it a private window? A private window keeps nothing after it closes.
+- Is the address the same? A different address, such as another port or another
+  domain, is a different site and has its own storage.
+- Was the browser's site data cleared, by you or by a privacy tool? That deletes
+  the resumes, and nobody has a copy to bring back.
+
+If you have a backup, **Restore** it from **Settings**. If not, there is nothing to
+recover, which is why a backup matters. See
+[Backup and restore](/docs/data/backup-restore).
+
+## The save indicator says Not saved [#not-saved]
+
+The last write to your device failed, so that change is not on disk. Your edits are
+still on the screen. Export a copy, a bundle is the safest, before you close the
+tab. The indicator stays on **Not saved** until a later write succeeds. A write can
+fail when the browser refuses to store more, for instance when the device is out of
+room or the browser is set to block site data. See
+[Autosave and undo](/docs/editor/autosave-and-undo) and [Storage](/docs/data/storage).
+
+## A resume will not open [#will-not-open]
+
+The page says This document could not be opened, or Document not found.
+
+- Document not found means it is not on this device. It may have been deleted, or
+  you may be in a different browser. Go back to the library to see what is there.
+- This document could not be opened, with The stored document could not be read,
+  means the stored data did not pass its check. Restore from a backup if you have
+  one, and check whether the same resume opens in a copy you exported.
+
+## The paper looks wrong [#paper]
+
+- A rule in your CSS has no effect. It may have been refused, which is underlined
+  in yellow in the `style.css` tab, or it may be something CSS cannot change. See
+  [What CSS cannot do](/docs/design/css-limits).
+- A gap where an icon should be. The name is not an icon. See
+  [Icons](/docs/design/icons).
+- A dashed box that says Missing image. The picture is not stored on this device,
+  or was deleted. See [Images and fonts](/docs/design/images-and-fonts).
+- A page breaks in an unexpected place. See
+  [Pages and breaks](/docs/editor/pages-and-breaks).
+
+## An export is wrong [#export]
+
+- **PDF** is greyed out. The paper has not been laid out yet. Open the **Paper** tab
+  once. See [PDF](/docs/export/pdf).
+- The PDF breaks differently from the paper. The print dialog has changed the
+  scale or margins. See [PDF](/docs/export/pdf#problems).
+- The Markdown has lost my styling. It holds content only. A bundle keeps style.
+  See [Export formats](/docs/export/export-formats).
+
+## A file is refused [#refused]
+
+Each refusal says why, and nothing is written when a file is refused.
+
+- An image: it must be a PNG, JPEG, WebP or GIF of up to 8 MB, and it must really
+  be one. See [Images and fonts](/docs/design/images-and-fonts).
+- A font: a WOFF2, WOFF, TrueType or OpenType file of up to 4 MB that the browser
+  can read.
+- A file in the new resume dialog: it must be Markdown, JSON Resume, text or a
+  bundle, and a text file over a megabyte is turned away. See
+  [Import formats](/docs/export/import-formats).
+- A bundle: see [Bundles](/docs/export/bundles#checks).
+- A backup: see [Backup and restore](/docs/data/backup-restore#refused).
+
+## It does not work offline [#offline]
+
+Settings says whether the app is cached on this device, under **Install on this
+device**. If it is not, opening Resivo still needs a connection once. A docs page you
+never opened cannot be fetched with no network. See
+[Install and work offline](/docs/data/install-offline).
+
+## The wrong language [#language]
+
+The app is in the wrong language: choose another in **Settings**. A resume's dates
+are in the wrong language: that is the resume's own setting, in the **Style** tab.
+See [Language](/docs/help/language).

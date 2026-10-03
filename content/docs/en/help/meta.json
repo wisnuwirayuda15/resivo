@@ -1,4 +1,11 @@
 {
   "title": "Help",
-  "pages": ["use-with-ai"]
+  "pages": [
+    "settings",
+    "language",
+    "tours",
+    "troubleshooting",
+    "faq",
+    "use-with-ai"
+  ]
 }

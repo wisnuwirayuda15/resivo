@@ -107,6 +107,12 @@ test.describe("docs SEO", () => {
   test("the app's own routes stay out of the sitemap", async ({ request }) => {
     const xml = await (await request.get("/sitemap.xml")).text();
 
+    // By whole path: a docs page may be named like an app route, and
+    // `/en/docs/help/settings` is not `/settings`.
+    const paths = [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map(
+      (match) => new URL(match[1] ?? "").pathname,
+    );
+
     for (const path of [
       "/resumes",
       "/archive",
@@ -114,7 +120,7 @@ test.describe("docs SEO", () => {
       "/fonts",
       "/settings",
     ]) {
-      expect(xml).not.toContain(`${path}<`);
+      expect(paths).not.toContain(path);
     }
   });
 

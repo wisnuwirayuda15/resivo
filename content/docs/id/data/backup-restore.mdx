@@ -1,0 +1,93 @@
+---
+title: Cadangkan dan pulihkan
+description: Tulis semua yang ada di perangkat ini ke satu berkas, kembalikan di perangkat ini atau lainnya tanpa mengganti apa pun, dan apa isi berkas serta cara diperiksa.
+---
+
+Semua yang disimpan Resivo ada di browser ini, di perangkat ini, dan tidak ada
+salinan di tempat lain. Karena itu cadangan adalah satu-satunya yang bertahan
+setelah browser dibersihkan atau perangkat hilang. Lihat
+[Mengutamakan lokal](/docs/getting-started/local-first).
+
+Cadangkan dan pulihkan ada di **Pengaturan**, di bawah **Cadangkan dan pulihkan**.
+
+## Membuat cadangan [#backup]
+
+Pilih **Unduh cadangan**. Resivo menulis setiap resume, grup, gambar, dan font di
+perangkat ke satu berkas JSON, dan browser Anda menyimpannya. Berkas diberi nama
+`resivo-backup-` diikuti tanggal, seperti `resivo-backup-2026-10-03.json`. Tidak
+ada yang dikirim ke mana pun.
+
+Simpan berkas itu di tempat yang bukan perangkat ini. Cadangan di mesin yang
+rusak bukanlah cadangan.
+
+### Apa isinya [#inside]
+
+- Setiap resume, termasuk isi, template, pengaturan gaya, dan CSS kustomnya, baik
+  diarsipkan maupun tidak, serta lowongan yang dituju sebuah versi, dan dari resume
+  mana versi itu dibuat.
+- Grup Anda, dan grup mana yang memuat tiap resume.
+- Setiap gambar dan setiap font yang Anda unggah dan simpan, juga yang tidak dipakai
+  resume mana pun.
+- Beberapa preferensi yang disimpan di perangkat, seperti template yang terakhir
+  Anda pilih di dialog resume baru.
+
+Bahasa antarmuka, tema warna, dan ukuran panel tidak termasuk, karena semuanya ada
+di penyimpanan lokal browser dan bukan di cadangan.
+
+Berkasnya JSON biasa, dan gambar serta font ditulis ke dalamnya sebagai teks,
+sehingga ukurannya sekitar sepertiga lebih besar dari aslinya. Itu disengaja.
+Siapa pun dapat membukanya dan membaca persis apa isi cadangan.
+
+## Memulihkan [#restore]
+
+Pilih **Pilih berkas cadangan** di bawah **Pulihkan** lalu pilih berkasnya. Ia
+menambahkan isi cadangan ke perangkat. Ia tidak pernah mengganti atau menghapus apa
+pun yang sudah ada di sini, karena cadangan biasanya dipulihkan saat sesuatu sudah
+salah, dan pemulihan yang menimpa keadaan sekarang bisa mengubah satu resume yang
+hilang menjadi semuanya.
+
+Yang terjadi pada tiap bagian:
+
+- Resume yang tidak bentrok dengan yang Anda punya dipulihkan apa adanya, dengan
+  grup, gambar, dan fontnya.
+- Resume yang bentrok dengan yang sudah Anda punya, yaitu yang berjati diri sama,
+  dipulihkan di sebelahnya dengan jati diri baru, dan `(restored)` ditambahkan ke
+  namanya. Anda menghapus salinan mana pun yang tidak Anda inginkan.
+- Gambar yang isinya sudah tersimpan tidak disimpan lagi. Resume yang dipulihkan
+  diarahkan ke salinan yang Anda miliki.
+- Font yang sudah tersimpan, dengan keluarga, ketebalan, dan gaya yang sama, juga
+  tidak disimpan lagi.
+- Grup yang sudah Anda miliki dibiarkan apa adanya, dan yang belum ada
+  ditambahkan. Resume yang grupnya tidak ada di perangkat ditaruh di bawah **Tanpa
+  grup**, tempat pustaka dapat menampilkannya.
+- Preferensi dipulihkan hanya bila perangkat belum memiliki miliknya sendiri.
+  Cadangan tidak pernah mengganti pilihan yang Anda buat di perangkat ini.
+- Versi mempertahankan tautannya ke resume asalnya, di mana pun resume itu mendarat.
+  Bila yang asli tidak ada di berkas maupun di perangkat, tautan dilepas dan
+  lowongan yang dituju tetap disimpan.
+
+Setiap resume yang dipulihkan dihitung diubah sekarang, jadi ia muncul di bagian
+atas pustaka saat Anda mengurutkan menurut **Terakhir diubah**.
+
+Setelah selesai, **Dipulihkan** mendaftar apa yang ditambahkan, berapa resume yang
+disimpan di samping salinan yang ada, dan berapa gambar serta font yang sudah ada.
+Cadangan tanpa isi mengatakannya dan tidak mengubah apa pun.
+
+## Bila pemulihan ditolak [#refused]
+
+Berkas dibaca seluruhnya sebelum apa pun ditulis, jadi masalah hanya membuat Anda
+mendapat pesan dan tidak kehilangan data, di bawah **Tidak ada yang dipulihkan**:
+
+- Berkas bukan JSON yang valid.
+- Ia JSON tetapi bukan cadangan Resivo. Cadangan dimulai dengan jenis
+  `resivo.backup`.
+- Ia ditulis oleh Resivo versi yang lebih baru daripada yang Anda miliki. Perbarui
+  dulu, karena memulihkannya di sini bisa menghilangkan sebagian.
+- Ia tidak dapat dibaca, dan pesan menyebut apa yang salah dan di mana letaknya di
+  berkas.
+
+## Cadangan atau bundel [#bundle]
+
+Cadangan adalah seluruh perangkat, ditulis untuk disimpan. Bundel adalah satu
+resume dengan gambar dan fontnya sebagai zip, ditulis untuk dipindahkan. Lihat
+[Bundel](/docs/export/bundles).

@@ -1,0 +1,96 @@
+---
+title: Pemecahan masalah
+description: Apa yang diperiksa saat resume tampak hilang, perubahan tidak tersimpan, ekspor keliru, berkas ditolak, atau luring gagal, beserta penyebab lazimnya.
+---
+
+Mulailah dari gejalanya. Sebagian besar penyebabnya sama, dan kebanyakan berasal
+dari tempat Resivo menyimpan sesuatu. Lihat
+[Mengutamakan lokal](/docs/getting-started/local-first).
+
+## Resume saya hilang [#gone]
+
+Resume tinggal di satu browser di satu perangkat, jadi ia tampak hilang saat Anda
+tidak melihat browser itu. Periksa, dalam urutan ini:
+
+- Apakah Anda di browser dan profil yang sama? Browser lain, profil lain, dan
+  perangkat lain masing-masing mulai kosong.
+- Apakah itu jendela pribadi? Jendela pribadi tidak menyimpan apa pun setelah
+  ditutup.
+- Apakah alamatnya sama? Alamat yang berbeda, seperti port atau domain lain, adalah
+  situs yang berbeda dan memiliki penyimpanannya sendiri.
+- Apakah data situs browser dibersihkan, oleh Anda atau oleh alat privasi? Itu
+  menghapus resume, dan tidak ada yang memegang salinan untuk dikembalikan.
+
+Bila Anda punya cadangan, **Pulihkan** dari **Pengaturan**. Bila tidak, tidak ada
+yang dapat diselamatkan, dan itulah sebabnya cadangan penting. Lihat
+[Cadangkan dan pulihkan](/docs/data/backup-restore).
+
+## Indikator simpan berkata Belum tersimpan [#not-saved]
+
+Penulisan terakhir ke perangkat Anda gagal, jadi perubahan itu belum ada di disk.
+Perubahan Anda masih ada di layar. Ekspor salinannya, bundel adalah yang paling
+aman, sebelum menutup tab. Indikator tetap di **Belum tersimpan** sampai
+penulisan berikutnya berhasil. Penulisan bisa gagal saat browser menolak menyimpan
+lebih banyak, misalnya saat perangkat kehabisan ruang atau browser diatur untuk
+memblokir data situs. Lihat [Simpan otomatis dan urungkan](/docs/editor/autosave-and-undo)
+dan [Penyimpanan](/docs/data/storage).
+
+## Sebuah resume tidak terbuka [#will-not-open]
+
+Halaman berkata Dokumen ini tidak dapat dibuka, atau Dokumen tidak ditemukan.
+
+- Dokumen tidak ditemukan berarti ia tidak ada di perangkat ini. Mungkin sudah
+  dihapus, atau Anda berada di browser yang lain. Kembali ke pustaka untuk melihat
+  apa yang ada.
+- Dokumen ini tidak dapat dibuka, dengan Dokumen yang tersimpan tidak dapat dibaca,
+  berarti data yang tersimpan tidak lolos pemeriksaannya. Pulihkan dari cadangan bila
+  Anda punya, dan periksa apakah resume yang sama terbuka di salinan yang pernah Anda
+  ekspor.
+
+## Kertas tampak salah [#paper]
+
+- Aturan di CSS Anda tidak berefek. Mungkin ia ditolak, yang digarisbawahi kuning di
+  tab `style.css`, atau ia sesuatu yang tidak dapat diubah CSS. Lihat
+  [Apa yang tidak dapat dilakukan CSS](/docs/design/css-limits).
+- Celah kosong tempat ikon seharusnya berada. Namanya bukan ikon. Lihat
+  [Ikon](/docs/design/icons).
+- Kotak putus-putus bertuliskan Missing image. Gambarnya tidak tersimpan di perangkat
+  ini, atau sudah dihapus. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+- Halaman terpisah di tempat yang tidak diduga. Lihat
+  [Halaman dan pemisah](/docs/editor/pages-and-breaks).
+
+## Ekspor keliru [#export]
+
+- **PDF** berwarna abu-abu. Kertas belum ditata. Buka tab **Kertas** sekali. Lihat
+  [PDF](/docs/export/pdf).
+- PDF terpisah berbeda dari kertas. Dialog cetak mengubah skala atau margin. Lihat
+  [PDF](/docs/export/pdf#problems).
+- Markdown kehilangan gaya saya. Ia hanya memuat isi. Bundel menyimpan gaya. Lihat
+  [Format ekspor](/docs/export/export-formats).
+
+## Berkas ditolak [#refused]
+
+Setiap penolakan menyebut alasannya, dan tidak ada yang ditulis saat berkas ditolak.
+
+- Gambar: harus PNG, JPEG, WebP, atau GIF hingga 8 MB, dan harus benar-benar
+  gambar. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+- Font: berkas WOFF2, WOFF, TrueType, atau OpenType hingga 4 MB yang dapat dibaca
+  browser.
+- Berkas di dialog resume baru: harus Markdown, JSON Resume, teks, atau bundel, dan
+  berkas teks di atas satu megabita ditolak. Lihat
+  [Format impor](/docs/export/import-formats).
+- Bundel: lihat [Bundel](/docs/export/bundles#checks).
+- Cadangan: lihat [Cadangkan dan pulihkan](/docs/data/backup-restore#refused).
+
+## Tidak berfungsi luring [#offline]
+
+Pengaturan menyebut apakah aplikasi tersimpan di cache di perangkat ini, di bawah
+**Pasang di perangkat ini**. Bila belum, membuka Resivo masih memerlukan koneksi
+sekali. Halaman dokumentasi yang tidak pernah Anda buka tidak dapat diambil tanpa
+jaringan. Lihat [Pasang dan pakai luring](/docs/data/install-offline).
+
+## Bahasa yang salah [#language]
+
+Aplikasi berbahasa salah: pilih yang lain di **Pengaturan**. Tanggal resume
+berbahasa salah: itu pengaturan milik resume, di tab **Gaya**. Lihat
+[Bahasa](/docs/help/language).

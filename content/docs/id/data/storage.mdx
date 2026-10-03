@@ -1,0 +1,54 @@
+---
+title: Penyimpanan
+description: Di mana Resivo menyimpan sesuatu di perangkat Anda, apa yang memakan ruang, dan cara melihat, mengosongkan, dan mengamankannya, tanpa yang dihapus otomatis.
+---
+
+Resivo menyimpan apa yang Anda tulis di penyimpanan milik browser Anda. Halaman
+ini tentang di mana tiap jenis hal berada dan seberapa banyak ruang perangkat yang
+dipakainya.
+
+## Di mana semuanya disimpan [#where]
+
+| Apa                                                     | Di mana                                |
+| ------------------------------------------------------- | -------------------------------------- |
+| Resume, grup, gambar, font, dan beberapa preferensi     | Basis data IndexedDB browser           |
+| Bahasa antarmuka, tema, bilah samping, dan ukuran panel | Penyimpanan lokal browser              |
+| Tur mana yang sudah Anda lihat                          | Penyimpanan lokal browser              |
+| Aplikasinya sendiri, setelah tersimpan di cache         | Cache browser, untuk penggunaan luring |
+
+Semuanya milik situs ini di browser ini. Browser lain, profil lain di browser yang
+sama, dan jendela pribadi masing-masing memiliki milik sendiri, dan jendela pribadi
+kehilangan miliknya saat ditutup. Lihat
+[Mengutamakan lokal](/docs/getting-started/local-first).
+
+## Apa yang memakan ruang [#room]
+
+Resume adalah teks, dan memakan ruang yang nyaris tak terasa. Gambar dan font yang
+dirasakan perangkat. Masing-masing disimpan sekali dan dipakai bersama oleh semua
+resume, jadi foto yang sama di sepuluh resume adalah satu berkas.
+
+Bagian **Penyimpanan** di **Pengaturan** menampilkan apa yang dipegang Resivo:
+berapa **Gambar** dan **Font** yang ada, berapa ruang yang dipakainya, dan berapa
+yang tidak dirujuk apa pun lagi. Setiap baris mengarah ke halamannya.
+
+Ia tidak menggambar bilah seberapa penuh perangkat. Jatah penyimpanan browser
+bergantung pada disk dan pada situsnya, dan angka yang dilaporkannya dibagi dan
+digelembungkan, jadi persentase akan menjadi ketepatan yang dikarang. Yang
+ditampilkan halaman ini adalah apa yang benar-benar tersimpan.
+
+## Mengosongkan ruang [#free]
+
+Tidak ada yang dihapus otomatis. Sebuah gambar bisa tidak dipakai hanya karena
+belum Anda letakkan, jadi keputusannya diserahkan kepada Anda. Halaman **Gambar**
+dan **Font** menunjukkan apa yang tidak dipakai, dan masing-masing memiliki
+**Hapus**, yang bertanya dulu. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+
+Menghapus resume menghilangkannya selamanya, karena tidak ada salinan lain.
+Mengarsipkan menyingkirkannya tanpa menghapus. Lihat
+[Kelola resume Anda](/docs/library/organize).
+
+## Menjaganya tetap aman [#safe]
+
+Penyimpanan yang dipegang browser dapat dibersihkan oleh Anda, oleh alat privasi,
+atau oleh browser saat perangkat kekurangan ruang. Tulislah cadangan sesekali, dan
+setelah pekerjaan besar. Lihat [Cadangkan dan pulihkan](/docs/data/backup-restore).

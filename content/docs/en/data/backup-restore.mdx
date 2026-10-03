@@ -1,0 +1,89 @@
+---
+title: Backup and restore
+description: Write everything on this device to one file, bring it back on this or another device without replacing anything, and what the file holds and how it is checked.
+---
+
+Everything Resivo stores is in this browser, on this device, and there is no copy
+anywhere else. A backup is therefore the only thing that survives a cleared
+browser or a lost machine. See [Local first](/docs/getting-started/local-first).
+
+Backup and restore are in **Settings**, under **Backup and restore**.
+
+## Making a backup [#backup]
+
+Choose **Download backup**. Resivo writes every resume, group, image and font on
+the device to one JSON file, and your browser saves it. The file is named
+`resivo-backup-` followed by the date, such as `resivo-backup-2026-10-03.json`.
+Nothing is sent anywhere.
+
+Keep the file somewhere that is not this device. A backup on the machine that
+fails is not a backup.
+
+### What is in it [#inside]
+
+- Every resume, including its content, template, style settings and custom CSS,
+  whether it is archived or not, and the job a version was written for, and which
+  resume a version was made from.
+- Your groups, and which group each resume is in.
+- Every image and every uploaded font you have stored, even those no resume uses.
+- The few preferences kept on the device, such as the template you last chose in
+  the new resume dialog.
+
+It is not in the interface language, the colour theme or the pane sizes, which
+live in the browser's local storage, and not in the backup.
+
+The file is plain JSON, and the images and fonts are written into it as text, which
+makes it about a third larger than they are. That is on purpose. Anyone can open it
+and read exactly what a backup holds.
+
+## Restoring [#restore]
+
+Choose **Choose a backup file** under **Restore** and pick the file. It adds the
+backup's contents to the device. It never replaces or deletes anything that is
+already here, because a backup is usually restored when something has already gone
+wrong, and a restore that overwrote the present could turn one lost resume into
+all of them.
+
+What happens to each part:
+
+- A resume that does not collide with one you have is restored as it was, with its
+  group, its images and its fonts.
+- A resume that collides with one you already have, which means the same
+  identity, is restored beside it under a new identity, with `(restored)` added to
+  its name. You delete whichever copy you do not want.
+- An image whose content is already stored is not stored again. The restored
+  resume is pointed at the copy you have.
+- A font that is already stored, with the same family, weight and style, is not
+  stored again either.
+- A group you already have is kept as it is, and one you do not is added. A
+  resume whose group is not on the device is put under **Ungrouped**, where the
+  library can show it.
+- A preference is restored only if the device has none of its own. A backup never
+  replaces a choice you made on this device.
+- A version keeps its link to the resume it was made from, wherever that resume
+  lands. If the original is in neither the file nor on the device, the link is
+  dropped and the job it was written for is kept.
+
+Every restored resume counts as edited now, so it appears at the top of the
+library when you sort by **Last edited**.
+
+When it finishes, **Restored** lists what was added, how many resumes were kept
+beside an existing copy, and how many images and fonts were already there. A
+backup with nothing in it says so and changes nothing.
+
+## When a restore is refused [#refused]
+
+A file is read completely before anything is written, so a problem costs you a
+message and no data, under **Nothing was restored**:
+
+- The file is not valid JSON.
+- It is JSON but not a Resivo backup. A backup starts with the kind
+  `resivo.backup`.
+- It was written by a newer version of Resivo than the one you have. Update first,
+  because restoring it here could lose part of it.
+- It cannot be read, and the message says what is wrong and where in the file.
+
+## Backup or bundle [#bundle]
+
+A backup is the whole device, written to be kept. A bundle is one resume with its
+images and fonts as a zip, written to be moved. See [Bundles](/docs/export/bundles).

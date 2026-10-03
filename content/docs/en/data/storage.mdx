@@ -1,0 +1,52 @@
+---
+title: Storage
+description: Where Resivo keeps things on your device, what takes room, and how to see it, free it and keep it safe, without anything being deleted automatically.
+---
+
+Resivo keeps what you write in your browser's own storage. This page is about
+where each kind of thing lives and how much of the device it takes.
+
+## Where things are kept [#where]
+
+| What                                                              | Where                                |
+| ----------------------------------------------------------------- | ------------------------------------ |
+| Resumes, groups, images, fonts, and a few preferences             | The browser's IndexedDB database     |
+| The interface language, the theme, the sidebar and the pane sizes | The browser's local storage          |
+| Which tours you have seen                                         | The browser's local storage          |
+| The app itself, once it is cached                                 | The browser's cache, for offline use |
+
+All of it belongs to this site in this browser. Another browser, another profile on
+the same browser, and a private window each have their own, and a private window
+loses its own when it closes. See [Local first](/docs/getting-started/local-first).
+
+## What takes room [#room]
+
+A resume is text, and takes a negligible amount of room. Images and fonts are what
+a device notices. Each is stored once and shared by every resume, so the same
+photograph in ten resumes is one file.
+
+The **Storage** section of **Settings** shows what Resivo holds: how many **Images**
+and **Fonts** there are, how much room they take, and how many nothing refers to
+any more. Each line leads to its page.
+
+It does not draw a bar of how full the device is. A browser's storage allowance
+depends on the disk and on the site, and the number it reports is shared and
+padded, so a percentage would be invented precision. What the page shows is what
+is really stored.
+
+## Freeing room [#free]
+
+Nothing is deleted automatically. An image can be unused only because you have not
+placed it yet, so deciding is left to you. The **Images** and **Fonts** pages show
+what is unused, and each has **Delete**, which asks first. See
+[Images and fonts](/docs/design/images-and-fonts).
+
+Deleting a resume removes it for good, because there is no other copy. Archiving
+takes one out of the way without deleting it. See
+[Organize your resumes](/docs/library/organize).
+
+## Keeping it safe [#safe]
+
+Storage that a browser holds can be cleared by you, by a privacy tool, or by the
+browser when the device is short of room. Write a backup now and then, and after a
+big piece of work. See [Backup and restore](/docs/data/backup-restore).
