@@ -6,6 +6,7 @@ import {
   checkCompiles,
   checkFences,
   checkFrontmatter,
+  checkIncludes,
   checkUiLabels,
   checkLinks,
   checkMeta,
@@ -517,5 +518,29 @@ describe("checkUiLabels", () => {
     expect(
       checkUiLabels(page("a.mdx", "An *emphasis* and plain text.\n"), labels),
     ).toEqual([]);
+  });
+});
+
+describe("checkIncludes", () => {
+  const withInclude = (path: string) =>
+    page("a.mdx", `<include lang="text">${path}</include>\n`);
+
+  it("accepts an include that points at a file that exists", () => {
+    expect(
+      checkIncludes(withInclude("../../../prompts/resume.md"), () => true),
+    ).toEqual([]);
+  });
+
+  it("names an include whose file is missing", () => {
+    const problems = checkIncludes(withInclude("../nope.md"), () => false);
+
+    expect(problems).toHaveLength(1);
+    expect(problems.join()).toContain(
+      "includes ../nope.md, which does not exist",
+    );
+  });
+
+  it("is quiet about a page with no include", () => {
+    expect(checkIncludes(page("a.mdx"), () => false)).toEqual([]);
   });
 });

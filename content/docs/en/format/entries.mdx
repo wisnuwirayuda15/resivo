@@ -1,0 +1,72 @@
+---
+title: Entries
+description: Write a job, a degree or a project as an entry block, with a title, place and dates as attributes, then a summary and bullet points.
+---
+
+An entry is the one block a heading cannot express. Writing
+`### Lead Engineer, Difference Engine Co., London (2021-2024)` means guessing at
+punctuation to get the four facts back out, and guessing is what makes a round
+trip lossy. So the facts are written as attributes, and the block holds the
+prose.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Experience
+
+:::entry{title="Lead Engineer" subtitle="Difference Engine Co." location="London" start="2021-03" current="true"}
+Owned the compiler, and the people who wrote it.
+
+- Cut the build from 14 minutes to 90 seconds
+- Hired and mentored four engineers
+:::
+```
+
+An entry starts with `:::entry` and the attributes in braces, and ends with a
+line that is only `:::`.
+
+## The attributes [#attributes]
+
+All of them are optional, though an entry with no `title` has nothing to head it.
+
+| Attribute  | What it holds                                         |
+| ---------- | ----------------------------------------------------- |
+| `title`    | The role, degree or project name                      |
+| `subtitle` | The employer, school or organisation                  |
+| `location` | Where it was                                          |
+| `start`    | When it began                                         |
+| `end`      | When it ended                                         |
+| `current`  | `"true"` for something you still do, instead of `end` |
+
+## Dates [#dates]
+
+A date is `YYYY-MM` or `YYYY`, and it is formatted for the resume's language, so
+`2021-03` prints as a month name and a year. Anything else is printed exactly as
+you typed it, so `start="Summer 2019"` is a valid date range and not an error.
+
+`current` replaces `end` for something still held, and the paper prints the
+language's word for ongoing in its place. Writing `current` with no value counts
+as true, and only `current="false"` turns it off.
+
+## Inside the block [#inside]
+
+The first paragraph is the entry's summary, and a list is its bullet points.
+Both are optional. Bullets are ordinary Markdown list items, so bold, italic and
+links work in them.
+
+## Attributes are plain text [#plain]
+
+The text in an attribute is not Markdown. A title of `**Lead**` is a title with
+two asterisks on each side, not a bold word, because reading it as markup would
+make the file come back different from how it was written. Put formatting in
+the summary and bullets, where it is read.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Education
+
+:::entry{title="Mathematics" subtitle="Private tuition" start="1840" end="1842"}
+Studied with **Augustus De Morgan**.
+:::
+```

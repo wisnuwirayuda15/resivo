@@ -1,0 +1,101 @@
+---
+title: Directive reference
+description: Every directive Resivo reads, how it is written, each attribute and which are required, and what happens when one is wrong.
+---
+
+A directive is a line, or a span of text, that starts with a colon and names a
+part Markdown has no word for. There are three forms:
+
+| Form                   | Written as                     | Used for                                                   |
+| ---------------------- | ------------------------------ | ---------------------------------------------------------- |
+| Inline, inside a line  | `:name[text]{attributes}`      | `:icon`                                                    |
+| Block, on its own line | `::name[text]{attributes}`     | `::contact`, `::tags`, `::label`, `::image`, `::pagebreak` |
+| Block with content     | `:::name{attributes}` to `:::` | `:::entry`                                                 |
+
+The text in square brackets and the attributes in braces are each optional where
+a directive does not need them. An attribute is written `name="value"`.
+
+## ::contact [#contact]
+
+One contact detail. Only read in the header, between the name and the first
+section.
+
+| Part     | Required | Meaning                 |
+| -------- | -------- | ----------------------- |
+| `[text]` | no       | What prints             |
+| `icon`   | no       | An icon name            |
+| `weight` | no       | The icon's weight       |
+| `href`   | no       | Where the line links to |
+
+See [Contacts](/docs/format/contacts).
+
+## :::entry [#entry]
+
+A job, a degree or a project. Closes with a line that is only `:::`. Its first
+paragraph is the summary, and a list is its bullets.
+
+| Attribute  | Required | Meaning                                            |
+| ---------- | -------- | -------------------------------------------------- |
+| `title`    | no       | The role, degree or project                        |
+| `subtitle` | no       | The employer, school or organisation               |
+| `location` | no       | Where                                              |
+| `start`    | no       | `YYYY-MM`, `YYYY`, or any text, printed as written |
+| `end`      | no       | The same                                           |
+| `current`  | no       | Present or `"true"` for ongoing, `"false"` for not |
+
+See [Entries](/docs/format/entries).
+
+## ::tags [#tags]
+
+`::tags[a, b, c]`. A comma-separated list drawn as pills. No attributes.
+
+## ::label [#label]
+
+`::label[text]{icon="name"}`. One line with an icon in front.
+
+| Part     | Required | Meaning           |
+| -------- | -------- | ----------------- |
+| `[text]` | no       | What prints       |
+| `icon`   | yes      | An icon name      |
+| `weight` | no       | The icon's weight |
+
+Without `icon` it is not read as a label, and the editor flags it.
+
+## :icon [#icon]
+
+`:icon{name="translate"}`. An icon inside a line of text.
+
+| Attribute | Required | Meaning           |
+| --------- | -------- | ----------------- |
+| `name`    | yes      | An icon name      |
+| `weight`  | no       | The icon's weight |
+
+Without `name` it is left as the plain text `:icon`.
+
+## ::image [#image]
+
+`::image[description]{id="…" width="40"}`. A picture from the Assets store.
+
+| Part            | Required | Meaning                                           |
+| --------------- | -------- | ------------------------------------------------- |
+| `[description]` | no       | What the image shows, for those who cannot see it |
+| `id`            | yes      | The image's id, written for you by **Assets**     |
+| `width`         | no       | A percentage of the text column                   |
+
+Without `id` it is not read as an image, and the editor flags it. See
+[Images and page breaks](/docs/format/images-and-breaks).
+
+## ::pagebreak [#pagebreak]
+
+`::pagebreak`. Starts whatever follows on a new page. No attributes and no text.
+
+## Icon weights [#weights]
+
+Wherever `weight` is accepted, it is one of `thin`, `light`, `regular`, `bold`,
+`fill` or `duotone`. Any other value is ignored.
+
+## A directive Resivo does not know [#unknown]
+
+A block directive with any other name, such as `::banner`, is kept exactly as
+written and flagged. An inline directive with an unknown name is left as its
+plain `:name` text.

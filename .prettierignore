@@ -7,3 +7,6 @@ bun.lock
 src/styles/theme.css
 src/routeTree.gen.ts
 src/features/icons/*.gen.ts
+
+# The prompts are copied to a model as written, byte for byte.
+content/prompts/

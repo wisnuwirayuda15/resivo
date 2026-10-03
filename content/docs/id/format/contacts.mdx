@@ -1,0 +1,55 @@
+---
+title: Kontak
+description: Tulis email, telepon, lokasi, dan tautan Anda sebagai baris ::contact di bawah nama, dengan ikon dan tautan opsional untuk masing-masing.
+---
+
+Keterangan kontak ditaruh di kepala, di antara nama Anda dan bagian pertama.
+Masing-masing adalah satu baris `::contact`, satu keterangan per baris.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[+44 20 7946 0958]{icon="phone"}
+::contact[ada.example.com]{icon="globe" href="https://ada.example.com"}
+::contact[London, Inggris]{icon="map-pin"}
+
+## Ringkasan
+
+Menulis algoritma pertama yang diterbitkan.
+```
+
+## Apa yang masuk di tiap bagian [#parts]
+
+- Teks di dalam kurung siku adalah yang tercetak.
+- `icon` adalah nama sebuah ikon, dalam kebab-case, seperti `envelope`, `phone`,
+  `map-pin`, `globe`, `github-logo`, atau `linkedin-logo`. Bersifat opsional.
+  [Keahlian, label, dan ikon](/docs/format/tags-labels-icons) menjelaskan lebih
+  banyak.
+- `href` adalah alamat yang dituju baris itu. Bersifat opsional. Dengannya,
+  baris itu menjadi tautan di PDF dan di ekspor HTML, jadi tulis alamat email sebagai
+  `mailto:` diikuti alamatnya.
+- `weight` adalah ketebalan ikon, dan juga opsional.
+
+Kontak tercetak bersama sebagai satu baris di bawah nama Anda, dipisahkan
+dengan cara template memisahkannya.
+
+## Hanya di kepala [#header]
+
+Baris `::contact` adalah kontak hanya di kepala. Taruh satu di bawah bagian
+pertama dan ia tidak dibaca sebagai kontak: ia disimpan seperti yang ditulis,
+dan editor menandainya sebagai baris yang tidak dapat ditata.
+
+```resume warns title="Not a contact"
+# Ada Lovelace
+
+## Ringkasan
+
+::contact[ada@example.com]{icon="envelope"}
+```
+
+## Pemilih [#picker]
+
+Anda tidak perlu mengingat nama ikon. Tab **Bagian** di inspektur memiliki
+kelompok **Kontak** dengan pemilih untuk ikon masing-masing, yang menulis
+namanya ke Markdown untuk Anda.

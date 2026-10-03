@@ -1,4 +1,14 @@
 {
   "title": "Format",
-  "pages": ["overview"]
+  "pages": [
+    "overview",
+    "contacts",
+    "entries",
+    "tags-labels-icons",
+    "images-and-breaks",
+    "standard-markdown",
+    "cover-letters",
+    "directive-reference",
+    "ai-prompts"
+  ]
 }

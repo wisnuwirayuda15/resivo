@@ -1,0 +1,66 @@
+---
+title: Images and page breaks
+description: How an image appears in the Markdown and why you add it from the Assets tab, and the ::pagebreak line that forces a new page.
+---
+
+## Images [#images]
+
+An image is written as an `::image` line:
+
+```resume title="resume.md"
+# Ada Lovelace
+
+::image[Portrait]{id="8f14e45f" width="40"}
+
+## Summary
+
+Wrote the first published algorithm.
+```
+
+- The text in brackets is the image's description, for readers who cannot see it.
+- `id` names the image. It is required: a `::image` with no `id` is not read as
+  an image and is flagged.
+- `width` is a percentage of the text column. It is optional.
+
+### Why you do not write it by hand [#why]
+
+An image's id belongs to the database in your own browser, so it cannot be
+written by hand or guessed. Add the image from the **Assets** tab, or from the
+Images page, and the directive is written for you. The width is set with the
+paper's own controls in Visual mode, where an image has **Image width** among
+them. See [Visual editing](/docs/editor/visual-editing).
+
+A file that refers to an image id this browser does not hold shows a dashed box
+with the words Missing image and the description, in place of a picture.
+
+```resume warns title="An image needs an id"
+# Ada Lovelace
+
+## Summary
+
+::image[Portrait]{width="40"}
+```
+
+## Page breaks [#breaks]
+
+`::pagebreak` forces whatever follows it onto a new page. It takes no
+attributes and no text.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Experience
+
+Wrote the notes that held the first program.
+
+::pagebreak
+
+## Publications
+
+Translated and annotated the Menabrea memoir.
+```
+
+A section can also be set to start on a new page from the **Sections** tab, and
+one setting for the whole document decides whether a heading may be the last
+thing on a page. All three ways, and how pages are filled, are in
+[Pages and breaks](/docs/editor/pages-and-breaks).

@@ -1,0 +1,57 @@
+---
+title: Keahlian, label, dan ikon
+description: Tulis daftar keahlian dengan ::tags, satu baris berikon dengan ::label, dan ikon di dalam kalimat dengan :icon, lalu pilih ketebalan ikon.
+---
+
+Tiga direktif kecil mencakup daftar pendek dan ikon.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Keahlian
+
+::tags[TypeScript, React, PostgreSQL, Rust]
+
+::label[Tersedia mulai Maret]{icon="calendar-check" weight="bold"}
+
+Fasih berbahasa Inggris dan Prancis :icon{name="translate"}
+```
+
+## Tag [#tags]
+
+`::tags` menerima daftar yang dipisah koma dan menggambarnya sebagai pil, bentuk
+yang tepat untuk keahlian, alat, dan bahasa. Teks dalam kurung adalah daftarnya
+sendiri: dipisah di setiap koma, dengan spasi di sekitar tiap butir dibuang, dan
+ditulis kembali dengan cara yang sama.
+
+## Label [#labels]
+
+`::label` adalah satu baris dengan ikon di depannya. Ia membutuhkan `icon`:
+`::label` tanpa ikon tidak dibaca sebagai label, dan editor menandainya.
+
+```resume warns title="A label needs an icon"
+# Ada Lovelace
+
+## Ringkasan
+
+::label[Tersedia mulai Maret]
+```
+
+## Ikon di dalam teks [#icon]
+
+`:icon` menaruh ikon di dalam sebaris teks, di mana pun Anda menulisnya, bahkan
+di tengah kalimat. Ia menerima `name` ikon. Tanpa nama ia bukan ikon, dan
+dibiarkan sebagai teks biasa `:icon`.
+
+## Nama dan ketebalan [#names]
+
+Ikon adalah set ikon Phosphor, dinamai dalam kebab-case: `envelope`, `map-pin`,
+`github-logo`, `calendar-check`. Setiap ikon tersedia dalam enam ketebalan, dan
+`weight` adalah salah satu dari `thin`, `light`, `regular`, `bold`, `fill`, atau
+`duotone`. Ketebalan yang tidak dikenal Resivo diabaikan, dan ikon digambar
+dengan ketebalan normalnya.
+
+Anda tidak perlu mengingat nama. Pemilih ikon mencari menurut apa yang
+digambarkan sebuah ikon, jadi mengetik mail menemukan amplop, dan ia menulis
+namanya untuk Anda. Ia terbuka dari tab **Bagian** untuk sebuah bagian atau
+kontak.

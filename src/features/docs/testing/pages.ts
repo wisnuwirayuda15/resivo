@@ -215,6 +215,20 @@ export const strongsOf = (page: DocsPage): Array<string> => {
   return found;
 };
 
+/** The file each `<include>` in a page points at, as written (relative to the
+ * page). The path is the element's text. */
+export const includesOf = (page: DocsPage): Array<string> => {
+  const found: Array<string> = [];
+
+  visitJsx(page, (node) => {
+    if (node.name === "include") {
+      found.push(toString({ type: "root", children: node.children }).trim());
+    }
+  });
+
+  return found;
+};
+
 /** The names of the JSX components a page uses, in order. */
 export const componentsOf = (page: DocsPage): Array<string> => {
   const found: Array<string> = [];

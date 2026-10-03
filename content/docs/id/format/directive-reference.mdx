@@ -1,0 +1,103 @@
+---
+title: Acuan direktif
+description: Setiap direktif yang dibaca Resivo, cara menulisnya, tiap atribut dan mana yang wajib, serta apa yang terjadi bila ada yang salah.
+---
+
+Direktif adalah satu baris, atau sepotong teks, yang diawali titik dua dan
+menamai bagian yang tidak punya padanan di Markdown. Ada tiga bentuk:
+
+| Bentuk                      | Ditulis sebagai                    | Dipakai untuk                                              |
+| --------------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| Sebaris, di dalam baris     | `:name[text]{attributes}`          | `:icon`                                                    |
+| Blok, pada barisnya sendiri | `::name[text]{attributes}`         | `::contact`, `::tags`, `::label`, `::image`, `::pagebreak` |
+| Blok dengan isi             | `:::name{attributes}` sampai `:::` | `:::entry`                                                 |
+
+Teks dalam kurung siku dan atribut dalam kurung kurawal masing-masing opsional
+bila sebuah direktif tidak membutuhkannya. Atribut ditulis `name="value"`.
+
+## ::contact [#contact]
+
+Satu keterangan kontak. Hanya dibaca di kepala, di antara nama dan bagian
+pertama.
+
+| Bagian   | Wajib | Artinya                 |
+| -------- | ----- | ----------------------- |
+| `[text]` | tidak | Yang tercetak           |
+| `icon`   | tidak | Nama ikon               |
+| `weight` | tidak | Ketebalan ikon          |
+| `href`   | tidak | Tujuan tautan baris itu |
+
+Lihat [Kontak](/docs/format/contacts).
+
+## :::entry [#entry]
+
+Pekerjaan, gelar, atau proyek. Ditutup dengan baris yang hanya berisi `:::`.
+Paragraf pertamanya adalah ringkasan, dan daftar adalah butir-butirnya.
+
+| Atribut    | Wajib | Artinya                                                    |
+| ---------- | ----- | ---------------------------------------------------------- |
+| `title`    | tidak | Jabatan, gelar, atau proyek                                |
+| `subtitle` | tidak | Pemberi kerja, sekolah, atau organisasi                    |
+| `location` | tidak | Di mana                                                    |
+| `start`    | tidak | `YYYY-MM`, `YYYY`, atau teks apa pun, dicetak apa adanya   |
+| `end`      | tidak | Sama                                                       |
+| `current`  | tidak | Ada atau `"true"` untuk berlangsung, `"false"` untuk tidak |
+
+Lihat [Entri](/docs/format/entries).
+
+## ::tags [#tags]
+
+`::tags[a, b, c]`. Daftar yang dipisah koma dan digambar sebagai pil. Tanpa
+atribut.
+
+## ::label [#label]
+
+`::label[text]{icon="name"}`. Satu baris dengan ikon di depannya.
+
+| Bagian   | Wajib | Artinya        |
+| -------- | ----- | -------------- |
+| `[text]` | tidak | Yang tercetak  |
+| `icon`   | ya    | Nama ikon      |
+| `weight` | tidak | Ketebalan ikon |
+
+Tanpa `icon` ia tidak dibaca sebagai label, dan editor menandainya.
+
+## :icon [#icon]
+
+`:icon{name="translate"}`. Ikon di dalam sebaris teks.
+
+| Atribut  | Wajib | Artinya        |
+| -------- | ----- | -------------- |
+| `name`   | ya    | Nama ikon      |
+| `weight` | tidak | Ketebalan ikon |
+
+Tanpa `name` ia dibiarkan sebagai teks biasa `:icon`.
+
+## ::image [#image]
+
+`::image[description]{id="…" width="40"}`. Gambar dari penyimpanan Aset.
+
+| Bagian          | Wajib | Artinya                                                       |
+| --------------- | ----- | ------------------------------------------------------------- |
+| `[description]` | tidak | Apa yang ditunjukkan gambar, bagi yang tidak dapat melihatnya |
+| `id`            | ya    | Id gambar, ditulis untuk Anda oleh **Aset**                   |
+| `width`         | tidak | Persentase dari lebar kolom teks                              |
+
+Tanpa `id` ia tidak dibaca sebagai gambar, dan editor menandainya. Lihat
+[Gambar dan pemisah halaman](/docs/format/images-and-breaks).
+
+## ::pagebreak [#pagebreak]
+
+`::pagebreak`. Memulai apa pun yang mengikutinya di halaman baru. Tanpa atribut
+dan tanpa teks.
+
+## Ketebalan ikon [#weights]
+
+Di mana pun `weight` diterima, nilainya adalah salah satu dari `thin`, `light`,
+`regular`, `bold`, `fill`, atau `duotone`. Nilai lain diabaikan.
+
+## Direktif yang tidak dikenal Resivo [#unknown]
+
+Direktif blok dengan nama lain, seperti `::banner`, disimpan persis seperti yang
+ditulis dan ditandai. Direktif sebaris dengan nama yang tidak dikenal
+dibiarkan sebagai teks biasa `:name`.

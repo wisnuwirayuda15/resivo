@@ -10,6 +10,7 @@ import {
   directiveSkeleton,
   fencesOf,
   headingsOf,
+  includesOf,
   linksOf,
   parsePage,
   strongsOf,
@@ -494,3 +495,19 @@ export const checkUiLabels = (
       (text) =>
         `${page.lang}/${page.path}: "${text}" is in bold but is not text the app shows`,
     );
+
+/**
+ * An `<include>` has to point at a file that exists.
+ *
+ * It is how the AI prompts get into their page without a second copy, and a
+ * wrong path would not fail the compile: the build would only find out when it
+ * tried to read the file. `exists` is given the path as written, relative to the
+ * page, so the check stays free of the file system and can be tried on fixtures.
+ */
+export const checkIncludes = (
+  page: DocsPage,
+  exists: (relativePath: string) => boolean,
+): Problems =>
+  includesOf(page)
+    .filter((path) => !exists(path))
+    .map((path) => `${where(page)}: includes ${path}, which does not exist`);

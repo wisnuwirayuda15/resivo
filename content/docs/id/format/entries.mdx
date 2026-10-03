@@ -1,0 +1,75 @@
+---
+title: Entri
+description: Tulis pekerjaan, gelar, atau proyek sebagai blok entri, dengan jabatan, tempat, dan tanggal sebagai atribut, lalu ringkasan dan butir-butirnya.
+---
+
+Entri adalah satu blok yang tidak dapat dinyatakan oleh judul. Menulis
+`### Lead Engineer, Difference Engine Co., London (2021-2024)` berarti menebak
+tanda baca untuk mengambil kembali keempat fakta, dan menebak itulah yang
+membuat pulang-pergi kehilangan isi. Maka faktanya ditulis sebagai atribut, dan
+blok itu memuat prosanya.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Pengalaman
+
+:::entry{title="Lead Engineer" subtitle="Difference Engine Co." location="London" start="2021-03" current="true"}
+Memimpin kompiler, dan orang-orang yang menulisnya.
+
+- Memangkas build dari 14 menit menjadi 90 detik
+- Merekrut dan membimbing empat insinyur
+:::
+```
+
+Entri dimulai dengan `:::entry` dan atribut dalam kurung kurawal, dan diakhiri
+dengan baris yang hanya berisi `:::`.
+
+## Atribut [#attributes]
+
+Semuanya opsional, meskipun entri tanpa `title` tidak punya apa pun sebagai
+kepalanya.
+
+| Atribut    | Isinya                                                  |
+| ---------- | ------------------------------------------------------- |
+| `title`    | Jabatan, gelar, atau nama proyek                        |
+| `subtitle` | Pemberi kerja, sekolah, atau organisasi                 |
+| `location` | Di mana                                                 |
+| `start`    | Kapan dimulai                                           |
+| `end`      | Kapan berakhir                                          |
+| `current`  | `"true"` untuk yang masih dijalani, sebagai ganti `end` |
+
+## Tanggal [#dates]
+
+Tanggal berupa `YYYY-MM` atau `YYYY`, dan diformat sesuai bahasa resume, jadi
+`2021-03` tercetak sebagai nama bulan dan tahun. Selain itu dicetak persis
+seperti yang Anda ketik, jadi `start="Summer 2019"` adalah rentang tanggal yang
+sah dan bukan kesalahan.
+
+`current` menggantikan `end` untuk sesuatu yang masih dijalani, dan kertas
+mencetak kata untuk berlangsung dalam bahasa itu sebagai gantinya. Menulis
+`current` tanpa nilai dihitung benar, dan hanya `current="false"` yang
+mematikannya.
+
+## Di dalam blok [#inside]
+
+Paragraf pertama adalah ringkasan entri, dan daftar adalah butir-butirnya.
+Keduanya opsional. Butir adalah item daftar Markdown biasa, jadi tebal, miring,
+dan tautan berfungsi di dalamnya.
+
+## Atribut adalah teks biasa [#plain]
+
+Teks dalam atribut bukan Markdown. Judul `**Lead**` adalah judul dengan dua
+tanda bintang di tiap sisi, bukan kata yang tebal, karena membacanya sebagai
+markup akan membuat berkas kembali berbeda dari yang ditulis. Taruh pemformatan
+di ringkasan dan butir, tempat ia dibaca.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Pendidikan
+
+:::entry{title="Mathematics" subtitle="Private tuition" start="1840" end="1842"}
+Belajar bersama **Augustus De Morgan**.
+:::
+```

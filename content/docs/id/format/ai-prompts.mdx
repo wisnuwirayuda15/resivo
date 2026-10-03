@@ -1,0 +1,52 @@
+---
+title: Prompt AI
+description: Prompt yang memberi tahu asisten AI persis cara menulis resume atau surat lamaran dalam format Resivo, dan apa yang tidak boleh dikarangnya.
+---
+
+Asisten yang belum pernah melihat format ini akan menebaknya. Prompt-prompt ini
+menyatakan seluruh format dan, sama pentingnya, apa yang tidak boleh ditulis,
+agar yang kembali adalah berkas yang dapat dibaca Resivo.
+
+## Cara memakainya [#use]
+
+1. Salin prompt di bawah dengan tombol salin di kanan atas bloknya.
+2. Tempelkan ke asisten mana pun.
+3. Tempelkan informasi Anda di bawahnya. Prompt berakhir dengan titik dua agar
+   yang Anda tambahkan terbaca sebagai masukan dan bukan instruksi tambahan.
+4. Tempelkan hasilnya ke tab `resume.md` di panel **Kode**.
+
+Lalu bacalah sampai habis. Prompt memberi tahu model agar tidak mengarang
+pemberi kerja, tanggal, jabatan, atau angka, dan agar menghilangkan yang tidak
+ada, tetapi model tetap bisa keliru, dan berkas ini tentang Anda. Hitungan
+catatan di ujung kanan deretan tab memberi tahu jika ada baris yang tidak dapat
+ditata.
+
+Prompt memakai bahasa Inggris dengan sengaja. Ia adalah instruksi untuk model
+dan bukan bagian dari antarmuka aplikasi, dan baris terakhir tiap prompt meminta
+model menulis dalam bahasa informasi yang Anda berikan, sehingga resume dalam
+bahasa Indonesia kembali dalam bahasa Indonesia.
+
+## Prompt resume [#resume]
+
+<include lang="text">../../../prompts/resume.md</include>
+
+## Prompt surat lamaran [#letter]
+
+Surat tidak punya entri, tag, atau bagian, jadi ia punya prompt sendiri: model
+yang diberi aturan resume akan menulis judul ke dalamnya. Prompt itu juga
+mengatakan apa yang perlu diberitahukan pada sebuah surat, karena dibiarkan
+sendiri, kebiasaan model pada surat lamaran adalah mengarang penerima,
+perusahaan, dan pencapaian yang tidak pernah dimiliki penulisnya.
+
+<include lang="text">../../../prompts/letter.md</include>
+
+## Apa yang diminta keduanya [#both]
+
+- Satu berkas, tanpa pembuka, tanpa penjelasan, dan tanpa blok kode di
+  sekelilingnya.
+- Hanya direktif di [acuan direktif](/docs/format/directive-reference), dan tidak
+  pernah `::image`, karena id gambar milik browser Anda sendiri.
+- Tanpa HTML mentah, catatan kaki, atau definisi rujukan tautan, yang disimpan
+  Resivo sebagai teks sumber dan ditandai, bukan ditata.
+- Tidak ada yang dikarang. Apa pun yang kurang dihilangkan dan disebutkan
+  setelah berkas.

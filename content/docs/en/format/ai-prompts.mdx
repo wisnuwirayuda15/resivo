@@ -1,0 +1,49 @@
+---
+title: AI prompts
+description: Prompts that tell an AI assistant exactly how to write a resume or a cover letter in Resivo's format, and what it must never invent.
+---
+
+An assistant that has never seen this format will guess at it. These prompts
+state the whole format and, as importantly, what never to write, so that what
+comes back is a file Resivo can read.
+
+## How to use one [#use]
+
+1. Copy the prompt below with the copy button at the top right of its block.
+2. Paste it into any assistant.
+3. Paste your information under it. The prompt ends on a colon so that what you
+   add reads as the input and not as more instructions.
+4. Paste what comes back into the `resume.md` tab of the **Code** pane.
+
+Then read it through. The prompt tells the model not to invent an employer, a
+date, a title or a number, and to leave out what is missing, but a model can
+still get things wrong, and the file is about you. The count of notices at the
+right of the tab strip tells you if any line could not be typeset.
+
+The prompts are in English on purpose. They are instructions to a model and not
+part of the app's interface, and the last line of each tells the model to write
+in the language of the information you give it, so a resume in Indonesian comes
+back in Indonesian.
+
+## The resume prompt [#resume]
+
+<include lang="text">../../../prompts/resume.md</include>
+
+## The cover letter prompt [#letter]
+
+A letter has no entries, tags or sections, so it has a prompt of its own: a model
+given the resume's rules would write headings into it. It also says what a
+letter needs to be told, because left to itself a model's habit with a cover
+letter is to invent a recipient, a company and an achievement the author never
+had.
+
+<include lang="text">../../../prompts/letter.md</include>
+
+## What both ask for [#both]
+
+- One file, with no preamble, no explanation and no code fence around it.
+- Only the directives in [the directive reference](/docs/format/directive-reference),
+  and never `::image`, because an image's id belongs to your own browser.
+- No raw HTML, footnotes or link reference definitions, which Resivo keeps as
+  source text and flags instead of typesetting.
+- Nothing invented. Anything missing is left out and named after the file.

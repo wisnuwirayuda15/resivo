@@ -64,25 +64,43 @@ test.describe("docs as Markdown", () => {
     expect(response.status()).toBe(200);
     expect(response.headers()["content-type"]).toContain("text/markdown");
     expect(body).toMatch(/^# The shape of the file\n\n> A resume is one/);
-    expect(body).toContain("Ordinary Markdown works");
+    expect(body).toContain("## The name and the headline");
     expect(leftovers(body)).toEqual([]);
   });
 
   test("components are written as plain Markdown", async ({ request }) => {
-    const body = await (
-      await request.get("/en/docs/format/overview.md")
-    ).text();
+    const get = async (path: string) => (await request.get(path)).text();
+    const overview = await get("/en/docs/format/overview.md");
 
-    expect(body).toContain("> **Mind the colons**");
-    expect(body).toContain("Press `Ctrl` + `K`");
+    expect(overview).toContain("> **Styling is not in the file**");
     // The author's heading id is gone, and a link to it points at the slug a
     // Markdown renderer makes from the heading.
-    expect(body).toContain("## What a section holds\n");
-    expect(body).toContain("(#what-a-section-holds)");
-    expect(body).not.toContain("(#sections)");
-    expect(body).toContain("**macOS**");
-    expect(body).toContain("### Open the editor");
-    expect(body).toContain('```resume title="resume.md"');
+    expect(overview).toContain("## What the directives are\n");
+    expect(overview).toContain("(#what-the-directives-are)");
+    expect(overview).not.toContain("(#directives)");
+    expect(overview).toContain('```resume title="resume.md"');
+
+    expect(await get("/en/docs/getting-started/quick-start.md")).toContain(
+      "### Open the library",
+    );
+
+    const shortcuts = await get("/en/docs/editor/shortcuts-and-palette.md");
+
+    expect(shortcuts).toContain("**macOS**");
+    expect(shortcuts).toContain("`Ctrl` + `K`");
+  });
+
+  test("an included prompt is in the page's Markdown, whole", async ({
+    request,
+  }) => {
+    const body = await (
+      await request.get("/en/docs/format/ai-prompts.md")
+    ).text();
+
+    expect(body).toContain("You are writing a resume in Resivo-Markdown");
+    expect(body).toContain("You are writing a cover letter in Resivo-Markdown");
+    expect(body).toContain("Here is my information. Turn it into the file");
+    expect(leftovers(body)).toEqual([]);
   });
 
   test("links point at the language being read, as Markdown", async ({
@@ -201,7 +219,7 @@ test.describe("page actions", () => {
     const text = await page.evaluate(() => navigator.clipboard.readText());
 
     expect(text).toContain("# The shape of the file");
-    expect(text).toContain("> **Mind the colons**");
+    expect(text).toContain("> **Styling is not in the file**");
     expect(leftovers(text)).toEqual([]);
   });
 

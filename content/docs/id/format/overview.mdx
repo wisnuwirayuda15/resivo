@@ -1,81 +1,105 @@
 ---
 title: Bentuk berkas
-description: Sebuah CV adalah satu berkas Markdown, dengan satu judul per bagian dan beberapa direktif untuk hal yang tidak punya padanan di Markdown.
+description: Resume adalah satu berkas Markdown dengan nama, tajuk, kontak, dan bagian, ditambah beberapa direktif untuk hal yang tidak punya padanan di Markdown.
 ---
 
-Sebuah CV adalah satu berkas Markdown. Baris pertamanya adalah judul `#` berisi
-nama Anda, dan setiap judul `##` sesudahnya memulai satu bagian.
+Resume di Resivo adalah satu berkas Markdown. Ia Markdown biasa dengan beberapa
+baris tambahan, yang disebut direktif, untuk hal yang tidak dapat dikatakan oleh
+judul dan daftar, seperti sebuah pekerjaan dengan jabatan, tempat, dan tanggal.
+Semua yang ada di kertas berasal dari berkas ini, dan setiap perubahan yang Anda
+buat di kertas ditulis kembali ke dalamnya, jadi berkas dengan bentuk ini adalah
+resume yang selesai, siapa atau apa pun yang mengetiknya.
 
 ```resume title="resume.md"
 # Ada Lovelace
 
-::contact[ada@example.com]{icon=envelope}
+Matematikawan, dan pemrogram pertama
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[London, Inggris]{icon="map-pin"}
 
 ## Ringkasan
 
-Matematikawan dan penulis algoritma pertama yang diterbitkan.
+Menulis algoritma pertama yang diterbitkan, untuk mesin yang tidak pernah selesai dibuat.
 
-:::entry{start=1842-01 end=1843-12}
-### Penerjemah, catatan Mesin Analitik
+## Pengalaman
+
+:::entry{title="Translator and annotator" subtitle="Analytical Engine notes" location="London" start="1842" end="1843"}
 Menulis catatan yang memuat program pertama.
+
+- Menerbitkan catatan itu bersama terjemahannya
 :::
+
+## Keahlian
+
+::tags[Matematika, Analisis, Menulis]
 ```
 
-## Isi sebuah bagian [#sections]
+## Nama dan tajuk [#name]
 
-Sebuah bagian adalah satu judul beserta yang mengikutinya. Ada tiga hal yang perlu diketahui:
+`#` adalah nama Anda. Hanya ada satu, ia datang pertama, dan itu satu-satunya
+hal yang harus dimiliki berkas. Paragraf di bawahnya adalah tajuk: satu baris
+yang berada di bawah nama Anda.
 
-- Markdown biasa tetap berlaku: daftar, tabel, tautan, dan penekanan.
-- Direktif diawali titik dua dan menamai bagian yang tidak punya padanan di Markdown.
-- Hanya judul `#` pertama yang diizinkan, karena itulah nama di bagian atas.
+## Kontak [#contacts]
 
-| Direktif    | Menulis                       |
-| ----------- | ----------------------------- |
-| `::contact` | Satu baris detail kontak      |
-| `:::entry`  | Pekerjaan, gelar, atau proyek |
-| `::tags`    | Deretan label singkat         |
+Di antara nama dan bagian pertama, setiap baris `::contact` adalah satu
+keterangan kontak. Lihat [Kontak](/docs/format/contacts).
 
-<Callout title="Catatan">Setiap judul `##` memulai satu bagian.</Callout>
+## Bagian [#sections]
 
-<Callout type="warning" title="Perhatikan titik dua">
-  Titik dua direktif tidak pernah mengikuti kata, jadi `Catatan:` adalah teks
-  dan `:icon` adalah direktif.
+`##` membuka sebuah bagian, dan teksnya adalah judul bagian itu. Judul-judul ini
+juga memberi tahu template jenis bagiannya:
+
+- Ringkasan, yang juga dibaca dari Tentang saya, Profil, dan Tujuan
+- Pengalaman, juga Pengalaman kerja, Pengalaman profesional, dan Riwayat
+  pekerjaan
+- Pendidikan
+- Keahlian, juga Keterampilan dan Keahlian teknis
+- Proyek
+- Sertifikasi, juga Sertifikat
+- Penghargaan
+- Publikasi
+- Bahasa
+- Minat, juga Hobi
+
+Padanan bahasa Inggrisnya juga dikenali, seperti Summary, Experience,
+Education, dan Skills. Judul lain tidak masalah dan digambar dengan cara yang
+sama, sebagai bagian kustom. Judul dicocokkan secara utuh dan tanpa
+memperhatikan huruf kapital, tidak pernah secara longgar, karena tebakan yang
+salah akan mengubah cara template menata bagian itu.
+
+Sebuah bagian mempertahankan identitasnya ketika judulnya Anda ganti. Ikonnya,
+apakah ia disembunyikan, dan pengaturan gayanya sendiri disimpan oleh Resivo dan
+tidak ditulis di Markdown, dan semuanya tetap bersama bagian itu melewati
+penggantian nama.
+
+Direktif didaftar di [tabel di bawah](#directives).
+
+Berkas yang ditulis dengan judul `###` tetap berfungsi apa adanya: tingkat judul
+paling dangkal di berkas dianggap tingkat bagian, dan dirapikan saat penyimpanan
+pertama.
+
+## Apa itu direktif [#directives]
+
+| Direktif      | Gunanya                                         |
+| ------------- | ----------------------------------------------- |
+| `::contact`   | Satu keterangan kontak, di kepala               |
+| `:::entry`    | Pekerjaan, gelar, atau proyek, beserta faktanya |
+| `::tags`      | Deretan label singkat, untuk keahlian dan alat  |
+| `::label`     | Satu baris dengan ikon di depannya              |
+| `:icon`       | Ikon di dalam sebaris teks                      |
+| `::image`     | Sebuah gambar                                   |
+| `::pagebreak` | Pemisah halaman paksa                           |
+
+[Acuan direktif](/docs/format/directive-reference) mendaftar setiap atribut. Apa
+pun yang bukan direktif adalah Markdown biasa, dibahas di
+[Selebihnya adalah Markdown biasa](/docs/format/standard-markdown).
+
+<Callout title="Gaya tidak ada di berkas">
+
+Markdown hanya memuat isi. Font, warna, dan margin diatur di tab **Gaya** dan di
+CSS Anda sendiri, jadi Anda bisa mengubah tampilan resume tanpa menyentuh satu
+kata pun.
+
 </Callout>
-
-## Coba sendiri [#try]
-
-<Steps>
-<Step>
-
-### Buka editor
-
-Tekan <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> lalu pilih sebuah CV.
-
-</Step>
-<Step>
-
-### Ubah Markdown-nya
-
-Pratinjau mengikuti setiap ketikan.
-
-</Step>
-</Steps>
-
-<Tabs items={["macOS", "Windows"]}>
-<Tab value="macOS">
-
-Gunakan <Kbd>Cmd</Kbd> + <Kbd>K</Kbd>.
-
-</Tab>
-<Tab value="Windows">
-
-Gunakan <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>.
-
-</Tab>
-</Tabs>
-
-```bash
-bun run dev
-```
-
-Baca [beranda dokumentasi](/docs) atau lompat ke [tabelnya](#sections).

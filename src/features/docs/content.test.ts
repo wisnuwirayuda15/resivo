@@ -1,3 +1,6 @@
+import { existsSync } from "node:fs";
+import { dirname, join } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { SUPPORTED_LANGUAGES } from "@/lib/i18n/language";
@@ -7,13 +10,18 @@ import {
   checkCompiles,
   checkFences,
   checkFrontmatter,
+  checkIncludes,
   checkLinks,
   checkMeta,
   checkParity,
   checkSlugs,
   checkUiLabels,
 } from "./testing/checks";
-import { languagesOnDisk, readDocsTree } from "./testing/contentFiles";
+import {
+  DOCS_ROOT,
+  languagesOnDisk,
+  readDocsTree,
+} from "./testing/contentFiles";
 import { uiLabelsFor } from "./testing/labels";
 
 /**
@@ -82,6 +90,16 @@ describe("the docs content", () => {
       expect(tree.pages.flatMap((page) => checkUiLabels(page, labels))).toEqual(
         [],
       );
+    });
+
+    it("includes only files that exist", () => {
+      const problems = tree.pages.flatMap((page) =>
+        checkIncludes(page, (relative) =>
+          existsSync(join(DOCS_ROOT, lang, dirname(page.path), relative)),
+        ),
+      );
+
+      expect(problems).toEqual([]);
     });
 
     it("has code blocks that are true", () => {

@@ -6,9 +6,11 @@ import type { Page } from "@playwright/test";
  * What an article is made of: highlighted code, the blocks an author can write,
  * links, and the contents column that follows the reader.
  *
- * These read the format overview page, which holds one of each on purpose. When
- * that page is rewritten for real, each assertion moves to whichever page holds
- * the same element; none of them is about that page's words.
+ * Each assertion reads a real page that holds the element, and none of them is
+ * about that page's words: when a page is rewritten, the assertion moves to
+ * whichever page holds the same element. The format overview has the code, the
+ * table, the list and a callout; the quick start has the steps; the shortcuts
+ * page has the tabs; and the local-first page has the warning.
  */
 const hydrated = async (page: Page) => {
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
@@ -16,9 +18,11 @@ const hydrated = async (page: Page) => {
 
 const article = (page: Page) => page.getByRole("article");
 
+const OVERVIEW = "/en/docs/format/overview";
+
 test.describe("docs article", () => {
   test("has one h1, and it is the page title", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
 
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.locator("h1")).toHaveText("The shape of the file");
@@ -27,7 +31,7 @@ test.describe("docs article", () => {
   test("colours a directive in the server's own markup", async ({
     request,
   }) => {
-    const html = await (await request.get("/en/docs/format/overview")).text();
+    const html = await (await request.get(OVERVIEW)).text();
 
     expect(html).toContain('<span class="hljs-keyword">::contact</span>');
   });
@@ -37,7 +41,7 @@ test.describe("docs article", () => {
     context,
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
     await hydrated(page);
 
     const block = article(page).locator("pre").first();
@@ -60,71 +64,79 @@ test.describe("docs article", () => {
   });
 
   test("makes each heading its own permalink", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
     await hydrated(page);
 
     const link = article(page).getByRole("link", {
-      name: /What a section holds/,
+      name: "What the directives are",
     });
 
-    await expect(link).toHaveAttribute("href", "#sections");
+    await expect(link).toHaveAttribute("href", "#directives");
     await link.click();
-    await expect(page).toHaveURL(/#sections$/);
+    await expect(page).toHaveURL(/#directives$/);
   });
 
   test("renders a Markdown table as a table", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
 
     const table = article(page).getByRole("table");
 
     await expect(
       table.getByRole("columnheader", { name: "Directive" }),
     ).toBeVisible();
-    await expect(table.getByRole("row")).toHaveCount(4);
+    // The header, and a row for each of the seven directives.
+    await expect(table.getByRole("row")).toHaveCount(8);
   });
 
   test("renders a list with its markers", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
 
     const list = article(page).getByRole("list").first();
 
-    await expect(list.getByRole("listitem")).toHaveCount(3);
+    expect(await list.getByRole("listitem").count()).toBeGreaterThan(3);
     expect(
       await list.evaluate((node) => getComputedStyle(node).listStyleType),
     ).toBe("disc");
   });
 
   test("boxes a callout, and keeps its kind", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
 
     const notes = article(page).getByRole("note");
 
-    await expect(notes).toHaveCount(2);
-    await expect(notes.first()).toContainText("A note");
-    await expect(notes.last()).toContainText("Mind the colons");
+    await expect(notes).toHaveCount(1);
+    await expect(notes.first()).toContainText("Styling is not in the file");
+
+    // A warning is a callout of another kind, in its own colour.
+    await page.goto("/en/docs/getting-started/local-first");
+
+    await expect(article(page).getByRole("note")).toContainText(
+      "The only copy is on your device",
+    );
   });
 
   test("numbers the steps of a procedure", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto("/en/docs/getting-started/quick-start");
 
     const steps = article(page).locator("ol > li");
 
-    await expect(steps).toHaveCount(2);
+    await expect(steps).toHaveCount(5);
     await expect(steps.first()).toContainText("1");
-    await expect(steps.last()).toContainText("2");
+    await expect(steps.last()).toContainText("5");
   });
 
   test("switches between tabs, with every alternative already in the page", async ({
     page,
     request,
   }) => {
-    const html = await (await request.get("/en/docs/format/overview")).text();
+    const shortcuts = "/en/docs/editor/shortcuts-and-palette";
+    const html = await (await request.get(shortcuts)).text();
 
     // The panel that is not showing still holds its content in the document.
-    expect(html).toMatch(/panel-macOS"[^>]*>[\s\S]{0,600}Cmd/);
-    expect(html).toMatch(/panel-Windows"[^>]*>[\s\S]{0,600}Ctrl/);
+    expect(html).toMatch(/panel-macOS"[^>]*>[\s\S]{0,600}Mac/);
+    expect(html).toMatch(/panel-Windows"[^>]*>[\s\S]{0,600}Windows and Linux/);
 
-    await page.goto("/en/docs/format/overview");
+    await page.goto(shortcuts);
     await hydrated(page);
 
     const panels = article(page).getByRole("tabpanel", { includeHidden: true });
@@ -132,50 +144,51 @@ test.describe("docs article", () => {
     await expect(panels.first()).toBeVisible();
     await expect(panels.last()).toBeHidden();
 
-    await article(page).getByRole("tab", { name: "Windows" }).click();
+    await article(page).getByRole("tab", { name: "macOS" }).click();
 
     await expect(panels.last()).toBeVisible();
     await expect(panels.first()).toBeHidden();
   });
 
   test("points a docs link at the language being read", async ({ page }) => {
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
+    // By address: a docs link is written with no language and has to come out
+    // with one, and none may be left that points at the bare `/docs`.
     await expect(
-      article(page).getByRole("link", { name: "the home page" }),
-    ).toHaveAttribute("href", "/en/docs");
+      article(page).locator('a[href="/en/docs/format/contacts"]').first(),
+    ).toBeVisible();
+    await expect(article(page).locator('a[href^="/docs"]')).toHaveCount(0);
 
     await page.goto("/id/docs/format/overview");
     await expect(
-      article(page).getByRole("link", { name: "beranda dokumentasi" }),
-    ).toHaveAttribute("href", "/id/docs");
+      article(page).locator('a[href="/id/docs/format/contacts"]').first(),
+    ).toBeVisible();
+    await expect(article(page).locator('a[href^="/docs"]')).toHaveCount(0);
   });
 
   test("follows the reader down the page in the contents column", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 1400, height: 700 });
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
     await hydrated(page);
 
     const toc = page.getByRole("complementary", { name: "On this page" });
 
     await article(page)
-      .getByRole("heading", { name: "Try it" })
+      .getByRole("heading", { name: "What the directives are" })
       .scrollIntoViewIfNeeded();
     await page.mouse.wheel(0, 600);
 
-    await expect(
-      toc
-        .getByRole("link", { name: /Try it|Open the editor|Edit the Markdown/ })
-        .first(),
-    ).toHaveAttribute("data-active", "true");
+    // One heading is the current one, whichever it is at this scroll position.
+    await expect(toc.locator('[data-active="true"]')).toHaveCount(1);
   });
 
   test("scrolls a long code line inside its block and not the page", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.goto("/en/docs/format/overview");
+    await page.goto(OVERVIEW);
     await hydrated(page);
 
     const overflow = await page.evaluate(

@@ -1,0 +1,63 @@
+---
+title: Cover letters
+description: A cover letter is the same file format as a resume, with a header and then paragraphs under one section that has no title.
+---
+
+A cover letter is a document like any other in Resivo, and the same file format:
+your name and contacts at the top, then paragraphs. The only difference is that
+it has no section headings to draw. You make one from the **New resume** dialog,
+or from a resume's menu in the library. See
+[Make a new resume](/docs/library/new-resume).
+
+```resume title="letter.md"
+# Ada Lovelace
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[London, UK]{icon="map-pin"}
+
+##
+
+14 March 1843
+
+Charles Babbage, Difference Engine Co., London
+
+Dear Mr. Babbage,
+
+I am writing about the Analytical Engine.
+
+Thank you for your time.
+
+Yours sincerely,
+
+Ada Lovelace
+```
+
+## The shape of a letter [#shape]
+
+- The header is the same as a resume's: `#` is the sender's name, and the
+  `::contact` lines are the details a reply would use.
+- Then a line with only `##`. That is the letter's one section, and it has no
+  title on purpose. The paper draws nothing for it, and the Markdown writes it
+  back exactly as it is, so leave it where it is.
+- Everything after it is paragraphs, one to a line with a blank line between:
+  the date, the recipient, the greeting, the body, the closing and your name.
+  An address set as several short paragraphs is fine, and is spaced like
+  several.
+
+## Length, and what a letter is checked for [#checks]
+
+A letter is one page. The **ATS** tab asks for that, and says so in words when
+the letter runs past about 450 of them.
+
+It does not ask a letter for an Experience section or for dates, because a
+letter has none. It still reads your name and contacts, the type size and the
+margins, and whether any text is hidden.
+
+A letter starts from a larger body text, an inch of margin and more space
+between paragraphs than a resume has, and keeps whatever template you chose for
+its type and colour.
+
+## Writing one with an assistant [#assistant]
+
+There is a prompt written for letters, which tells a model not to invent a
+recipient, a company or an achievement. See [AI prompts](/docs/format/ai-prompts).

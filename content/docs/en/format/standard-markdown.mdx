@@ -1,0 +1,65 @@
+---
+title: Everything else is ordinary Markdown
+description: Everything that is not a directive is CommonMark and GFM Markdown, what is typeset, and what is kept as plain source text and flagged.
+---
+
+Anything that is not a directive is ordinary Markdown: CommonMark and GFM, with
+no changes to what they mean. All of it is typeset.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Education
+
+**Mathematics**, private tuition (1840 to 1842)
+
+| Award      | Year |
+| ---------- | ---- |
+| Gold Medal | 1843 |
+
+> The Analytical Engine weaves algebraic patterns.
+
+- [ ] Still to write up
+- [x] Notes published
+```
+
+## What is typeset [#typeset]
+
+- Headings below the section level
+- Bullet lists and numbered lists, at any depth, and task lists
+- Tables
+- Block quotes
+- Code blocks
+- Horizontal rules
+- Bold, italic and links, inside a line
+
+## What is kept as it was written [#raw]
+
+Some Markdown has no place in a resume's model: raw HTML, footnotes and link
+reference definitions. Resivo does not drop them and does not render them. Each
+is kept exactly as you wrote it, printed as plain source text, and the editor
+flags it as a notice so you know.
+
+```resume warns title="Raw HTML is kept as text"
+# Ada Lovelace
+
+## Summary
+
+<div>Wrote the first published algorithm.</div>
+```
+
+The same goes for a directive this build does not know, such as `::banner`, and
+for a known one that is missing something it needs. See
+[the directive reference](/docs/format/directive-reference).
+
+## Text above the first heading [#above]
+
+Text that comes before the first heading is not refused. It goes into a section
+with no title, so nothing you typed is lost.
+
+## Headings [#headings]
+
+`#` is the name, and `##` opens a section. If a file uses deeper headings for its
+sections, such as `###`, the shallowest level in the file is taken as the section
+level, so a resume written elsewhere works as pasted. Headings deeper than the
+section level are subheadings inside it.

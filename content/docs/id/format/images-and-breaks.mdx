@@ -1,0 +1,68 @@
+---
+title: Gambar dan pemisah halaman
+description: Bagaimana gambar muncul di Markdown dan mengapa Anda menambahkannya dari tab Aset, serta baris ::pagebreak yang memaksa halaman baru.
+---
+
+## Gambar [#images]
+
+Gambar ditulis sebagai baris `::image`:
+
+```resume title="resume.md"
+# Ada Lovelace
+
+::image[Potret]{id="8f14e45f" width="40"}
+
+## Ringkasan
+
+Menulis algoritma pertama yang diterbitkan.
+```
+
+- Teks dalam kurung adalah deskripsi gambar, untuk pembaca yang tidak dapat
+  melihatnya.
+- `id` menamai gambar. Ia wajib: `::image` tanpa `id` tidak dibaca sebagai
+  gambar dan ditandai.
+- `width` adalah persentase dari lebar kolom teks. Bersifat opsional.
+
+### Mengapa tidak menulisnya dengan tangan [#why]
+
+Id sebuah gambar milik basis data di browser Anda sendiri, jadi tidak dapat
+ditulis dengan tangan atau ditebak. Tambahkan gambar dari tab **Aset**, atau
+dari halaman Gambar, dan direktifnya ditulis untuk Anda. Lebarnya diatur dengan
+kontrol di kertas dalam mode Visual, tempat gambar memiliki **Lebar gambar**
+di antara kontrolnya. Lihat [Penyuntingan visual](/docs/editor/visual-editing).
+
+Berkas yang merujuk id gambar yang tidak dimiliki browser ini menampilkan kotak
+bergaris putus-putus berisi kata Missing image dan deskripsinya, sebagai ganti
+gambar.
+
+```resume warns title="An image needs an id"
+# Ada Lovelace
+
+## Ringkasan
+
+::image[Potret]{width="40"}
+```
+
+## Pemisah halaman [#breaks]
+
+`::pagebreak` memaksa apa pun yang mengikutinya ke halaman baru. Ia tidak
+menerima atribut maupun teks.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Pengalaman
+
+Menulis catatan yang memuat program pertama.
+
+::pagebreak
+
+## Publikasi
+
+Menerjemahkan dan memberi catatan pada memoar Menabrea.
+```
+
+Sebuah bagian juga dapat diatur mulai di halaman baru dari tab **Bagian**, dan
+satu pengaturan untuk seluruh dokumen menentukan apakah judul boleh menjadi hal
+terakhir di sebuah halaman. Ketiga caranya, dan bagaimana halaman diisi, ada di
+[Halaman dan pemisah](/docs/editor/pages-and-breaks).

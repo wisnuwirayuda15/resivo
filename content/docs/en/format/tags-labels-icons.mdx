@@ -1,0 +1,56 @@
+---
+title: Skills, labels and icons
+description: Write a skills list with ::tags, a line with an icon with ::label, and an icon inside a sentence with :icon, and choose the icon's weight.
+---
+
+Three small directives cover short lists and icons.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Skills
+
+::tags[TypeScript, React, PostgreSQL, Rust]
+
+::label[Available from March]{icon="calendar-check" weight="bold"}
+
+Fluent in English and French :icon{name="translate"}
+```
+
+## Tags [#tags]
+
+`::tags` takes a comma-separated list and draws it as pills, which is the right
+shape for skills, tools and languages. The text in brackets is the list itself:
+split at each comma, with the spaces around each item removed, and written back
+the same way.
+
+## Labels [#labels]
+
+`::label` is one line with an icon in front of it. It needs an `icon`: a
+`::label` without one is not read as a label, and the editor flags it.
+
+```resume warns title="A label needs an icon"
+# Ada Lovelace
+
+## Summary
+
+::label[Available from March]
+```
+
+## Icons in text [#icon]
+
+`:icon` puts an icon inside a line of text, wherever you write it, even mid
+sentence. It takes the icon's `name`. Without a name it is not an icon, and it is
+left as the plain text `:icon`.
+
+## Names and weights [#names]
+
+Icons are the Phosphor icon set, named in kebab-case: `envelope`, `map-pin`,
+`github-logo`, `calendar-check`. Every icon is available in six weights, and
+`weight` is one of `thin`, `light`, `regular`, `bold`, `fill` or `duotone`. A
+weight Resivo does not know is ignored, and the icon is drawn in its normal
+weight.
+
+You do not need to remember names. The icon picker searches by what an icon
+shows, so typing mail finds the envelope, and it writes the name for you. It
+opens from the **Sections** tab for a section or a contact.

@@ -1,0 +1,54 @@
+---
+title: Contacts
+description: Write your email, phone, location and links as ::contact lines under your name, with an optional icon and link for each.
+---
+
+Contact details go in the header, between your name and the first section. Each
+one is a `::contact` line, one detail per line.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[+44 20 7946 0958]{icon="phone"}
+::contact[ada.example.com]{icon="globe" href="https://ada.example.com"}
+::contact[London, UK]{icon="map-pin"}
+
+## Summary
+
+Wrote the first published algorithm.
+```
+
+## What goes in each part [#parts]
+
+- The text in square brackets is what prints.
+- `icon` is the name of an icon, in kebab-case, such as `envelope`, `phone`,
+  `map-pin`, `globe`, `github-logo` or `linkedin-logo`. It is optional.
+  [Skills, labels and icons](/docs/format/tags-labels-icons) says more.
+- `href` is the address the line links to. It is optional. With it, the line is
+  a link in the PDF and in the HTML export, so write an email address as
+  `mailto:` followed by the address.
+- `weight` is the icon's weight, and is optional too.
+
+Contacts print together as one line under your name, separated the way the
+template separates them.
+
+## Only in the header [#header]
+
+A `::contact` line is a contact only in the header. Put one below the first
+section and it is not read as a contact: it is kept as it was written, and the
+editor flags it as a line it could not typeset.
+
+```resume warns title="Not a contact"
+# Ada Lovelace
+
+## Summary
+
+::contact[ada@example.com]{icon="envelope"}
+```
+
+## The picker [#picker]
+
+You do not have to remember icon names. The **Sections** tab in the inspector
+has a **Contacts** group with a picker for the icon of each one, which writes
+the name into the Markdown for you.

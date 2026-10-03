@@ -1,0 +1,63 @@
+---
+title: Surat lamaran
+description: Surat lamaran memakai format berkas yang sama dengan resume, dengan kepala lalu paragraf di bawah satu bagian yang tidak punya judul.
+---
+
+Surat lamaran adalah dokumen seperti yang lain di Resivo, dengan format berkas
+yang sama: nama dan kontak Anda di atas, lalu paragraf. Satu-satunya perbedaan
+adalah ia tidak punya judul bagian untuk digambar. Anda membuatnya dari dialog
+**Resume baru**, atau dari menu sebuah resume di pustaka. Lihat
+[Buat resume baru](/docs/library/new-resume).
+
+```resume title="letter.md"
+# Ada Lovelace
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[London, Inggris]{icon="map-pin"}
+
+##
+
+14 Maret 1843
+
+Charles Babbage, Difference Engine Co., London
+
+Yth. Bapak Babbage,
+
+Saya menulis perihal Mesin Analitik.
+
+Terima kasih atas waktu Anda.
+
+Hormat saya,
+
+Ada Lovelace
+```
+
+## Bentuk sebuah surat [#shape]
+
+- Kepalanya sama dengan resume: `#` adalah nama pengirim, dan baris `::contact`
+  adalah keterangan yang akan dipakai untuk membalas.
+- Lalu satu baris yang hanya berisi `##`. Itulah satu-satunya bagian surat, dan
+  ia sengaja tanpa judul. Kertas tidak menggambar apa pun untuknya, dan Markdown
+  menuliskannya kembali persis seperti adanya, jadi biarkan di tempatnya.
+- Semua sesudahnya adalah paragraf, satu per baris dengan baris kosong di
+  antaranya: tanggal, penerima, salam, isi, penutup, dan nama Anda. Alamat yang
+  ditata sebagai beberapa paragraf pendek tidak masalah, dan diberi jarak seperti
+  beberapa paragraf.
+
+## Panjang, dan apa yang diperiksa pada surat [#checks]
+
+Surat panjangnya satu halaman. Tab **ATS** menanyakan hal itu, dan
+mengatakannya dengan kata-kata ketika surat melampaui sekitar 450 kata.
+
+Ia tidak meminta bagian Pengalaman atau tanggal dari sebuah surat, karena surat
+tidak punya. Ia tetap membaca nama dan kontak Anda, ukuran huruf dan margin, dan
+apakah ada teks yang tersembunyi.
+
+Surat dimulai dari teks isi yang lebih besar, margin satu inci, dan jarak antar
+paragraf yang lebih lega daripada resume, dan mempertahankan template yang Anda
+pilih untuk jenis huruf dan warnanya.
+
+## Menulisnya dengan asisten [#assistant]
+
+Ada prompt yang ditulis untuk surat, yang memberi tahu model agar tidak mengarang
+penerima, perusahaan, atau pencapaian. Lihat [Prompt AI](/docs/format/ai-prompts).

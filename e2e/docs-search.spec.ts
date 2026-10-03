@@ -64,14 +64,14 @@ test.describe("docs search", () => {
     await page.goto("/en/docs");
     await hydrated(page);
     await page.keyboard.press("Control+k");
-    await box(page).fill("section holds");
+    await box(page).fill("directives are");
 
-    const hit = hits(page, /What a section holds/).first();
+    const hit = hits(page, /What the directives are/).first();
 
     await expect(hit).toBeVisible();
     await hit.click();
 
-    await expect(page).toHaveURL(/\/en\/docs\/format\/overview#sections$/);
+    await expect(page).toHaveURL(/\/en\/docs\/format\/overview#directives$/);
     await expect(box(page)).toBeHidden();
   });
 
@@ -80,7 +80,7 @@ test.describe("docs search", () => {
     await hydrated(page);
     await page.keyboard.press("Control+k");
     // The first hit for this query is the page itself, so Enter lands on it.
-    await box(page).fill("section holds");
+    await box(page).fill("shape of the file");
     await expect(hits(page).first()).toBeVisible();
 
     await page.keyboard.press("Enter");
@@ -103,7 +103,7 @@ test.describe("docs search", () => {
     await page.goto("/id/docs");
     await hydrated(page);
     await page.getByRole("button", { name: "Cari" }).click();
-    await box(page).fill("titik dua");
+    await box(page).fill("tebakan");
 
     const hit = hits(page).first();
 
@@ -162,10 +162,10 @@ test.describe("docs search", () => {
     const enText = await en.text();
     const idText = await id.text();
 
-    expect(enText).toContain("Ordinary Markdown works");
-    expect(enText).not.toContain("Markdown biasa tetap berlaku");
-    expect(idText).toContain("Markdown biasa tetap berlaku");
-    expect(idText).not.toContain("Ordinary Markdown works");
+    expect(enText).toContain("never loosely");
+    expect(enText).not.toContain("tidak pernah secara longgar");
+    expect(idText).toContain("tidak pernah secara longgar");
+    expect(idText).not.toContain("never loosely");
 
     expect(enText.length).toBeLessThan(INDEX_BUDGET);
     expect(idText.length).toBeLessThan(INDEX_BUDGET);

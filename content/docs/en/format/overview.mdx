@@ -1,81 +1,103 @@
 ---
 title: The shape of the file
-description: A resume is one Markdown file, with a heading per section and a few directives for the parts Markdown has no word for.
+description: A resume is one Markdown file with your name, a headline, contacts and sections, plus a few directives for the parts Markdown has no word for.
 ---
 
-A resume is one Markdown file. The first line is a `#` heading with your name,
-and every `##` heading after it starts a section.
+A resume in Resivo is one Markdown file. It is ordinary Markdown with a few
+extra lines, called directives, for the things a heading and a list cannot say,
+such as a job with a title, a place and dates. Everything on the paper comes
+from this file, and every edit you make on the paper is written back into it, so
+a file in this shape is a finished resume whoever or whatever typed it.
 
 ```resume title="resume.md"
 # Ada Lovelace
 
-::contact[ada@example.com]{icon=envelope}
+Mathematician, and the first programmer
+
+::contact[ada@example.com]{icon="envelope" href="mailto:ada@example.com"}
+::contact[London, UK]{icon="map-pin"}
 
 ## Summary
 
-Mathematician and the author of the first published algorithm.
+Wrote the first published algorithm, for a machine that was never built.
 
-:::entry{start=1842-01 end=1843-12}
-### Translator, Analytical Engine notes
+## Experience
+
+:::entry{title="Translator and annotator" subtitle="Analytical Engine notes" location="London" start="1842" end="1843"}
 Wrote the notes that held the first program.
+
+- Published the notes alongside the translation
 :::
+
+## Skills
+
+::tags[Mathematics, Analysis, Writing]
 ```
 
-## What a section holds [#sections]
+## The name and the headline [#name]
 
-A section is a heading and whatever follows it. Three things are worth knowing:
+`#` is your name. There is one, it comes first, and it is the only thing the
+file has to have. The paragraph under it is the headline: the single line that
+sits beneath your name.
 
-- Ordinary Markdown works: lists, tables, links and emphasis.
-- A directive starts with a colon and names a part Markdown has no word for.
-- The first `#` heading is the only one allowed, because it is the name at the top.
+## Contacts [#contacts]
 
-| Directive   | Writes                       |
-| ----------- | ---------------------------- |
-| `::contact` | One line of contact details  |
-| `:::entry`  | A job, a degree or a project |
-| `::tags`    | A row of short labels        |
+Between the name and the first section, each `::contact` line is one contact
+detail. See [Contacts](/docs/format/contacts).
 
-<Callout title="A note">Each `##` heading starts a section.</Callout>
+## Sections [#sections]
 
-<Callout type="warning" title="Mind the colons">
-  A directive's colon never follows a word, so `Note:` is text and `:icon` is a
-  directive.
+`##` opens a section, and its text is that section's title. These titles also
+tell a template what kind of section it is:
+
+- Summary, which is also read from About, Profile and Objective
+- Experience, also Work experience, Professional experience, Employment and Work
+  history
+- Education
+- Skills, also Technical skills
+- Projects
+- Certifications, also Certificates
+- Awards, also Honours and Honors
+- Publications
+- Languages
+- Interests, also Hobbies
+
+The Indonesian titles for these are recognised too, such as Ringkasan,
+Pengalaman, Pendidikan and Keahlian. Any other title is fine and is drawn the
+same way, as a custom section. A title is matched in full and ignoring capital
+letters, never loosely, because a wrong guess would change how a template lays
+the section out.
+
+A section keeps its identity when you rename its heading. Its icon, whether it
+is hidden and its own style settings are kept by Resivo and not written in the
+Markdown, and they stay with the section through the rename.
+
+The directives are listed in [the table below](#directives).
+
+A file written with `###` headings instead works as pasted: the shallowest
+heading level in the file is taken as the section level, and it is tidied on the
+first save.
+
+## What the directives are [#directives]
+
+| Directive     | What it is for                               |
+| ------------- | -------------------------------------------- |
+| `::contact`   | One contact detail, in the header            |
+| `:::entry`    | A job, a degree or a project, with its facts |
+| `::tags`      | A row of short labels, for skills and tools  |
+| `::label`     | One line with an icon in front of it         |
+| `:icon`       | An icon inside a line of text                |
+| `::image`     | A picture                                    |
+| `::pagebreak` | A forced page break                          |
+
+[The directive reference](/docs/format/directive-reference) lists every
+attribute. Anything that is not a directive is ordinary Markdown, covered in
+[Everything else is ordinary Markdown](/docs/format/standard-markdown).
+
+<Callout title="Styling is not in the file">
+
+The Markdown holds content only. Fonts, colours and margins are set in the
+**Style** tab and in your own CSS, so you can change how a resume looks without
+touching a word of it.
+
 </Callout>
-
-## Try it [#try]
-
-<Steps>
-<Step>
-
-### Open the editor
-
-Press <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd> and choose a resume.
-
-</Step>
-<Step>
-
-### Edit the Markdown
-
-The preview follows each keystroke.
-
-</Step>
-</Steps>
-
-<Tabs items={["macOS", "Windows"]}>
-<Tab value="macOS">
-
-Use <Kbd>Cmd</Kbd> + <Kbd>K</Kbd>.
-
-</Tab>
-<Tab value="Windows">
-
-Use <Kbd>Ctrl</Kbd> + <Kbd>K</Kbd>.
-
-</Tab>
-</Tabs>
-
-```bash
-bun run dev
-```
-
-Read [the home page](/docs) or jump to [the table](#sections).

@@ -1,0 +1,67 @@
+---
+title: Selebihnya adalah Markdown biasa
+description: Semua yang bukan direktif adalah Markdown CommonMark dan GFM, apa yang ditata, dan apa yang disimpan sebagai teks sumber biasa dan ditandai.
+---
+
+Apa pun yang bukan direktif adalah Markdown biasa: CommonMark dan GFM, tanpa
+perubahan pada artinya. Semuanya ditata.
+
+```resume title="resume.md"
+# Ada Lovelace
+
+## Pendidikan
+
+**Matematika**, bimbingan pribadi (1840 sampai 1842)
+
+| Penghargaan | Tahun |
+| ----------- | ----- |
+| Gold Medal  | 1843  |
+
+> Mesin Analitik menenun pola aljabar.
+
+- [ ] Masih harus ditulis
+- [x] Catatan diterbitkan
+```
+
+## Apa yang ditata [#typeset]
+
+- Judul di bawah tingkat bagian
+- Daftar butir dan daftar bernomor, di kedalaman berapa pun, dan daftar tugas
+- Tabel
+- Kutipan blok
+- Blok kode
+- Garis pemisah
+- Tebal, miring, dan tautan, di dalam baris
+
+## Apa yang disimpan apa adanya [#raw]
+
+Sebagian Markdown tidak punya tempat dalam model resume: HTML mentah, catatan
+kaki, dan definisi rujukan tautan. Resivo tidak membuangnya dan tidak
+merendernya. Masing-masing disimpan persis seperti yang Anda tulis, dicetak
+sebagai teks sumber biasa, dan editor menandainya sebagai catatan agar Anda
+tahu.
+
+```resume warns title="Raw HTML is kept as text"
+# Ada Lovelace
+
+## Ringkasan
+
+<div>Menulis algoritma pertama yang diterbitkan.</div>
+```
+
+Hal yang sama berlaku untuk direktif yang tidak dikenal build ini, seperti
+`::banner`, dan untuk direktif yang dikenal tetapi kekurangan sesuatu yang
+dibutuhkannya. Lihat [acuan direktif](/docs/format/directive-reference).
+
+## Teks di atas judul pertama [#above]
+
+Teks yang datang sebelum judul pertama tidak ditolak. Ia masuk ke bagian tanpa
+judul, jadi tidak ada yang Anda ketik yang hilang.
+
+## Judul [#headings]
+
+`#` adalah nama, dan `##` membuka sebuah bagian. Jika sebuah berkas memakai judul
+yang lebih dalam untuk bagiannya, seperti `###`, tingkat paling dangkal di
+berkas dianggap tingkat bagian, jadi resume yang ditulis di tempat lain
+berfungsi apa adanya. Judul yang lebih dalam dari tingkat bagian adalah subjudul
+di dalamnya.
