@@ -1,0 +1,92 @@
+---
+title: Aturan ATS
+description: Setiap aturan pemeriksaan ATS, dikelompokkan menurut yang dilihatnya, dengan tingkat dan titik penerapannya, dan mana yang dapat diperbaiki satu klik.
+---
+
+Inilah semua aturan di balik [pemeriksaan ATS](/docs/checks/ats-check). Setiap
+aturan berlaku untuk resume kecuali sebuah catatan menyebut ia juga berlaku untuk
+surat lamaran. Aturan yang punya perbaikan satu klik menyebut apa yang dilakukan
+perbaikan itu.
+
+## Header dan kontak [#header]
+
+| Aturan               | Tingkat    | Kapan berlaku                                                               |
+| -------------------- | ---------- | --------------------------------------------------------------------------- |
+| Tanpa nama           | Kesalahan  | Header tidak memiliki nama. Juga untuk surat.                               |
+| Tanpa alamat email   | Peringatan | Tidak ada kontak yang terbaca sebagai alamat email. Juga untuk surat.       |
+| Tanpa nomor telepon  | Saran      | Tidak ada kontak yang terbaca sebagai nomor telepon sedikitnya tujuh digit. |
+| Kontak hanya berikon | Kesalahan  | Sebuah kontak menampilkan ikon tanpa teks. Juga untuk surat.                |
+
+Email adalah kontak yang berbentuk `nama@contoh.com`, dan nomor telepon adalah
+kontak dengan sedikitnya tujuh digit. Keduanya dibaca dari isi kontak dan skema
+tautannya, karena kontak adalah teks bebas dan bukan kolom bertipe.
+
+## Bagian dan struktur [#structure]
+
+| Aturan                       | Tingkat    | Kapan berlaku                                                                                          |
+| ---------------------------- | ---------- | ------------------------------------------------------------------------------------------------------ |
+| Bagian tanpa judul           | Kesalahan  | Sebuah bagian yang terlihat memiliki judul kosong.                                                     |
+| Bagian kosong                | Peringatan | Sebuah bagian yang terlihat tidak memiliki blok. Perbaikan: sembunyikan bagian itu.                    |
+| Tanpa bagian inti            | Peringatan | Tidak ada bagian Pengalaman, Pendidikan, atau Proyek yang terlihat dan berisi.                         |
+| Judul yang tidak lazim       | Saran      | Judul bukan yang mungkin dikenal parser. Hanya diperiksa untuk resume berbahasa Inggris dan Indonesia. |
+| Dua kolom                    | Peringatan | Sebuah bagian diatur dalam dua kolom. Perbaikan: pakai satu kolom.                                     |
+| Tabel                        | Peringatan | Sebuah tabel dipakai. Juga untuk surat.                                                                |
+| Markdown yang tidak tercetak | Saran      | Sebuah baris disimpan sebagai teks sumber karena tidak dapat ditata. Juga untuk surat.                 |
+| Gambar tanpa teks alternatif | Peringatan | Sebuah gambar memiliki deskripsi kosong. Juga untuk surat.                                             |
+| Foto                         | Saran      | Header membawa foto.                                                                                   |
+
+Tidak satu pun template Resivo mengatur bagian dalam dua kolom, dan tidak ada
+yang di editor melakukannya. Aturan ini berlaku untuk dokumen yang datang dengan
+cara itu, seperti cadangan yang dipulihkan.
+
+## Tanggal [#dates]
+
+| Aturan                  | Tingkat    | Kapan berlaku                                                                    |
+| ----------------------- | ---------- | -------------------------------------------------------------------------------- |
+| Akhir sebelum awal      | Kesalahan  | Rentang tanggal berjalan mundur.                                                 |
+| Akhir tanpa awal        | Peringatan | Rentang tanggal memiliki tanggal akhir tanpa awal.                               |
+| Tanggal dalam kata      | Peringatan | Tanggal bukan tahun atau bulan, seperti Musim panas 2019.                        |
+| Format tanggal campuran | Saran      | Sebuah bagian menulis sebagian tanggal sebagai tahun dan sebagian sebagai bulan. |
+| Jeda                    | Saran      | Ada lebih dari enam bulan antara satu pekerjaan berakhir dan berikutnya dimulai. |
+
+Tanggal dibaca sebagai `YYYY` atau `YYYY-MM`. Pekerjaan dengan awal tetapi tanpa
+akhir bisa jadi masih berjalan, jadi aturan jeda tidak mengatakan apa pun alih-alih
+menebak.
+
+## Huruf, margin, dan warna [#style]
+
+| Aturan             | Tingkat    | Kapan berlaku                                                            | Perbaikan               |
+| ------------------ | ---------- | ------------------------------------------------------------------------ | ----------------------- |
+| Teks isi kecil     | Peringatan | Ukuran isi di bawah 9.5pt. Juga untuk surat.                             | Atur ukuran isi ke 10pt |
+| Margin sempit      | Peringatan | Sebuah margin di bawah 0.4in. Juga untuk surat.                          | Naikkan margin ke 0.5in |
+| Kontras rendah     | Peringatan | Warna teks, judul, aksen, atau redup di bawah 4.5 banding 1 pada kertas. | Pulihkan warna template |
+| Font yang diunggah | Saran      | Font isi atau font judul adalah font yang Anda unggah.                   | Pakai font template     |
+
+Font yang diunggah disematkan di PDF dan HTML, tetapi sistem yang menggambar ulang
+teksnya mungkin memakai fontnya sendiri, jadi tiga huruf bawaan adalah pilihan
+yang lebih aman. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+
+## Teks tersembunyi dan tambahan [#css]
+
+| Aturan           | Tingkat    | Kapan berlaku                                                                                                               |
+| ---------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Teks tersembunyi | Peringatan | CSS Anda memakai `display: none`, `visibility: hidden`, ukuran huruf 0, opasitas 0, atau teks transparan. Juga untuk surat. |
+| Teks buatan      | Saran      | CSS Anda menambahkan teks dengan `::before` atau `::after`. Juga untuk surat.                                               |
+
+Komentar di CSS Anda diabaikan, jadi aturan yang sudah Anda matikan tidak
+dilaporkan. Lihat [CSS kustom](/docs/design/custom-css).
+
+## Isi [#content]
+
+| Aturan                 | Tingkat | Kapan berlaku                                                       |
+| ---------------------- | ------- | ------------------------------------------------------------------- |
+| Butir yang panjang     | Saran   | Sebuah butir lebih dari sekitar 300 karakter, kira-kira tiga baris. |
+| Ringkasan yang panjang | Saran   | Sebuah ringkasan lebih dari sekitar 600 karakter.                   |
+| Peran tanpa deskripsi  | Saran   | Sebuah entri di Pengalaman tidak memiliki ringkasan dan butir.      |
+
+## Panjang [#length]
+
+| Aturan                 | Tingkat    | Kapan berlaku                                                                               |
+| ---------------------- | ---------- | ------------------------------------------------------------------------------------------- |
+| Terlalu banyak halaman | Peringatan | Resume melewati dua halaman, atau surat melewati satu. Memerlukan kertas yang sudah diukur. |
+| Surat yang panjang     | Saran      | Surat lamaran lebih dari 450 kata. Dihitung dari teks, jadi tidak perlu pengukuran.         |

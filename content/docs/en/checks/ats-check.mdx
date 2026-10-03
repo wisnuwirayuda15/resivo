@@ -1,0 +1,67 @@
+---
+title: The ATS check
+description: What the ATS tab looks for, how to read what it reports, how to fix or dismiss an item, and why it can say what may go wrong but never that a resume will pass.
+---
+
+Many employers pass a resume through an applicant tracking system, or ATS, before
+a person reads it. These systems read the text of the file, and each one does it
+a little differently. The **ATS** tab in the **Style** pane reads your resume the
+way such a system might and lists what could go wrong.
+
+It cannot promise how a particular system will read the file, because none of
+them publishes how it works, and the tab says so under its results. Think of it
+as a proofreader for the things a machine trips on, and not as a pass mark.
+
+## Reading the list [#list]
+
+Each item says what was found, where it is and why it matters, in a sentence.
+Items come in three kinds, with the most serious first:
+
+- An error is something that certainly breaks a parser, such as a resume with no
+  name, a contact that shows an icon and no text, or an end date before its
+  start. The word is kept for these cases only, so that it still means
+  something.
+- A warning is a real risk that depends on the system, such as a missing email
+  address, a table, or body text that is too small.
+- A suggestion is advice. It does not mean anything is wrong.
+
+At the top is a count of each kind. When there is nothing to report, the tab says
+**No issues we recognise**, which is a narrower claim than "this is fine". The
+rules are listed in [The ATS rules](/docs/checks/ats-rules).
+
+The check runs on every change while the tab is open, using only the resume on
+your device. Nothing is sent anywhere.
+
+## Fixing an item [#fix]
+
+Some items carry a button that fixes them in one click, such as raising a body
+size that is too small, or hiding a section with nothing in it. When there is
+more than one such item, a button at the top fixes all of them together.
+
+A fix is an ordinary edit. It shows on the paper, it is saved like any other
+change, and the undo button takes back a fix-all in one step. See
+[Autosave and undo](/docs/editor/autosave-and-undo).
+
+## Dismissing an item [#dismiss]
+
+An item you have read and do not agree with can be set aside with **Dismiss for
+now**. The tab then says how many issues are dismissed, and **Show again** brings
+them back.
+
+A dismissal lasts for the session and belongs to that resume. It is not saved in
+the resume: reloading the page, or closing the tab, brings every item back.
+
+## Length [#length]
+
+Whether the resume runs past two pages is measured on the paper, so it can only
+be checked when the paper has been laid out. If you open the **ATS** tab before
+then, it says that length is not checked and asks you to open the **Paper** tab
+to measure it. On a wide screen the paper is always there.
+
+## Cover letters [#letters]
+
+A cover letter is checked against the questions that apply to a letter: whether
+it names its sender and has a way to reply, the type size and the margins,
+hidden text, tables and unprintable lines, and its length in pages and words. It
+is not asked for an Experience section or for dates. See
+[Cover letters](/docs/format/cover-letters).

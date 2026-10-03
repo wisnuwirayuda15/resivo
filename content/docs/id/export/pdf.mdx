@@ -1,0 +1,57 @@
+---
+title: PDF
+description: Bagaimana PDF dibuat dengan mencetak dokumen ekspor, pengaturan yang dibiarkan di dialog cetak, dan apa yang dilakukan bila tombolnya mati atau hasilnya keliru.
+---
+
+Resivo membuat PDF dengan mencetak, bukan menggambar ulang halaman. Ini disengaja,
+dan inilah sebabnya PDF memiliki teks sungguhan yang dapat dibaca parser.
+
+## Membuatnya [#make]
+
+1. Pilih **Ekspor**, lalu **PDF**.
+2. Dialog cetak browser terbuka. Pilih “Simpan sebagai PDF” sebagai tujuan.
+3. Biarkan skala dan margin apa adanya, lalu simpan.
+
+Petunjuk di bawah **PDF** pada menu mengatakan hal yang sama. Skala dan margin
+penting karena halaman diukur pada ukuran kertas sungguhan dengan margin yang
+diatur di tab Gaya. Bila dialog menambahkan margin sendiri atau mengecilkan
+halaman agar muat, area isi bukan lagi yang dipakai untuk menghitung pemisah
+halaman.
+
+## Apa yang dicetak [#what]
+
+Yang dicetak adalah dokumen yang sama dengan yang ditulis ekspor **HTML**: tata
+letak, CSS Anda, font, dan gambar, semuanya di dalamnya, dan pemisah halaman yang
+diukur kertas, sudah ditempatkan ke dalam halaman. Ia ditulis ke dalam bingkai
+tersembunyi, dicetak, dan dibuang, jadi tidak ada keadaan editor, seperti zoom
+atau pegangan seret, yang dapat mencapai halaman.
+
+Itulah sebabnya PDF sama dengan kertas. Ia adalah kertas, yang dicetak. Lihat
+[Cara kerja Resivo](/docs/getting-started/how-resivo-works).
+
+## Mengapa bukan pustaka PDF [#why]
+
+Browser adalah satu-satunya yang mengubah HTML dan CSS menjadi PDF dengan teks
+sungguhan yang dapat dipilih. Sebuah pustaka akan memotret halaman, yang
+menghancurkan lapisan teks yang dibaca parser, atau menata dokumen dengan mesinnya
+sendiri, sehingga PDF tidak lagi menjadi yang diukur.
+
+Satu hal yang tersisa adalah dialog cetak itu sendiri. Pilihannya milik browser dan
+sistem Anda, bukan Resivo, dan bisa berbeda antar browser.
+
+## Bila tidak berhasil [#problems]
+
+- **PDF** mati, atau abu-abu. Ia menunggu sampai kertas ditata, karena ia memakai
+  pemisah halaman yang diukur kertas. Pada layar sempit, buka tab **Kertas**
+  sekali, lalu coba lagi. Lihat [Editor](/docs/editor/overview).
+- Halaman terpisah di tempat selain di kertas. Periksa bahwa skala dan margin
+  dialog dibiarkan apa adanya, dan bahwa tidak ada yang diatur untuk mengecilkan
+  halaman agar muat.
+- Huruf yang salah. Font yang Anda unggah disematkan, tetapi bila ia dihapus,
+  resume tercetak dalam huruf pengganti. Lihat
+  [Gambar dan font](/docs/design/images-and-fonts).
+- Tidak terjadi apa-apa saat Anda membatalkan dialog. Itu bukan kesalahan, dan
+  Resivo tidak dapat membedakannya dari cetakan yang selesai.
+
+Bila ekspornya sendiri tidak dapat dibuat, sebuah pesan singkat muncul di samping
+tombol **Ekspor**.

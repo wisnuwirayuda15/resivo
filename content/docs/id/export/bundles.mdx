@@ -1,0 +1,81 @@
+---
+title: Bundel
+description: Pindahkan satu resume antar perangkat sebagai zip yang menyimpan gaya, CSS, gambar, dan fontnya, isinya, cara diperiksa saat masuk, dan kapan ia bisa berbeda.
+---
+
+Bundel adalah satu resume beserta semua yang dibutuhkannya agar tampak sama di
+tempat lain: isi, template, pengaturan gaya, CSS Anda, serta gambar dan font yang
+dipakainya, sebagai berkas aslinya. Ia satu-satunya ekspor yang terbaca kembali
+menjadi resume yang sama.
+
+## Membuatnya [#make]
+
+Dua cara, dan keduanya menulis berkas yang sama:
+
+- Di editor, pilih **Ekspor**, lalu **Bundle (.zip)**.
+- Di pustaka, buka menu sebuah kartu dengan **Lainnya** dan pilih **Ekspor sebagai
+  zip**.
+
+Berkas diberi nama sesuai resume dan berakhiran `.zip`.
+
+## Apa isinya [#inside]
+
+| Berkas          | Apa itu                                                                      |
+| --------------- | ---------------------------------------------------------------------------- |
+| `manifest.json` | Apa berkas ini, nomor formatnya, dan revisi template yang menggambar resume. |
+| `resume.json`   | Nama resume, dokumennya, dan catatan untuk setiap gambar dan font.           |
+| `images/`       | Gambar yang dipakai resume, persis seperti saat disimpan.                    |
+| `fonts/`        | Font yang Anda unggah dan dipakai resume.                                    |
+| `resume.md`     | Salinan Markdown untuk dibaca. Ia tidak pernah dibaca kembali.               |
+
+Hanya yang dirujuk resume yang masuk, jadi bundel seukuran resume dan bukan seluruh
+galeri Anda. Tiga huruf bawaan tidak disertakan, karena setiap salinan Resivo
+memilikinya. Bila resume ditulis untuk sebuah lowongan, itu juga dicatat.
+
+Zip terbuka di alat arsip mana pun, jadi Anda dapat melihat persis apa yang
+meninggalkan perangkat Anda.
+
+## Mengimpornya [#import]
+
+Di dialog resume baru, di bawah **Impor berkas**, pilih `.zip`. Resivo
+mengenalinya sebagai bundel dari byte pertamanya dan bukan dari namanya. Lihat
+[Buat resume baru](/docs/library/new-resume#import).
+
+Bundel selalu membuat resume baru. Ia tidak pernah menggantikan satu pun, dan
+mengimpor bundel yang sama dua kali menghasilkan dua resume. Gambar dan font
+dicocokkan menurut isinya dengan yang sudah ada di perangkat, jadi foto yang sudah
+Anda miliki dipakai ulang dan tidak disimpan lagi.
+
+Bundel membawa template dan gayanya sendiri, jadi **Template** yang Anda pilih di
+dialog tidak dipakai untuknya.
+
+### Cara diperiksa [#checks]
+
+Bundel adalah berkas dari luar, jadi ia dibaca seluruhnya dan diperiksa sebelum
+apa pun ditulis. Bila ada yang salah, Anda mendapat pesan yang menyebut apa, dan
+tidak ada yang ditambahkan. Bundel ditolak bila:
+
+- ia bukan zip, atau zip yang bukan bundel Resivo;
+- ia ditulis oleh Resivo versi yang lebih baru daripada yang Anda miliki, dan
+  pesannya meminta Anda memperbarui dulu;
+- resume di dalamnya tidak valid, atau sebuah berkas yang didaftarnya hilang;
+- sebuah gambar atau font tidak dapat dibaca sebagaimana mestinya, atau sebuah
+  gambar tidak cocok dengan checksum yang dicatat untuknya, yang berarti ia rusak;
+- ukurannya lebih dari 100 MB saat dibuka, memuat berkas di atas 25 MB, atau
+  memuat lebih dari 500 berkas, yang tidak pernah dimiliki resume mana pun.
+
+Bundel yang lebih lama dimutakhirkan saat dibaca.
+
+## Kapan ia bisa tampak berbeda [#differ]
+
+Bundel tampak sama saat tiba selama desain template tidak berubah. Setiap template
+memiliki nomor revisi, dan bundel mencatat yang menggambar resume. Bila Resivo
+versi ini memiliki revisi template yang lebih baru, dialog menyebut kedua revisi
+itu dan memperingatkan bahwa sebuah halaman bisa terpisah berbeda dari aslinya.
+Resume tetap lengkap, dan terbuka.
+
+## Bundel atau cadangan [#backup]
+
+Bundel adalah satu resume, untuk dipindahkan. Cadangan adalah seluruh perangkat,
+untuk disimpan. Keduanya berkas yang berbeda, dan cadangan dibahas bersama
+halaman tentang data Anda.

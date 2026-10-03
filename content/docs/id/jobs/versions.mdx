@@ -1,0 +1,81 @@
+---
+title: Versi untuk lowongan
+description: Sesuaikan salinan resume dengan satu perusahaan dan posisi, cara ia disimpan dan ditemukan, dan bagaimana laci Bandingkan menunjukkan persis yang Anda ubah.
+---
+
+Resume yang disesuaikan untuk sebuah lowongan adalah resume yang sama dengan
+beberapa kata diubah. Versi adalah salinan yang dibuat untuk itu. Ia resume
+tersendiri, selesai dan dapat diekspor, dan tidak ada yang menjaganya selaras
+dengan yang menjadi asalnya. Anda dapat menyunting salah satunya tanpa menyentuh
+yang lain, dan Anda selalu dapat bertanya apa yang berbeda.
+
+## Membuat versi [#make]
+
+Di pustaka, buka menu sebuah resume dengan **Lainnya** dan pilih **Buat versi untuk
+lowongan**. Dialog bernama **Versi baru** menanyakan:
+
+- **Perusahaan**, yang satu-satunya jawaban wajib. Bila dikosongkan, dialog meminta
+  Anda menyebut untuk perusahaan mana.
+- **Posisi**, yaitu apa pun yang disebut lowongan itu.
+- **Tautan lowongan**, yang opsional. Itu tempat lowongan berada, untuk saat tiba
+  waktunya bersiap. Tautan harus diawali `http://` atau `https://`.
+
+Pilih **Buat versi** dan resume baru terbuka di editor. Ia dinamai sesuai resume
+asalnya dengan perusahaan ditambahkan, seperti `Staff Engineer untuk Acme`, dan
+disimpan di grup yang sama. Anda dapat mengganti namanya seperti resume mana pun.
+
+## Apa yang ditampilkan pustaka [#library]
+
+Kartu versi menyebut untuk siapa ia ditulis, seperti Untuk Acme, Staff Engineer.
+Resume asalnya menampilkan berapa versi yang dimilikinya. Mencari sebuah perusahaan
+menemukan versinya apa pun namanya. Lihat
+[Kelola resume Anda](/docs/library/organize).
+
+## Versi dari versi [#family]
+
+Versi yang dibuat dari sebuah versi tetap versi dari yang asli. Semua versi dalam
+satu keluarga menunjuk kembali ke yang menjadi awalnya, jadi perbandingan selalu
+terhadap yang itu, dan chip di editor selalu menuju ke sana.
+
+Bila Anda menghapus yang asli, versinya dipertahankan sebagai resume tersendiri.
+Mereka kehilangan tautan dan perbandingan, yang membutuhkan sesuatu untuk
+ditunjuk, dan mempertahankan catatan untuk lowongan mana mereka ditulis.
+
+## Di editor [#chip]
+
+Versi menampilkan chip kecil di bilah di atas editor, seperti Versi untuk Acme.
+Memilihnya membuka resume asalnya. Di sebelahnya ada tombol **Bandingkan**.
+
+## Membandingkan [#compare]
+
+**Bandingkan** membuka laci bernama Perubahan dari, diikuti nama yang asli. Ia
+mendaftar apa yang dimiliki versi ini tetapi tidak dimiliki yang asli, dan apa yang
+tidak ada padanya, dengan cara Anda menjelaskannya:
+
+- Di header, nama, tajuk, atau kontak yang ditambahkan, dihapus, atau diubah.
+- Pengaturan yang berbeda: template berbeda, pengaturan gaya berbeda, CSS khusus
+  berbeda.
+- Untuk setiap bagian yang berbeda, apakah ia ditambahkan, dihapus, dipindahkan,
+  disembunyikan di sini, ditampilkan di sini, diganti namanya, atau bergaya
+  berbeda, dan di bawahnya setiap blok yang **Ditambahkan**, **Dihapus**,
+  **Diubah**, atau **Dipindahkan**. Blok yang diubah ditampilkan kata demi kata,
+  jadi Anda dapat melihat persis kata mana yang Anda tulis ulang.
+- Blok yang katanya sama tetapi formatnya tidak dilaporkan sebagai Kata sama,
+  format berbeda, jadi perubahan tidak pernah ditampilkan sebagai tanpa perubahan.
+- Berapa bagian yang tidak berubah.
+
+Bila tidak ada yang berbeda, ia mengatakannya. Perbandingan dihitung ulang setiap
+kali salah satu resume berubah, jadi ia tidak pernah usang.
+
+### Cara keduanya disejajarkan [#identity]
+
+Versi mempertahankan identitas setiap bagian dan blok yang disalin bersamanya, dan
+menyunting Markdown juga mempertahankannya, jadi kedua resume dapat disejajarkan
+menurut identitas dan bukan menebak paragraf mana yang menjadi yang mana. Itu juga
+sebabnya bagian yang Anda ganti namanya dilaporkan sebagai diganti namanya dan
+bukan satu dihapus dan satu ditambahkan.
+
+Bila salah satu resume Markdown-nya diganti seluruhnya, misalnya dengan menempelkan
+berkas lain di atas semuanya, tidak ada lagi yang dibagi. Laci lalu mengatakannya,
+dan menampilkan semuanya sebagai baru, karena perbandingan baris demi baris tidak
+lagi mungkin.

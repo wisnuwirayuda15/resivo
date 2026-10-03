@@ -1,0 +1,55 @@
+---
+title: PDF
+description: How a PDF is made by printing the exported document, the print settings to leave alone, and what to do when the button is off or the result is wrong.
+---
+
+Resivo makes a PDF by printing, not by drawing the page again. This is on
+purpose, and it is the reason the PDF has real text that a parser can read.
+
+## Making one [#make]
+
+1. Choose **Export**, then **PDF**.
+2. The browser's print dialog opens. Choose “Save as PDF” as the destination.
+3. Leave the scale and the margins as they are, then save.
+
+The hint under **PDF** in the menu says the same thing. The scale and margins
+matter because the pages were measured at the real paper size with margins set in
+the Style tab. If the dialog adds its own margin or shrinks the page to fit, the
+content area is no longer the one the page breaks were worked out for.
+
+## What is printed [#what]
+
+What is printed is the same document the **HTML** export writes: the layout, your
+CSS, the fonts and the images, all inside it, and the page breaks the paper
+measured, already placed into pages. It is written into a hidden frame, printed
+and thrown away, so nothing about the editor's state, such as the zoom or the
+drag handles, can reach the page.
+
+That is why the PDF matches the paper. It is the paper, printed. See
+[How Resivo works](/docs/getting-started/how-resivo-works).
+
+## Why not a PDF library [#why]
+
+A browser is the only thing that turns HTML and CSS into a PDF with real, selectable
+text. A library would either take a picture of the page, which destroys the text
+layer a parser reads, or lay the document out with its own engine, so the PDF
+would stop being the thing that was measured.
+
+The one thing this leaves is the print dialog itself. Its choices belong to your
+browser and your system, not to Resivo, and they can differ between browsers.
+
+## When it does not work [#problems]
+
+- **PDF** is off, or greyed. It waits until the paper has been laid out, because
+  it uses the page breaks the paper measured. On a narrow screen, open the
+  **Paper** tab once, then try again. See [The editor](/docs/editor/overview).
+- Pages break somewhere other than on the paper. Check that the dialog's scale
+  and margins have been left as they are, and that nothing is set to shrink the
+  page to fit.
+- The wrong font. A font you uploaded is embedded, but if it was deleted the
+  resume prints in a fallback face. See [Images and fonts](/docs/design/images-and-fonts).
+- Nothing happens when you cancel the dialog. That is not an error, and there is
+  no way for Resivo to tell it apart from a print that finished.
+
+If the export itself cannot be built, a short message appears beside the
+**Export** button.

@@ -1,0 +1,79 @@
+---
+title: Versions for a job
+description: Tailor a copy of a resume to one company and role, how it is kept and found, and how the Compare drawer shows exactly what you changed from the original.
+---
+
+A resume that is tailored for a job is the same resume with some words changed. A
+version is a copy made for exactly that. It is a resume of its own, finished and
+exportable, and nothing keeps it in step with the one it came from. You can edit
+either without touching the other, and you can always ask what is different.
+
+## Making a version [#make]
+
+In the library, open a resume's menu with **More** and choose **Create version for
+a job**. A dialog named **New version** asks for:
+
+- **Company**, which is the one required answer. If you leave it empty, the dialog
+  asks you to say which company it is for.
+- **Role**, which is whatever the posting called it.
+- **Posting link**, which is optional. It is where the posting is, for when it is
+  time to prepare. A link has to start with `http://` or `https://`.
+
+Choose **Create version** and the new resume opens in the editor. It is named
+after the resume it came from with the company added, such as `Staff Engineer for
+Acme`, and it is filed in the same group. You can rename it like any resume.
+
+## What the library shows [#library]
+
+A version's card says who it was written for, such as For Acme, Staff Engineer.
+The resume it was made from shows how many versions it has. Searching for a
+company finds its version whatever it is called. See
+[Organize your resumes](/docs/library/organize).
+
+## Versions of versions [#family]
+
+A version made from a version is still a version of the original. All the
+versions in a family point back to the one they began from, so a comparison is
+always against that one, and the chip in the editor always leads there.
+
+If you delete the original, its versions are kept as resumes in their own right.
+They lose the link and the comparison, which need something to point at, and keep
+the note of which job they were written for.
+
+## In the editor [#chip]
+
+A version shows a small chip in the bar above the editor, such as Version for
+Acme. Choosing it opens the resume it was made from. Next to it is a **Compare**
+button.
+
+## Comparing [#compare]
+
+**Compare** opens a drawer named Changes from, followed by the original's name.
+It lists what this version has that the original does not, and what it lacks,
+in the way you would describe it:
+
+- In the header, a name, headline or contact that was added, removed or changed.
+- The settings that differ: a different template, different style settings,
+  different custom CSS.
+- For each section that differs, whether it was added, removed, moved, hidden
+  here, shown here, renamed, or styled differently, and under it each block that
+  was **Added**, **Removed**, **Changed** or **Moved**. A changed block is shown
+  word by word, so you can see exactly which words you rewrote.
+- A block whose words are the same but whose formatting is not is reported as
+  Same words, different formatting, so a change is never shown as no change.
+- How many sections are unchanged.
+
+If nothing differs, it says so. The comparison is worked out again whenever
+either resume changes, so it is never out of date.
+
+### How the two are lined up [#identity]
+
+A version keeps the identity of every section and block it was copied with, and
+editing the Markdown keeps them too, so the two resumes can be lined up by
+identity and not by guessing which paragraph became which. That is also why a
+section you rename is reported as renamed and not as one removed and one added.
+
+If one of the resumes had its Markdown replaced whole, for example by pasting a
+different file over all of it, nothing is shared any more. The drawer then says
+so, and shows everything as new, because a line by line comparison is no longer
+possible.

@@ -1,0 +1,86 @@
+---
+title: Format impor
+description: Berkas yang dapat dibaca dialog resume baru, cara membedakannya, apa yang disimpan dan dibuang dari masing-masing, dan apa yang diperiksa setelahnya.
+---
+
+Anda dapat memulai resume dari berkas yang sudah Anda miliki. Di dialog resume
+baru, di bawah **Impor berkas**, pilih satu. Lihat
+[Buat resume baru](/docs/library/new-resume#import). Tidak ada yang ditulis sampai
+Anda memilih **Buat resume**, jadi berkas yang tidak dapat dibaca hanya
+membuat Anda mendapat pesan dan tidak ada yang lain.
+
+## Cara berkas dikenali [#detect]
+
+Ekstensi hanyalah petunjuk. Resivo melihat apa yang ada di dalam:
+
+1. Zip, yang dikenali dari byte pertamanya, adalah bundel.
+2. Berkas yang berakhiran `.json`, atau yang teksnya diawali kurung kurawal, dibaca
+   sebagai JSON Resume.
+3. Berkas dengan judul `#` atau direktif `::` di dalamnya dibaca sebagai Markdown.
+4. Selain itu dibaca sebagai teks biasa.
+
+Berkas JSON yang disimpan sebagai `.txt` tetap dibaca sebagai JSON, dan `.md`
+tanpa judul di dalamnya dibaca sebagai teks.
+
+## Markdown [#markdown]
+
+Format yang dijelaskan dokumentasi ini. Ia dibaca oleh pembaca yang sama dengan
+panel Markdown, jadi dipahami persis seperti bila Anda mengetiknya di sana. Baris
+yang tidak dapat ditata disimpan sebagai teks sumber, dan dialog menyebut berapa,
+supaya editor dapat menunjuknya. Lihat [Bentuk berkas](/docs/format/overview).
+
+## JSON Resume [#json-resume]
+
+Format yang ditulis banyak alat resume lain. Ia membawa kata, tanggal, dan
+struktur, dan Resivo membacanya dengan longgar, karena berkas di dunia nyata sering
+memiliki angka di tempat skema menyebut string, daftar yang hilang, atau kolom dari
+revisi yang lebih baru. Setiap kolom yang tidak dapat dibaca dianggap tidak ada,
+dan setiap daftar mempertahankan butir yang dapat dibaca.
+
+Resume di sini tidak punya tempat untuk sebagian isi JSON Resume. Dialog mendaftar
+apa yang dilewatkan, dan tidak membuangnya diam-diam:
+
+- foto;
+- tautan pada pekerjaan, sekolah, dan proyek;
+- nilai;
+- mata kuliah;
+- tingkat keahlian;
+- kata kunci proyek.
+
+Berkas yang bukan JSON valid, atau JSON yang bukan JSON Resume, ditolak dengan
+kalimat yang menyebut yang mana. Lihat
+[Format ekspor](/docs/export/export-formats#json-resume) untuk arah sebaliknya.
+
+## Teks biasa [#text]
+
+Teks biasa tidak memiliki struktur, jadi membacanya adalah tebakan, dan tebakannya
+kecil. Ia mengenali kebiasaan resume teks:
+
+- Baris pertama adalah nama Anda.
+- Di antaranya dan judul pertama adalah header. Potongan yang tampak seperti alamat
+  email, nomor telepon, atau alamat web menjadi kontak, dengan ikon. Baris pertama
+  yang bukan salah satunya adalah tajuk.
+- Sebuah baris adalah judul bila ia nama yang dikenal format, seperti Pengalaman,
+  atau baris pendek berhuruf kapital tanpa angka. Titik dua di akhir diperbolehkan.
+- Baris yang diawali karakter butir, seperti titik, tanda hubung, atau tanda
+  bintang, adalah butir daftar, dan baris menjorok di bawahnya melanjutkannya.
+- Setiap baris lain adalah paragraf.
+
+Ia tidak mencari entri. Baris berisi peran, perusahaan, dan tanggal dibaca sebagai
+paragraf, dan Anda dapat mengubahnya menjadi entri di panel Markdown. Judul-judul
+menentukan bagiannya, jadi periksa begitu berkas terbuka.
+
+Teks dan Markdown memakai satu pembaca. Teks biasa diubah menjadi Markdown lalu
+dibaca oleh parser yang sama, jadi berkas teks tidak pernah dipahami berbeda dari
+isi yang sama yang diketik di editor.
+
+## Bundel [#bundle]
+
+Bundel dibaca kembali utuh, dengan gaya dan berkasnya. Lihat
+[Bundel](/docs/export/bundles).
+
+## Batas [#limits]
+
+Berkas Markdown, JSON, atau teks berukuran beberapa kilobita. Yang lebih besar dari
+satu megabita ditolak karena kemungkinan bukan resume. Bundel boleh lebih besar,
+hingga batas di halamannya sendiri.

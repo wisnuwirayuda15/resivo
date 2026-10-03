@@ -1,0 +1,77 @@
+---
+title: Format ekspor
+description: Berkas yang ditulis menu Ekspor, kegunaan dan yang dilewatkan masing-masing, dan cara memilih di antaranya untuk formulir, perusahaan, atau cadangan.
+---
+
+Tombol **Ekspor** di bilah di atas editor menulis resume yang terbuka menjadi
+berkas, atau mencetaknya. Menunya memiliki dua bagian: **Cetak**, yang memuat
+**PDF**, dan **Berkas**, yang mendaftar format di bawah. Berkas diberi nama sesuai
+resume, dengan karakter yang ditolak beberapa sistem dibuang, dan dengan ekstensi
+yang tepat.
+
+Tidak ada yang diunggah. Berkas dibuat di browser Anda dan diserahkan kepadanya
+untuk disimpan.
+
+| Format            | Berkas  | Cocok untuk                                                | Yang dilewatkan                                    |
+| ----------------- | ------- | ---------------------------------------------------------- | -------------------------------------------------- |
+| **PDF**           | cetakan | Dikirim ke perusahaan.                                     | Tidak ada: ia adalah halamannya.                   |
+| **HTML**          | `.html` | Salinan setia yang terbuka di browser mana pun.            | Tidak ada: ia adalah halamannya.                   |
+| **Markdown**      | `.md`   | Hanya isi, dalam format yang dibaca editor.                | Gaya, dan apa pun yang tidak punya kata di format. |
+| **JSON Resume**   | `.json` | Pindah ke alat resume lain.                                | Gaya, bagian tersembunyi dan khusus, dan lainnya.  |
+| **Plain text**    | `.txt`  | Formulir yang meminta Anda menempelkan resume.             | Semua gaya dan struktur.                           |
+| **Bundle (.zip)** | `.zip`  | Memindahkan resume ke perangkat lain dengan tampilan sama. | Tidak ada.                                         |
+
+## PDF [#pdf]
+
+Resume dikirim sebagai PDF, jadi inilah format yang paling banyak dicari. Ia
+dijelaskan di [PDF](/docs/export/pdf).
+
+## HTML [#html]
+
+Satu berkas mandiri dengan tata letak yang sama dengan pratinjau. Gaya, pemisah
+halaman yang diukur kertas, CSS kustom Anda, serta gambar dan font semuanya ada di
+dalamnya, sebagai data dan bukan tautan, jadi ia tidak butuh jaringan atau berkas
+lain. Buka di browser mana pun dan ia tampak seperti kertasnya. PDF dibuat dengan
+mencetak dokumen yang sama ini.
+
+## Markdown [#markdown]
+
+Resume sebagai teks yang ditampilkan editor di `resume.md`, ditulis oleh penulis
+milik editor sendiri, jadi ia terbaca kembali persis. Ia hanya memuat isi. Gaya,
+template, dan CSS Anda tidak ada di dalamnya, dan bagian yang Anda sembunyikan
+ditulis sebagai bagian biasa, karena menyembunyikan tidak punya sintaks. Pakai
+bundel untuk menyimpannya. Lihat [Bentuk berkas](/docs/format/overview).
+
+## JSON Resume [#json-resume]
+
+Isi dalam format JSON Resume, yang dibaca banyak alat resume lain. Ia memuat kata,
+tanggal, dan struktur. Ia tidak punya tempat untuk template atau tata letak, dan
+ia melewatkan bagian tersembunyi serta bagian khusus, karena formatnya memiliki
+nama bagian yang tetap dan tidak ada yang pantas dinamai untuk bagian berjudul
+bebas. Butir ini tidak ditawarkan untuk surat lamaran, yang tidak memiliki bagian
+semacam itu.
+
+## Plain text [#text]
+
+Resume tanpa gaya, untuk formulir yang punya kotak untuk menempel. Nama datang
+lebih dulu, lalu tajuk dan kontak dalam satu baris, lalu setiap bagian di bawah
+judulnya. Sebuah entri ditulis dalam satu baris sebagai judul, subjudul, dan
+tempatnya, lalu tanggalnya dalam tanda kurung, lalu ringkasan dan butirnya.
+Tautan ditulis sebagai labelnya diikuti alamatnya dalam tanda kurung, karena teks
+tidak punya tautan. Gambar, garis, dan pemisah halaman tidak punya yang dapat
+ditulis. Bagian tersembunyi tidak disertakan.
+
+## Bundle (.zip) [#bundle]
+
+Satu-satunya format yang terbaca kembali menjadi resume yang sama, dengan gaya,
+CSS, gambar, dan fontnya. Lihat [Bundel](/docs/export/bundles).
+
+## Mana yang dikirim [#which]
+
+- Ke perusahaan: PDF, atau apa pun yang mereka minta.
+- Ke formulir dengan kotak: teks biasa.
+- Untuk menyimpan salinan yang dapat disunting lagi: bundel, dan juga Markdown
+  bila Anda ingin berkas polos untuk dibaca.
+- Untuk memakai isi di tempat lain: JSON Resume.
+
+Mengimpor adalah arah sebaliknya. Lihat [Format impor](/docs/export/import-formats).

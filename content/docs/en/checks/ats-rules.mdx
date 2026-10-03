@@ -1,0 +1,90 @@
+---
+title: The ATS rules
+description: Every rule the ATS check applies, grouped by what it looks at, with its severity and the exact point at which it applies, and which can be fixed in one click.
+---
+
+These are all the rules behind [the ATS check](/docs/checks/ats-check). Each
+applies to a resume unless a note says it also applies to a cover letter. A rule
+that has a one-click fix says what the fix does.
+
+## The header and contacts [#header]
+
+| Rule                        | Severity   | When it applies                                              |
+| --------------------------- | ---------- | ------------------------------------------------------------ |
+| No name                     | Error      | The header has no name. Also a letter.                       |
+| No email address            | Warning    | No contact reads as an email address. Also a letter.         |
+| No phone number             | Suggestion | No contact reads as a phone number of at least seven digits. |
+| A contact with only an icon | Error      | A contact shows an icon and no text. Also a letter.          |
+
+An email is a contact that looks like `name@example.com`, and a phone number is a
+contact with at least seven digits. They are read from what the contact says and from the scheme
+of its link, because a contact is free text and not a typed field.
+
+## Sections and structure [#structure]
+
+| Rule                      | Severity   | When it applies                                                                                   |
+| ------------------------- | ---------- | ------------------------------------------------------------------------------------------------- |
+| A section has no heading  | Error      | A visible section has an empty title.                                                             |
+| A section is empty        | Warning    | A visible section has no blocks. Fix: hide the section.                                           |
+| No core section           | Warning    | No visible Experience, Education or Projects section has anything in it.                          |
+| An unusual heading        | Suggestion | A heading is not one a parser is likely to know. Only checked for English and Indonesian resumes. |
+| Two columns               | Warning    | A section is set in two columns. Fix: use one column.                                             |
+| A table                   | Warning    | A table is used. Also a letter.                                                                   |
+| Unprintable Markdown      | Suggestion | A line is kept as source text because it cannot be typeset. Also a letter.                        |
+| An image with no alt text | Warning    | An image has an empty description. Also a letter.                                                 |
+| A photo                   | Suggestion | The header carries a photograph.                                                                  |
+
+None of Resivo's own templates sets a section in two columns, and nothing in the
+editor does. The rule applies to a document that arrived that way, such as a
+restored backup.
+
+## Dates [#dates]
+
+| Rule                        | Severity   | When it applies                                                             |
+| --------------------------- | ---------- | --------------------------------------------------------------------------- |
+| The end is before the start | Error      | A date range runs backwards.                                                |
+| An end with no start        | Warning    | A date range has an end date and no start.                                  |
+| A date in words             | Warning    | A date is not a year or a month, such as Summer 2019.                       |
+| Mixed date formats          | Suggestion | A section writes some dates as years and others as months.                  |
+| A gap                       | Suggestion | There is more than six months between one job ending and the next starting. |
+
+Dates are read as `YYYY` or `YYYY-MM`. A job with a start and no end could be
+ongoing, so the gap rule says nothing at all rather than guess.
+
+## Type, margins and colour [#style]
+
+| Rule             | Severity   | When it applies                                                           | Fix                           |
+| ---------------- | ---------- | ------------------------------------------------------------------------- | ----------------------------- |
+| Small body text  | Warning    | The body size is under 9.5pt. Also a letter.                              | Set the body size to 10pt     |
+| Narrow margins   | Warning    | A margin is under 0.4in. Also a letter.                                   | Raise the margins to 0.5in    |
+| Low contrast     | Warning    | The text, heading, accent or muted colour is under 4.5 to 1 on the paper. | Restore the template's colour |
+| An uploaded font | Suggestion | The body or heading font is one you uploaded.                             | Use the template's font       |
+
+An uploaded font is embedded in the PDF and the HTML, but a system that re-draws
+the text may substitute its own, so the three built-in faces are the safer
+choice. See [Images and fonts](/docs/design/images-and-fonts).
+
+## Hidden and added text [#css]
+
+| Rule           | Severity   | When it applies                                                                                                            |
+| -------------- | ---------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Hidden text    | Warning    | Your CSS uses `display: none`, `visibility: hidden`, a font size of 0, an opacity of 0 or transparent text. Also a letter. |
+| Generated text | Suggestion | Your CSS adds text with `::before` or `::after`. Also a letter.                                                            |
+
+Comments in your CSS are ignored, so a rule you have switched off is not
+reported. See [Custom CSS](/docs/design/custom-css).
+
+## Content [#content]
+
+| Rule                       | Severity   | When it applies                                                   |
+| -------------------------- | ---------- | ----------------------------------------------------------------- |
+| A long bullet              | Suggestion | A bullet is longer than about 300 characters, around three lines. |
+| A long summary             | Suggestion | A summary is longer than about 600 characters.                    |
+| A role with no description | Suggestion | An entry in Experience has no summary and no bullets.             |
+
+## Length [#length]
+
+| Rule           | Severity   | When it applies                                                                            |
+| -------------- | ---------- | ------------------------------------------------------------------------------------------ |
+| Too many pages | Warning    | A resume runs past two pages, or a letter past one. Needs the paper to have been measured. |
+| A long letter  | Suggestion | A cover letter is over 450 words. Counted from the text, so it needs no measuring.         |

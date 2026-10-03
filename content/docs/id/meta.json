@@ -7,6 +7,9 @@
     "editor",
     "format",
     "design",
+    "checks",
+    "export",
+    "jobs",
     "help"
   ]
 }

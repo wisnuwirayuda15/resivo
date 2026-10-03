@@ -109,13 +109,15 @@ test.describe("docs search", () => {
     await page.goto("/id/docs");
     await hydrated(page);
     await page.getByRole("button", { name: "Cari" }).click();
-    await box(page).fill("tebakan");
+    await box(page).fill("dirapikan");
 
     const hit = hits(page).first();
 
     await expect(hit).toBeVisible();
     await hit.click();
-    await expect(page).toHaveURL(/\/id\/docs\/format\/overview/);
+    // Which Indonesian page ranks first moves with every page written. That it
+    // is an Indonesian page, found by an Indonesian word, is the claim.
+    await expect(page).toHaveURL(/\/id\/docs\/.+/);
   });
 
   test("searches only the language being read", async ({ page }) => {

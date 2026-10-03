@@ -1,0 +1,74 @@
+---
+title: Export formats
+description: The files the Export menu writes, what each is good for and what each leaves out, and how to choose between them for a form, an employer or a backup.
+---
+
+The **Export** button in the bar above the editor writes the open resume to a
+file, or prints it. Its menu has two parts: **Print**, which has **PDF**, and
+**File**, which lists the formats below. A file is named after the resume, with
+characters that some systems refuse removed, and with the right extension.
+
+Nothing is uploaded. The file is made in your browser and handed to it to save.
+
+| Format            | File    | Good for                                                | What it leaves out                              |
+| ----------------- | ------- | ------------------------------------------------------- | ----------------------------------------------- |
+| **PDF**           | a print | Sending to an employer.                                 | Nothing: it is the page.                        |
+| **HTML**          | `.html` | A faithful copy that opens in any browser.              | Nothing: it is the page.                        |
+| **Markdown**      | `.md`   | Content only, in the format the editor reads.           | Style, and anything the format has no word for. |
+| **JSON Resume**   | `.json` | Moving to other resume tools.                           | Style, hidden and custom sections, and more.    |
+| **Plain text**    | `.txt`  | A form that asks you to paste your resume.              | All styling and structure.                      |
+| **Bundle (.zip)** | `.zip`  | Moving a resume to another device and looking the same. | Nothing.                                        |
+
+## PDF [#pdf]
+
+A resume is sent as a PDF, so this is the format most people want. It is
+described in [PDF](/docs/export/pdf).
+
+## HTML [#html]
+
+One self-contained file with the same layout as the preview. The styles, the
+page breaks the paper measured, your custom CSS, and the images and fonts are all
+inside it, as data and not as links, so it needs no network and no other files.
+Open it in any browser and it looks as the paper does. The PDF is made by
+printing this same document.
+
+## Markdown [#markdown]
+
+The resume as the text the editor shows in `resume.md`, written by the editor's
+own writer, so it reads back in exactly. It holds content only. Style, the
+template and your CSS are not in it, and a section you have hidden is written as
+an ordinary section, because hiding has no syntax. Use a bundle to keep those.
+See [The shape of the file](/docs/format/overview).
+
+## JSON Resume [#json-resume]
+
+The content in the JSON Resume format, which many other resume tools read. It
+holds the words, the dates and the structure. It has no place for templates or
+layout, and it leaves out hidden sections and custom sections, because the
+format has fixed section names and nothing a free-titled section could honestly
+be called. The item is not offered for a cover letter, which has no such
+sections.
+
+## Plain text [#text]
+
+The resume with no styling, for a form that has a box to paste into. The name
+comes first, then the headline and the contacts on one line, then each section
+under its title. An entry is written on one line as its title, subtitle and place,
+then its dates in brackets, then the summary and bullets. A link is written as its
+label followed by its address in brackets, because text has no links. Pictures,
+rules and page breaks have nothing to write. Hidden sections are left out.
+
+## Bundle (.zip) [#bundle]
+
+The one format that reads back to the same resume, with its style, CSS, images
+and fonts. See [Bundles](/docs/export/bundles).
+
+## Which to send [#which]
+
+- To an employer: the PDF, or whatever they ask for.
+- To a form with a box: plain text.
+- To keep a copy that can be edited again: a bundle, and also the Markdown if
+  you want a plain file to read.
+- To use the content somewhere else: JSON Resume.
+
+Importing is the other direction. See [Import formats](/docs/export/import-formats).

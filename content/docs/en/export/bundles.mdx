@@ -1,0 +1,80 @@
+---
+title: Bundles
+description: Move one resume between devices as a zip that keeps its style, CSS, images and fonts, what is inside, how it is checked on import, and when it can differ.
+---
+
+A bundle is one resume with everything it needs to look the same somewhere else:
+the content, the template, the style settings, your CSS, and the images and fonts
+it uses, as the files they are. It is the one export that reads back to the same
+resume.
+
+## Making one [#make]
+
+Two ways, and both write the same file:
+
+- In the editor, choose **Export**, then **Bundle (.zip)**.
+- In the library, open a card's menu with **More** and choose **Export as zip**.
+
+The file is named after the resume and ends in `.zip`.
+
+## What is inside [#inside]
+
+| File            | What it is                                                                          |
+| --------------- | ----------------------------------------------------------------------------------- |
+| `manifest.json` | What the file is, its format number, and the revision of the template that drew it. |
+| `resume.json`   | The resume's name, the document, and a record for each image and font.              |
+| `images/`       | The images the resume uses, exactly as they were stored.                            |
+| `fonts/`        | The fonts you uploaded that the resume uses.                                        |
+| `resume.md`     | A copy of the Markdown to read. It is never read back in.                           |
+
+Only what the resume refers to goes in, so a bundle is the size of the resume and
+not of your whole gallery. The three built-in typefaces are not included, because
+every copy of Resivo has them. If the resume was written for a job, that is
+recorded too.
+
+A zip opens in any archive tool, so you can see exactly what leaves your device.
+
+## Importing one [#import]
+
+In the new resume dialog, under **Import a file**, choose the `.zip`. Resivo
+recognises it as a bundle by its first bytes and not by its name. See
+[Make a new resume](/docs/library/new-resume#import).
+
+A bundle always makes a new resume. It never replaces one, and importing the same
+bundle twice gives two resumes. The images and fonts are matched by content to the
+ones already on the device, so a photograph you already have is reused and not
+stored again.
+
+The bundle keeps its own template and style, so the **Template** you chose in the
+dialog is not used for it.
+
+### How it is checked [#checks]
+
+A bundle is a file from outside, so it is read completely and checked before
+anything is written. If anything is wrong, you get a message saying what, and
+nothing is added. A bundle is refused when:
+
+- it is not a zip, or it is a zip that is not a Resivo bundle;
+- it was written by a newer version of Resivo than the one you have, in which case
+  the message says to update first;
+- the resume inside is not valid, or a file it lists is missing;
+- an image or font cannot be read as one, or an image does not match the checksum
+  recorded for it, which means it is damaged;
+- it is larger than 100 MB when unpacked, holds a file over 25 MB, or holds more
+  than 500 files, which no resume does.
+
+An older bundle is brought up to date as it is read.
+
+## When it can look different [#differ]
+
+A bundle looks the same on arrival while the template's design is unchanged. Each
+template has a revision number, and the bundle records the one that drew the
+resume. If this version of Resivo has a newer revision of that template, the
+dialog tells you the two revisions and warns that a page may break differently
+from the original. The resume is complete either way, and it opens.
+
+## Bundle or backup [#backup]
+
+A bundle is one resume, meant to be moved. A backup is the whole device, meant to
+be kept. They are different files, and a backup is covered with the pages on
+your data.

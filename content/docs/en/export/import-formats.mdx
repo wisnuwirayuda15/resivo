@@ -1,0 +1,86 @@
+---
+title: Import formats
+description: The files the new resume dialog can read, how it tells them apart, what it keeps and drops from each, and what to check after a text file is read.
+---
+
+You can start a resume from a file you already have. In the new resume dialog,
+under **Import a file**, choose one. See
+[Make a new resume](/docs/library/new-resume#import). Nothing is written until
+you choose **Create resume**, so a file that cannot be read costs you a message
+and nothing else.
+
+## How a file is recognised [#detect]
+
+The extension is only a hint. Resivo looks at what is inside:
+
+1. A zip, which is recognised by its first bytes, is a bundle.
+2. A file that ends in `.json`, or whose text starts with a curly brace, is read
+   as JSON Resume.
+3. A file with a `#` heading or a `::` directive in it is read as Markdown.
+4. Anything else is read as plain text.
+
+A JSON file saved as `.txt` is therefore still read as JSON, and a `.md` with no
+heading in it is read as text.
+
+## Markdown [#markdown]
+
+The format these docs describe. It is read by the same reader as the Markdown
+pane, so it is understood exactly as if you had typed it there. A line that
+cannot be typeset is kept as source text, and the dialog says how many, so the
+editor can point at them. See [The shape of the file](/docs/format/overview).
+
+## JSON Resume [#json-resume]
+
+The format many other resume tools write. It carries words, dates and structure,
+and Resivo reads it generously, because a file in the wild often has a number
+where the schema says a string, a missing list, or a field from a newer revision.
+Each field that cannot be read is treated as absent, and each list keeps the items
+that can.
+
+A resume here has no place for some of what JSON Resume can hold. The dialog
+lists what was left out, and does not drop it quietly:
+
+- the photograph;
+- links on jobs, schools and projects;
+- grades;
+- courses;
+- skill levels;
+- project keywords.
+
+A file that is not valid JSON, or is JSON that is not a JSON Resume, is refused
+with a sentence saying which. See [Export formats](/docs/export/export-formats#json-resume)
+for the other direction.
+
+## Plain text [#text]
+
+Plain text has no structure, so reading it is a guess, and the guess is small. It
+recognises the habits of a text resume:
+
+- The first line is your name.
+- Between it and the first heading is the header. A piece that looks like an
+  email address, a phone number or a web address becomes a contact, with an icon.
+  The first line that is none of those is the headline.
+- A line is a heading if it is a name the format knows, such as Experience, or a
+  short line in capitals with no digits. A trailing colon is allowed.
+- A line that starts with a bullet character, such as a dot, a dash or an
+  asterisk, is a list item, and an indented line under it continues it.
+- Every other line is a paragraph.
+
+It does not look for entries. A line such as a role, a company and dates is read
+as a paragraph, and you can turn it into an entry in the Markdown pane. The
+headings decide the sections, so look them over once the file opens.
+
+Text and Markdown share one reader. Plain text is turned into Markdown and then
+read by the same parser, so a text file is never understood differently from the
+same content typed into the editor.
+
+## Bundles [#bundle]
+
+A bundle is read back whole, with its style and files. See
+[Bundles](/docs/export/bundles).
+
+## Limits [#limits]
+
+A Markdown, JSON or text file is a few kilobytes. One larger than a megabyte is
+turned away as probably not being a resume. A bundle is allowed to be larger, up
+to the limits on its own page.
