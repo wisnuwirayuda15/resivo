@@ -1,0 +1,11 @@
+{
+  "title": "Editor",
+  "pages": [
+    "overview",
+    "markdown-and-css-panes",
+    "visual-editing",
+    "pages-and-breaks",
+    "autosave-and-undo",
+    "shortcuts-and-palette"
+  ]
+}

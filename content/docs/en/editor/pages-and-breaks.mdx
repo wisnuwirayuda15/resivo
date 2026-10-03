@@ -1,0 +1,75 @@
+---
+title: Pages and breaks
+description: How the paper is divided into pages, what you can do to move a break, and the three ways to say where a page should end.
+---
+
+The paper is laid out at a real paper size, and Resivo works out where each page
+ends. The strip above the paper says how many pages there are, such as 2 pages.
+
+## Paper size and zoom [#size]
+
+Beside the page count are the controls for the view:
+
+- **Paper size** switches between `A4` and `Letter`. Changing it re-flows the
+  pages, because the pages are a different size.
+- **Zoom out** and **Zoom in** step through 50, 67, 80, 100, 125, 150 and 200
+  per cent. **Fit width** returns to the zoom that fits the paper to the pane,
+  which is what it uses until you pick another.
+
+Zoom changes how large the paper is drawn and nothing about where pages break.
+On a narrow pane these controls fold into a menu.
+
+## How a page is filled [#flow]
+
+Every block is laid out once at the real page width and measured, and whole
+blocks are then placed onto pages one after another. A block that does not fit
+the room left on a page starts the next one.
+
+So a page break never cuts through the middle of something: an entry is moved
+to the next page whole, and a paragraph is never split. What this does not do is
+shrink or squeeze a block to fit. A block that is taller than a whole page is
+given a page of its own and is cut off at the bottom of it, which is rare, as it
+takes an extraordinarily long block.
+
+The export uses the breaks the paper measured, so the PDF breaks exactly where
+you see it break.
+
+## Saying where a page should end [#control]
+
+There are three ways, from one place to the whole document.
+
+### A break at one place [#one]
+
+A page break forces whatever follows it onto a new page. Write it in the
+Markdown on a line of its own:
+
+```text
+::pagebreak
+```
+
+Or, in Visual mode, use **Insert a page break after this** on a block. The two
+are the same thing: a break written in the Markdown appears on the paper, and a
+break inserted on the paper appears in the Markdown. **Delete** removes one. Two
+breaks in a row make a blank page, which is what asking for two breaks means.
+
+### A section that starts on a new page [#section]
+
+In the **Sections** tab, each section has **Start on a new page**. Turning it on
+begins that section on a fresh page every time. It belongs to that section and
+moves with it.
+
+### Whether a heading can end a page [#headings]
+
+In the **Style** tab, under **Page breaks**, **Keep headings with content**
+decides whether a section's heading may be the last thing on a page. It is on
+by default, so a heading is moved to the next page along with the first thing
+under it, and it is why a break you place before a section's first block is
+honoured before the heading, not between them. Turning it off packs the pages
+tighter, at the cost of the break most readers notice.
+
+## What CSS cannot do [#css]
+
+Your own CSS cannot move a page break. The pages are decided from
+measurements, and `break-inside`, `orphans` and `widows` are deliberately left
+out of the print stylesheet, so they have nothing to act on. Use a page break or
+a section's own setting instead.

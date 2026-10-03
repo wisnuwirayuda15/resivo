@@ -1,0 +1,59 @@
+---
+title: Markdown and CSS panes
+description: Write the resume in Markdown and restyle the paper with your own CSS in the Code pane, and what its notices and undo mean.
+---
+
+The **Code** pane has two tabs: `resume.md` for the content and `style.css` for
+your own styling. It is a real code editor, so it has line numbers, syntax
+colouring and the editor's own find.
+
+## resume.md [#markdown]
+
+This tab shows the whole resume written as Markdown, in the format described in
+[the shape of the file](/docs/format/overview). Type in it and the paper
+follows: about a quarter of a second after you stop typing, the text is read
+again and the page is laid out again.
+
+The Markdown is the resume, not a separate copy of it. When you change something
+somewhere else, such as moving a section on the paper or stepping back with
+undo, the text here is rewritten to match.
+
+### Tidying [#tidying]
+
+Resivo writes Markdown in one consistent form. If you type something that reads
+the same but is spelled differently, it is put into that form, but not while your
+cursor is in the pane. Rewriting half-typed text under your hands would be worse
+than leaving it, so the tidying waits until you click out of the pane.
+
+### Lines that cannot be typeset [#notices]
+
+Resivo does not refuse text. A line it cannot typeset, such as raw HTML, is kept
+exactly as you wrote it and underlined in yellow, and hovering over it says why.
+It is not typeset, and it is not lost.
+
+The number of these appears at the right of the tab strip as a count of
+notices, such as 2 notices. The count includes the CSS tab's.
+
+## style.css [#css]
+
+This tab is for CSS you write yourself. It is applied to the paper only, after
+the template and the style settings, so it has the last word on how the resume
+looks, and it cannot reach the rest of the app.
+
+What you write is stored exactly as you wrote it. The paper uses a cleaned copy:
+a rule the paper refuses to apply is underlined in yellow with the reason, and
+the rest of your CSS still applies. The refused rule is a notice, like a line of
+Markdown that could not be typeset.
+
+## Undo in the panes [#undo]
+
+The code editor keeps its own undo history for the text you typed, so the undo
+shortcut inside it undoes typing, a step at a time. The undo button in the bar
+above acts on the resume as a whole instead. Both are explained in
+[Autosave and undo](/docs/editor/autosave-and-undo).
+
+## Find and commands [#find]
+
+Inside the pane, <Kbd>Ctrl</Kbd> + <Kbd>F</Kbd> (<Kbd>⌘</Kbd> + <Kbd>F</Kbd> on
+a Mac) searches the text, and <Kbd>F1</Kbd> opens the editor's own list of
+commands.

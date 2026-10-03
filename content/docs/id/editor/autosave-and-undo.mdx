@@ -1,0 +1,67 @@
+---
+title: Simpan otomatis dan urungkan
+description: Kapan perubahan ditulis ke perangkat Anda, arti indikator simpan, dan bagaimana urungkan serta ulangi melangkah melalui perubahan Anda.
+---
+
+Anda tidak pernah menyimpan resume secara manual. Setiap perubahan ditulis ke
+perangkat Anda untuk Anda, dan Anda dapat mundur melalui perubahan dengan
+urungkan.
+
+## Simpan otomatis [#autosave]
+
+Perubahan ditulis sekitar 0,6 detik setelah Anda berhenti membuat perubahan,
+sehingga rentetan ketikan menjadi satu penulisan. Indikator simpan di bilah atas
+editor menyatakan keadaannya:
+
+- **Menyimpan** berarti ada perubahan yang menunggu ditulis, atau sedang
+  ditulis.
+- **Tersimpan** berarti perubahan terakhir sudah ada di perangkat ini. Arahkan
+  kursor ke atasnya dan ia mengatakannya: tertulis di perangkat ini, dan tidak
+  ada salinan di tempat lain.
+- **Belum tersimpan** berarti penulisan terakhir gagal, jadi resume belum ada
+  di disk. Perubahan Anda masih ada di layar. Ekspor salinannya sebelum menutup
+  tab. Indikator tetap pada **Belum tersimpan** sampai penulisan berikutnya
+  berhasil.
+
+Jika tab disembunyikan, misalnya dengan berpindah ke tab lain, atau halaman
+ditutup, perubahan yang menunggu ditulis seketika dan tidak dibiarkan menunggu gilirannya.
+Meninggalkan editor juga menuliskannya. Penulisan dilakukan berurutan, jadi
+versi lama tidak pernah mendarat setelah versi yang lebih baru.
+
+Simpan otomatis menulis ke penyimpanan milik browser sendiri, jadi ia tidak
+butuh apa pun selain perangkat. Untuk arti hal itu bagi keamanan resume, lihat
+[Lokal lebih dulu](/docs/getting-started/local-first).
+
+## Urungkan dan ulangi [#undo]
+
+Tombol urungkan dan ulangi ada di bilah atas editor, dengan pintasannya di
+tooltip. Keduanya melangkah mundur dan maju melalui perubahan pada resume
+secara keseluruhan: teks yang Anda tulis, pengaturan gaya yang Anda geser,
+bagian yang Anda susun ulang di kertas, blok yang Anda hapus.
+
+Beberapa hal yang perlu diketahui:
+
+- Perubahan beruntun pada hal yang sama digabung menjadi satu langkah. Mengetik
+  sebuah kalimat butuh satu urungkan untuk membatalkannya, bukan satu per huruf,
+  dan menggeser slider adalah satu langkah. Satu rangkaian berakhir ketika Anda
+  berhenti sekitar tiga perempat detik atau berpindah ke hal lain.
+- Riwayat menyimpan 100 langkah terakhir.
+- Riwayat dipertahankan selama resume terbuka. Ia tidak disimpan, jadi menutup
+  resume atau memuat ulang memulainya dari kosong.
+- Membuat perubahan baru setelah mengurungkan membuang apa yang tadinya bisa
+  Anda ulangi.
+- Perubahan yang tidak mengubah apa pun bukan sebuah langkah.
+
+## Urungkan di panel kode dan di kertas [#panes]
+
+Dua tempat menyimpan riwayat urungkan sendiri, dan di sana pintasan itu milik
+mereka. Di panel **Kode**, pintasan urungkan membatalkan teks yang Anda ketik,
+selangkah demi selangkah. Selagi Anda menyunting sebuah kolom di kertas, urungkan
+bawaan browser berlaku untuk apa yang Anda ketik di kolom itu.
+
+Tombol di bilah selalu bekerja pada resume secara keseluruhan, di mana pun
+kursor Anda berada. Di tempat lain, pintasan melakukan hal yang sama:
+
+<Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd> untuk mengurungkan, dan <Kbd>Ctrl</Kbd> +
+<Kbd>Shift</Kbd> + <Kbd>Z</Kbd> atau <Kbd>Ctrl</Kbd> + <Kbd>Y</Kbd> untuk
+mengulangi, dengan <Kbd>⌘</Kbd> sebagai pengganti <Kbd>Ctrl</Kbd> pada Mac.

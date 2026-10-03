@@ -1,0 +1,79 @@
+---
+title: Halaman dan pemisah
+description: Bagaimana kertas dibagi menjadi halaman, apa yang bisa Anda lakukan untuk menggeser pemisah, dan tiga cara menyatakan di mana halaman harus berakhir.
+---
+
+Kertas ditata pada ukuran kertas sungguhan, dan Resivo menghitung di mana tiap
+halaman berakhir. Strip di atas kertas menyatakan berapa halaman yang ada,
+seperti 2 halaman.
+
+## Ukuran kertas dan zoom [#size]
+
+Di samping jumlah halaman ada kontrol untuk tampilan:
+
+- **Ukuran kertas** berpindah antara `A4` dan `Letter`. Mengubahnya menata
+  ulang halaman, karena halamannya berukuran lain.
+- **Perkecil** dan **Perbesar** melangkah melalui 50, 67, 80, 100, 125, 150, dan
+  200 persen. **Sesuaikan lebar** kembali ke zoom yang memuat kertas pada
+  panel, yang dipakai sampai Anda memilih yang lain.
+
+Zoom mengubah seberapa besar kertas digambar dan tidak mengubah di mana halaman
+terpisah. Pada panel yang sempit, kontrol ini terlipat ke dalam sebuah menu.
+
+## Bagaimana halaman diisi [#flow]
+
+Setiap blok ditata sekali pada lebar halaman sungguhan dan diukur, lalu blok
+utuh ditempatkan ke halaman satu demi satu. Blok yang tidak muat di sisa ruang
+sebuah halaman memulai halaman berikutnya.
+
+Jadi pemisah halaman tidak pernah memotong bagian tengah sesuatu: satu entri
+dipindahkan utuh ke halaman berikutnya, dan satu paragraf tidak pernah dibelah.
+Yang tidak dilakukannya adalah mengecilkan atau memampatkan blok agar muat.
+Blok yang lebih tinggi dari satu halaman penuh diberi halamannya sendiri dan
+terpotong di bagian bawahnya, yang jarang terjadi, karena butuh blok yang luar
+biasa panjang.
+
+Ekspor memakai pemisah yang diukur kertas, jadi PDF terpisah persis di tempat
+yang Anda lihat.
+
+## Menyatakan di mana halaman harus berakhir [#control]
+
+Ada tiga cara, dari satu tempat sampai seluruh dokumen.
+
+### Pemisah di satu tempat [#one]
+
+Pemisah halaman memaksa apa pun yang mengikutinya ke halaman baru. Tulis di
+Markdown pada barisnya sendiri:
+
+```text
+::pagebreak
+```
+
+Atau, dalam mode Visual, pakai **Sisipkan pemisah halaman setelah ini** pada
+sebuah blok. Keduanya sama: pemisah yang ditulis di Markdown muncul di kertas,
+dan pemisah yang disisipkan di kertas muncul di Markdown. **Hapus** menghapus
+satu. Dua pemisah berturutan menghasilkan halaman kosong, yang memang
+berarti begitu bila Anda meminta dua pemisah.
+
+### Bagian yang dimulai di halaman baru [#section]
+
+Di tab **Bagian**, setiap bagian memiliki **Mulai di halaman baru**. Menyalakannya
+memulai bagian itu di halaman baru setiap kali. Ia milik bagian itu dan
+berpindah bersamanya.
+
+### Apakah judul boleh mengakhiri halaman [#headings]
+
+Di tab **Gaya**, di bawah **Pemisah halaman**, **Jaga judul bersama isinya**
+menentukan apakah judul bagian boleh menjadi hal terakhir di sebuah halaman.
+Pengaturan ini menyala secara bawaan, jadi judul dipindahkan ke halaman berikutnya
+bersama hal pertama di bawahnya, dan itulah sebabnya pemisah yang Anda taruh
+sebelum blok pertama sebuah bagian dihormati sebelum judulnya, bukan di antara
+keduanya. Mematikannya memadatkan halaman, dengan harga pemisah yang paling
+dilihat kebanyakan pembaca.
+
+## Yang tidak bisa dilakukan CSS [#css]
+
+CSS Anda sendiri tidak dapat menggeser pemisah halaman. Halaman ditentukan dari
+pengukuran, dan `break-inside`, `orphans`, serta `widows` sengaja tidak ada di
+stylesheet cetak, jadi tidak ada yang bisa mereka pengaruhi. Pakailah pemisah
+halaman atau pengaturan milik bagian itu.

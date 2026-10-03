@@ -1,0 +1,61 @@
+---
+title: Visual editing
+description: Edit text directly on the paper, drag and reorder blocks and sections, delete a block, and change an image's width.
+---
+
+Besides writing Markdown, you can edit on the paper itself. At the top of the
+**Paper** pane, **Preview mode** switches between two modes:
+
+- **Read** shows the page and nothing else. It is what you export.
+- **Visual** makes the page editable.
+
+Visual mode changes what you can do, not what the page is. The controls it draws
+sit in the margin and are never part of what is measured, so turning it on
+cannot move a page break.
+
+## Edit text [#text]
+
+In **Visual** mode, click a piece of text on the paper to edit it. You can also
+move to it with the Tab key and press Enter. Each field is edited on its own:
+you change the words in that one place, not the shape of the document.
+
+- Press Enter, or click elsewhere, to keep the change.
+- Press Escape to discard it.
+
+Whatever you keep is written back into the Markdown, so the code pane shows it
+at once. The change is one step in the undo history, and while you are typing in
+a field the browser's own undo applies to that field's typing.
+
+## Move things [#move]
+
+Hover over a block or a section heading and a small set of controls appears in
+the margin:
+
+- **Drag to move** is a handle you drag.
+- **Move up** and **Move down** do the same one place at a time, and are the way
+  to do it from the keyboard.
+- **Delete** removes a block. It is a block-level control: a section is
+  removed from the **Sections** tab, where it asks first.
+
+The header at the top of the page has no controls, since it has nowhere to move
+to.
+
+What a move means depends on what you drop on what:
+
+- A block dropped on another block takes its place, in the same section or a
+  different one.
+- A block dropped on a section heading goes to the top of that section.
+- A section heading dropped on another section heading reorders the sections.
+
+Any other combination does nothing, rather than a guess. Every move can be
+undone.
+
+## Images [#images]
+
+An image has **Image width** among its controls. The width is a percentage of
+the text column, and is what the `width` in the Markdown directive holds.
+
+## Page breaks [#breaks]
+
+**Insert a page break after this** adds a page break after a block. See
+[Pages and breaks](/docs/editor/pages-and-breaks).

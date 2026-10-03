@@ -1,0 +1,62 @@
+---
+title: Panel Markdown dan CSS
+description: Tulis resume dalam Markdown dan tata ulang kertas dengan CSS Anda sendiri di panel Kode, serta arti catatan dan urungkan di sana.
+---
+
+Panel **Kode** memiliki dua tab: `resume.md` untuk isi dan `style.css` untuk
+gaya buatan Anda sendiri. Ia adalah editor kode sungguhan, jadi ada nomor baris,
+pewarnaan sintaks, dan pencarian milik editor itu sendiri.
+
+## resume.md [#markdown]
+
+Tab ini menampilkan seluruh resume yang ditulis sebagai Markdown, dalam format
+yang dijelaskan di [bentuk berkas](/docs/format/overview). Ketik di dalamnya dan
+kertas mengikuti: sekitar seperempat detik setelah Anda berhenti mengetik, teks
+dibaca ulang dan halaman ditata ulang.
+
+Markdown adalah resumenya, bukan salinan terpisah darinya. Ketika Anda
+mengubah sesuatu di tempat lain, seperti memindahkan bagian di kertas atau
+mundur dengan urungkan, teks di sini ditulis ulang agar sesuai.
+
+### Dirapikan [#tidying]
+
+Resivo menulis Markdown dalam satu bentuk yang konsisten. Jika Anda mengetik
+sesuatu yang terbaca sama tetapi dieja berbeda, ia dimasukkan ke bentuk itu,
+tetapi tidak selama kursor Anda ada di panel. Menulis ulang teks yang setengah
+diketik di bawah tangan Anda lebih buruk daripada membiarkannya, jadi
+perapian menunggu sampai Anda mengklik keluar dari panel.
+
+### Baris yang tidak dapat ditata [#notices]
+
+Resivo tidak menolak teks. Baris yang tidak dapat ditata, seperti HTML mentah,
+disimpan persis seperti yang Anda tulis dan digarisbawahi dengan warna kuning,
+dan mengarahkan kursor ke atasnya menjelaskan sebabnya. Baris itu tidak ditata,
+dan tidak hilang.
+
+Jumlahnya muncul di ujung kanan deretan tab sebagai hitungan catatan,
+seperti 2 catatan. Hitungan itu mencakup catatan dari tab CSS.
+
+## style.css [#css]
+
+Tab ini untuk CSS yang Anda tulis sendiri. Ia hanya diterapkan pada kertas,
+setelah template dan pengaturan gaya, sehingga ia memegang keputusan terakhir
+tentang tampilan resume, dan ia tidak dapat menjangkau bagian aplikasi lainnya.
+
+Yang Anda tulis disimpan persis seperti yang Anda tulis. Kertas memakai salinan
+yang sudah dibersihkan: aturan yang ditolak kertas digarisbawahi kuning beserta
+alasannya, dan sisa CSS Anda tetap berlaku. Aturan yang ditolak itu adalah
+sebuah catatan, seperti baris Markdown yang tidak dapat ditata.
+
+## Urungkan di panel [#undo]
+
+Editor kode menyimpan riwayat urungkannya sendiri untuk teks yang Anda ketik,
+jadi pintasan urungkan di dalamnya membatalkan ketikan, selangkah demi
+selangkah. Tombol urungkan di bilah atas bekerja pada resume secara
+keseluruhan. Keduanya dijelaskan di
+[Simpan otomatis dan urungkan](/docs/editor/autosave-and-undo).
+
+## Cari dan perintah [#find]
+
+Di dalam panel, <Kbd>Ctrl</Kbd> + <Kbd>F</Kbd> (<Kbd>⌘</Kbd> + <Kbd>F</Kbd>
+pada Mac) mencari teks, dan <Kbd>F1</Kbd> membuka daftar perintah milik editor
+itu sendiri.

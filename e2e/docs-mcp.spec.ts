@@ -63,7 +63,7 @@ test.describe("docs MCP server", () => {
   }) => {
     const listed = await call(request, "list_pages", { lang: "id" });
     const text = listed.content[0]?.text ?? "";
-    const address = /\]\(([^)]+overview\.md)\)/.exec(text)?.[1];
+    const address = /\]\(([^)]+format\/overview\.md)\)/.exec(text)?.[1];
 
     expect(address).toContain("/id/docs/format/overview.md");
 

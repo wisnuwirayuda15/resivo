@@ -1,0 +1,64 @@
+---
+title: Penyuntingan visual
+description: Sunting teks langsung di kertas, seret dan susun ulang blok dan bagian, hapus blok, dan ubah lebar gambar.
+---
+
+Selain menulis Markdown, Anda bisa menyunting di kertas itu sendiri. Di bagian
+atas panel **Kertas**, **Mode pratinjau** berpindah antara dua mode:
+
+- **Baca** menampilkan halaman dan tidak ada yang lain. Itulah yang Anda
+  ekspor.
+- **Visual** membuat halaman dapat disunting.
+
+Mode Visual mengubah apa yang dapat Anda lakukan, bukan apa halaman itu. Kontrol
+yang digambarnya berada di margin dan tidak pernah menjadi bagian dari yang
+diukur, jadi menyalakannya tidak dapat menggeser pemisah halaman.
+
+## Sunting teks [#text]
+
+Dalam mode **Visual**, klik sepotong teks di kertas untuk menyuntingnya. Anda
+juga bisa berpindah ke sana dengan tombol Tab lalu menekan Enter. Setiap kolom
+disunting sendiri-sendiri: Anda mengubah kata di satu tempat itu, bukan bentuk
+dokumen.
+
+- Tekan Enter, atau klik di tempat lain, untuk menyimpan perubahan.
+- Tekan Escape untuk membuangnya.
+
+Apa pun yang Anda simpan ditulis kembali ke Markdown, jadi panel kode
+menampilkannya seketika. Perubahan itu satu langkah dalam riwayat urungkan, dan
+selagi Anda mengetik di sebuah kolom, urungkan bawaan browser berlaku untuk
+ketikan di kolom itu.
+
+## Pindahkan [#move]
+
+Arahkan kursor ke sebuah blok atau judul bagian dan seperangkat kontrol kecil
+muncul di margin:
+
+- **Seret untuk memindahkan** adalah pegangan yang Anda seret.
+- **Naikkan** dan **Turunkan** melakukan hal yang sama satu tempat sekali, dan
+  menjadi cara melakukannya dari keyboard.
+- **Hapus** menghapus sebuah blok. Ini kontrol tingkat blok: sebuah bagian
+  dihapus dari tab **Bagian**, yang bertanya dulu.
+
+Kepala di bagian atas halaman tidak memiliki kontrol, karena tidak ada tempat
+untuk memindahkannya.
+
+Arti sebuah pemindahan bergantung pada apa yang dijatuhkan ke atas apa:
+
+- Blok yang dijatuhkan ke blok lain menggantikan tempatnya, dalam bagian yang
+  sama atau bagian lain.
+- Blok yang dijatuhkan ke judul bagian pindah ke bagian atas bagian itu.
+- Judul bagian yang dijatuhkan ke judul bagian lain menyusun ulang bagian.
+
+Kombinasi lain tidak melakukan apa-apa, bukan menebak. Setiap pemindahan dapat
+diurungkan.
+
+## Gambar [#images]
+
+Gambar memiliki **Lebar gambar** di antara kontrolnya. Lebarnya adalah
+persentase dari kolom teks, dan itulah isi `width` pada direktif Markdown.
+
+## Pemisah halaman [#breaks]
+
+**Sisipkan pemisah halaman setelah ini** menambahkan pemisah halaman setelah
+sebuah blok. Lihat [Halaman dan pemisah](/docs/editor/pages-and-breaks).

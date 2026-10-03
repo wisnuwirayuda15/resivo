@@ -1,0 +1,61 @@
+---
+title: Autosave and undo
+description: When a change is written to your device, what the save indicator means, and how undo and redo step through your changes.
+---
+
+You never save a resume by hand. Every change is written to your device for you,
+and you can step back through your changes with undo.
+
+## Autosave [#autosave]
+
+A change is written about 0.6 seconds after you stop making changes, so a burst
+of typing is one write. The save indicator in the bar above the editor says where
+things stand:
+
+- **Saving** means a change is waiting to be written, or is being written.
+- **Saved** means the last change is on this device. Hover over it and it says
+  so: written to this device, and there is no copy anywhere else.
+- **Not saved** means the last write failed, so the resume is not on disk. Your
+  edits are still on the screen. Export a copy before you close the tab. The
+  indicator stays on **Not saved** until a later write succeeds.
+
+If the tab is hidden, for instance by switching to another tab, or the page is
+closed, a change that is waiting is written at once and not left for its turn. Leaving the editor writes
+it too. Writes are done in order, so an older version can never land after a
+newer one.
+
+Autosave writes to the browser's own storage, so it needs nothing but the
+device. For what that means for the resume's safety, see
+[Local first](/docs/getting-started/local-first).
+
+## Undo and redo [#undo]
+
+The undo and redo buttons are in the bar above the editor, with the shortcut in
+the tooltip. They step back and forward through changes to the resume as a whole:
+text you wrote, a style setting you moved, a section you reordered on the paper,
+a block you deleted.
+
+A few things worth knowing:
+
+- Changes made in one run to the same thing are merged into one step. Typing a
+  sentence takes one undo to take back, not one per letter, and dragging a
+  slider is one step. A run ends when you pause for roughly three-quarters of a
+  second or move to something else.
+- The history holds the last 100 steps.
+- It is kept while the resume is open. It is not saved, so closing the
+  resume or reloading starts it empty.
+- Making a new change after undoing discards what you could have redone.
+- A change that alters nothing is not a step.
+
+## Undo in the code panes and on the paper [#panes]
+
+Two places keep an undo history of their own, and in them the shortcut is theirs.
+In the **Code** pane, the undo shortcut undoes the text you typed, a step at a
+time. While you are editing a field on the paper, the browser's undo applies to
+what you typed in that field.
+
+The buttons in the bar always act on the resume as a whole, wherever your cursor
+is. Elsewhere, the shortcuts do the same: <Kbd>Ctrl</Kbd> + <Kbd>Z</Kbd> to undo, and
+
+<Kbd>Ctrl</Kbd> + <Kbd>Shift</Kbd> + <Kbd>Z</Kbd> or <Kbd>Ctrl</Kbd> +
+<Kbd>Y</Kbd> to redo, with <Kbd>⌘</Kbd> in place of <Kbd>Ctrl</Kbd> on a Mac.
