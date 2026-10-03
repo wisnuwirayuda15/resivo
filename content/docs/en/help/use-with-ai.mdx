@@ -32,15 +32,14 @@ For the whole documentation at once there are three files:
 
 Assistants that support the Model Context Protocol can read the docs directly
 from `/api/mcp`. It has three tools: `list_pages`, `get_page` and `search`. Each
-takes an optional `lang` (`en` or `id`, English by default). In Claude Code, for
-a copy running on your own machine:
+takes an optional `lang` (`en` or `id`, English by default). In Claude Code:
 
 ```bash
-claude mcp add --transport http resivo-docs http://localhost:3000/api/mcp
+claude mcp add --transport http resivo-docs https://resivo-cv.vercel.app/api/mcp
 ```
 
-For a deployed copy, use that copy's address in place of
-`http://localhost:3000`.
+If you host your own copy, use its address in place of
+`https://resivo-cv.vercel.app`.
 
 ## What is shared [#shared]
 
