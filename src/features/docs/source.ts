@@ -2,6 +2,7 @@ import { loader } from "fumadocs-core/source";
 import { defineDocs } from "fumadocs-mdx/macro";
 
 import { docsI18n } from "./i18n";
+import { docsMarkdownOptions } from "./markdown/stringify";
 
 /**
  * The docs collection and the loader that turns it into pages and a tree.
@@ -13,8 +14,9 @@ import { docsI18n } from "./i18n";
  *
  * `includeProcessedMarkdown` is what lets a page be read back as plain Markdown
  * (`page.data.getText("processed")`), which is the whole of the copy-as-Markdown
- * button and the `.md` and `llms.txt` routes. It has to be on from the start:
- * it is a compile-time flag, not something a route can ask for later.
+ * button and the `.md` and `llms.txt` routes. It is a compile-time flag, not
+ * something a route can ask for later, and its options say how each component
+ * is written without its tags (see `markdown/stringify.ts`).
  *
  * Server and Vite only. The macro is rewritten by `fumadocsMdx()` in the Vite
  * config, so Vitest, which loads no Vite plugins, can never import this file.
@@ -24,7 +26,7 @@ export const docs = defineDocs({
   dir: "content/docs",
   docs: {
     async: true,
-    postprocess: { includeProcessedMarkdown: true },
+    postprocess: { includeProcessedMarkdown: docsMarkdownOptions },
   },
 });
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { containsUrl, isFolderOpenByDefault, nodeKey, pagerFor } from "./tree";
+import {
+  containsUrl,
+  isFolderOpenByDefault,
+  nodeKey,
+  pageUrlsInOrder,
+  pagerFor,
+} from "./tree";
 
 import type { Folder, Root } from "fumadocs-core/page-tree";
 
@@ -80,5 +86,18 @@ describe("nodeKey", () => {
   it("prefers the tree's id and falls back to type and place", () => {
     expect(nodeKey({ ...format, $id: "id:format" }, 1)).toBe("id:format");
     expect(nodeKey(format, 1)).toBe("folder-1");
+  });
+});
+
+describe("pageUrlsInOrder", () => {
+  it("lists pages as the sidebar does, a folder's own page first", () => {
+    expect(pageUrlsInOrder(tree)).toEqual([
+      "/en/docs",
+      "/en/docs/format/overview",
+      "/en/docs/format/entries",
+      "/en/docs/design",
+      "/en/docs/design/tokens",
+      "/en/docs/faq",
+    ]);
   });
 });

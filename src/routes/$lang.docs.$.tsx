@@ -5,9 +5,11 @@ import { Box, Text, Title } from "@mantine/core";
 
 import { DocsBreadcrumbs } from "@/features/docs/components/DocsBreadcrumbs";
 import { DocsPager } from "@/features/docs/components/DocsPager";
+import { PageActions } from "@/features/docs/components/PageActions";
 import { DocsToc } from "@/features/docs/components/DocsToc";
 import { getDocsPage } from "@/features/docs/loaders";
-import { isDocsLanguage } from "@/features/docs/paths";
+import { markdownHref } from "@/features/docs/markdown/urls";
+import { isDocsLanguage, parseDocsPath } from "@/features/docs/paths";
 import { docsComponents } from "@/features/docs/mdx/components";
 import { docs } from "@/features/docs/source";
 
@@ -39,6 +41,11 @@ const Article: React.FC<{
         {description === undefined ? null : (
           <Text className="text-muted mt-2 text-[15px]">{description}</Text>
         )}
+        <PageActions
+          lang={lang}
+          slugs={parseDocsPath(url)?.slugs ?? []}
+          title={title}
+        />
         <Box className="mt-6">
           <Body components={docsComponents} />
         </Box>
@@ -67,5 +74,21 @@ export const Route = createFileRoute("/$lang/docs/$")({
 
     return data;
   },
+  // The Markdown of this page, advertised the way a feed is: a crawler or an
+  // agent that reads the head learns it exists without guessing the address.
+  head: ({ params }) => ({
+    links: isDocsLanguage(params.lang)
+      ? [
+          {
+            rel: "alternate",
+            type: "text/markdown",
+            href: markdownHref(
+              params.lang,
+              (params._splat ?? "").split("/").filter(Boolean),
+            ),
+          },
+        ]
+      : [],
+  }),
   component: DocsPageRoute,
 });

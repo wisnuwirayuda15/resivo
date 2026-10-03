@@ -41,3 +41,31 @@ export const pagerFor = (
 /** A stable key for a node: its tree id where it has one, its place otherwise. */
 export const nodeKey = (node: Node, index: number): string =>
   node.$id ?? `${node.type}-${index}`;
+
+/** The address of every page in reading order: a folder's own page, then what is
+ * inside it. Pages the tree leaves out are not here, which is the point: a page
+ * a `meta.json` hides is hidden from the index and the full text as well. */
+export const pageUrlsInOrder = (tree: Root): Array<string> => {
+  const urls: Array<string> = [];
+
+  const walk = (node: Node): void => {
+    switch (node.type) {
+      case "page":
+        urls.push(node.url);
+        break;
+      case "folder":
+        if (node.index !== undefined) {
+          urls.push(node.index.url);
+        }
+
+        node.children.forEach(walk);
+        break;
+      default:
+        break;
+    }
+  };
+
+  tree.children.forEach(walk);
+
+  return urls;
+};

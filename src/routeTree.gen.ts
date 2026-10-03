@@ -14,9 +14,12 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as FontsRouteImport } from './routes/fonts'
 import { Route as ImagesRouteImport } from './routes/images'
+import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as LangDocsRouteRouteImport } from './routes/$lang.docs.route'
+import { Route as LangLlmsFullDottxtRouteImport } from './routes/$lang.llms-full[.]txt'
+import { Route as LangLlmsDottxtRouteImport } from './routes/$lang.llms[.]txt'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
@@ -48,6 +51,11 @@ const ImagesRoute = ImagesRouteImport.update({
   path: '/images',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
+  id: '/llms.txt',
+  path: '/llms.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -61,6 +69,16 @@ const TemplatesRoute = TemplatesRouteImport.update({
 const LangDocsRouteRoute = LangDocsRouteRouteImport.update({
   id: '/$lang/docs',
   path: '/$lang/docs',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangLlmsFullDottxtRoute = LangLlmsFullDottxtRouteImport.update({
+  id: '/$lang/llms-full.txt',
+  path: '/$lang/llms-full.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LangLlmsDottxtRoute = LangLlmsDottxtRouteImport.update({
+  id: '/$lang/llms.txt',
+  path: '/$lang/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
@@ -95,9 +113,12 @@ export interface FileRoutesByFullPath {
   '/archive': typeof ArchiveRoute
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
+  '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
+  '/$lang/llms.txt': typeof LangLlmsDottxtRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -110,9 +131,12 @@ export interface FileRoutesByTo {
   '/archive': typeof ArchiveRoute
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
+  '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
+  '/$lang/llms.txt': typeof LangLlmsDottxtRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes': typeof ResumesIndexRoute
@@ -126,9 +150,12 @@ export interface FileRoutesById {
   '/archive': typeof ArchiveRoute
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
+  '/llms.txt': typeof LlmsDottxtRoute
   '/settings': typeof SettingsRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
+  '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
+  '/$lang/llms.txt': typeof LangLlmsDottxtRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -143,9 +170,12 @@ export interface FileRouteTypes {
     | '/archive'
     | '/fonts'
     | '/images'
+    | '/llms.txt'
     | '/settings'
     | '/templates'
     | '/$lang/docs'
+    | '/$lang/llms-full.txt'
+    | '/$lang/llms.txt'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes/'
@@ -158,9 +188,12 @@ export interface FileRouteTypes {
     | '/archive'
     | '/fonts'
     | '/images'
+    | '/llms.txt'
     | '/settings'
     | '/templates'
     | '/$lang/docs'
+    | '/$lang/llms-full.txt'
+    | '/$lang/llms.txt'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes'
@@ -173,9 +206,12 @@ export interface FileRouteTypes {
     | '/archive'
     | '/fonts'
     | '/images'
+    | '/llms.txt'
     | '/settings'
     | '/templates'
     | '/$lang/docs'
+    | '/$lang/llms-full.txt'
+    | '/$lang/llms.txt'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes/'
@@ -189,9 +225,12 @@ export interface RootRouteChildren {
   ArchiveRoute: typeof ArchiveRoute
   FontsRoute: typeof FontsRoute
   ImagesRoute: typeof ImagesRoute
+  LlmsDottxtRoute: typeof LlmsDottxtRoute
   SettingsRoute: typeof SettingsRoute
   TemplatesRoute: typeof TemplatesRoute
   LangDocsRouteRoute: typeof LangDocsRouteRouteWithChildren
+  LangLlmsFullDottxtRoute: typeof LangLlmsFullDottxtRoute
+  LangLlmsDottxtRoute: typeof LangLlmsDottxtRoute
   DocsSplatRoute: typeof DocsSplatRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
   ResumesIndexRoute: typeof ResumesIndexRoute
@@ -235,6 +274,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ImagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/llms.txt': {
+      id: '/llms.txt'
+      path: '/llms.txt'
+      fullPath: '/llms.txt'
+      preLoaderRoute: typeof LlmsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -254,6 +300,20 @@ declare module '@tanstack/react-router' {
       path: '/$lang/docs'
       fullPath: '/$lang/docs'
       preLoaderRoute: typeof LangDocsRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/llms-full.txt': {
+      id: '/$lang/llms-full.txt'
+      path: '/$lang/llms-full.txt'
+      fullPath: '/$lang/llms-full.txt'
+      preLoaderRoute: typeof LangLlmsFullDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/$lang/llms.txt': {
+      id: '/$lang/llms.txt'
+      path: '/$lang/llms.txt'
+      fullPath: '/$lang/llms.txt'
+      preLoaderRoute: typeof LangLlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/docs/$': {
@@ -312,9 +372,12 @@ const rootRouteChildren: RootRouteChildren = {
   ArchiveRoute: ArchiveRoute,
   FontsRoute: FontsRoute,
   ImagesRoute: ImagesRoute,
+  LlmsDottxtRoute: LlmsDottxtRoute,
   SettingsRoute: SettingsRoute,
   TemplatesRoute: TemplatesRoute,
   LangDocsRouteRoute: LangDocsRouteRouteWithChildren,
+  LangLlmsFullDottxtRoute: LangLlmsFullDottxtRoute,
+  LangLlmsDottxtRoute: LangLlmsDottxtRoute,
   DocsSplatRoute: DocsSplatRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,
   ResumesIndexRoute: ResumesIndexRoute,
@@ -325,10 +388,11 @@ export const routeTree = rootRouteImport
   ._addFileTypes<FileRouteTypes>()
 
 import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
+import type { startInstance } from './start.ts'
 declare module '@tanstack/react-start' {
   interface Register {
     ssr: true
     router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
   }
 }
