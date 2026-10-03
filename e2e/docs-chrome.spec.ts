@@ -84,9 +84,9 @@ test.describe("docs chrome", () => {
     const pager = page.getByRole("navigation", { name: "More pages" });
 
     await expect(pager.getByRole("link")).toHaveCount(1);
-    await pager.getByRole("link", { name: /The shape of the file/ }).click();
+    await pager.getByRole("link", { name: /Quick start/ }).click();
 
-    await expect(page).toHaveURL("/en/docs/format/overview");
+    await expect(page).toHaveURL("/en/docs/getting-started/quick-start");
     await expect(
       page
         .getByRole("navigation", { name: "More pages" })
@@ -102,7 +102,7 @@ test.describe("docs chrome", () => {
       page
         .getByRole("complementary", { name: "On this page" })
         .getByRole("link", {
-          name: "Where to go next",
+          name: "Start here",
         }),
     ).toBeVisible();
   });

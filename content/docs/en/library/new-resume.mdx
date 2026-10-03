@@ -1,0 +1,72 @@
+---
+title: Make a new resume
+description: Start a resume or a cover letter from an example, a blank page or a file you already have, and choose its template, name and group.
+---
+
+Choose **New resume** at the top of the library, or in the sidebar, or run it
+from the command palette. A dialog asks how to start.
+
+## Kind of document [#kind]
+
+**Kind of document** is **Resume** or **Cover letter**. A letter is the same kind
+of document as a resume, with paragraphs in place of sections. The rest of this
+page applies to both, and the choices under **Start from** change to match.
+
+## Start from [#start]
+
+- **Example resume** is a finished resume to write over, with entries, dates and
+  a skills list already in it. It shows what each part of the format does, and
+  it is real Markdown, so it is also a reference.
+- **Blank page** has the four sections almost every resume has, each empty.
+
+Whichever you pick is remembered, and the dialog offers it next time. The
+example is what you get until you pick otherwise. For a letter the two choices
+are **Example letter** and **Blank letter**.
+
+## Template, name and group [#details]
+
+- **Template** is the base look. You can change it later, so the choice is not
+  permanent. The last one you used is offered again.
+- **Name** is what the resume is called in the library. It is optional: a resume
+  with no name is called Untitled resume, and you can rename it at any time.
+- **Group** files it in one of your groups. If you opened the dialog while
+  viewing a group, that group is already chosen.
+
+Choose **Create resume** and the editor opens on it.
+
+## Import a file [#import]
+
+Under **Import a file**, choose a file you already have instead of starting from
+the example or a blank page. Resivo reads:
+
+- Markdown, in the format these docs describe;
+- JSON Resume, the format other resume tools write;
+- plain text, read for the usual habits of a text resume: a name on top,
+  contact details under it, and headings in capitals or with their usual names;
+- a Resivo bundle (`.zip`), which is one resume exported with its images,
+  fonts and style.
+
+The dialog tells you how the file read. A file read cleanly says so. A line that
+could not be typeset is kept as source text and the editor points at it. For a
+JSON Resume file, anything a resume here has no place for, such as a photograph,
+is listed and not silently dropped. For a text file, the headings decide the
+sections, so look them over once it opens.
+
+A bundle keeps its own template and style, so the **Template** you chose in the
+dialog is not used for it. If the template has changed since the bundle was
+exported, the dialog warns that a page may break differently from the original.
+A file that is not a valid bundle is refused with a reason, and nothing is
+written.
+
+A Markdown, JSON or text file is a few kilobytes, so one larger than a megabyte
+is turned away as probably not being a resume. The name defaults to the one in the
+file, or to the file's name, unless you have typed your own.
+
+## Other ways to make one [#from-existing]
+
+From the menu on a resume's card:
+
+- **Duplicate** makes a copy. See [Organize your resumes](/docs/library/organize).
+- **Create version for a job** copies a resume to tailor for one company and
+  role.
+- **Create cover letter** makes a letter that takes its header from the resume.

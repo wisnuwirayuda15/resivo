@@ -1,0 +1,66 @@
+---
+title: Lokal lebih dulu
+description: Resume Anda berada di browser pada perangkat Anda, tanpa akun dan tanpa salinan di tempat lain, jadi cadangan adalah satu-satunya perlindungannya.
+---
+
+Resivo menyimpan semua yang Anda tulis di browser Anda sendiri, pada perangkat
+tempat Anda menulisnya. Tidak ada akun, tidak ada server yang memegang resume
+Anda, dan tidak ada sinkronisasi. Itulah alasan sebagian besar pilihan dalam
+aplikasi ini, dan ada akibat yang perlu diketahui sebelum Anda
+mengandalkannya.
+
+## Apa yang disimpan, dan di mana [#storage]
+
+- Resume, grup, gambar, dan font Anda disimpan di IndexedDB browser Anda,
+  basis data yang dimiliki situs ini di browser ini.
+- Beberapa preferensi disimpan di penyimpanan lokal browser: bahasa
+  antarmuka, tema warna, apakah bilah samping diciutkan, dan tur mana yang sudah
+  Anda lihat.
+
+Tidak ada hal lain tentang Anda yang disimpan. Resivo tidak punya proses masuk,
+jadi tidak ada profil.
+
+## Apa yang meninggalkan perangkat Anda [#network]
+
+Tidak ada isi resume yang pernah dikirim ke mana pun. Memuat Resivo adalah
+permintaan biasa untuk berkas aplikasi, seperti pada situs mana pun, dan server
+yang menjawabnya melihat apa yang dilihat server web mana pun, seperti alamat
+jaringan Anda. Apa yang Anda ketik, gambar yang Anda tambahkan, dan berkas yang
+Anda ekspor tidak pernah menjadi bagian dari sebuah permintaan.
+
+Dokumentasi bekerja dengan cara yang sama. Pencarian berjalan di browser Anda
+terhadap indeks yang diunduh sekali. **Tanya asisten** di halaman dokumentasi
+membuka situs lain hanya bila Anda memilihnya, dan hanya mengirim alamat
+halaman publik itu.
+
+## Konsekuensinya [#tradeoff]
+
+Karena satu-satunya salinan ada di perangkat Anda, membersihkan data situs
+browser menghapus resume Anda, begitu pula kehilangan perangkat. Tidak ada
+yang bisa memulihkannya untuk Anda, karena tidak ada orang lain yang
+memilikinya.
+
+Editor mengatakannya lewat indikator simpan: **Tersimpan** berarti _tertulis di
+perangkat ini_, dan tidak ada salinan di tempat lain.
+
+## Cadangkan [#backup]
+
+Di **Pengaturan**, **Cadangkan dan pulihkan** melindungi dari hal itu. **Unduh
+cadangan** menulis setiap resume, grup, gambar, dan font di perangkat ke satu
+berkas JSON, yang disimpan oleh browser Anda. Simpan di tempat yang bukan
+perangkat ini.
+
+**Pulihkan** menambahkan isi sebuah cadangan ke perangkat dan tidak pernah
+mengganti atau menghapus yang sudah ada. Resume yang bentrok dengan yang sudah
+Anda punya dipulihkan di sebelahnya, dengan `(restored)` ditambahkan pada
+namanya, dan gambar yang sudah tersimpan tidak disimpan dua kali.
+
+Untuk memindahkan satu resume saja, bukan semuanya, pakai **Ekspor sebagai zip**
+pada kartunya, atau **Bundle (.zip)** di menu **Ekspor** editor, lalu impor
+berkasnya dari dialog **Resume baru** di perangkat lain.
+
+## Bekerja tanpa jaringan [#offline]
+
+Resivo dapat dipasang seperti aplikasi, dan setelah menyimpan dirinya di cache ia
+terbuka tanpa jaringan sama sekali. **Pengaturan** menyebutkan mana yang berlaku
+di perangkat Anda, di bawah **Pasang di perangkat ini**.

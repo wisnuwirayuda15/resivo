@@ -11,8 +11,10 @@ import {
   checkMeta,
   checkParity,
   checkSlugs,
+  checkUiLabels,
 } from "./testing/checks";
 import { languagesOnDisk, readDocsTree } from "./testing/contentFiles";
+import { uiLabelsFor } from "./testing/labels";
 
 /**
  * The docs content has to be true, complete and the same in every language.
@@ -72,6 +74,14 @@ describe("the docs content", () => {
 
     it("links only to places that exist", () => {
       expect(checkLinks(tree)).toEqual([]);
+    });
+
+    it("sets only real interface labels in bold", () => {
+      const labels = uiLabelsFor(lang);
+
+      expect(tree.pages.flatMap((page) => checkUiLabels(page, labels))).toEqual(
+        [],
+      );
     });
 
     it("has code blocks that are true", () => {

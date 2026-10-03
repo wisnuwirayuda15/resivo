@@ -1,0 +1,55 @@
+---
+title: How Resivo works
+description: A resume is one Markdown file drawn by a template, and the page you see is the document you export, which is why the PDF matches.
+---
+
+Three ideas explain most of how Resivo behaves. Once they are clear the rest of
+these docs read as detail.
+
+## A resume is a Markdown file [#file]
+
+What you write is plain Markdown: your name, then sections, each a heading with
+whatever follows it. A few extra lines, called directives, cover the parts
+Markdown has no word for, such as a job with dates. The
+[shape of the file](/docs/format/overview) describes them.
+
+The Markdown is the content. It says nothing about fonts, colours or margins, so
+you can change how a resume looks without touching a word of it, and the other
+way round.
+
+## A template draws it [#template]
+
+How the content looks comes from three layers, each applied over the one before:
+
+- a template, which is the base look;
+- the style settings, such as paper size, margins, fonts and colours;
+- your own custom CSS, if you write any, which has the last word.
+
+Because the layers are separate, switching template keeps your content and your
+settings keep your tweaks. Your CSS can restyle the paper but cannot reach the
+rest of the app.
+
+## The page is the export [#export]
+
+The preview is a real page, laid out at the real paper size. Resivo measures how
+tall each block is and places whole blocks onto pages, so an entry is never cut
+in half by a page break. The HTML export is that same page as one file, and the
+PDF is that file printed, so the PDF and the preview are one document with two
+destinations and neither can drift from the other.
+
+The paper stays light even when the app is in a dark theme, because a printed
+resume is white.
+
+## Resumes and cover letters [#letters]
+
+A cover letter is the same kind of document: it lives in the same library, opens
+in the same editor and exports the same way. It is written as paragraphs with no
+section headings, and starts from a design suited to a letter. You make one from
+the **New resume** dialog, or from a resume's menu in the library.
+
+## What it is not [#limits]
+
+Resivo does not keep a history of every edit you make to a resume. Undo steps
+back through recent changes, and a copy for one job is a separate resume you can
+compare with the original. For a copy of everything, see
+[Local first](/docs/getting-started/local-first).

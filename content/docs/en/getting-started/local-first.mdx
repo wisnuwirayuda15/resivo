@@ -1,0 +1,60 @@
+---
+title: Local first
+description: Your resumes live in your browser on your device, with no account and no copy elsewhere, so a backup is the one thing that protects them.
+---
+
+Resivo keeps everything you write in your own browser, on the device you wrote
+it on. There is no account, no server holding your resumes and no sync. That is
+the reason for most of the choices in the app, and it has consequences worth
+knowing before you rely on it.
+
+## What is stored, and where [#storage]
+
+- Your resumes, groups, images and fonts are stored in your browser's
+  IndexedDB, a database that belongs to this site in this browser.
+- A few preferences are stored in the browser's local storage: the interface
+  language, the colour theme, whether the sidebar is collapsed, and which tours
+  you have seen.
+
+Nothing else about you is kept. Resivo has no sign-in, so there is no profile.
+
+## What leaves your device [#network]
+
+No resume content is ever sent anywhere. Loading Resivo is an ordinary request
+for the app's files, as with any website, and the server that answers sees what
+any web server sees, such as your network address. What you type, the images you
+add and the files you export never form part of a request.
+
+The documentation works the same way. Search runs in your browser against an
+index it downloads once. **Ask an assistant** on a docs page opens another site
+only when you choose it, and sends only the address of that public page.
+
+## The tradeoff [#tradeoff]
+
+Because the only copy is on your device, clearing your browser's site data
+deletes your resumes, and so does losing the device. Nobody can recover them
+for you, because nobody else has them.
+
+The editor says this in its save indicator: **Saved** means _written to this
+device_, and that there is no copy anywhere else.
+
+## Back up [#backup]
+
+In **Settings**, **Backup and restore** protects against that. **Download
+backup** writes every resume, group, image and font on the device to one JSON
+file, which your browser saves. Keep it somewhere that is not this device.
+
+**Restore** adds a backup's contents to the device and never replaces or deletes
+what is already there. A resume that collides with one you already have is
+restored beside it, with `(restored)` added to its name, and an image already
+stored is not stored twice.
+
+To move one resume rather than everything, use **Export as zip** on its card, or
+**Bundle (.zip)** in the editor's **Export** menu, and import the file from the
+**New resume** dialog on the other device.
+
+## Working offline [#offline]
+
+Resivo can be installed like an app, and once it has cached itself it opens with
+no network at all. **Settings** says which of these is true on your device,
+under **Install on this device**.

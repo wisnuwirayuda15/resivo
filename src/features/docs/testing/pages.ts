@@ -7,7 +7,7 @@ import { unified } from "unified";
 import { visit } from "unist-util-visit";
 import { parse as parseYaml } from "yaml";
 
-import type { Code, Heading, Link, Root } from "mdast";
+import type { Code, Heading, Link, Root, Strong } from "mdast";
 import type { MdxJsxFlowElement, MdxJsxTextElement } from "mdast-util-mdx-jsx";
 
 /**
@@ -192,6 +192,24 @@ export const linksOf = (page: DocsPage): Array<LinkInfo> => {
         found.push({ url: attribute.value });
       }
     }
+  });
+
+  return found;
+};
+
+/**
+ * Every phrase a page sets in bold, as text.
+ *
+ * Bold is reserved for a label the app shows, written exactly as it is shown, so
+ * a reader can find it on screen. That convention is what makes the labels
+ * checkable (see `checkUiLabels`).
+ */
+export const strongsOf = (page: DocsPage): Array<string> => {
+  const found: Array<string> = [];
+
+  visit(page.tree, "strong", (node: Strong) => {
+    // A phrase wrapped across two lines of source is one phrase on screen.
+    found.push(toString(node).replace(/\s+/g, " "));
   });
 
   return found;

@@ -1,0 +1,60 @@
+---
+title: Cara kerja Resivo
+description: Resume adalah satu berkas Markdown yang digambar oleh template, dan halaman yang Anda lihat adalah dokumen yang diekspor, itulah sebabnya PDF-nya sama.
+---
+
+Tiga gagasan menjelaskan sebagian besar cara kerja Resivo. Setelah ketiganya
+jelas, sisa dokumentasi ini terbaca sebagai rincian.
+
+## Resume adalah berkas Markdown [#file]
+
+Yang Anda tulis adalah Markdown biasa: nama Anda, lalu bagian-bagian, masing-masing
+berupa satu judul beserta yang mengikutinya. Beberapa baris tambahan, yang
+disebut direktif, mencakup hal yang tidak punya padanan di Markdown, seperti
+sebuah pekerjaan beserta tanggalnya. [Bentuk berkas](/docs/format/overview)
+menjelaskannya.
+
+Markdown adalah isinya. Ia tidak berkata apa pun tentang font, warna, atau
+margin, jadi Anda bisa mengubah tampilan resume tanpa menyentuh satu kata pun,
+dan sebaliknya.
+
+## Template menggambarnya [#template]
+
+Tampilan isi berasal dari tiga lapis, masing-masing diterapkan di atas yang
+sebelumnya:
+
+- sebuah template, yaitu tampilan dasar;
+- pengaturan gaya, seperti ukuran kertas, margin, font, dan warna;
+- CSS kustom Anda sendiri, jika Anda menulisnya, yang memegang keputusan
+  terakhir.
+
+Karena lapisannya terpisah, berganti template mempertahankan isi Anda dan
+pengaturan Anda mempertahankan ubahan Anda. CSS Anda dapat menata ulang kertas
+tetapi tidak dapat menjangkau bagian aplikasi lainnya.
+
+## Halamannya adalah ekspornya [#export]
+
+Pratinjau adalah halaman sungguhan, ditata pada ukuran kertas sungguhan. Resivo
+mengukur tinggi tiap blok lalu menempatkan blok utuh ke halaman, sehingga satu
+entri tidak pernah terpotong di tengah oleh pemisah halaman. Ekspor HTML adalah
+halaman yang sama sebagai satu berkas, dan PDF adalah berkas itu yang dicetak,
+jadi PDF dan pratinjau adalah satu dokumen dengan dua tujuan dan tidak ada yang
+bisa menyimpang dari yang lain.
+
+Kertas tetap terang meskipun aplikasi memakai tema gelap, karena resume yang
+dicetak berwarna putih.
+
+## Resume dan surat lamaran [#letters]
+
+Surat lamaran adalah jenis dokumen yang sama: ia berada di pustaka yang sama,
+terbuka di editor yang sama, dan diekspor dengan cara yang sama. Ia ditulis
+sebagai paragraf tanpa judul bagian, dan dimulai dari desain yang cocok untuk
+surat. Anda membuatnya dari dialog **Resume baru**, atau dari menu sebuah resume
+di pustaka.
+
+## Yang bukan fungsinya [#limits]
+
+Resivo tidak menyimpan riwayat setiap perubahan yang Anda buat pada sebuah
+resume. Urungkan mundur melalui perubahan terbaru, dan salinan untuk satu
+lowongan adalah resume terpisah yang bisa Anda bandingkan dengan aslinya. Untuk
+salinan semuanya, lihat [Lokal lebih dulu](/docs/getting-started/local-first).

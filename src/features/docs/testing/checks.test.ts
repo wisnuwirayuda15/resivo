@@ -6,6 +6,7 @@ import {
   checkCompiles,
   checkFences,
   checkFrontmatter,
+  checkUiLabels,
   checkLinks,
   checkMeta,
   checkParity,
@@ -487,5 +488,34 @@ describe("checkFences", () => {
   it("leaves other languages alone", () => {
     expect(checkFences(fenced("bash", "ls -la"))).toEqual([]);
     expect(checkFences(fenced("", "plain"))).toEqual([]);
+  });
+});
+
+describe("checkUiLabels", () => {
+  const labels = new Set(["New resume", "Saved"]);
+
+  it("accepts bold text that is a label the app shows", () => {
+    expect(
+      checkUiLabels(
+        page("a.mdx", "Choose **New resume**, then see **Saved**.\n"),
+        labels,
+      ),
+    ).toEqual([]);
+  });
+
+  it("names bold text that is not one", () => {
+    const problems = checkUiLabels(
+      page("a.mdx", "Choose **New resumee** now.\n"),
+      labels,
+    );
+
+    expect(problems).toHaveLength(1);
+    expect(problems.join()).toContain('"New resumee" is in bold');
+  });
+
+  it("leaves italics and plain text alone", () => {
+    expect(
+      checkUiLabels(page("a.mdx", "An *emphasis* and plain text.\n"), labels),
+    ).toEqual([]);
   });
 });

@@ -12,6 +12,7 @@ import {
   headingsOf,
   linksOf,
   parsePage,
+  strongsOf,
 } from "./pages";
 
 import type { DocsPage, DocsTree, FenceInfo } from "./pages";
@@ -471,3 +472,25 @@ export const checkFences = (page: DocsPage): Problems => {
 /** Parses a page from text, for tests that build their own content. */
 export const pageFrom = (lang: string, path: string, raw: string): DocsPage =>
   parsePage(lang, path, raw);
+
+/**
+ * Bold text is a label the app shows, and it has to be one that exists.
+ *
+ * A page that says "choose **New resume**" is making a claim about the screen,
+ * and the screen is in the locale files, so the claim can be checked against
+ * them in the language the page is written in. A label that was renamed, or
+ * quoted from memory, fails here instead of sending a reader looking for a
+ * button that is not there. `labels` is every string the interface can show in
+ * that language. A phrase that is bold for emphasis and not as a label is a
+ * mistake to fix in the page and not an exception to list: use italics.
+ */
+export const checkUiLabels = (
+  page: DocsPage,
+  labels: ReadonlySet<string>,
+): Problems =>
+  strongsOf(page)
+    .filter((text) => !labels.has(text.trim()))
+    .map(
+      (text) =>
+        `${page.lang}/${page.path}: "${text}" is in bold but is not text the app shows`,
+    );
