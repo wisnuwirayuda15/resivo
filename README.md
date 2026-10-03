@@ -300,8 +300,9 @@ Each docs page also names its canonical address and links its translation, with
 `x-default` pointing at English, and carries a breadcrumb trail as structured
 data. `/sitemap.xml` lists the three public pages and every docs page with its
 alternates, and `/robots.txt` is a route that points at it. Both need an
-absolute address, and the repo does not know where it will be deployed, so set
-`SITE_URL` (for example `https://resivo.example`) in production. Without it the
+absolute address, and the repo does not know where it is deployed, so set
+`SITE_URL` in production (the live site is `https://resivo-cv.vercel.app`, set as
+an environment variable in the Vercel project). Without it the
 address of the incoming request is used, which is right locally and behind a
 proxy that forwards the real host, but a `Host` header is chosen by whoever
 sends the request, so do not rely on it for a public site. Where no origin can be
