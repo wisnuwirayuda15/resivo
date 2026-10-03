@@ -9,6 +9,7 @@ import { PageActions } from "@/features/docs/components/PageActions";
 import { DocsToc } from "@/features/docs/components/DocsToc";
 import { docsHead } from "@/features/docs/head";
 import { getDocsPage } from "@/features/docs/loaders";
+import { OriginContext } from "@/features/docs/origin";
 import { markdownHref } from "@/features/docs/markdown/urls";
 import { isDocsLanguage, parseDocsPath } from "@/features/docs/paths";
 import { docsComponents } from "@/features/docs/mdx/components";
@@ -22,7 +23,8 @@ const Article: React.FC<{
   url: string;
   title: string;
   description?: string;
-}> = ({ path, url, title, description }) => {
+  origin: string | null;
+}> = ({ path, url, title, description, origin }) => {
   const { lang } = Route.useParams();
   const { pageTree } = useFumadocsLoader(layoutApi.useLoaderData());
   const page = docs.getPage(path);
@@ -48,7 +50,9 @@ const Article: React.FC<{
           title={title}
         />
         <Box className="mt-6">
-          <Body components={docsComponents} />
+          <OriginContext value={origin}>
+            <Body components={docsComponents} />
+          </OriginContext>
         </Box>
         <DocsPager lang={lang} tree={pageTree} url={url} />
       </Box>

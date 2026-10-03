@@ -1,4 +1,10 @@
-import { useRef } from "react";
+import {
+  Children,
+  cloneElement,
+  isValidElement,
+  useContext,
+  useRef,
+} from "react";
 import { Box, Text, UnstyledButton } from "@mantine/core";
 import { useClipboard } from "@mantine/hooks";
 
@@ -6,6 +12,7 @@ import { Icon } from "@/features/icons/IconRenderer";
 import { FALLBACK_LANGUAGE } from "@/lib/i18n/language";
 import { useRouteLanguage } from "@/lib/i18n/useRouteLanguage";
 
+import { OriginContext, withOrigin } from "../origin";
 import { useDocsTranslation } from "../useDocsTranslation";
 
 interface CodeBlockProps {
@@ -25,6 +32,28 @@ const LANGUAGE_LABELS: Record<string, string> = {
   bash: "Shell",
   text: "Text",
 };
+
+/** The same tree with the origin token written out in its text. The
+ * highlighter leaves the token whole inside one text node, so walking the nodes
+ * is enough. */
+const writeOrigin = (
+  node: React.ReactNode,
+  origin: string | null,
+): React.ReactNode =>
+  Children.map(node, (child) => {
+    if (typeof child === "string") {
+      return withOrigin(child, origin);
+    }
+
+    return isValidElement<{ children?: React.ReactNode }>(child) &&
+      child.props.children !== undefined
+      ? cloneElement(
+          child,
+          undefined,
+          writeOrigin(child.props.children, origin),
+        )
+      : child;
+  });
 
 /**
  * A fenced code block, drawn.
@@ -46,6 +75,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
 }) => {
   const lang = useRouteLanguage() ?? FALLBACK_LANGUAGE;
   const { t } = useDocsTranslation(lang);
+  const origin = useContext(OriginContext);
   const clipboard = useClipboard({ timeout: 1600 });
   const preRef = useRef<HTMLPreElement>(null);
 
@@ -71,7 +101,7 @@ export const CodeBlock: React.FC<CodeBlockProps> = ({
         component="pre"
         ref={preRef}
       >
-        {children}
+        {writeOrigin(children, origin)}
       </Box>
     </Box>
   );

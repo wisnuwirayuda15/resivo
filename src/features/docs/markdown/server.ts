@@ -6,6 +6,7 @@ import {
   SUPPORTED_LANGUAGES,
 } from "@/lib/i18n/language";
 
+import { withOrigin } from "../origin";
 import { isDocsLanguage } from "../paths";
 import { pageUrlsInOrder } from "../tree";
 import { source } from "../source";
@@ -33,7 +34,7 @@ export const renderPage = async (
 ): Promise<string> => {
   const lang = isDocsLanguage(page.locale) ? page.locale : "en";
   const body = localizeMarkdownLinks(
-    resolveHeadingIds(await page.data.getText("processed")),
+    resolveHeadingIds(withOrigin(await page.data.getText("processed"), origin)),
     lang,
     origin,
   );

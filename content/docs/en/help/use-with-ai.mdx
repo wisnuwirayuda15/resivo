@@ -35,11 +35,11 @@ from `/api/mcp`. It has three tools: `list_pages`, `get_page` and `search`. Each
 takes an optional `lang` (`en` or `id`, English by default). In Claude Code:
 
 ```bash
-claude mcp add --transport http resivo-docs https://resivo-cv.vercel.app/api/mcp
+claude mcp add --transport http resivo-docs {{origin}}/api/mcp
 ```
 
-If you host your own copy, use its address in place of
-`https://resivo-cv.vercel.app`.
+The command carries the address of the site you are reading, so it works as
+it is on a copy you host yourself.
 
 ## What is shared [#shared]
 

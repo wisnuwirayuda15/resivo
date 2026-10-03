@@ -132,6 +132,21 @@ test.describe("docs MCP server", () => {
       for (const tool of ["list_pages", "get_page", "search", "/api/mcp"]) {
         expect(page, `${lang} ${tool}`).toContain(tool);
       }
+
+      // The address in the command is the one the page was read from.
+      expect(page, lang).toContain("http://localhost:3000/api/mcp");
+      expect(page, lang).not.toContain("{{origin}}");
     }
+  });
+
+  test("the command on the page names the address it is read at", async ({
+    page,
+  }) => {
+    await page.goto("/en/docs/help/use-with-ai");
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+
+    await expect(page.locator("pre")).toContainText(
+      "resivo-docs http://localhost:3000/api/mcp",
+    );
   });
 });
