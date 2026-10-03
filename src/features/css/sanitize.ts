@@ -108,6 +108,9 @@ const ALLOWED_URL = /^(?:data:|blob:|#)/i;
 const REMOTE_URL_MESSAGE =
   "Only data: and blob: URLs are allowed, a remote URL would fetch over the network.";
 
+const IMPORTANT_MESSAGE =
+  "!important is not needed here: custom CSS is already the highest layer, and it is removed so a rule cannot override the page geometry.";
+
 // ---------------------------------------------------------------------------
 // Values
 // ---------------------------------------------------------------------------
@@ -219,6 +222,17 @@ const declarations = (
         `position: ${value} would take the element out of the page, so the print would not match the preview.`,
       );
       return;
+    }
+
+    /**
+     * PostCSS keeps the flag on `declaration.important`, not in `value`, so
+     * leaving it out of the output below is what removes it. It is
+     * dropped because an `!important` inside `@layer custom` would beat the
+     * unlayered page geometry the paginator measured against. It is reported
+     * because nothing here is dropped quietly, and the declaration itself is kept.
+     */
+    if (declaration.important) {
+      warn(context, node, IMPORTANT_MESSAGE);
     }
 
     kept.push(`${property}: ${value}`);

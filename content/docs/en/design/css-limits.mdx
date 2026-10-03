@@ -12,7 +12,7 @@ that way. This page is both lists, so a rule that does nothing is explained.
 A refusal is announced. The rule is underlined in yellow in the `style.css` tab
 with the reason, at the line and column it is on, and it is counted with the
 notices. Only the part that is refused is left out, so the rest of the rule and
-of the stylesheet still applies. The one exception is `!important`, below.
+of the stylesheet still applies. `!important` is handled the same way, below.
 
 ### Anything that fetches [#network]
 
@@ -105,9 +105,10 @@ fault is and keeps the rules that could be read, as a browser would.
 
 ### `!important` [#important]
 
-`!important` is removed from the copy the paper uses, and no notice is shown. It
-is never needed, because your CSS is already the highest layer, and it would let
-a rule override the page itself.
+`!important` is removed from the copy the paper uses, and a notice is shown at
+the declaration. The rest of the declaration still applies. It is never needed,
+because your CSS is already the highest layer, and it would let a rule override
+the page itself.
 
 ## What is allowed [#allowed]
 

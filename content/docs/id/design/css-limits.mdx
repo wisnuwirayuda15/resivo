@@ -13,7 +13,7 @@ berefek ada penjelasannya.
 Penolakan selalu diumumkan. Aturannya digarisbawahi kuning di tab `style.css`
 beserta alasannya, pada baris dan kolom tempat ia berada, dan dihitung bersama
 catatan. Hanya bagian yang ditolak yang dibuang, jadi sisa aturan itu dan sisa
-stylesheet tetap berlaku. Satu-satunya pengecualian adalah `!important`, di
+stylesheet tetap berlaku. `!important` diperlakukan dengan cara yang sama, di
 bawah.
 
 ### Apa pun yang mengambil sesuatu [#network]
@@ -109,9 +109,10 @@ dilakukan browser.
 
 ### `!important` [#important]
 
-`!important` dibuang dari salinan yang dipakai kertas, dan tidak ada catatan yang
-ditampilkan. Ia tidak pernah diperlukan, karena CSS Anda sudah berada di lapisan
-tertinggi, dan ia akan membiarkan sebuah aturan menimpa halaman itu sendiri.
+`!important` dibuang dari salinan yang dipakai kertas, dan sebuah catatan
+ditampilkan pada deklarasinya. Sisa deklarasi itu tetap berlaku. Ia tidak pernah
+diperlukan, karena CSS Anda sudah berada di lapisan tertinggi, dan ia akan
+membiarkan sebuah aturan menimpa halaman itu sendiri.
 
 ## Apa yang diizinkan [#allowed]
 

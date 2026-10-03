@@ -307,6 +307,29 @@ describe("reporting", () => {
     expect(warnings[0]?.message).toContain("@nonsense");
   });
 
+  it("removes !important and says so, keeping the declaration", () => {
+    const { css, warnings } = sanitizeCss(
+      ".rp-figure { width: 10% !important; }",
+    );
+
+    expect(css).toBe(".rp-figure { width: 10% }");
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]?.message).toContain("!important");
+    expect(warnings[0]?.line).toBe(1);
+    expect(warnings[0]?.column).toBe(14);
+  });
+
+  it("removes !important inside @media and points at its line", () => {
+    const { css, warnings } = sanitizeCss(
+      "@media print {\n  .a { color: red !important; font-size: 9pt }\n}",
+    );
+
+    expect(css).toBe("@media print { .a { color: red; font-size: 9pt } }");
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]?.message).toContain("!important");
+    expect(warnings[0]?.line).toBe(2);
+  });
+
   it("says nothing about valid CSS", () => {
     const { warnings } = sanitizeCss(
       "@media (min-width: 10px) { .a { color: red; --x: 1 } }",
