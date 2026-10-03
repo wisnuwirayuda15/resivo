@@ -270,20 +270,28 @@ migration that touches every stored resume, for a preference that only matters
 while someone works down the list. It is kept per resume in memory, so it
 survives switching tabs but not a reload.
 
-**Three pages are indexable, and the rest say so.** `/`, `/templates` and
-`/about` carry a title, a description and a social card. Every route behind the
-app shell renders the contents of one browser's IndexedDB, so a crawler sees an
-empty shell of it however full the real one is, and an empty shell in a search
-index is worse than no result: those routes send `noindex` and `robots.txt`
-repeats it. The two are not redundant, because they are read at different
-moments. `robots.txt` stops the fetch; the meta tag stops the indexing of a
-page reached by a link from elsewhere.
+**Three pages and the documentation are indexable, and the rest say so.** `/`,
+`/templates`, `/about` and everything under `/en/docs` and `/id/docs` carry a
+title, a description and a social card. Every route behind the app shell renders
+the contents of one browser's IndexedDB, so a crawler sees an empty shell of it
+however full the real one is, and an empty shell in a search index is worse than
+no result: those routes send `noindex` and `robots.txt` repeats it. The two are
+not redundant, because they are read at different moments. `robots.txt` stops
+the fetch; the meta tag stops the indexing of a page reached by a link from
+elsewhere.
 
-There is no sitemap, and no absolute URL anywhere. A sitemap helps a large or
-poorly linked site; this one has three indexable pages, all linked from the
-root. The canonical and the `og:image` are root-relative because this repo does
-not know the origin it will be deployed to, and a hardcoded domain would be
-wrong on every deployment that is not that domain.
+Each docs page also names its canonical address and links its translation, with
+`x-default` pointing at English, and carries a breadcrumb trail as structured
+data. `/sitemap.xml` lists the three public pages and every docs page with its
+alternates, and `/robots.txt` is a route that points at it. Both need an
+absolute address, and the repo does not know where it will be deployed, so set
+`SITE_URL` (for example `https://resivo.example`) in production. Without it the
+address of the incoming request is used, which is right locally and behind a
+proxy that forwards the real host, but a `Host` header is chosen by whoever
+sends the request, so do not rely on it for a public site. Where no origin can be
+found at all, the absolute tags are left out rather than guessed. The landing
+page's canonical and the social card on the app's own pages stay root-relative,
+as they always were.
 
 **Two things in `PRD.md` were superseded while building, and the file is left as
 it was written.** It lists Iconify web components in the stack and Phosphor with

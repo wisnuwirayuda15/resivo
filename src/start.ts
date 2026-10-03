@@ -36,12 +36,9 @@ const markdown = createMiddleware().server(async ({ request, next }) => {
   }
 
   const { markdownResponse } = await import("@/features/docs/markdown/server");
+  const { requestOrigin } = await import("@/lib/siteOrigin");
 
-  return markdownResponse(
-    wanted.lang,
-    wanted.slugs,
-    new URL(request.url).origin,
-  );
+  return markdownResponse(wanted.lang, wanted.slugs, requestOrigin(request));
 });
 
 export const startInstance = createStart(() => ({

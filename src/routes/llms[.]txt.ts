@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { requestOrigin } from "@/lib/siteOrigin";
+
 import { renderRootIndex } from "@/features/docs/markdown/server";
 
 /**
@@ -12,7 +14,7 @@ export const Route = createFileRoute("/llms.txt")({
   server: {
     handlers: {
       GET: async ({ request }) =>
-        new Response(await renderRootIndex(new URL(request.url).origin), {
+        new Response(await renderRootIndex(requestOrigin(request)), {
           headers: { "Content-Type": "text/plain; charset=utf-8" },
         }),
     },

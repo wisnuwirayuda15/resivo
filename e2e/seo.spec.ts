@@ -11,8 +11,8 @@ import type { Page } from "@playwright/test";
  * arrays and still miss the merge, which is exactly what went wrong with
  * `theme-color`: two tags with one name, deduped down to one.
  *
- * The rule these tests encode is that three pages are worth indexing and the
- * rest are not. Everything behind the app shell renders one browser's
+ * The rule these tests encode is that three pages (and the documentation, which
+ * `docs-seo.spec.ts` covers) are worth indexing and the rest are not. Everything behind the app shell renders one browser's
  * IndexedDB, so a crawler sees an empty shell of it however full the real one
  * is, and an empty shell in a search index is worse than no result.
  */

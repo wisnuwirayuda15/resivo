@@ -1,7 +1,14 @@
 import { notFound } from "@tanstack/react-router";
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestUrl } from "@tanstack/react-start/server";
+import { getBreadcrumbItems } from "fumadocs-core/breadcrumb";
 
+import { resolveSiteOrigin } from "@/lib/siteOrigin";
+
+import { docsHref } from "./paths";
 import { source } from "./source";
+
+import type { DocsLanguage } from "./paths";
 
 interface TreeRequest {
   lang: string;
@@ -25,10 +32,13 @@ export const getDocsTree = createServerFn({ method: "GET" })
   }));
 
 /**
- * One page: which file to load on the client, and its address.
+ * One page: which file to load on the client, its address, and what its head
+ * needs to say about it.
  *
  * A missing page is thrown as `notFound()`, so an unknown slug is a 404 with the
- * right status and not an empty article.
+ * right status and not an empty article. The origin and the breadcrumb trail are
+ * here because only the server knows them: the origin comes from the deployment
+ * (`SITE_URL`, see `resolveSiteOrigin`) and the trail from the page tree.
  */
 export const getDocsPage = createServerFn({ method: "GET" })
   .validator((input: PageRequest) => input)
@@ -39,10 +49,21 @@ export const getDocsPage = createServerFn({ method: "GET" })
       throw notFound();
     }
 
+    const tree = source.getPageTree(data.lang);
+
     return {
       path: page.path,
       url: page.url,
       title: page.data.title,
       description: page.data.description,
+      origin: resolveSiteOrigin(process.env.SITE_URL, getRequestUrl().href),
+      crumbs: [
+        { name: String(tree.name), url: docsHref(data.lang as DocsLanguage) },
+        ...getBreadcrumbItems(page.url, tree).map((item) => ({
+          name: String(item.name),
+          url: item.url,
+        })),
+        { name: page.data.title, url: page.url },
+      ],
     };
   });

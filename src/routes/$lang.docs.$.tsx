@@ -7,6 +7,7 @@ import { DocsBreadcrumbs } from "@/features/docs/components/DocsBreadcrumbs";
 import { DocsPager } from "@/features/docs/components/DocsPager";
 import { PageActions } from "@/features/docs/components/PageActions";
 import { DocsToc } from "@/features/docs/components/DocsToc";
+import { docsHead } from "@/features/docs/head";
 import { getDocsPage } from "@/features/docs/loaders";
 import { markdownHref } from "@/features/docs/markdown/urls";
 import { isDocsLanguage, parseDocsPath } from "@/features/docs/paths";
@@ -74,21 +75,35 @@ export const Route = createFileRoute("/$lang/docs/$")({
 
     return data;
   },
-  // The Markdown of this page, advertised the way a feed is: a crawler or an
-  // agent that reads the head learns it exists without guessing the address.
-  head: ({ params }) => ({
-    links: isDocsLanguage(params.lang)
-      ? [
-          {
-            rel: "alternate",
-            type: "text/markdown",
-            href: markdownHref(
-              params.lang,
-              (params._splat ?? "").split("/").filter(Boolean),
-            ),
-          },
-        ]
-      : [],
-  }),
+  // Everything a crawler reads about the page (see `docsHead`), and the
+  // Markdown form of it, advertised the way a feed is: an agent that reads the
+  // head learns it exists without guessing the address.
+  head: ({ params, loaderData }) => {
+    if (!isDocsLanguage(params.lang) || loaderData === undefined) {
+      return {};
+    }
+
+    const slugs = (params._splat ?? "").split("/").filter(Boolean);
+    const base = docsHead({
+      lang: params.lang,
+      slugs,
+      title: loaderData.title,
+      description: loaderData.description,
+      origin: loaderData.origin,
+      crumbs: loaderData.crumbs,
+    });
+
+    return {
+      ...base,
+      links: [
+        ...base.links,
+        {
+          rel: "alternate",
+          type: "text/markdown",
+          href: markdownHref(params.lang, slugs),
+        },
+      ],
+    };
+  },
   component: DocsPageRoute,
 });

@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { requestOrigin } from "@/lib/siteOrigin";
+
 /**
  * `/api/mcp`: the documentation as an MCP server over streamable HTTP.
  *
@@ -16,7 +18,7 @@ const handle = async (request: Request): Promise<Response> => {
     import("@modelcontextprotocol/server"),
     import("@/features/docs/mcp/server"),
   ]);
-  const origin = new URL(request.url).origin;
+  const origin = requestOrigin(request);
 
   return createMcpHandler(() => createDocsMcpServer(origin)).fetch(request);
 };

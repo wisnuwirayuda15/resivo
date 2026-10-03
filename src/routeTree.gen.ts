@@ -15,7 +15,9 @@ import { Route as ArchiveRouteImport } from './routes/archive'
 import { Route as FontsRouteImport } from './routes/fonts'
 import { Route as ImagesRouteImport } from './routes/images'
 import { Route as LlmsDottxtRouteImport } from './routes/llms[.]txt'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as LangDocsRouteRouteImport } from './routes/$lang.docs.route'
 import { Route as LangLlmsFullDottxtRouteImport } from './routes/$lang.llms-full[.]txt'
@@ -57,9 +59,19 @@ const LlmsDottxtRoute = LlmsDottxtRouteImport.update({
   path: '/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TemplatesRoute = TemplatesRouteImport.update({
@@ -120,7 +132,9 @@ export interface FileRoutesByFullPath {
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
@@ -139,7 +153,9 @@ export interface FileRoutesByTo {
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
@@ -159,7 +175,9 @@ export interface FileRoutesById {
   '/fonts': typeof FontsRoute
   '/images': typeof ImagesRoute
   '/llms.txt': typeof LlmsDottxtRoute
+  '/robots.txt': typeof RobotsDottxtRoute
   '/settings': typeof SettingsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/templates': typeof TemplatesRoute
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
@@ -180,7 +198,9 @@ export interface FileRouteTypes {
     | '/fonts'
     | '/images'
     | '/llms.txt'
+    | '/robots.txt'
     | '/settings'
+    | '/sitemap.xml'
     | '/templates'
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
@@ -199,7 +219,9 @@ export interface FileRouteTypes {
     | '/fonts'
     | '/images'
     | '/llms.txt'
+    | '/robots.txt'
     | '/settings'
+    | '/sitemap.xml'
     | '/templates'
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
@@ -218,7 +240,9 @@ export interface FileRouteTypes {
     | '/fonts'
     | '/images'
     | '/llms.txt'
+    | '/robots.txt'
     | '/settings'
+    | '/sitemap.xml'
     | '/templates'
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
@@ -238,7 +262,9 @@ export interface RootRouteChildren {
   FontsRoute: typeof FontsRoute
   ImagesRoute: typeof ImagesRoute
   LlmsDottxtRoute: typeof LlmsDottxtRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
   SettingsRoute: typeof SettingsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TemplatesRoute: typeof TemplatesRoute
   LangDocsRouteRoute: typeof LangDocsRouteRouteWithChildren
   LangLlmsFullDottxtRoute: typeof LangLlmsFullDottxtRoute
@@ -294,11 +320,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/templates': {
@@ -393,7 +433,9 @@ const rootRouteChildren: RootRouteChildren = {
   FontsRoute: FontsRoute,
   ImagesRoute: ImagesRoute,
   LlmsDottxtRoute: LlmsDottxtRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
   SettingsRoute: SettingsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TemplatesRoute: TemplatesRoute,
   LangDocsRouteRoute: LangDocsRouteRouteWithChildren,
   LangLlmsFullDottxtRoute: LangLlmsFullDottxtRoute,

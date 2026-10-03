@@ -180,12 +180,19 @@ which the Markdown writes as a bare `##` and reads back as the same section.
 `kind` survives `applyMarkdown` and `documentFromMarkdown` because both
 spread the document or base they are given; it is not in the Markdown itself.
 
-**SEO: three routes are indexable** (`/`, `/templates`, `/about`) and every
-route behind the app shell sends `noindex`, because they render one browser's
-IndexedDB and a crawler would only ever see an empty shell. Build the tags with
-`seo()` from `src/lib/seo.ts`. `theme-color` has to live in the document head in
-`__root.tsx`, not in a route's `head`: the router dedupes meta by name and would
-keep only one of the light and dark pair.
+**SEO: three app routes and the docs are indexable** (`/`, `/templates`,
+`/about`, `/<lang>/docs/...`) and every route behind the app shell sends
+`noindex`, because they render one browser's IndexedDB and a crawler would only
+ever see an empty shell. Build the tags with `seo()` from `src/lib/seo.ts`; a
+docs page goes through `docsHead` (`features/docs/head.ts`), which adds the
+canonical, the hreflang cluster and a breadcrumb trail through `seoLinks()`.
+Those need an absolute origin, which comes from `resolveSiteOrigin` in
+`src/lib/siteOrigin.ts`: `SITE_URL` first, the request's origin second, and no
+absolute tag at all when neither exists. Never take a canonical from a
+`Host` header alone. `robots.txt` and `sitemap.xml` are routes, not files in
+`public/`: a static `robots.txt` would shadow the route. `theme-color` has to
+live in the document head in `__root.tsx`, not in a route's `head`: the router
+dedupes meta by name and would keep only one of the light and dark pair.
 
 **The service worker is production-only, and that is why it has its own test
 config.** `public/sw.js` is registered from an inline script in `__root.tsx`
