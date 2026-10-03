@@ -237,7 +237,7 @@
   font-family: var(--paper-font-head);
   font-weight: var(--paper-fw-head);
   font-size: calc(var(--paper-fs-section) * 0.88);
-  color: var(--paper-ink-head);
+  color: var(--paper-heading, var(--paper-ink));
 }
 
 .rp-heading[data-level="4"] {
@@ -294,7 +294,7 @@
 
 .rp-table th {
   font-weight: var(--paper-fw-head);
-  color: var(--paper-ink-head);
+  color: var(--paper-heading, var(--paper-ink));
 }
 
 /* ---- Tags ---- */
