@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { Box, Button, Text } from "@mantine/core";
 
 import { Logo } from "@/components/shell/Logo";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 
 import { Reveal } from "./Reveal";
 
@@ -22,6 +22,7 @@ const FOOTER_LINKS = [
 
 export const Closing: React.FC = () => {
   const { t } = useTranslation("landing");
+  const lang = useUiLanguage();
 
   return (
     <>
@@ -64,6 +65,14 @@ export const Closing: React.FC = () => {
           </Box>
 
           <Box className="flex items-center gap-4 sm:ml-auto">
+            <Text
+              className="text-muted hover:text-body duration-fast ease-standard text-[12px] transition-colors"
+              component="span"
+            >
+              <Link params={{ lang, _splat: "" }} to="/$lang/docs/$">
+                {t("nav.docs")}
+              </Link>
+            </Text>
             {FOOTER_LINKS.map((link) => (
               <Text
                 className="text-muted hover:text-body duration-fast ease-standard text-[12px] transition-colors"

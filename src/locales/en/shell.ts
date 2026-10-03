@@ -12,6 +12,7 @@ export const shell = {
     applicationMenu: "Application menu",
     keyboardShortcuts: "Keyboard shortcuts",
     about: "About Resivo",
+    docs: "Documentation",
     takeTheTour: "Take the tour",
     editTitle: "Edit title",
   },

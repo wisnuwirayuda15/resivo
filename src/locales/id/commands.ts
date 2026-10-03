@@ -52,6 +52,11 @@ export const commands = {
     label: "Tentang Resivo",
     keywords: "bantuan privasi lokal help privacy local",
   },
+  docs: {
+    label: "Dokumentasi",
+    keywords:
+      "bantuan panduan referensi format markdown help guide manual reference",
+  },
   theme: {
     light: "Tema terang",
     dark: "Tema gelap",

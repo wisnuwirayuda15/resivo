@@ -48,6 +48,10 @@ export const commands = {
     keywords: "backup restore export storage language",
   },
   about: { label: "About Resivo", keywords: "help privacy local" },
+  docs: {
+    label: "Documentation",
+    keywords: "help guide manual reference format markdown",
+  },
   theme: {
     light: "Light theme",
     dark: "Dark theme",

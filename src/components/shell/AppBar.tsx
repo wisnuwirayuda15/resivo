@@ -9,9 +9,10 @@ import {
 } from "@mantine/core";
 
 import { Link } from "@tanstack/react-router";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
+import { docsHref } from "@/features/docs/paths";
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { cn } from "@/lib/utils";
@@ -95,6 +96,7 @@ export const AppBar: React.FC<AppBarProps> = ({
   onToggleSidebar,
 }) => {
   const { t } = useTranslation("shell");
+  const lang = useUiLanguage();
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -189,6 +191,16 @@ export const AppBar: React.FC<AppBarProps> = ({
                 onClick={onShowShortcuts}
               >
                 {t("appBar.keyboardShortcuts")}
+              </Menu.Item>
+              {/* A plain anchor and not the router's link: the docs are a
+                  separate site section with their own chrome, so this is a
+                  full navigation, and an anchor can be opened in a new tab. */}
+              <Menu.Item
+                component="a"
+                href={docsHref(lang)}
+                leftSection={<Icon name="markdown-logo" size={15} />}
+              >
+                {t("appBar.docs")}
               </Menu.Item>
               <Menu.Item
                 component={Link}

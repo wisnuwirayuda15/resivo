@@ -11,6 +11,7 @@ export const shell = {
     applicationMenu: "Menu aplikasi",
     keyboardShortcuts: "Pintasan keyboard",
     about: "Tentang Resivo",
+    docs: "Dokumentasi",
     takeTheTour: "Ikuti tur",
     editTitle: "Ubah judul",
   },

@@ -5,6 +5,7 @@ export const landing = {
   nav: {
     templates: "Template",
     about: "Tentang",
+    docs: "Dokumentasi",
     logo: "Resivo",
     openApp: "Buka aplikasi",
     lightTheme: "Tema terang",

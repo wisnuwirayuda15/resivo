@@ -11,6 +11,7 @@ export const landing = {
   nav: {
     templates: "Templates",
     about: "About",
+    docs: "Docs",
     logo: "Resivo",
     openApp: "Open the app",
     lightTheme: "Light theme",

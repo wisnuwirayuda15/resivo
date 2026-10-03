@@ -10,7 +10,7 @@ import {
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { Logo } from "@/components/shell/Logo";
-import { useTranslation } from "@/lib/i18n/useTranslation";
+import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 
 /**
  * The landing page's own bar.
@@ -31,6 +31,9 @@ const LINKS = [
 
 export const LandingNav: React.FC = () => {
   const { t } = useTranslation("landing");
+  // The docs have a language in their address, and the one the interface is
+  // in is the one this reader chose, so the link needs no redirect to find it.
+  const lang = useUiLanguage();
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
     getInitialValueInEffect: true,
@@ -51,6 +54,13 @@ export const LandingNav: React.FC = () => {
           {/* Off the bar on a phone, where the logo, the theme control and the
               one action already fill the row. Both are in the footer, and the
               app the button opens has its own navigation. */}
+          <Link
+            className="text-muted hover:text-body duration-fast ease-standard rounded-control hidden px-2 py-1 text-[13px] transition-colors sm:block"
+            params={{ lang, _splat: "" }}
+            to="/$lang/docs/$"
+          >
+            {t("nav.docs")}
+          </Link>
           {LINKS.map((link) => (
             <Text
               className="text-muted hover:text-body duration-fast ease-standard rounded-control hidden px-2 py-1 text-[13px] transition-colors sm:block"

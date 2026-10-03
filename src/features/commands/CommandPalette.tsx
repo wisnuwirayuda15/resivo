@@ -48,6 +48,7 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
   onToggleSidebar,
 }) => {
   const { t } = useTranslation("commands");
+  const uiLanguage = useUiLanguage();
   const navigate = useNavigate();
   const { setColorScheme } = useMantineColorScheme();
   const scheme = useComputedColorScheme("light", {
@@ -134,6 +135,17 @@ export const CommandPalette: React.FC<CommandPaletteProps> = ({
           keywords: t("settings.keywords"),
           leftSection: <Icon name="gear" size={16} />,
           onClick: () => void navigate({ to: "/settings" }),
+        },
+        {
+          id: "docs",
+          label: t("docs.label"),
+          keywords: t("docs.keywords"),
+          leftSection: <Icon name="markdown-logo" size={16} />,
+          onClick: () =>
+            void navigate({
+              to: "/$lang/docs/$",
+              params: { lang: uiLanguage, _splat: "" },
+            }),
         },
         {
           id: "about",
