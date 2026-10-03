@@ -17,9 +17,10 @@ export type AppLanguage = (typeof SUPPORTED_LANGUAGES)[number];
 
 /**
  * English, and not the Indonesian the reference project falls back to. The
- * server only ever renders this language (see `LanguageSync`), so the pages a
- * search engine indexes are in one stable language, and English is the one the
- * page titles and descriptions are written in.
+ * app routes are always rendered by the server in this language and switch after
+ * hydration (see `LanguageSync`), so what a search engine sees of them is stable.
+ * The docs are the exception: their routes carry a language of their own, and the
+ * server renders each in it, `html lang` included.
  */
 export const FALLBACK_LANGUAGE: AppLanguage = "en";
 

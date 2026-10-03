@@ -16,11 +16,12 @@ import type { Page } from "@playwright/test";
 /** Bytes, uncompressed, one language's index may weigh.
  *
  * The first figure, 800 KB, came from placeholder pages and was too low by a
- * factor of three: real pages cost about 32 KB each. Measured with 30 real pages,
- * English is 960 KB and Indonesian 986 KB, and each is about 196 KB on the wire
- * once compressed. The planned 46 pages projects to 1.5 MB raw and about 300 KB
- * compressed, fetched once on a reader's first search and then kept by the
- * service worker. This is that, with a quarter of room. Raise it knowingly, not by
+ * factor of three: real pages cost about 32 KB each. Measured with the finished
+ * docs (47 pages a language), English is 1.49 MB and Indonesian 1.53 MB, and each
+ * is about 310 KB on the wire once compressed. It is fetched once, on a reader's
+ * first search, and then kept by the service worker. The budget leaves a sixth of
+ * room. Most of the weight is the engine's sorting tables and the url and page id
+ * frequencies, which a leaner index could drop. Raise it knowingly, not by
  * drift. */
 const INDEX_BUDGET = 1792 * 1024;
 

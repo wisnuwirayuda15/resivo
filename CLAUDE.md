@@ -14,8 +14,8 @@ Read `README.md` for what the app does and `PRD.md` for the original brief
 bun install
 bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
-bun run test             # vitest, 818 tests in 51 files
-bun run test:e2e         # playwright, 93 specs, chromium only
+bun run test             # vitest, 1017 tests in 71 files
+bun run test:e2e         # playwright, 166 specs, chromium only
 bun run test:e2e:pwa     # playwright against a real build, 11 specs
 bun run lint             # eslint
 bun run check            # prettier --check
@@ -151,8 +151,10 @@ words (the catalog, the tour, the ATS findings) holds keys and params, and the
 words are looked up when shown; `checkDocument` stays pure and language-free.
 `i18next/no-literal-string` rejects text between JSX tags, and
 `src/lib/i18n/i18n.test.ts` fails on a missing key, a changed placeholder or an
-Indonesian sentence still in English. The AI prompts (`content/prompts`) and the SEO tags stay English
-on purpose.
+Indonesian sentence still in English. The AI prompts (`content/prompts`) and the SEO
+tags stay English on purpose. The one place words skip `t()` is the docs' MDX
+prose, which is a document in two languages rather than an interface; the docs
+chrome around it goes through `useDocsTranslation` like everything else.
 
 **A bundle's "looks the same" rests on the template's `version`.** A bundle
 (`features/bundle/`) records the revision of the template that drew it, and an
@@ -179,6 +181,34 @@ is made; `ats/check.ts` chooses `LETTER_RULES`; and the library files by
 which the Markdown writes as a bare `##` and reads back as the same section.
 `kind` survives `applyMarkdown` and `documentFromMarkdown` because both
 spread the document or base they are given; it is not in the Markdown itself.
+
+**The docs are content, and the content is tested like code.** The text is MDX in
+`content/docs/{en,id}/` (Fumadocs headless: `fumadocs-core` and `fumadocs-mdx`,
+no `fumadocs-ui`, all chrome is Mantine), served at `/<lang>/docs/...`, with
+`/docs/...` redirecting to the saved or negotiated language. Rules that are
+checked by `features/docs/content.test.ts`: the same files and `meta.json` in
+every language; ASCII slugs identical across languages; no h1 in a page; a
+description of at most 160 characters; internal links and anchors that resolve;
+the same headings with the same ids, components and code-fence kinds in both
+languages. Every `resume` fence must parse with no warning (or say `warns` and
+really warn), and every `css` fence must say `verify` (kept whole by
+`sanitizeCss`) or `refused` (not). **Bold in prose means a label the app shows,
+written exactly as the app writes it** (checked against the message files and
+the export adapters); emphasis is otherwise plain or italic, and a code name is
+in backticks. `design.test.ts` and `usage.test.ts` tie quoted numbers, names and
+lists to the code that owns them (every CSS variable `designVars` writes, every
+`rp-` class the markup draws, the ATS rules, the export formats, the limits), so a
+change there fails the page by name. The AI prompts are text files in
+`content/prompts`, included into the page, so the page, its Markdown and the copy
+button read the same bytes. A page is written in English first with the
+Indonesian in the same commit, and a translation may not change the text inside
+a directive attribute, because parity compares it.
+
+The docs are also meant for tools. Every page has a `.md` address, the normal
+address gives Markdown to a client that sends `Accept: text/markdown`,
+`/llms.txt`, `/<lang>/llms.txt` and `/<lang>/llms-full.txt` list and carry every
+page, and `/api/mcp` is a stateless, read-only MCP server over the same pages. All
+of it is public text and none of it touches the app's data.
 
 **SEO: three app routes and the docs are indexable** (`/`, `/templates`,
 `/about`, `/<lang>/docs/...`) and every route behind the app shell sends
@@ -217,6 +247,7 @@ so an update never purges the cache under a page that is still running. Bump
 ## Layout
 
 ```
+content/           the docs (MDX, en and id) and the AI prompts
 e2e/               Playwright specs, and the moves they share in app.ts
 e2e-pwa/           the offline spec, which needs a real build (own config)
 src/

@@ -162,6 +162,17 @@ assistant to write comes back in a shape this app can read. Every resume example
 is parsed by the real codec, and every CSS one by the real sanitizer, in a test,
 because a syntax guide's failure mode is being wrong rather than being ugly.
 
+**Documentation, for people and for tools.** `/en/docs` and `/id/docs` are a
+complete public manual: sidebar, contents, search that runs in the browser,
+breadcrumbs and previous and next links, written in both languages and read at
+the same address in either. It is MDX in `content/docs`, rendered with Fumadocs
+headless and Mantine. Any page can be copied as Markdown, opened as Markdown, or
+handed to Claude or ChatGPT by its public address alone. Tools can read it too:
+every page has a `.md` address, the normal address returns Markdown to a client
+that asks for it, `/llms.txt` and the per-language `llms-full.txt` carry the
+whole manual, and `/api/mcp` is a read-only MCP server over the same pages. It
+holds public text only and never touches what is stored in a browser.
+
 **Visual editing.** Click any text on the paper to edit it in place; drag blocks
 and sections to reorder them, or use the move buttons beside them. Switching the
 editor on cannot move a page break, the chrome is never part of what the
@@ -322,6 +333,7 @@ boundaries.
 ## Project layout
 
 ```
+content/           the docs (MDX, English and Indonesian) and the AI prompts
 e2e/               Playwright specs, and the moves they share
 e2e-pwa/           the offline spec, which needs a real build
 src/
@@ -383,7 +395,10 @@ bun run test
 
 Unit-level, no browser: the model, the Markdown codec, the paginator, the CSS
 sanitizer, the reorder logic, the export writer, the backup format and the
-document migrations. Repository tests use `fake-indexeddb`; the few that need a
+document migrations, and the docs content: every page in both languages, every
+code example run through the real codec or sanitizer, and every number, name and
+limit the pages quote checked against the code that owns it. Repository tests
+use `fake-indexeddb`; the few that need a
 DOM opt in per file with `// @vitest-environment happy-dom`.
 
 ```bash
