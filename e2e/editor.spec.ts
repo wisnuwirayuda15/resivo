@@ -186,58 +186,59 @@ test("reports Markdown it cannot typeset, without losing it", async ({
 });
 
 /**
- * The writing guide.
+ * The way from the editor into the documentation on the format.
  *
- * The assertion that matters is the copy, not the prose: the prompt exists so
- * someone can hand the whole format to a language model in one click, and
- * Mantine only switches the label to "Copied" once `writeText` has resolved,
- * so the label is proof the clipboard write happened, without the test needing
- * clipboard read permission.
+ * The guide used to be a drawer in the editor; it is a link into the docs now, so
+ * what is worth asserting is where the link goes and that following it leaves the
+ * editor where it was. The prompt is no longer behind a button of its own: it is
+ * on the docs page that describes the format, copied from its block, and the
+ * clipboard is what proves the copy happened.
  */
-test("the guide explains the format, and hands it over", async ({ page }) => {
+test("the guide opens the format's docs in a new tab, and the prompt copies from there", async ({
+  page,
+}) => {
   test.slow();
 
   /**
    * The browser gates the clipboard, not the app.
    *
    * Chromium refuses `writeText` from an automated context without this, and a
-   * refusal is indistinguishable from a broken button: Mantine leaves the label
-   * alone when the promise rejects. Granting it is what makes the assertion
-   * below about the app rather than about Playwright's defaults.
+   * refusal is indistinguishable from a broken button.
    */
   await page.context().grantPermissions(["clipboard-read", "clipboard-write"]);
 
   await openEmptyApp(page);
   await createResume(page, "Ada Lovelace");
 
-  await page.getByRole("button", { name: "Guide" }).click();
+  const guide = page.getByRole("link", { name: "Guide" });
 
-  const guide = page.getByRole("dialog", { name: "Writing guide" });
-  await expect(guide).toBeVisible();
+  await expect(guide).toHaveAttribute("href", "/en/docs/format/overview");
+  await expect(guide).toHaveAttribute("target", "_blank");
+  await expect(guide).toHaveAttribute("rel", /noopener/);
 
-  // The block a heading convention cannot express, which is the reason the
-  // format has directives at all.
-  await expect(guide.getByText("Entries", { exact: true })).toBeVisible();
-  await expect(guide).toContainText(":::entry{title=");
+  const [docs] = await Promise.all([
+    page.context().waitForEvent("page"),
+    guide.click(),
+  ]);
 
-  await page.getByRole("button", { name: "Copy the AI prompt" }).click();
-  await expect(page.getByRole("button", { name: "Copied" })).toBeVisible();
+  await expect(docs).toHaveURL(/\/en\/docs\/format\/overview$/);
+  await expect(docs.getByRole("heading", { level: 1 })).toHaveText(
+    "The shape of the file",
+  );
 
-  // And what landed there is the prompt, not the guide: they are two different
-  // documents behind two buttons a few pixels apart.
-  const copied = await page.evaluate(() => navigator.clipboard.readText());
+  // Nothing about the editor moved: the link opened a tab and left this one be.
+  await expect(page).toHaveURL(/\/resumes\/.+/);
+
+  await docs.goto("/en/docs/format/ai-prompts");
+  await expect(docs.locator('[data-hydrated="true"]')).toBeVisible({
+    timeout: 15_000,
+  });
+  await docs.getByRole("button", { name: "Copy the code" }).first().click();
+
+  const copied = await docs.evaluate(() => navigator.clipboard.readText());
+
   expect(copied).toContain("Output the file and nothing else");
   expect(copied).toContain(":::entry{title=");
-
-  await guide.getByRole("tab", { name: "Styling" }).click();
-
-  // The half that is not Markdown: what custom CSS can reach, and what it
-  // cannot do here at all.
-  await expect(guide).toContainText(".rp-name");
-  await expect(guide).toContainText("It cannot move a page break");
-
-  await page.keyboard.press("Escape");
-  await expect(guide).toBeHidden();
 });
 
 /**

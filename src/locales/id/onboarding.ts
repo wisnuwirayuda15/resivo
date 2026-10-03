@@ -39,7 +39,7 @@ export const onboarding = {
     guide: {
       title: "Setiap direktif, dengan contoh",
       content:
-        "Formatnya adalah Markdown ditambah beberapa direktif (entri, kontak, daftar keahlian), dan di sinilah masing-masing dituliskan, dengan contoh yang diperiksa terhadap parser sungguhan. Di sini juga ada prompt yang menyatakan seluruh format kepada asisten, termasuk apa yang tidak boleh ditulis, sehingga resume yang Anda minta darinya kembali dalam bentuk yang dapat dibaca aplikasi ini.",
+        "Formatnya adalah Markdown ditambah beberapa direktif (entri, kontak, daftar keahlian). Ini membuka dokumentasinya di tab baru: setiap direktif dituliskan dengan contoh yang diperiksa terhadap parser sungguhan, dan prompt yang menyatakan seluruh format kepada asisten, termasuk apa yang tidak boleh ditulis, sehingga resume yang Anda minta darinya kembali dalam bentuk yang dapat dibaca aplikasi ini.",
     },
     paper: {
       title: "Kertasnya juga dapat disunting",

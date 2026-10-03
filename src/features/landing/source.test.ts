@@ -5,7 +5,7 @@ import { parseDocument } from "@/features/markdown/index";
 import { HERO_SOURCE, sourceLineKind } from "./source";
 
 /**
- * The hero has to be true, for the same reason the guide does.
+ * The hero has to be true, for the same reason the docs do.
  *
  * This is the first Resivo syntax anybody sees, and the one they are most
  * likely to retype. The parser reports a warning for anything it could not

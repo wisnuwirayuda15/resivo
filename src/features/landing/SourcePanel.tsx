@@ -9,7 +9,7 @@ import { HERO_SOURCE, sourceLineKind } from "./source";
  * The Markdown pane, as it appears on the landing page.
  *
  * Coloured by line rather than by token. The full highlighter is `highlight.js`
- * behind the guide's lazy chunk, and pulling it into the first paint of a
+ * in a lazy chunk of its own, and pulling it into the first paint of a
  * marketing page to tint fifteen lines is the wrong trade. Two colours make the
  * only point this panel has to make: the directives are not prose.
  *

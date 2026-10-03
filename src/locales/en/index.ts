@@ -4,7 +4,6 @@ import { commands } from "./commands";
 import { common } from "./common";
 import { docs } from "./docs";
 import { editor } from "./editor";
-import { guide } from "./guide";
 import { landing } from "./landing";
 import { library } from "./library";
 import { onboarding } from "./onboarding";
@@ -32,7 +31,6 @@ export const en = {
   ats,
   assets,
   landing,
-  guide,
   onboarding,
   docs,
 } as const;

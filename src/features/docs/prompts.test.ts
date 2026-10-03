@@ -76,15 +76,3 @@ describe("the cover letter prompt", () => {
     ).toEqual([]);
   });
 });
-
-describe("the editor's own copy of the prompts", () => {
-  // Until the guide drawer is replaced by a link into these docs, it carries the
-  // prompts in code. Two copies that differ are two different prompts.
-  it("is the same text as the files", async () => {
-    const { AI_PROMPT, AI_PROMPT_LETTER } =
-      await import("@/features/guide/content");
-
-    expect(AI_PROMPT).toBe(resume);
-    expect(AI_PROMPT_LETTER).toBe(letter);
-  });
-});

@@ -53,8 +53,8 @@ you have searched, and the move between pages you have already opened are all
 available offline. A docs page you never opened is not, and falls back to the
 docs home if you opened that.
 
-**English and Indonesian.** The whole interface, including the writing guide,
-the tours and the ATS findings, is available in both, chosen in Settings or from
+**English and Indonesian.** The whole interface, including the docs, the
+tours and the ATS findings, is available in both, chosen in Settings or from
 the command palette and kept in this browser. English is the default and what the
 server renders, so the indexed pages are stable for a crawler; the stored choice,
 or failing that the browser's language, is applied after hydration rather than
@@ -106,7 +106,7 @@ of space between paragraphs) over whichever template you picked. The ATS tab
 asks it letter questions: a name, an email, type and margins, hidden text, one
 page and about 450 words, and not the sections, dates and entries a resume has.
 And the library files it apart, behind a Cover letters row in the sidebar. The
-guide has a chapter for letters and a prompt to copy for writing one with an
+docs have a page for letters and a prompt to copy for writing one with an
 assistant, which tells the model not to invent a recipient, a company or an
 achievement. JSON Resume is not offered for a letter, because it has nowhere to
 put one.
@@ -119,8 +119,8 @@ one-page resume with entries, dates, a tag list and every section a template
 lays out specially, or a blank page with the four usual sections and nothing in
 them. The example is the default until you pick the other, and then that is
 remembered. The point of it is the first minute: an empty page does not show
-what an entry is or that skills are a `::tags` line, and the writing guide is a
-drawer somebody has to know to open. It is real Markdown, checked against the
+what an entry is or that skills are a `::tags` line, and the documentation is a
+link somebody has to know to follow. It is real Markdown, checked against the
 real parser in a test, so what you read in the code pane is what the format
 actually is. A third way in is an existing file, from the same dialog: Markdown,
 a JSON Resume file, or plain text. Plain text is read for the conventions a text
@@ -154,13 +154,13 @@ what is left (raw HTML, footnotes, link definitions) is kept verbatim and
 flagged as a warning rather than silently dropped, and text that arrives above
 the first heading goes into an untitled section rather than being refused.
 
-**A guide, and a prompt.** The editor carries the format's own documentation:
-every directive with a working example, and what custom CSS can and cannot reach.
-Two buttons copy it, one the guide, one a prompt that states the whole format to
-a language model, including what never to emit, so a resume you asked an
-assistant to write comes back in a shape this app can read. Every example in it
-is parsed by the real codec in a test, because a syntax guide's failure mode is
-being wrong rather than being ugly.
+**A guide, and a prompt.** The Guide button in the code pane opens the docs on the
+format in a new tab: every directive with a working example, and what custom CSS
+can and cannot reach. One page there holds a prompt that states the whole format
+to a language model, including what never to emit, so a resume you asked an
+assistant to write comes back in a shape this app can read. Every resume example
+is parsed by the real codec, and every CSS one by the real sanitizer, in a test,
+because a syntax guide's failure mode is being wrong rather than being ugly.
 
 **Visual editing.** Click any text on the paper to edit it in place; drag blocks
 and sections to reorder them, or use the move buttons beside them. Switching the
@@ -338,7 +338,8 @@ src/
     assets/        images and fonts
     ats/           the ATS check: rules, fixes, and the inspector tab
     export/        PDF, HTML and Markdown adapters
-    guide/         the writing guide, and the prompt for a model
+    docs/          the public documentation: routes, search, Markdown for readers
+                   and agents (the text itself is in `content/docs`)
     landing/       the marketing page at `/`
     pwa/           installing, and whether the app is cached here
     backup/        whole-database backup and restore

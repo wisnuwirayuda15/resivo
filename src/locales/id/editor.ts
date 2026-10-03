@@ -10,6 +10,8 @@ export const editor = {
   },
   code: {
     sourceFiles: "Berkas sumber",
+    guide: "Panduan",
+    guideHint: "Formatnya, di dokumentasi. Terbuka di tab baru.",
     notices_one: "{{count}} catatan",
     notices_other: "{{count}} catatan",
   },

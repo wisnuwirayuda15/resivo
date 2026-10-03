@@ -15,6 +15,8 @@ export const editor = {
   },
   code: {
     sourceFiles: "Source files",
+    guide: "Guide",
+    guideHint: "The format, in the documentation. Opens in a new tab.",
     notices_one: "{{count}} notice",
     notices_other: "{{count}} notices",
   },

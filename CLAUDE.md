@@ -151,7 +151,7 @@ words (the catalog, the tour, the ATS findings) holds keys and params, and the
 words are looked up when shown; `checkDocument` stays pure and language-free.
 `i18next/no-literal-string` rejects text between JSX tags, and
 `src/lib/i18n/i18n.test.ts` fails on a missing key, a changed placeholder or an
-Indonesian sentence still in English. `AI_PROMPT` and the SEO tags stay English
+Indonesian sentence still in English. The AI prompts (`content/prompts`) and the SEO tags stay English
 on purpose.
 
 **A bundle's "looks the same" rests on the template's `version`.** A bundle
@@ -237,7 +237,8 @@ src/
     bundle/        one resume as a zip with its images and fonts, both ways
     versions/      a version per job: the comparison, its drawer, the dialog
                    (cover letters have no folder: they are `kind` on a document)
-    guide/         the writing guide, and the prompt for a model
+    docs/          the public documentation: routes, search, Markdown for readers
+                   and agents (the text itself is in content/docs)
     landing/       the marketing page at /
     pwa/           installing, and whether the app is cached here
     backup/        whole-database backup and restore

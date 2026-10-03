@@ -44,7 +44,7 @@ export const onboarding = {
     guide: {
       title: "Every directive, with an example",
       content:
-        "The format is Markdown plus a few directives (an entry, a contact, a list of skills), and this is where each one is written down, with an example that is checked against the real parser. It also copies a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.",
+        "The format is Markdown plus a few directives (an entry, a contact, a list of skills). This opens the documentation on it in a new tab: each directive written down with an example that is checked against the real parser, and a prompt that states the whole format to an assistant, including what never to write, so a resume you asked one for comes back in a shape this app can read.",
     },
     paper: {
       title: "The paper is editable too",

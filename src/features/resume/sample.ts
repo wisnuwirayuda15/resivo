@@ -17,16 +17,16 @@ import type {
  * new-resume dialog rather than what every resume starts as. What it left out
  * was the first minute: an empty page does not show what an entry is, that
  * skills are a `::tags` line, or that a date range is two attributes, and the
- * guide is a drawer someone has to know to open.
+ * documentation is a link someone has to know to follow.
  *
  * Kept as Markdown rather than as a hand-built tree for the same reason the
- * guide's snippets are: this is the only representation a reader can check
+ * docs' examples are: this is the only representation a reader can check
  * against what they see in the code pane, and `sample.test.ts` parses it with
  * the real codec and fails on a single warning. A tree assembled by hand would
  * be a second way of saying the same thing, and the two would drift.
  *
- * Ada Lovelace throughout, because she is already the example in the writing
- * guide and on the landing page, and because a resume dated 1843 cannot be
+ * Ada Lovelace throughout, because she is already the example in the docs
+ * and on the landing page, and because a resume dated 1843 cannot be
  * mistaken for content the user forgot to replace.
  *
  * One line per paragraph and per bullet, deliberately. The serializer writes
@@ -111,7 +111,7 @@ export const createSampleDocument = (
  * above (it parses without a warning, and it is its own serialization). The bare
  * `##` is the letter's one untitled section: the flow draws no heading for it,
  * and the Markdown writes it as it is, so the line is the first thing worth
- * explaining and the guide does.
+ * explaining and the docs do.
  *
  * One paragraph per line, for the reason the resume gives. The recipient is one
  * line because a paragraph is the only block that can hold it, and a letter's

@@ -4,7 +4,7 @@ import { Box, Loader, Tabs, Text } from "@mantine/core";
 import { Icon } from "@/features/icons/IconRenderer";
 import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
-import { GuideButton } from "@/features/guide/GuideButton";
+import { GuideLink } from "./GuideLink";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/lib/i18n/useTranslation";
@@ -106,7 +106,7 @@ export const CodePane: React.FC<CodePaneProps> = ({
                   {t("code.notices", { count: notices })}
                 </Text>
               )}
-              <GuideButton />
+              <GuideLink />
             </Box>
           </Tabs.List>
 

@@ -18,7 +18,7 @@ import { Reveal } from "./Reveal";
  * cell from arriving after the reader has already read it.
  */
 
-/** A real stylesheet, from the guide's own styling chapter. */
+/** A real stylesheet, of the kind the docs describe under custom CSS. */
 const CSS_SAMPLE = [
   ".rp-section-title {",
   "  text-transform: uppercase;",

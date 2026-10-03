@@ -16,7 +16,7 @@ import type { DocsLanguage } from "../paths";
  * Choosing a language does two things on purpose. It goes to the same page in
  * that language (slugs are identical across languages, so nothing is looked
  * up), and it stores the choice, because this is a deliberate act and the next
- * visit, the app and the guide should all agree with it. Merely opening a
+ * visit, the app and the docs should all agree with it. Merely opening a
  * `/id/docs` link stores nothing.
  *
  * Each language is named in itself, as in the app's own picker: someone who
