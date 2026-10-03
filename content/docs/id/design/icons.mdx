@@ -1,0 +1,59 @@
+---
+title: Ikon
+description: Kumpulan ikon, enam ketebalannya, di mana ikon boleh ditaruh, bagaimana pemilih menemukannya, dan cara mengatur ukuran serta warna ikon di kertas.
+---
+
+Resivo menyertakan kumpulan ikon Phosphor: lebih dari seribu lima ratus ikon,
+masing-masing dalam enam ketebalan. Ikon adalah gambar vektor kecil yang menjadi
+bagian halaman, jadi ia tercetak dan diekspor setajam teks di sebelahnya.
+
+## Di mana ikon boleh ditaruh [#where]
+
+- Di samping sebuah kontak, seperti amplop sebelum alamat email.
+- Di samping sebuah judul bagian, diatur dari tab **Bagian**.
+- Di awal sebuah baris, dengan direktif `::label`.
+- Di dalam sebaris teks, dengan direktif `:icon`.
+
+Direktifnya dijelaskan di
+[Keahlian, label, dan ikon](/docs/format/tags-labels-icons), dan kontak di
+[Kontak](/docs/format/contacts).
+
+## Pemilih ikon [#picker]
+
+Anda tidak perlu mengingat nama sebuah ikon. Di tab **Bagian**, **Tambah ikon** di
+samping sebuah bagian atau kontak membuka pemilih, dan **Ganti ikon** membukanya
+kembali pada ikon yang sudah diatur.
+
+- **Cari ikon** menemukan ikon menurut apa yang digambarkannya dan bukan hanya
+  namanya, jadi mail menemukan amplop. Kotaknya menyarankan mail, phone, dan
+  github untuk memulai.
+- **Ketebalan ikon** memilih ketebalan yang dipakai menggambar kisi, dari
+  **Tipis**, **Ringan**, **Normal**, **Tebal**, **Isi**, dan **Dua nada**. Yang
+  Anda lihat adalah yang akan digambar kertas.
+- Sebuah hitungan menunjukkan berapa ikon yang cocok dengan pencarian Anda dari
+  seluruh kumpulan.
+- **Hapus ikon** melepas ikon.
+
+Bila tidak ada yang cocok, pemilih menyarankan kata untuk apa yang digambarkan
+ikon itu.
+
+## Nama dan ketebalan di berkas [#names]
+
+Di Markdown, ikon adalah namanya dalam kebab-case, seperti `envelope`, `map-pin`,
+atau `github-logo`, dan sebuah `weight` yang berupa salah satu dari `thin`,
+`light`, `regular`, `bold`, `fill`, atau `duotone`. Pemilih menuliskan keduanya
+untuk Anda. Bila Anda mengetik nama dengan tangan dan ia bukan ikon, kertas
+mencadangkan ruang tempat ikon itu seharusnya berada dan membiarkannya kosong,
+jadi celah kosong di samping sebuah kontak berarti namanya salah.
+
+## Ukuran dan warna [#style]
+
+Di tab **Gaya**, di bawah **Ikon**, **Ukuran** mengatur seberapa besar ikon, dari 6
+sampai 48 px, dan **Warna** mengatur warna ikon di samping kontak dan label.
+Ikon di samping judul bagian tidak diwarnai oleh pengaturan itu: ia memakai warna
+aksen, sama seperti judulnya. Lihat [Token desain](/docs/design/design-tokens).
+
+Ikon digambar dengan ketebalan yang diberikan pada masing-masing, dan tidak ada
+pengaturan yang mengubah semuanya sekaligus. Untuk menatanya dengan CSS, pilih
+`svg` di dalam kelas yang memuatnya, seperti `.rp-contact svg`. Lihat
+[Acuan kelas CSS](/docs/design/css-class-reference).

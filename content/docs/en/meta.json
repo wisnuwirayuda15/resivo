@@ -1,4 +1,12 @@
 {
   "title": "Documentation",
-  "pages": ["index", "getting-started", "library", "editor", "format", "help"]
+  "pages": [
+    "index",
+    "getting-started",
+    "library",
+    "editor",
+    "format",
+    "design",
+    "help"
+  ]
 }

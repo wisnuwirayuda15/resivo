@@ -1,0 +1,95 @@
+---
+title: Custom CSS
+description: Restyle the paper with your own CSS, where it applies and what it beats, how it travels with the resume, and how to write rules that keep working.
+---
+
+Custom CSS is for what no control in the **Style** tab can do. You write it in
+the `style.css` tab of the **Code** pane, and it applies to the paper and
+nothing else. See [Markdown and CSS panes](/docs/editor/markdown-and-css-panes).
+
+Try the controls first. Moving a setting in the Style tab is easier than a rule,
+and it is safer: the paper is measured at the values you set, so the pages stay
+right. See [Design tokens](/docs/design/design-tokens).
+
+## Where it applies [#layers]
+
+Three layers of style are stacked on the paper, and yours is the highest:
+
+1. The template, which draws every element.
+2. The Style tab, which sets the design tokens as CSS variables.
+3. Your CSS.
+
+A rule of yours therefore beats the template and the Style tab with an ordinary
+selector. You do not need to make it more specific, and you do not need
+`!important`, which the paper removes from your CSS anyway. See
+[What CSS cannot do](/docs/design/css-limits).
+
+Your CSS cannot reach the app around the paper, because the paper is a document
+of its own. The one part of the paper it cannot change is the page itself: the
+size of the sheet, its margins and the clipping at its edge. Those are the
+**Paper** settings.
+
+## It travels with the resume [#travels]
+
+Your CSS is stored with the resume, exactly as you typed it. The HTML export
+carries it inside the file, and the PDF is that same document printed, so a rule
+you write here is in every form of the resume.
+
+The paper is laid out with your CSS applied, and the page breaks are measured
+afterwards. A rule that makes something taller or shorter therefore moves where a
+page ends, and the export breaks in the same place. See
+[Pages and breaks](/docs/editor/pages-and-breaks).
+
+## Writing rules [#writing]
+
+Select elements by their class names, which all begin `rp-`. They are listed in
+[The CSS class reference](/docs/design/css-class-reference). Read the design
+tokens with `var()` so a rule follows the Style tab, such as `var(--paper-accent)`.
+
+Spread the letters of section headings out:
+
+```css verify title="style.css"
+.rp-section-title {
+  letter-spacing: 0.12em;
+}
+```
+
+Set each contact on a line of its own:
+
+```css verify title="style.css"
+.rp-contacts {
+  flex-direction: column;
+  gap: 0.15em;
+}
+```
+
+Put a slash between skills instead of a dot:
+
+```css verify title="style.css"
+.rp-tag + .rp-tag::before {
+  content: "/";
+}
+```
+
+That last rule adds a character that is on the page and not in the file. It is
+harmless here, but the ATS tab points out text added this way, because a parser
+never reads it.
+
+## What the paper does with it [#notices]
+
+What you write is kept as you wrote it. The paper uses a cleaned copy, written
+out again in one plain form, without comments, and without any rule it refuses.
+A refused rule is underlined in yellow in the editor with the reason, and it is
+counted as a notice beside the Markdown's.
+
+A mistake does not void the stylesheet. If a brace is missing, or one rule is
+refused, every other rule that could be read still applies. The list of what is
+refused, and why, is in [What CSS cannot do](/docs/design/css-limits).
+
+## CSS that hides text [#ats]
+
+The **ATS** tab reads your CSS as well as your content. It warns when a rule
+hides text, with `display: none`, `visibility: hidden`, a font size of 0, an
+opacity of 0 or transparent text. Hidden text is read by a parser and never by a
+person, and some systems score the pattern as keyword stuffing, whatever the
+author meant.

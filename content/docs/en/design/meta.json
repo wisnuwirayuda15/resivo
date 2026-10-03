@@ -1,0 +1,13 @@
+{
+  "title": "Design",
+  "pages": [
+    "templates",
+    "style-inspector",
+    "design-tokens",
+    "custom-css",
+    "css-class-reference",
+    "css-limits",
+    "icons",
+    "images-and-fonts"
+  ]
+}

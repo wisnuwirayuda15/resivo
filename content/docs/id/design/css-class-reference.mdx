@@ -1,0 +1,106 @@
+---
+title: Acuan kelas CSS
+description: Nama kelas yang menyusun kertas, per kelompok, dan cara mengarahkan aturan ke satu template atau satu ukuran kertas.
+---
+
+Kertas adalah HTML biasa dengan nama kelas yang diawali `rp-`. Inilah yang dipakai
+untuk menulis CSS. Kertas memiliki beberapa lagi yang ada untuk menyunting dan
+mengukur, dan sengaja tidak ditulis di sini karena dapat berubah.
+
+Aturan ditulis di tab `style.css`. Lihat [CSS kustom](/docs/design/custom-css).
+
+## Halaman [#page]
+
+| Kelas      | Apa itu                                                                      |
+| ---------- | ---------------------------------------------------------------------------- |
+| `.rp-page` | Satu lembar kertas. Ia juga membawa `resivo-paper`, template, dan ukurannya. |
+
+Dua atribut pada lembar memungkinkan aturan diarahkan ke template atau ukuran
+kertas:
+
+- `data-template` adalah id template: `classic`, `modern`, `technical`,
+  `editorial`, `compact`, `profile`, atau `bold`.
+- `data-size` adalah `A4` atau `Letter`.
+
+```css verify title="style.css"
+.resivo-paper[data-template="classic"] .rp-name {
+  letter-spacing: 0.02em;
+}
+
+.resivo-paper[data-size="A4"] .rp-section-title {
+  letter-spacing: 0.1em;
+}
+```
+
+## Header [#header]
+
+| Kelas             | Apa itu                                            |
+| ----------------- | -------------------------------------------------- |
+| `.rp-header`      | Blok header, dengan foto di samping teks bila ada. |
+| `.rp-avatar`      | Foto.                                              |
+| `.rp-header-text` | Nama, tajuk, dan kontak sekaligus.                 |
+| `.rp-name`        | Nama Anda.                                         |
+| `.rp-headline`    | Baris di bawah nama Anda.                          |
+| `.rp-contacts`    | Deretan kontak.                                    |
+| `.rp-contact`     | Satu kontak. Ikonnya adalah `svg` di dalamnya.     |
+| `.rp-link`        | Sebuah tautan, di header atau di teks.             |
+
+## Bagian [#sections]
+
+| Kelas                   | Apa itu                                                      |
+| ----------------------- | ------------------------------------------------------------ |
+| `.rp-section`           | Blok judul sebuah bagian: baris judul dan garis di bawahnya. |
+| `.rp-section-title-row` | Baris yang memuat ikon bagian, bila ada, dan judulnya.       |
+| `.rp-section-title`     | Judul bagian.                                                |
+| `.rp-section-rule`      | Garis di bawah atau di samping judul.                        |
+
+Isi sebuah bagian tidak berada di dalam `.rp-section`. Blok yang mengikuti judul
+adalah saudaranya, dan itulah yang membuat halaman bisa terpisah di antaranya.
+Bagian tanpa judul sama sekali tidak menggambar blok judul.
+
+## Entri [#entries]
+
+| Kelas                | Apa itu                                               |
+| -------------------- | ----------------------------------------------------- |
+| `.rp-entry`          | Satu entri.                                           |
+| `.rp-entry-head`     | Baris pertama entri: judul di kiri, tanggal di kanan. |
+| `.rp-entry-title`    | Judul entri.                                          |
+| `.rp-entry-subtitle` | Subjudul, ditaruh setelah judul.                      |
+| `.rp-entry-meta`     | Tanggal dan lokasi, di kanan baris pertama.           |
+| `.rp-entry-summary`  | Paragraf ringkasan entri.                             |
+| `.rp-bullets`        | Daftar butir milik entri.                             |
+
+## Daftar dan teks [#text]
+
+| Kelas            | Apa itu                                                                      |
+| ---------------- | ---------------------------------------------------------------------------- |
+| `.rp-list`       | Daftar di sebuah bagian. Yang bernomor juga memiliki `.rp-list-ordered`.     |
+| `.rp-task`       | Butir daftar yang berupa tugas, dengan kotaknya sendiri sebagai ganti titik. |
+| `.rp-checkbox`   | Kotak sebuah tugas.                                                          |
+| `.rp-heading`    | Subjudul di dalam sebuah bagian. Ia memiliki `data-level` 3 sampai 6.        |
+| `.rp-quote`      | Kutipan blok.                                                                |
+| `.rp-code-block` | Blok kode berpagar.                                                          |
+| `.rp-table`      | Sebuah tabel.                                                                |
+| `.rp-strong`     | Teks tebal.                                                                  |
+| `.rp-code`       | Kode di dalam sebaris teks.                                                  |
+
+## Sisanya [#rest]
+
+| Kelas               | Apa itu                                                                  |
+| ------------------- | ------------------------------------------------------------------------ |
+| `.rp-tags`          | Daftar `::tags`.                                                         |
+| `.rp-tag`           | Satu butir daftar tag.                                                   |
+| `.rp-icon-label`    | Baris `::label`, dengan ikon di depannya.                                |
+| `.rp-figure`        | Sebuah gambar, dan kotak di sekelilingnya.                               |
+| `.rp-image`         | Gambarnya sendiri.                                                       |
+| `.rp-image-missing` | Kotak putus-putus yang tampil saat sebuah gambar tidak ditemukan.        |
+| `.rp-divider`       | Pemisah tematik, yaitu baris berisi tiga tanda hubung di Markdown.       |
+| `.rp-raw`           | Baris Markdown yang tidak dapat ditata, disimpan dan dicetak apa adanya. |
+
+Lebar sebuah gambar berasal dari gambar itu sendiri, diatur dari kontrol kertas,
+jadi aturan untuk lebar `.rp-figure` tidak mengubahnya. Lihat
+[Gambar dan pemisah halaman](/docs/format/images-and-breaks).
+
+Kelas pada teks yang digambar template dipakai bersama oleh setiap template.
+Template berbeda dengan menyatakan ulang beberapa di antaranya, itulah sebabnya
+satu aturan yang ditulis terhadap nama-nama ini berfungsi di template mana pun.

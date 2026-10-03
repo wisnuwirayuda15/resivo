@@ -1,0 +1,143 @@
+---
+title: Token desain
+description: Setiap pengaturan di tab Gaya beserta rentangnya, apa yang diubahnya di kertas, dan variabel CSS tempat ia ditulis, supaya CSS Anda sendiri dapat membacanya.
+---
+
+Pengaturan di tab **Gaya** disebut token desain. Ia disimpan bersama resume dan
+bukan di Markdown, jadi resume dapat ditata ulang tanpa satu kata pun berubah. Di
+kertas, masing-masing adalah variabel CSS yang namanya diawali `--paper-`, dan
+begitulah template membacanya serta cara CSS Anda sendiri dapat membacanya juga.
+
+Template yang Anda pilih menentukan nilai awal setiap token. Setelah itu nilainya
+menjadi milik resume. Lihat [Template](/docs/design/templates).
+
+## Kertas [#paper]
+
+| Kontrol                                                              | Rentang                 | Fungsinya                                                                                                  |
+| -------------------------------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------- |
+| **Ukuran**                                                           | Letter atau A4          | Ukuran lembar: 8.5 kali 11 inci, atau 210 kali 297 milimeter. `--paper-w`, `--paper-h`                     |
+| **Margin atas**, **Margin kanan**, **Margin bawah**, **Margin kiri** | 0 sampai 3 in, per 0.05 | Margin cetak. `--paper-margin-top`, `--paper-margin-right`, `--paper-margin-bottom`, `--paper-margin-left` |
+
+Halaman diukur terhadap margin, jadi mengubah satu margin menata ulang halaman.
+Ukuran kertas juga dapat diubah dari deretan di atas kertas. Lihat
+[Halaman dan pemisah](/docs/editor/pages-and-breaks).
+
+## Tipografi [#typography]
+
+| Kontrol                                | Rentang                        | Fungsinya                                                                                                  |
+| -------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------- |
+| **Font isi**                           | Font bawaan atau yang diunggah | Huruf teks. `--paper-font-body`                                                                            |
+| **Font judul**                         | Font bawaan atau yang diunggah | Huruf nama, judul bagian, dan subjudul. `--paper-font-head`                                                |
+| **Ukuran isi**                         | 6 sampai 24 pt, per 0.25       | Ukuran teks. Dalam poin, bukan piksel, karena resume adalah dokumen cetak. `--paper-fs-body`               |
+| **Skala**                              | 1 sampai 1.6                   | Rasio antara satu ukuran judul dan berikutnya. Lihat di bawah.                                             |
+| **Tinggi baris**                       | 1 sampai 2                     | Jarak antar baris, sebagai kelipatan ukuran huruf. `--paper-lh`                                            |
+| **Ketebalan isi**, **Ketebalan judul** | Tipis sampai Tebal             | Setebal apa teks, dan setebal apa judul, judul entri, dan teks tebal. `--paper-fw-body`, `--paper-fw-head` |
+
+Ketebalannya adalah **Tipis** (300), **Normal** (400), **Sedang** (500),
+**Semi tebal** (600), dan **Tebal** (700).
+
+Tiga huruf bawaan adalah Source Serif 4, Instrument Sans, dan JetBrains Mono.
+Font yang Anda tambahkan muncul di dua daftar yang sama. Lihat
+[Gambar dan font](/docs/design/images-and-fonts).
+
+### Cara kerja skala [#scale]
+
+Ukuran judul tidak diatur satu per satu. Masing-masing adalah ukuran isi dikali
+skala, sehingga seluruh jenjang tetap proporsional ketika Anda mengubah satu
+angka:
+
+- Judul bagian dan tajuk di bawah nama adalah ukuran isi dikali skala.
+  `--paper-fs-section`, `--paper-fs-headline`
+- Nama berada empat langkah ke atas, yaitu ukuran isi dikali skala sebanyak
+  empat kali. `--paper-fs-name`
+- Teks kecil, seperti tanggal dan kontak, adalah 0.92 dari ukuran isi.
+  `--paper-fs-small`
+
+## Warna [#colour]
+
+| Kontrol      | Apa yang diwarnainya                                                                |
+| ------------ | ----------------------------------------------------------------------------------- |
+| **Teks isi** | Teks resume. `--paper-ink`                                                          |
+| **Judul**    | Nama dan judul entri. `--paper-heading`                                             |
+| **Aksen**    | Judul bagian beserta ikonnya. Satu-satunya warna jenuh di halaman. `--paper-accent` |
+| **Redup**    | Tanggal, lokasi, tajuk, dan baris sekunder lainnya. `--paper-ink-muted`             |
+
+Kertas selalu terang, apa pun tema aplikasinya, karena itulah yang akan
+dicetak. Warna di sini adalah warna di atas kertas.
+
+## Jarak [#spacing]
+
+| Kontrol            | Rentang                  | Fungsinya                                                              |
+| ------------------ | ------------------------ | ---------------------------------------------------------------------- |
+| **Bagian**         | 0 sampai 5 rem, per 0.05 | Ruang di atas setiap judul bagian. `--paper-space-section`             |
+| **Blok**           | 0 sampai 5 rem, per 0.05 | Ruang antar blok di dalam satu bagian. `--paper-space-block`           |
+| **Di bawah judul** | 0 sampai 5 rem, per 0.05 | Jarak di bawah judul, sebelum blok pertamanya. `--paper-space-heading` |
+
+## Garis [#rules]
+
+| Kontrol       | Rentang                | Fungsinya                                                        |
+| ------------- | ---------------------- | ---------------------------------------------------------------- |
+| **Pembatas**  | Hidup atau mati        | Apakah garis digambar di bawah atau di samping judul bagian.     |
+| **Ketebalan** | 0 sampai 8 px, per 0.5 | Setebal apa garisnya. `--paper-rule-w`                           |
+| **Warna**     | Warna apa pun          | Warna garis, serta garis tabel dan kutipan. `--paper-rule-color` |
+
+Mematikan **Pembatas** juga menjadikan ketebalan nol, bukan sekadar tidak
+menggambar garis, sehingga template yang menggambar garisnya sendiri tidak
+meninggalkan garis tipis.
+
+## Ikon [#icons]
+
+| Kontrol    | Rentang        | Fungsinya                                                                   |
+| ---------- | -------------- | --------------------------------------------------------------------------- |
+| **Ukuran** | 6 sampai 48 px | Ukuran ikon di samping kontak, label, dan judul bagian. `--paper-icon-size` |
+| **Warna**  | Warna apa pun  | Warna ikon di samping kontak dan label. `--paper-icon-color`                |
+
+Ikon di samping judul bagian digambar dengan warna aksen. Lihat
+[Ikon](/docs/design/icons).
+
+## Foto [#photo]
+
+| Kontrol    | Rentang                                        | Fungsinya                                    |
+| ---------- | ---------------------------------------------- | -------------------------------------------- |
+| **Bentuk** | **Lingkaran**, **Sudut membulat**, **Persegi** | Bentuk foto. `--paper-avatar-radius`         |
+| **Ukuran** | 24 sampai 300 px, per 2                        | Lebar dan tinggi foto. `--paper-avatar-size` |
+
+Ini berlaku setelah foto dipasang, dari tab **Aset** atau halaman Gambar.
+
+## Pemisah halaman [#breaks]
+
+**Jaga judul bersama isinya** menyala secara bawaan. Ia mencegah judul bagian
+menjadi hal terakhir di sebuah halaman, dan mematikannya memadatkan halaman.
+Pengaturan ini dijelaskan di
+[Halaman dan pemisah](/docs/editor/pages-and-breaks#headings).
+
+## Bahasa [#language]
+
+**Dokumen** mengatur bahasa resume itu sendiri. Ia memformat nama bulan dan
+menulis akhir peran yang masih berjalan dalam bahasa itu, seperti Sekarang, dan
+mengatur bahasa dokumen yang diekspor. Ia tidak menerjemahkan apa yang Anda
+tulis. Ia terpisah dari bahasa aplikasi, jadi resume berbahasa Prancis dapat
+ditulis dan digambar di aplikasi yang diatur ke bahasa Inggris.
+
+## Membaca token di CSS Anda [#variables]
+
+Karena setiap token adalah variabel, CSS Anda sendiri dapat memakainya, dan
+aturan yang Anda tulis mengikuti tab Gaya ketika pengaturannya berubah:
+
+```css verify title="style.css"
+.rp-entry-title {
+  color: var(--paper-accent);
+}
+```
+
+Anda juga dapat mengatur variabel sendiri. CSS Anda diterapkan setelah token,
+jadi ia menang untuk resume itu, dan kontrol di tab Gaya tetap menampilkan
+nilainya sendiri:
+
+```css verify title="style.css"
+.resivo-paper {
+  --paper-accent: #b45309;
+}
+```
+
+Utamakan kontrol bila ada. Lihat [CSS kustom](/docs/design/custom-css).

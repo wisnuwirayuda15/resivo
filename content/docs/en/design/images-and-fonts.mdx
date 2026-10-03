@@ -1,0 +1,78 @@
+---
+title: Images and fonts
+description: Add pictures and typefaces once and use them in any resume, which files are accepted, how to place an image or set a font, and what deleting one does.
+---
+
+Images and fonts are kept on your device, not in a resume, and every resume on
+that device can use them. The same photograph does not have to be uploaded twice
+for two versions of a resume. They are added and used from the **Assets** tab in
+the **Style** pane, and the sidebar has an **Images** page and a **Fonts** page
+that hold the same libraries.
+
+## Images [#images]
+
+**Add image** takes a PNG, JPEG, WebP or GIF of up to 8 MB. SVG is not accepted:
+it has no fixed pixel size to reserve room for, and it can carry markup of its
+own. A resume prints a picture a few inches wide at most, so a larger file only
+makes every backup heavier. A file that is too large, or that is named like an
+image and is not one, is refused with a message that says what to do.
+
+Select an image in the **Assets** tab to use it:
+
+- **Use as photo** puts it beside your name in the header. **Remove as photo**
+  takes it off again. The **Photo** settings in the Style tab, the shape and the
+  size, apply once a photo is attached. See
+  [Design tokens](/docs/design/design-tokens#photo).
+- **Section to insert into** and **Insert** place it as a picture in that
+  section. Resivo writes the `::image` line for you, because an image's id belongs
+  to this browser and cannot be written by hand. See
+  [Images and page breaks](/docs/format/images-and-breaks).
+- Its name is a field, and renaming it changes only the name shown in the
+  gallery.
+
+An image used by no resume is marked as unused, and the **Images** page can
+filter to those with **Unused**. Nothing is deleted automatically, because an
+image can be unused only because it has not been placed yet.
+
+**Delete** asks first. If a resume still uses the image, the dialog says that
+resume will show a missing image box where the picture was, and a missing image
+is a dashed box on the paper. If nothing uses it, deleting it frees the space it
+took on the device.
+
+## Fonts [#fonts]
+
+Three typefaces come with Resivo and need no upload: Source Serif 4,
+Instrument Sans and JetBrains Mono. The templates use them.
+
+**Add font** takes a WOFF2, WOFF, TrueType or OpenType file of up to 4 MB, which
+is generous for one weight of a text face. The file is not trusted by its name.
+Resivo reads its first bytes to learn the format, and then hands it to the
+browser's own font parser, which is the same one that would later refuse it, so a
+bad file is refused when you add it and not by quietly printing in a different
+face.
+
+The family, the weight and whether it is italic are read from the file's name and
+not from the font. A file called `Lora-Bold.ttf` is added as Lora at weight 700.
+The gallery shows the result, so a wrong guess is visible, and renaming the file
+before adding it puts it right. Several files of one family, such as a regular
+and an italic, are listed separately.
+
+To use a font, either:
+
+- in the **Assets** tab, choose **Body** or **Headings** on the font's card, or
+- in the **Style** tab, pick it from **Body font** or **Heading font**, where
+  your fonts are listed after the three built in.
+
+### Fonts and page breaks [#breaks]
+
+The paper is measured with the font already loaded, because a face swapped in
+afterwards would change the height of every line and so where pages break.
+Deleting a font that a resume uses makes that resume print in a fallback face,
+and its pages may break in different places. The delete dialog warns you.
+
+### Fonts in exports [#export]
+
+The font is embedded in an HTML export, so the file is complete without the web,
+and the PDF prints from that file. A system that reads the file and re-draws its
+text may use a face of its own instead, so the three built-in faces are the safer
+choice when a resume is going to a parser.

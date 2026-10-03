@@ -1,0 +1,105 @@
+---
+title: The CSS class reference
+description: The class names the paper is built from, grouped by the header, sections, entries, lists and the rest, and how to aim a rule at one template or one paper size.
+---
+
+The paper is plain HTML with class names that begin `rp-`. These are the ones to
+write CSS against. The paper has a few more that exist for editing and measuring,
+and they are left out here because they can change.
+
+Rules go in the `style.css` tab. See [Custom CSS](/docs/design/custom-css).
+
+## The page [#page]
+
+| Class      | What it is                                                                     |
+| ---------- | ------------------------------------------------------------------------------ |
+| `.rp-page` | One sheet of paper. It also carries `resivo-paper`, the template and the size. |
+
+Two attributes on the sheet let a rule aim at a template or a paper size:
+
+- `data-template` is the template's id: `classic`, `modern`, `technical`,
+  `editorial`, `compact`, `profile` or `bold`.
+- `data-size` is `A4` or `Letter`.
+
+```css verify title="style.css"
+.resivo-paper[data-template="classic"] .rp-name {
+  letter-spacing: 0.02em;
+}
+
+.resivo-paper[data-size="A4"] .rp-section-title {
+  letter-spacing: 0.1em;
+}
+```
+
+## The header [#header]
+
+| Class             | What it is                                                               |
+| ----------------- | ------------------------------------------------------------------------ |
+| `.rp-header`      | The header block, with the photograph beside the text when there is one. |
+| `.rp-avatar`      | The photograph.                                                          |
+| `.rp-header-text` | The name, the headline and the contacts together.                        |
+| `.rp-name`        | Your name.                                                               |
+| `.rp-headline`    | The line under your name.                                                |
+| `.rp-contacts`    | The row of contacts.                                                     |
+| `.rp-contact`     | One contact. Its icon is an `svg` inside it.                             |
+| `.rp-link`        | A link, in the header or in the text.                                    |
+
+## Sections [#sections]
+
+| Class                   | What it is                                                        |
+| ----------------------- | ----------------------------------------------------------------- |
+| `.rp-section`           | A section's heading block: the title row and the rule under it.   |
+| `.rp-section-title-row` | The row holding the section's icon, if it has one, and its title. |
+| `.rp-section-title`     | The title of the section.                                         |
+| `.rp-section-rule`      | The rule under or beside the title.                               |
+
+A section's content is not inside `.rp-section`. The blocks that follow a
+heading are siblings of it, which is what lets the pages break between them. A
+section with no title draws no heading block at all.
+
+## Entries [#entries]
+
+| Class                | What it is                                                                 |
+| -------------------- | -------------------------------------------------------------------------- |
+| `.rp-entry`          | One entry.                                                                 |
+| `.rp-entry-head`     | The first line of an entry: the title on the left, the dates on the right. |
+| `.rp-entry-title`    | The entry's title.                                                         |
+| `.rp-entry-subtitle` | The subtitle, set after the title.                                         |
+| `.rp-entry-meta`     | The dates and the location, on the right of the first line.                |
+| `.rp-entry-summary`  | The entry's summary paragraph.                                             |
+| `.rp-bullets`        | The entry's list of bullets.                                               |
+
+## Lists and text [#text]
+
+| Class            | What it is                                                        |
+| ---------------- | ----------------------------------------------------------------- |
+| `.rp-list`       | A list in a section. A numbered one also has `.rp-list-ordered`.  |
+| `.rp-task`       | A list item that is a task, with its own box instead of a bullet. |
+| `.rp-checkbox`   | The box of a task.                                                |
+| `.rp-heading`    | A subheading inside a section. It has a `data-level` of 3 to 6.   |
+| `.rp-quote`      | A block quote.                                                    |
+| `.rp-code-block` | A fenced block of code.                                           |
+| `.rp-table`      | A table.                                                          |
+| `.rp-strong`     | Bold text.                                                        |
+| `.rp-code`       | Code inside a line of text.                                       |
+
+## The rest [#rest]
+
+| Class               | What it is                                                              |
+| ------------------- | ----------------------------------------------------------------------- |
+| `.rp-tags`          | A `::tags` list.                                                        |
+| `.rp-tag`           | One item of a tags list.                                                |
+| `.rp-icon-label`    | A `::label` line, with its icon in front.                               |
+| `.rp-figure`        | An image, and the box around it.                                        |
+| `.rp-image`         | The picture itself.                                                     |
+| `.rp-image-missing` | The dashed box shown when an image cannot be found.                     |
+| `.rp-divider`       | A thematic break, which is a line of three dashes in the Markdown.      |
+| `.rp-raw`           | A line of Markdown that cannot be typeset, kept and printed as written. |
+
+An image's width comes from the image itself, set from the paper's own controls,
+so a rule for the width of `.rp-figure` does not change it. See
+[Images and page breaks](/docs/format/images-and-breaks).
+
+The classes of the text a template draws are shared by every template. A template
+differs by restating a few of them, which is why one rule written against these
+names works whichever template is chosen.

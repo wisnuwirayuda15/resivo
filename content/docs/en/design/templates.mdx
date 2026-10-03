@@ -1,0 +1,84 @@
+---
+title: Templates
+description: The seven templates and how each looks, how to switch between them without touching your content, and what happens to your style changes when you do.
+---
+
+A template is the base look of a resume: its typefaces, sizes, colours and the
+way a heading and its rule are laid out. Your content is separate from it. Every
+template draws the same document the same way round, so switching from one to
+another never changes what you wrote, only how it is drawn.
+
+Every template is a single column. There are no tables holding the layout, no
+text inside images and no second column for a machine to read in the wrong
+order, which is what an applicant tracking system reads most reliably.
+
+## The seven templates [#list]
+
+| Template      | How it looks                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Classic**   | A serif face throughout, ruled section headings and a centred header. The traditional resume.                   |
+| **Modern**    | A sans face throughout and a near-black accent. The rule runs beside the heading instead of under it.           |
+| **Technical** | A sans body under monospace headings, at 10pt. Dates and locations are set so the digits line up.               |
+| **Editorial** | A serif face with a larger name, a red accent, no rules and an italic headline. Hierarchy comes from type size. |
+| **Compact**   | A sans face at 9.5pt with 0.5in margins and tight spacing, for a long history on few pages.                     |
+| **Profile**   | A sans body under serif headings, a plum accent and a header built around your photograph.                      |
+| **Bold**      | An upper-case name, heavy section headings and a thick orange rule.                                             |
+
+**Compact** sits exactly on the smallest body size and margins the ATS check
+accepts, so a resume that fits is still one a parser and a recruiter can read.
+**Profile** has no photograph unless you add one, and without it the header is a
+plain left-aligned block with a rule under it. Adding one is described in
+[Images and fonts](/docs/design/images-and-fonts).
+
+## Choosing a template [#choose]
+
+There are three places, and the first two change something.
+
+- When you make a resume, **Template** in the new resume dialog sets the base
+  look. See [Make a new resume](/docs/library/new-resume).
+- In the editor, the **Style** tab starts with a **Template** group that lists
+  all seven. Each row shows a sample in the template's accent and heading face,
+  its name and a one-line description. Choose a row to switch.
+- **Templates** in the sidebar shows all seven, each with a note on how it reads
+  to a parser. It only describes them. Nothing is applied from there.
+
+## Switching, and your style changes [#switching]
+
+A template does more than draw the page. It also starts a resume off with its
+own style settings: its faces, sizes, colours and spacing. Those are copied into
+the resume when you choose the template, and from then on they belong to the
+resume, so changing them is yours to do in the **Style** tab. See
+[Design tokens](/docs/design/design-tokens).
+
+What a switch does with them depends on whether you have changed any:
+
+- If you have not changed any style setting, the switch is immediate, and the new
+  template's settings replace the old ones. There is nothing to lose, so you are
+  not asked.
+- If you have changed something, a dialog named **Keep your style changes?**
+  asks. **Use template defaults** replaces your settings with the new template's.
+  **Keep my changes** keeps them and changes only the template's own look.
+  **Keep my changes** is the one that is focused, so pressing Enter by mistake
+  cannot throw styling work away. Your content is untouched either way, and you
+  can cancel the switch.
+
+Paper size is not counted as a change. It is a property of the printer and not
+of the design, so changing it never makes the dialog appear.
+
+Your own CSS is not part of the question. A switch leaves it exactly as it is.
+See [Custom CSS](/docs/design/custom-css).
+
+## Cover letters [#letters]
+
+A cover letter chooses from the same seven. A letter takes the template's
+typefaces and colours, but its own measures: a one inch margin, a body of at
+least 11pt, lines 1.5 apart and a paragraph's worth of space between paragraphs.
+A letter in **Compact** is a letter in that template's type and not its density.
+See [Cover letters](/docs/format/cover-letters).
+
+## When a template is improved [#versions]
+
+A resume stores only which template it uses, not a copy of it. The templates
+come with Resivo, so if a later release improves one, a resume that uses it is
+drawn with the improved version, and a page can break in a slightly different
+place.

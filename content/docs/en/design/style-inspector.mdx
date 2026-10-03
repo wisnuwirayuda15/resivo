@@ -1,0 +1,53 @@
+---
+title: The style inspector
+description: The panel on the right of the editor, with its four tabs, and how a change made there is an ordinary edit that is previewed, saved and undone like typing.
+---
+
+The **Style** pane on the right of the editor is the inspector. It does not write
+Markdown. It changes everything about a resume that is not its content: how it
+looks, which section is where, which pictures and fonts it uses, and whether a
+parser will read it well. On a narrow screen it is the **Style** tab along the
+top of the editor. See [The editor](/docs/editor/overview).
+
+## The four tabs [#tabs]
+
+- **Style** holds the template and every design setting: paper, type, colour,
+  spacing, rules, icons, photo, page breaks and language.
+- **Sections** is the outline and the contacts. Each section can be moved, hidden,
+  given an icon, or set to start on a new page, and each contact can have an icon
+  and a link.
+- **Assets** holds the images and fonts stored on this device, and is where you
+  place one in a resume. See [Images and fonts](/docs/design/images-and-fonts).
+- **ATS** reads the resume the way an applicant tracking system might and lists
+  what could go wrong.
+
+The **Sections** tab is where a section's **Start on a new page** is, which is
+one of the ways of ending a page. See
+[Pages and breaks](/docs/editor/pages-and-breaks#section).
+
+## A change is an edit [#edits]
+
+Moving a control writes to the resume exactly as typing does. The paper
+re-flows, the change is saved by autosave and the undo button can take it back.
+Nothing in the inspector tells the preview to update: the preview draws again
+because the resume changed.
+
+Dragging a slider or holding down a stepper makes a stream of changes, and they
+are joined into one undo step, so undo takes back the size change and not one
+tenth of a point of it. A switch or a menu is a step of its own. See
+[Autosave and undo](/docs/editor/autosave-and-undo).
+
+## The Style tab [#style]
+
+The tab starts with the **Template** group, then runs down through **Paper**,
+**Typography**, **Colour**, **Spacing**, **Rules**, **Icons**, **Photo**,
+**Page breaks** and **Language**. A control that is not obvious has a line of
+help under it. Every control, its range and the CSS variable it sets are
+listed in [Design tokens](/docs/design/design-tokens).
+
+### Try the Style tab first [#first]
+
+Most styling here is not CSS. There is a control for every setting the templates
+read, and moving one is both easier and safer than overriding it in CSS: the
+paper is measured at the values you set, so the pages stay right. Reach for
+[Custom CSS](/docs/design/custom-css) only for what no control can do.

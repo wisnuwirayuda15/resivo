@@ -1,0 +1,98 @@
+---
+title: CSS kustom
+description: Tata ulang kertas dengan CSS Anda sendiri, di mana ia berlaku, bagaimana ia ikut bersama resume, dan cara menulis aturan yang tetap berfungsi.
+---
+
+CSS kustom untuk apa yang tidak dapat dilakukan kontrol mana pun di tab **Gaya**.
+Anda menulisnya di tab `style.css` pada panel **Kode**, dan ia berlaku untuk
+kertas dan tidak ada yang lain. Lihat
+[Panel Markdown dan CSS](/docs/editor/markdown-and-css-panes).
+
+Coba kontrolnya dulu. Menggeser pengaturan di tab Gaya lebih mudah daripada
+menulis aturan, dan lebih aman: kertas diukur pada nilai yang Anda atur, jadi
+halaman tetap benar. Lihat [Token desain](/docs/design/design-tokens).
+
+## Di mana ia berlaku [#layers]
+
+Tiga lapisan gaya ditumpuk di kertas, dan milik Anda yang tertinggi:
+
+1. Template, yang menggambar setiap elemen.
+2. Tab Gaya, yang mengatur token desain sebagai variabel CSS.
+3. CSS Anda.
+
+Karena itu aturan Anda mengalahkan template dan tab Gaya dengan selektor biasa.
+Anda tidak perlu membuatnya lebih spesifik, dan Anda tidak perlu `!important`,
+yang toh dibuang kertas dari CSS Anda. Lihat
+[Apa yang tidak dapat dilakukan CSS](/docs/design/css-limits).
+
+CSS Anda tidak dapat menjangkau aplikasi di sekeliling kertas, karena kertas
+adalah dokumen tersendiri. Satu-satunya bagian kertas yang tidak dapat
+diubahnya adalah halaman itu sendiri: ukuran lembar, marginnya, dan pemotongan di
+tepinya. Itu adalah pengaturan **Kertas**.
+
+## Ia ikut bersama resume [#travels]
+
+CSS Anda disimpan bersama resume, persis seperti yang Anda ketik. Ekspor HTML
+membawanya di dalam berkas, dan PDF adalah dokumen yang sama itu yang dicetak,
+jadi aturan yang Anda tulis di sini ada di setiap bentuk resume.
+
+Kertas ditata dengan CSS Anda diterapkan, dan pemisah halaman diukur sesudahnya.
+Karena itu aturan yang membuat sesuatu lebih tinggi atau lebih pendek menggeser
+di mana sebuah halaman berakhir, dan ekspor terpisah di tempat yang sama. Lihat
+[Halaman dan pemisah](/docs/editor/pages-and-breaks).
+
+## Menulis aturan [#writing]
+
+Pilih elemen menurut nama kelasnya, yang semuanya diawali `rp-`. Daftarnya ada di
+[Acuan kelas CSS](/docs/design/css-class-reference). Baca token desain dengan
+`var()` supaya aturan mengikuti tab Gaya, seperti `var(--paper-accent)`.
+
+Renggangkan huruf judul bagian:
+
+```css verify title="style.css"
+.rp-section-title {
+  letter-spacing: 0.12em;
+}
+```
+
+Taruh setiap kontak di barisnya sendiri:
+
+```css verify title="style.css"
+.rp-contacts {
+  flex-direction: column;
+  gap: 0.15em;
+}
+```
+
+Taruh garis miring di antara keahlian sebagai ganti titik:
+
+```css verify title="style.css"
+.rp-tag + .rp-tag::before {
+  content: "/";
+}
+```
+
+Aturan terakhir itu menambahkan karakter yang ada di halaman dan tidak ada di
+berkas. Di sini ia tidak berbahaya, tetapi tab ATS menunjukkan teks yang
+ditambahkan dengan cara ini, karena parser tidak pernah membacanya.
+
+## Apa yang dilakukan kertas terhadapnya [#notices]
+
+Yang Anda tulis disimpan persis seperti yang Anda tulis. Kertas memakai salinan
+yang sudah dibersihkan, ditulis ulang dalam satu bentuk polos, tanpa komentar,
+dan tanpa aturan apa pun yang ditolaknya. Aturan yang ditolak digarisbawahi
+kuning di editor beserta alasannya, dan dihitung sebagai catatan di samping
+catatan Markdown.
+
+Satu kesalahan tidak membatalkan seluruh stylesheet. Bila sebuah kurung kurawal
+hilang, atau satu aturan ditolak, setiap aturan lain yang dapat dibaca tetap
+berlaku. Daftar apa yang ditolak, dan mengapa, ada di
+[Apa yang tidak dapat dilakukan CSS](/docs/design/css-limits).
+
+## CSS yang menyembunyikan teks [#ats]
+
+Tab **ATS** membaca CSS Anda selain isi Anda. Ia memperingatkan ketika sebuah
+aturan menyembunyikan teks, dengan `display: none`, `visibility: hidden`, ukuran
+huruf 0, opasitas 0, atau teks transparan. Teks tersembunyi dibaca parser dan
+tidak pernah oleh manusia, dan sebagian sistem menilai pola itu sebagai
+penjejalan kata kunci, apa pun maksud penulisnya.

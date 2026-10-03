@@ -1,0 +1,82 @@
+---
+title: Gambar dan font
+description: Tambahkan gambar dan jenis huruf sekali lalu pakai di resume mana pun, berkas yang diterima, cara memakainya, dan apa yang terjadi saat dihapus.
+---
+
+Gambar dan font disimpan di perangkat Anda, bukan di dalam resume, dan setiap
+resume di perangkat itu dapat memakainya. Foto yang sama tidak perlu diunggah dua
+kali untuk dua versi resume. Keduanya ditambahkan dan dipakai dari tab **Aset** di
+panel **Gaya**, dan bilah samping memiliki halaman **Gambar** dan halaman **Font**
+yang memuat pustaka yang sama.
+
+## Gambar [#images]
+
+**Tambah gambar** menerima PNG, JPEG, WebP, atau GIF hingga 8 MB. SVG tidak
+diterima: ia tidak punya ukuran piksel tetap untuk dicadangkan ruangnya, dan ia
+bisa membawa markup sendiri. Resume mencetak gambar paling lebar beberapa inci,
+jadi berkas yang lebih besar hanya membuat setiap cadangan lebih berat. Berkas
+yang terlalu besar, atau yang bernama seperti gambar padahal bukan, ditolak
+dengan pesan yang menjelaskan apa yang perlu dilakukan.
+
+Pilih sebuah gambar di tab **Aset** untuk memakainya:
+
+- **Pakai sebagai foto** menaruhnya di samping nama Anda di header. **Lepas
+  sebagai foto** melepasnya lagi. Pengaturan **Foto** di tab Gaya, bentuk dan
+  ukuran, berlaku setelah foto dipasang. Lihat
+  [Token desain](/docs/design/design-tokens#photo).
+- **Bagian tujuan sisipan** dan **Sisipkan** menaruhnya sebagai gambar di bagian
+  itu. Resivo menuliskan baris `::image` untuk Anda, karena id sebuah gambar
+  milik browser ini dan tidak dapat ditulis dengan tangan. Lihat
+  [Gambar dan pemisah halaman](/docs/format/images-and-breaks).
+- Namanya adalah sebuah kolom, dan mengganti namanya hanya mengubah nama yang
+  ditampilkan di galeri.
+
+Gambar yang tidak dipakai resume mana pun ditandai sebagai tidak dipakai, dan
+halaman **Gambar** dapat menyaring hanya yang **Tidak dipakai**. Tidak ada yang
+dihapus otomatis, karena sebuah gambar bisa tidak dipakai hanya karena belum
+diletakkan.
+
+**Hapus** bertanya dulu. Bila sebuah resume masih memakai gambar itu, dialog
+menyebutkan bahwa resume itu akan menampilkan kotak gambar hilang di tempat
+gambarnya, dan gambar hilang adalah kotak putus-putus di kertas. Bila tidak ada
+yang memakainya, menghapusnya membebaskan ruang yang dipakainya di perangkat.
+
+## Font [#fonts]
+
+Tiga jenis huruf datang bersama Resivo dan tidak perlu diunggah: Source Serif 4,
+Instrument Sans, dan JetBrains Mono. Template memakainya.
+
+**Tambah font** menerima berkas WOFF2, WOFF, TrueType, atau OpenType hingga 4 MB,
+yang sudah longgar untuk satu ketebalan huruf teks. Berkas tidak dipercaya
+berdasarkan namanya. Resivo membaca byte pertamanya untuk mengetahui formatnya,
+lalu menyerahkannya ke pengurai font milik browser, yang sama dengan yang nanti
+akan menolaknya, jadi berkas yang rusak ditolak saat Anda menambahkannya dan
+bukan dengan diam-diam mencetak dalam huruf yang berbeda.
+
+Keluarga huruf, ketebalan, dan apakah ia miring dibaca dari nama berkasnya dan
+bukan dari fontnya. Berkas bernama `Lora-Bold.ttf` ditambahkan sebagai Lora
+dengan ketebalan 700. Galeri menampilkan hasilnya, jadi tebakan yang keliru
+terlihat, dan mengganti nama berkas sebelum menambahkannya meluruskannya.
+Beberapa berkas dari satu keluarga, seperti yang normal dan yang miring, didaftar
+terpisah.
+
+Untuk memakai sebuah font, lakukan salah satu:
+
+- di tab **Aset**, pilih **Isi** atau **Judul** pada kartu font itu, atau
+- di tab **Gaya**, pilih dari **Font isi** atau **Font judul**, tempat font Anda
+  didaftar setelah tiga yang bawaan.
+
+### Font dan pemisah halaman [#breaks]
+
+Kertas diukur dengan font yang sudah dimuat, karena huruf yang ditukar kemudian
+akan mengubah tinggi setiap baris dan dengan begitu letak pemisah halaman.
+Menghapus font yang dipakai sebuah resume membuat resume itu tercetak dalam huruf
+pengganti, dan halamannya mungkin terpisah di tempat yang berbeda. Dialog hapus
+memperingatkan Anda.
+
+### Font di ekspor [#export]
+
+Font disematkan di ekspor HTML, jadi berkasnya lengkap tanpa web, dan PDF dicetak
+dari berkas itu. Sistem yang membaca berkas lalu menggambar ulang teksnya mungkin
+memakai hurufnya sendiri, jadi tiga huruf bawaan adalah pilihan yang lebih aman
+saat resume akan dikirim ke parser.

@@ -1,0 +1,159 @@
+---
+title: Apa yang tidak dapat dilakukan CSS
+description: Apa yang ditolak kertas dari CSS Anda dan mengapa, aturan mana yang diizinkan, dan apa yang tidak dapat diubah CSS, seperti di mana halaman berakhir.
+---
+
+CSS Anda dapat menata ulang hampir semua yang digambar template. Sederet kecil hal
+ditolak, dan beberapa hal berada di luar jangkauannya karena kertas dibangun
+dengan cara itu. Halaman ini memuat kedua daftar itu, sehingga aturan yang tidak
+berefek ada penjelasannya.
+
+## Apa yang ditolak [#refused]
+
+Penolakan selalu diumumkan. Aturannya digarisbawahi kuning di tab `style.css`
+beserta alasannya, pada baris dan kolom tempat ia berada, dan dihitung bersama
+catatan. Hanya bagian yang ditolak yang dibuang, jadi sisa aturan itu dan sisa
+stylesheet tetap berlaku. Satu-satunya pengecualian adalah `!important`, di
+bawah.
+
+### Apa pun yang mengambil sesuatu [#network]
+
+`@import`, dan `url()` apa pun yang bukan `data:` atau `blob:`, termasuk alamat
+relatif. Resivo mengutamakan lokal, dan stylesheet yang mengambil sesuatu
+mengumumkan dirinya di setiap render. Tempelkan saja aturannya, dan pakai tab
+Aset untuk font dan gambar. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+
+```css refused
+@import url("https://example.com/theme.css");
+
+.rp-name {
+  background: url("https://example.com/paper.png");
+}
+```
+
+### Apa pun yang mendefinisikan ulang halaman [#page]
+
+`@page`, dan `position: fixed` atau `position: sticky`. Keduanya akan membuat
+dokumen cetak berbeda dari pratinjau yang dipaginasi, padahal itulah satu janji
+yang ingin dipenuhi pratinjau. Ukuran dan margin lembar adalah pengaturan
+**Kertas**.
+
+```css refused
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.rp-name {
+  position: fixed;
+}
+```
+
+### Apa pun yang dapat menjalankan skrip [#script]
+
+`expression()`, alamat `javascript:` di dalam nilai, dan properti `behavior` serta
+`-moz-binding`. Semua itu dulu jalur dari stylesheet menuju kode yang berjalan.
+Browser sekarang sudah lama tidak mendukungnya dan menolaknya tidak memakan
+biaya, dan berkas ekspor bisa dibuka bertahun-tahun lagi oleh browser yang bukan
+yang ini.
+
+```css refused
+.rp-name {
+  behavior: url(script.htc);
+  -moz-binding: url(script.xml);
+  width: expression(1 + 1);
+}
+```
+
+### Apa pun yang bukan aturan biasa [#structure]
+
+- Aturan di dalam aturan. Nesting CSS tidak didukung di sini, dan ditolak supaya
+  sebuah kurung kurawal tidak pernah menutup lapisan milik kertas lebih awal.
+- `@layer`, karena CSS Anda sudah berada di lapisan tertinggi.
+- `@charset`, `@namespace`, dan `@document`, yang tidak berfungsi di sini, serta
+  at-rule apa pun yang tidak ada di daftar di bawah.
+- Deklarasi yang ditulis di luar aturan, aturan tanpa selektor, dan properti
+  tanpa nilai.
+
+```css refused
+@layer custom {
+  .rp-name {
+    color: #7c2d12;
+  }
+}
+
+.rp-name {
+  .rp-link {
+    color: #7c2d12;
+  }
+}
+```
+
+### Hanya barisnya yang hilang [#partial]
+
+Penolakan hanya membuang apa yang ditolak. Di sini warnanya berlaku dan baris
+yang mengatur `position` adalah satu-satunya catatan:
+
+```css refused
+.rp-name {
+  color: #7c2d12;
+  position: fixed;
+}
+```
+
+### Kurung yang hilang [#typos]
+
+Stylesheet dengan kurung kurawal yang hilang tidak dibuang. Kertas menyebutkan di
+mana kesalahannya dan mempertahankan aturan yang dapat dibaca, seperti yang
+dilakukan browser.
+
+### `!important` [#important]
+
+`!important` dibuang dari salinan yang dipakai kertas, dan tidak ada catatan yang
+ditampilkan. Ia tidak pernah diperlukan, karena CSS Anda sudah berada di lapisan
+tertinggi, dan ia akan membiarkan sebuah aturan menimpa halaman itu sendiri.
+
+## Apa yang diizinkan [#allowed]
+
+Aturan biasa, dan at-rule berikut: `@media`, `@supports`, `@container`, `@scope`,
+`@keyframes`, `@font-face`, `@counter-style`, `@property`, dan
+`@font-feature-values`. Yang lain ditolak sebagai tidak didukung, karena daftar
+at-rule tumbuh seiring web dan daftar apa yang diizinkan tidak dapat tanpa
+sengaja menerima yang berikutnya.
+
+Properti kustom dan selektor jenis apa pun boleh, begitu juga `url()` yang
+menunjuk ke alamat `data:` atau `blob:`.
+
+## Apa yang tidak dapat dijangkau CSS [#cannot]
+
+### Di mana halaman berakhir [#breaks]
+
+CSS tidak dapat memindahkan pemisah halaman. Halaman tidak dibuat oleh browser
+yang memecah sebuah kolom. Setiap blok ditata sekali pada lebar halaman yang
+persis, diukur, lalu ditempatkan ke halaman secara utuh, satu blok demi satu
+blok. Jadi sebuah entri tidak pernah terbelah di dua halaman dan sebuah paragraf
+tidak pernah diseimbangkan melewati pemisah, dan `break-inside`, `orphans`, serta
+`widows` tidak punya apa-apa untuk dipengaruhi. Stylesheet Resivo sendiri juga
+tidak memakainya.
+
+Untuk mengatur pemisah halaman, tulis `::pagebreak`, atur sebuah bagian agar
+mulai di halaman baru, atau ubah **Jaga judul bersama isinya**. Ketiganya ada di
+[Halaman dan pemisah](/docs/editor/pages-and-breaks).
+
+### Lembar [#sheet]
+
+Lebar, tinggi, dan margin sebuah halaman, serta pemotongan di tepinya, tidak
+dapat ditimpa oleh aturan untuk `.rp-page`. Semuanya milik geometri kertas, yang
+berada di luar lapisan tempat CSS Anda berada, supaya sebuah stylesheet dapat
+menata ulang resume tetapi tidak merusak paginasi yang diukur untuknya. Ubah
+dengan pengaturan **Kertas**. Lihat [Token desain](/docs/design/design-tokens).
+
+### Lebar gambar [#image]
+
+Lebar sebuah gambar diatur pada gambar itu sendiri, dari kontrol kertas, jadi
+aturan untuk lebar `.rp-figure` tidak mengubahnya.
+
+### Web [#web]
+
+CSS Anda tidak dapat memuat font atau gambar dari sebuah alamat. Tambahkan
+berkasnya di tab **Aset** dan ia menjadi bagian resume, serta bagian ekspor HTML.

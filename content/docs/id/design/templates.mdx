@@ -1,0 +1,89 @@
+---
+title: Template
+description: Tujuh template dan tampilan masing-masing, cara berganti di antaranya tanpa menyentuh isi Anda, dan apa yang terjadi pada perubahan gaya Anda saat berganti.
+---
+
+Template adalah tampilan dasar sebuah resume: jenis hurufnya, ukuran, warna, dan
+cara judul beserta garisnya ditata. Isi Anda terpisah darinya. Setiap template
+menggambar dokumen yang sama dengan cara yang sama, jadi berganti dari satu ke
+yang lain tidak pernah mengubah apa yang Anda tulis, hanya cara menggambarnya.
+
+Setiap template berupa satu kolom. Tidak ada tabel yang memegang tata letak,
+tidak ada teks di dalam gambar, dan tidak ada kolom kedua yang bisa terbaca
+dalam urutan salah oleh mesin, dan itulah yang paling andal dibaca sistem
+pelacakan pelamar.
+
+## Tujuh template [#list]
+
+| Template      | Tampilannya                                                                                                              |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Classic**   | Huruf serif di seluruh dokumen, judul bagian bergaris, dan header di tengah. Resume yang tradisional.                    |
+| **Modern**    | Huruf sans di seluruh dokumen dan aksen hampir hitam. Garisnya berjalan di samping judul, bukan di bawahnya.             |
+| **Technical** | Isi sans di bawah judul monospace, pada 10pt. Tanggal dan lokasi ditata agar angkanya sejajar.                           |
+| **Editorial** | Huruf serif dengan nama yang lebih besar, aksen merah, tanpa garis, dan tajuk miring. Hierarki datang dari ukuran huruf. |
+| **Compact**   | Huruf sans pada 9.5pt dengan margin 0.5in dan jarak rapat, untuk riwayat panjang di sedikit halaman.                     |
+| **Profile**   | Isi sans di bawah judul serif, aksen ungu, dan header yang dibangun di sekitar foto Anda.                                |
+| **Bold**      | Nama huruf kapital, judul bagian yang tebal, dan garis tebal berwarna oranye.                                            |
+
+**Compact** berada tepat di ukuran isi dan margin terkecil yang diterima
+pemeriksaan ATS, jadi resume yang muat tetap dapat dibaca oleh parser maupun
+perekrut. **Profile** tidak memiliki foto kecuali Anda menambahkannya, dan tanpa
+foto, header-nya hanyalah blok rata kiri dengan garis di bawahnya. Cara
+menambahkannya dijelaskan di [Gambar dan font](/docs/design/images-and-fonts).
+
+## Memilih template [#choose]
+
+Ada tiga tempat, dan dua yang pertama mengubah sesuatu.
+
+- Saat Anda membuat resume, **Template** di dialog resume baru menentukan
+  tampilan dasar. Lihat [Buat resume baru](/docs/library/new-resume).
+- Di editor, tab **Gaya** dimulai dengan grup **Template** yang mendaftar
+  ketujuhnya. Setiap baris menampilkan contoh dengan aksen dan huruf judul
+  template itu, namanya, dan deskripsi satu baris. Pilih sebuah baris untuk
+  berganti.
+- **Template** di bilah samping menampilkan ketujuhnya, masing-masing dengan
+  catatan tentang bagaimana ia terbaca oleh parser. Ia hanya menjelaskan. Tidak
+  ada yang diterapkan dari sana.
+
+## Berganti, dan perubahan gaya Anda [#switching]
+
+Template melakukan lebih dari menggambar halaman. Ia juga membekali resume dengan
+pengaturan gayanya sendiri: huruf, ukuran, warna, dan jaraknya. Semuanya disalin
+ke resume saat Anda memilih template, dan sejak itu menjadi milik resume, jadi
+mengubahnya adalah urusan Anda di tab **Gaya**. Lihat
+[Token desain](/docs/design/design-tokens).
+
+Apa yang dilakukan pergantian terhadapnya bergantung pada apakah Anda sudah
+mengubah sesuatu:
+
+- Jika Anda belum mengubah satu pun pengaturan gaya, pergantian berlangsung
+  seketika, dan pengaturan template baru menggantikan yang lama. Tidak ada yang
+  bisa hilang, jadi Anda tidak ditanyai.
+- Jika Anda sudah mengubah sesuatu, sebuah dialog bernama **Pertahankan
+  perubahan gaya Anda?** bertanya. **Pakai bawaan template** mengganti
+  pengaturan Anda dengan milik template baru. **Pertahankan perubahan saya**
+  mempertahankannya dan hanya mengubah tampilan template itu sendiri.
+  **Pertahankan perubahan saya** adalah yang terfokus, sehingga menekan Enter
+  karena tidak sengaja tidak membuang kerja penataan Anda. Isi Anda tidak
+  tersentuh dalam kedua kasus, dan Anda dapat membatalkan pergantian itu.
+
+Ukuran kertas tidak dihitung sebagai perubahan. Ia sifat printer dan bukan
+desain, jadi mengubahnya tidak pernah memunculkan dialog itu.
+
+CSS Anda sendiri tidak termasuk dalam pertanyaan ini. Pergantian membiarkannya
+persis seperti adanya. Lihat [CSS kustom](/docs/design/custom-css).
+
+## Surat lamaran [#letters]
+
+Surat lamaran memilih dari ketujuh yang sama. Surat mengambil huruf dan warna
+template, tetapi dengan ukurannya sendiri: margin satu inci, isi sedikitnya 11pt,
+baris berjarak 1.5, dan ruang sebesar satu paragraf di antara paragraf. Surat
+dalam **Compact** adalah surat dengan huruf template itu dan bukan kerapatannya.
+Lihat [Surat lamaran](/docs/format/cover-letters).
+
+## Saat template diperbaiki [#versions]
+
+Resume hanya menyimpan template mana yang dipakainya, bukan salinannya. Template
+datang bersama Resivo, jadi bila rilis berikutnya memperbaiki satu, resume yang
+memakainya digambar dengan versi yang diperbaiki, dan sebuah halaman dapat
+terpisah di tempat yang sedikit berbeda.

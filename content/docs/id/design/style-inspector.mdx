@@ -1,0 +1,55 @@
+---
+title: Inspektur gaya
+description: Panel di kanan editor dengan empat tabnya, dan mengapa perubahan di sana adalah suntingan biasa yang disimpan dan dapat diurungkan.
+---
+
+Panel **Gaya** di kanan editor adalah inspektur. Ia tidak menulis Markdown. Ia
+mengubah segala hal tentang resume yang bukan isinya: bagaimana tampilannya,
+bagian mana di mana, gambar dan font mana yang dipakainya, dan apakah sebuah
+parser akan membacanya dengan baik. Pada layar sempit, ia adalah tab **Gaya** di
+bagian atas editor. Lihat [Editor](/docs/editor/overview).
+
+## Empat tab [#tabs]
+
+- **Gaya** berisi template dan setiap pengaturan desain: kertas, huruf, warna,
+  jarak, garis, ikon, foto, pemisah halaman, dan bahasa.
+- **Bagian** adalah kerangka dan kontaknya. Setiap bagian dapat dipindah,
+  disembunyikan, diberi ikon, atau diatur untuk mulai di halaman baru, dan
+  setiap kontak dapat memiliki ikon dan tautan.
+- **Aset** berisi gambar dan font yang tersimpan di perangkat ini, dan di sanalah
+  Anda menempatkannya di resume. Lihat [Gambar dan font](/docs/design/images-and-fonts).
+- **ATS** membaca resume seperti yang mungkin dilakukan sistem pelacakan pelamar
+  dan mendaftar apa yang bisa salah.
+
+Tab **Bagian** adalah tempat **Mulai di halaman baru** sebuah bagian berada, yang
+merupakan salah satu cara mengakhiri halaman. Lihat
+[Halaman dan pemisah](/docs/editor/pages-and-breaks#section).
+
+## Perubahan adalah suntingan [#edits]
+
+Menggeser sebuah kontrol menulis ke resume persis seperti mengetik. Kertas
+ditata ulang, perubahan disimpan oleh simpan otomatis, dan tombol urungkan dapat
+membatalkannya. Tidak ada di inspektur yang menyuruh pratinjau memperbarui:
+pratinjau menggambar ulang karena resume berubah.
+
+Menyeret penggeser atau menahan tombol langkah menghasilkan aliran perubahan,
+dan semuanya digabung menjadi satu langkah urungkan, jadi urungkan membatalkan
+perubahan ukuran itu dan bukan sepersepuluh poin darinya. Sebuah sakelar atau
+menu adalah langkah tersendiri. Lihat
+[Simpan otomatis dan urungkan](/docs/editor/autosave-and-undo).
+
+## Tab Gaya [#style]
+
+Tab ini dimulai dengan grup **Template**, lalu turun melalui **Kertas**,
+**Tipografi**, **Warna**, **Jarak**, **Garis**, **Ikon**, **Foto**,
+**Pemisah halaman**, dan **Bahasa**. Kontrol yang kurang jelas memiliki satu
+baris bantuan di bawahnya. Setiap kontrol, rentangnya, dan variabel CSS yang
+diaturnya didaftar di [Token desain](/docs/design/design-tokens).
+
+### Coba tab Gaya dulu [#first]
+
+Sebagian besar penataan di sini bukan CSS. Ada kontrol untuk setiap pengaturan
+yang dibaca template, dan menggesernya lebih mudah sekaligus lebih aman daripada
+menimpanya di CSS: kertas diukur pada nilai yang Anda atur, jadi halaman tetap
+benar. Gunakan [CSS kustom](/docs/design/custom-css) hanya untuk apa yang tidak
+dapat dilakukan kontrol mana pun.

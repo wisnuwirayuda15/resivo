@@ -1,0 +1,56 @@
+---
+title: Icons
+description: The icon set, the six weights, where an icon can go, how the picker finds one, and how to set the size and colour of icons on the paper.
+---
+
+Resivo includes the Phosphor icon set: more than fifteen hundred icons, each in
+six weights. An icon is a small vector drawing that is part of the page, so it
+prints and exports as sharp as the text beside it.
+
+## Where an icon can go [#where]
+
+- Beside a contact, such as an envelope before an email address.
+- Beside a section heading, set from the **Sections** tab.
+- At the front of a line, with the `::label` directive.
+- Inside a line of text, with the `:icon` directive.
+
+The directives are described in
+[Skills, labels and icons](/docs/format/tags-labels-icons), and contacts in
+[Contacts](/docs/format/contacts).
+
+## The icon picker [#picker]
+
+You never need to remember an icon's name. In the **Sections** tab, **Add icon**
+beside a section or a contact opens the picker, and **Change icon** reopens it on
+an icon that is already set.
+
+- **Search icons** finds an icon by what it shows and not only by its name, so
+  mail finds the envelope. The box suggests mail, phone and github to start with.
+- **Icon weight** chooses the weight the grid is drawn in, from **Thin**,
+  **Light**, **Regular**, **Bold**, **Fill** and **Duo**. What you see is what the
+  paper will draw.
+- A count shows how many icons match your search out of the whole set.
+- **Remove icon** takes the icon off.
+
+When nothing matches, the picker suggests a word for what the icon shows.
+
+## Names and weights in the file [#names]
+
+In the Markdown an icon is its name in kebab-case, such as `envelope`, `map-pin`
+or `github-logo`, and a `weight` that is one of `thin`, `light`, `regular`,
+`bold`, `fill` or `duotone`. The picker writes both for you. If you type a name
+by hand and it is not an icon, the paper reserves the space where the icon would
+be and leaves it empty, so a blank gap beside a contact means the name is wrong.
+
+## Size and colour [#style]
+
+In the **Style** tab, under **Icons**, **Size** sets how large icons are, from 6
+to 48 px, and **Colour** sets the colour of the icons beside contacts and labels.
+An icon beside a section heading is not coloured by that setting: it takes the
+accent colour, the same as the heading. See
+[Design tokens](/docs/design/design-tokens).
+
+Icons are drawn in the weight each one was given, and there is no setting that
+changes them all at once. To restyle them with CSS, select the `svg` inside the
+class that holds them, such as `.rp-contact svg`. See
+[The CSS class reference](/docs/design/css-class-reference).

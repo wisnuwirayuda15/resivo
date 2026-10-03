@@ -1,0 +1,141 @@
+---
+title: Design tokens
+description: Every setting in the Style tab with its range, what it changes on the paper, and the CSS variable it is written to, so your own CSS can read it.
+---
+
+The settings in the **Style** tab are called design tokens. They are stored with
+the resume and not in the Markdown, so a resume can be restyled without a word
+of it changing. On the paper each one is a CSS variable whose name starts
+`--paper-`, which is how the templates read them and how your own CSS can too.
+
+The template you choose sets the starting value of every one. After that the
+values belong to the resume. See [Templates](/docs/design/templates).
+
+## Paper [#paper]
+
+| Control                                                              | Range              | What it does                                                                                                     |
+| -------------------------------------------------------------------- | ------------------ | ---------------------------------------------------------------------------------------------------------------- |
+| **Size**                                                             | Letter or A4       | The size of the sheet: 8.5 by 11 inches, or 210 by 297 millimetres. `--paper-w`, `--paper-h`                     |
+| **Top margin**, **Right margin**, **Bottom margin**, **Left margin** | 0 to 3 in, by 0.05 | The printed margin. `--paper-margin-top`, `--paper-margin-right`, `--paper-margin-bottom`, `--paper-margin-left` |
+
+The pages are measured against the margins, so changing one lays the pages out
+again. Paper size can also be changed from the strip above the paper. See
+[Pages and breaks](/docs/editor/pages-and-breaks).
+
+## Typography [#typography]
+
+| Control                             | Range                       | What it does                                                                                                        |
+| ----------------------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| **Body font**                       | A built-in or uploaded font | The face of the text. `--paper-font-body`                                                                           |
+| **Heading font**                    | A built-in or uploaded font | The face of the name, section headings and subheadings. `--paper-font-head`                                         |
+| **Body size**                       | 6 to 24 pt, by 0.25         | The size of the text. Points, not pixels, because a resume is a print document. `--paper-fs-body`                   |
+| **Scale**                           | 1 to 1.6                    | The ratio between one heading size and the next. See below.                                                         |
+| **Line height**                     | 1 to 2                      | The space between lines, as a multiple of the type size. `--paper-lh`                                               |
+| **Body weight**, **Heading weight** | Light to Bold               | How heavy the text is, and how heavy headings, entry titles and bold text are. `--paper-fw-body`, `--paper-fw-head` |
+
+The weights are **Light** (300), **Regular** (400), **Medium** (500),
+**Semibold** (600) and **Bold** (700).
+
+The three built-in faces are Source Serif 4, Instrument Sans and JetBrains Mono.
+Fonts you add appear in the same two lists. See
+[Images and fonts](/docs/design/images-and-fonts).
+
+### How the scale works [#scale]
+
+Heading sizes are not set one by one. Each is the body size multiplied by the
+scale, so the whole ramp stays in proportion when you change one number:
+
+- Section headings and the headline under the name are the body size times the
+  scale. `--paper-fs-section`, `--paper-fs-headline`
+- The name is four steps up, which is the body size times the scale four times
+  over. `--paper-fs-name`
+- Small text, such as dates and contacts, is 0.92 of the body size.
+  `--paper-fs-small`
+
+## Colour [#colour]
+
+| Control       | What it colours                                                                                |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| **Body text** | The text of the resume. `--paper-ink`                                                          |
+| **Headings**  | The name and the titles of entries. `--paper-heading`                                          |
+| **Accent**    | Section headings and their icons. It is the one saturated colour on the page. `--paper-accent` |
+| **Muted**     | Dates, locations, the headline and other secondary lines. `--paper-ink-muted`                  |
+
+The paper is always light, whatever the app's theme is, because it is what will
+be printed. The colours here are the colours on paper.
+
+## Spacing [#spacing]
+
+| Control           | Range               | What it does                                                             |
+| ----------------- | ------------------- | ------------------------------------------------------------------------ |
+| **Section**       | 0 to 5 rem, by 0.05 | The space above each section heading. `--paper-space-section`            |
+| **Block**         | 0 to 5 rem, by 0.05 | The space between blocks inside a section. `--paper-space-block`         |
+| **Under heading** | 0 to 5 rem, by 0.05 | The gap under a heading, before its first block. `--paper-space-heading` |
+
+## Rules [#rules]
+
+| Control       | Range             | What it does                                                                        |
+| ------------- | ----------------- | ----------------------------------------------------------------------------------- |
+| **Dividers**  | On or off         | Whether a rule is drawn under or beside a section heading.                          |
+| **Thickness** | 0 to 8 px, by 0.5 | How thick the rule is. `--paper-rule-w`                                             |
+| **Colour**    | Any colour        | The colour of the rule, and of the lines of tables and quotes. `--paper-rule-color` |
+
+Turning **Dividers** off sets the thickness to zero as well as leaving the rule
+out, so a template that draws its own line does not leave a thin one behind.
+
+## Icons [#icons]
+
+| Control    | Range      | What it does                                                                         |
+| ---------- | ---------- | ------------------------------------------------------------------------------------ |
+| **Size**   | 6 to 48 px | The size of icons next to contacts, labels and section headings. `--paper-icon-size` |
+| **Colour** | Any colour | The colour of the icons next to contacts and labels. `--paper-icon-color`            |
+
+An icon next to a section heading is drawn in the accent colour instead. See
+[Icons](/docs/design/icons).
+
+## Photo [#photo]
+
+| Control   | Range                               | What it does                                                  |
+| --------- | ----------------------------------- | ------------------------------------------------------------- |
+| **Shape** | **Circle**, **Rounded**, **Square** | The shape of the photograph. `--paper-avatar-radius`          |
+| **Size**  | 24 to 300 px, by 2                  | The width and height of the photograph. `--paper-avatar-size` |
+
+These apply once a photograph is attached, from the **Assets** tab or the Images
+page.
+
+## Page breaks [#breaks]
+
+**Keep headings with content** is on by default. It stops a section heading
+being the last thing on a page, and turning it off packs the pages tighter. It
+is described in [Pages and breaks](/docs/editor/pages-and-breaks#headings).
+
+## Language [#language]
+
+**Document** sets the language of the resume itself. It formats month names and
+writes the end of an ongoing role in that language, such as Present, and it
+sets the language of the exported document. It does not translate what you
+wrote. It is separate from the language of the app, so a resume in French can be
+written and drawn in an app set to English.
+
+## Reading a token in your CSS [#variables]
+
+Because every token is a variable, your own CSS can use it, and a rule you
+write follows the Style tab when the setting changes:
+
+```css verify title="style.css"
+.rp-entry-title {
+  color: var(--paper-accent);
+}
+```
+
+You can also set a variable yourself. Your CSS is applied after the tokens, so it
+wins for that resume, and the control in the Style tab goes on showing its own
+value:
+
+```css verify title="style.css"
+.resivo-paper {
+  --paper-accent: #b45309;
+}
+```
+
+Prefer the control when there is one. See [Custom CSS](/docs/design/custom-css).

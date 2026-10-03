@@ -1,0 +1,154 @@
+---
+title: What CSS cannot do
+description: What the paper refuses in your own CSS and why, which rules are allowed, and the parts of the page that CSS cannot change, such as where a page ends.
+---
+
+Your CSS can restyle nearly everything the template draws. A short list of things
+is refused, and a few things are out of its reach because the paper is built
+that way. This page is both lists, so a rule that does nothing is explained.
+
+## What is refused [#refused]
+
+A refusal is announced. The rule is underlined in yellow in the `style.css` tab
+with the reason, at the line and column it is on, and it is counted with the
+notices. Only the part that is refused is left out, so the rest of the rule and
+of the stylesheet still applies. The one exception is `!important`, below.
+
+### Anything that fetches [#network]
+
+`@import`, and any `url()` that is not `data:` or `blob:`, which includes a
+relative address. Resivo is local-first, and a stylesheet that fetches announces
+itself on every render. Paste the rules in instead, and use the Assets tab for
+fonts and images. See [Images and fonts](/docs/design/images-and-fonts).
+
+```css refused
+@import url("https://example.com/theme.css");
+
+.rp-name {
+  background: url("https://example.com/paper.png");
+}
+```
+
+### Anything that redefines the page [#page]
+
+`@page`, and `position: fixed` or `position: sticky`. Both would make the
+printed document disagree with the paginated preview, which is the one promise
+the preview exists to keep. The size and margins of the sheet are the **Paper**
+settings.
+
+```css refused
+@page {
+  size: A4;
+  margin: 0;
+}
+
+.rp-name {
+  position: fixed;
+}
+```
+
+### Anything that can run script [#script]
+
+`expression()`, a `javascript:` address in a value, and the properties `behavior`
+and `-moz-binding`. These were routes from a stylesheet to running code. They are
+long dead in current browsers and cost nothing to refuse, and an exported file
+can be opened years from now by a browser that is not this one.
+
+```css refused
+.rp-name {
+  behavior: url(script.htc);
+  -moz-binding: url(script.xml);
+  width: expression(1 + 1);
+}
+```
+
+### Anything that is not a plain rule [#structure]
+
+- A rule inside a rule. CSS nesting is not supported here, and it is refused so
+  that a brace can never close the paper's own layer early.
+- `@layer`, because your CSS is already in the highest one.
+- `@charset`, `@namespace` and `@document`, which do nothing here, and any
+  at-rule not on the list below.
+- A declaration written outside any rule, a rule with no selector, and a property
+  with no value.
+
+```css refused
+@layer custom {
+  .rp-name {
+    color: #7c2d12;
+  }
+}
+
+.rp-name {
+  .rp-link {
+    color: #7c2d12;
+  }
+}
+```
+
+### Only the line is lost [#partial]
+
+A refusal removes only what is refused. Here the colour applies and the line
+that sets `position` is the one notice:
+
+```css refused
+.rp-name {
+  color: #7c2d12;
+  position: fixed;
+}
+```
+
+### Missing braces [#typos]
+
+A stylesheet with a missing brace is not thrown away. The paper says where the
+fault is and keeps the rules that could be read, as a browser would.
+
+### `!important` [#important]
+
+`!important` is removed from the copy the paper uses, and no notice is shown. It
+is never needed, because your CSS is already the highest layer, and it would let
+a rule override the page itself.
+
+## What is allowed [#allowed]
+
+Plain rules, and these at-rules: `@media`, `@supports`, `@container`, `@scope`,
+`@keyframes`, `@font-face`, `@counter-style`, `@property` and
+`@font-feature-values`. Anything else is refused as not supported, because the
+list of at-rules grows with the web and a list of what is allowed cannot admit
+the next one by accident.
+
+Custom properties and selectors of any kind are fine, and so is a `url()` that
+points at a `data:` or `blob:` address.
+
+## What CSS cannot reach [#cannot]
+
+### Where a page ends [#breaks]
+
+CSS cannot move a page break. The pages are not made by the browser breaking a
+column. Every block is laid out once at the exact page width, measured, and then
+placed onto pages whole, one block after another. So an entry is never split
+across two pages and a paragraph is never balanced across a break, and
+`break-inside`, `orphans` and `widows` have nothing to act on. Resivo's own
+stylesheet does not use them either.
+
+To control a page break, write `::pagebreak`, set a section to start on a new
+page, or change **Keep headings with content**. All three are in
+[Pages and breaks](/docs/editor/pages-and-breaks).
+
+### The sheet [#sheet]
+
+The width, height and margins of a page, and the clipping at its edge, cannot be
+overridden by a rule for `.rp-page`. They belong to the paper's geometry, which
+sits outside the layers your CSS is in, so that a stylesheet can restyle a resume
+but not break the pagination it was measured for. Change them with the **Paper**
+settings. See [Design tokens](/docs/design/design-tokens).
+
+### Image widths [#image]
+
+An image's width is set on the image itself, from the paper's own controls, so a
+rule for the width of `.rp-figure` does not change it.
+
+### The web [#web]
+
+Your CSS cannot load a font or a picture from an address. Add the file in the
+**Assets** tab and it is part of the resume, and part of an HTML export.

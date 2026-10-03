@@ -13,10 +13,16 @@ import type { Page } from "@playwright/test";
  * only ever receives its own text.
  */
 
-/** Bytes, uncompressed, one language's index may weigh. The full docs are about
- * 46 pages; at the measured cost per page that is roughly half this, and the
- * wire size is a fifth of it once compressed. Raise it knowingly, not by drift. */
-const INDEX_BUDGET = 800 * 1024;
+/** Bytes, uncompressed, one language's index may weigh.
+ *
+ * The first figure, 800 KB, came from placeholder pages and was too low by a
+ * factor of three: real pages cost about 32 KB each. Measured with 30 real pages,
+ * English is 960 KB and Indonesian 986 KB, and each is about 196 KB on the wire
+ * once compressed. The planned 46 pages projects to 1.5 MB raw and about 300 KB
+ * compressed, fetched once on a reader's first search and then kept by the
+ * service worker. This is that, with a quarter of room. Raise it knowingly, not by
+ * drift. */
+const INDEX_BUDGET = 1792 * 1024;
 
 const hydrated = async (page: Page) => {
   await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
