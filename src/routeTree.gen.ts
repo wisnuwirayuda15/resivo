@@ -20,6 +20,7 @@ import { Route as TemplatesRouteImport } from './routes/templates'
 import { Route as LangDocsRouteRouteImport } from './routes/$lang.docs.route'
 import { Route as LangLlmsFullDottxtRouteImport } from './routes/$lang.llms-full[.]txt'
 import { Route as LangLlmsDottxtRouteImport } from './routes/$lang.llms[.]txt'
+import { Route as ApiMcpRouteImport } from './routes/api.mcp'
 import { Route as DocsSplatRouteImport } from './routes/docs.$'
 import { Route as ResumesIndexRouteImport } from './routes/resumes.index'
 import { Route as ResumesResumeIdRouteImport } from './routes/resumes.$resumeId'
@@ -81,6 +82,11 @@ const LangLlmsDottxtRoute = LangLlmsDottxtRouteImport.update({
   path: '/$lang/llms.txt',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMcpRoute = ApiMcpRouteImport.update({
+  id: '/api/mcp',
+  path: '/api/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DocsSplatRoute = DocsSplatRouteImport.update({
   id: '/docs/$',
   path: '/docs/$',
@@ -119,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
   '/$lang/llms.txt': typeof LangLlmsDottxtRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -137,6 +144,7 @@ export interface FileRoutesByTo {
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
   '/$lang/llms.txt': typeof LangLlmsDottxtRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes': typeof ResumesIndexRoute
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/$lang/docs': typeof LangDocsRouteRouteWithChildren
   '/$lang/llms-full.txt': typeof LangLlmsFullDottxtRoute
   '/$lang/llms.txt': typeof LangLlmsDottxtRoute
+  '/api/mcp': typeof ApiMcpRoute
   '/docs/$': typeof DocsSplatRoute
   '/resumes/$resumeId': typeof ResumesResumeIdRoute
   '/resumes/': typeof ResumesIndexRoute
@@ -176,6 +185,7 @@ export interface FileRouteTypes {
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
     | '/$lang/llms.txt'
+    | '/api/mcp'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes/'
@@ -194,6 +204,7 @@ export interface FileRouteTypes {
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
     | '/$lang/llms.txt'
+    | '/api/mcp'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes'
@@ -212,6 +223,7 @@ export interface FileRouteTypes {
     | '/$lang/docs'
     | '/$lang/llms-full.txt'
     | '/$lang/llms.txt'
+    | '/api/mcp'
     | '/docs/$'
     | '/resumes/$resumeId'
     | '/resumes/'
@@ -231,6 +243,7 @@ export interface RootRouteChildren {
   LangDocsRouteRoute: typeof LangDocsRouteRouteWithChildren
   LangLlmsFullDottxtRoute: typeof LangLlmsFullDottxtRoute
   LangLlmsDottxtRoute: typeof LangLlmsDottxtRoute
+  ApiMcpRoute: typeof ApiMcpRoute
   DocsSplatRoute: typeof DocsSplatRoute
   ResumesResumeIdRoute: typeof ResumesResumeIdRoute
   ResumesIndexRoute: typeof ResumesIndexRoute
@@ -316,6 +329,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LangLlmsDottxtRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/mcp': {
+      id: '/api/mcp'
+      path: '/api/mcp'
+      fullPath: '/api/mcp'
+      preLoaderRoute: typeof ApiMcpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/docs/$': {
       id: '/docs/$'
       path: '/docs/$'
@@ -378,6 +398,7 @@ const rootRouteChildren: RootRouteChildren = {
   LangDocsRouteRoute: LangDocsRouteRouteWithChildren,
   LangLlmsFullDottxtRoute: LangLlmsFullDottxtRoute,
   LangLlmsDottxtRoute: LangLlmsDottxtRoute,
+  ApiMcpRoute: ApiMcpRoute,
   DocsSplatRoute: DocsSplatRoute,
   ResumesResumeIdRoute: ResumesResumeIdRoute,
   ResumesIndexRoute: ResumesIndexRoute,

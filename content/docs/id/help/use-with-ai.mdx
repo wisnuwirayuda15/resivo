@@ -1,0 +1,49 @@
+---
+title: Gunakan dokumentasi dengan asisten AI
+description: Salin halaman sebagai Markdown, beri asisten tautan untuk dibaca, atau hubungkan ke server dokumentasi. Tidak ada yang Anda tulis di aplikasi yang terlibat.
+---
+
+Setiap halaman dokumentasi ini tersedia sebagai Markdown biasa, sehingga asisten
+dapat membacanya seperti Anda. Ada tiga cara menyerahkannya.
+
+## Salin halaman [#copy]
+
+Di bawah setiap judul, **Salin halaman** menaruh Markdown halaman itu di
+papan klip Anda, dan **Lihat sebagai Markdown** membuka teks yang sama di
+alamatnya sendiri. **Tanya asisten** membuka Claude atau ChatGPT dengan pesan
+yang hanya menyebut alamat halaman.
+
+## Baca dari tautan [#links]
+
+Markdown sebuah halaman ada di alamatnya dengan `.md` di ujung, jadi
+`/id/docs/format/overview` juga `/id/docs/format/overview.md`. Beranda
+dokumentasi adalah `/id/docs/index.md`. Klien yang mengirim header
+`Accept: text/markdown` ke alamat biasa mendapat Markdown darinya.
+
+Untuk seluruh dokumentasi sekaligus ada tiga berkas:
+
+- `/llms.txt` mendaftar halaman bahasa Inggris, dengan tautan ke Markdown
+  masing-masing, dan menunjuk ke bahasa lain.
+- `/en/llms.txt` dan `/id/llms.txt` mendaftar satu bahasa masing-masing.
+- `/en/llms-full.txt` dan `/id/llms-full.txt` memuat setiap halaman bahasa itu
+  dalam satu berkas.
+
+## Hubungkan asisten [#mcp]
+
+Asisten yang mendukung Model Context Protocol dapat membaca dokumentasi
+langsung dari `/api/mcp`. Ada tiga alat: `list_pages`, `get_page`, dan
+`search`. Masing-masing menerima `lang` opsional (`en` atau `id`, bawaannya
+bahasa Inggris). Di Claude Code, untuk salinan yang berjalan di komputer Anda:
+
+```bash
+claude mcp add --transport http resivo-docs http://localhost:3000/api/mcp
+```
+
+Untuk salinan yang sudah di-deploy, pakai alamat salinan itu sebagai ganti
+`http://localhost:3000`.
+
+## Apa yang dibagikan [#shared]
+
+Hanya dokumentasi, yang bersifat publik. CV Anda tetap di browser Anda, dan
+tidak ada yang di bagian ini dapat menjangkaunya: server tidak punya salinan
+untuk diberikan.

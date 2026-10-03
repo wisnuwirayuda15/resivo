@@ -1,0 +1,48 @@
+---
+title: Use the docs with an AI assistant
+description: Copy a page as Markdown, give an assistant a link to read, or connect it to the documentation server. None of what you wrote in the app is involved.
+---
+
+Every page of these docs is available as plain Markdown, so an assistant can
+read it the way you do. There are three ways to hand it one.
+
+## Copy a page [#copy]
+
+Under each title, **Copy page** puts that page's Markdown on your clipboard, and
+**View as Markdown** opens the same text at its own address. **Ask an
+assistant** opens Claude or ChatGPT with a message that names the page's
+address and nothing else.
+
+## Read it from a link [#links]
+
+A page's Markdown lives at its address with `.md` on the end, so
+`/en/docs/format/overview` is also `/en/docs/format/overview.md`. The docs home
+is `/en/docs/index.md`. A client that sends `Accept: text/markdown` to the
+normal address gets the Markdown from it.
+
+For the whole documentation at once there are three files:
+
+- `/llms.txt` lists the English pages, with a link to the Markdown of each, and
+  points to the other languages.
+- `/en/llms.txt` and `/id/llms.txt` list one language each.
+- `/en/llms-full.txt` and `/id/llms-full.txt` hold every page of that language
+  in a single file.
+
+## Connect an assistant [#mcp]
+
+Assistants that support the Model Context Protocol can read the docs directly
+from `/api/mcp`. It has three tools: `list_pages`, `get_page` and `search`. Each
+takes an optional `lang` (`en` or `id`, English by default). In Claude Code, for
+a copy running on your own machine:
+
+```bash
+claude mcp add --transport http resivo-docs http://localhost:3000/api/mcp
+```
+
+For a deployed copy, use that copy's address in place of
+`http://localhost:3000`.
+
+## What is shared [#shared]
+
+Only the documentation, which is public. Your resumes stay in your browser, and
+nothing in this section can reach them: the server has no copy to give.
