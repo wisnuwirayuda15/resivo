@@ -33,6 +33,17 @@
  * files here whose names are stable, so a new one has to be able to replace an
  * old one, and none of them is on the critical path for a paint.
  *
+ * The documentation's search index (`/api/search/<lang>`) and its server
+ * functions (`/_serverFn/*`, which a client-side move between docs pages
+ * calls for the page's data) are stale-while-revalidate for the same reason:
+ * their URLs are stable and their content changes with a deploy. They are what
+ * make a docs page that was read before readable again with no network, and
+ * search work offline after its first use. The docs are the only server
+ * functions this app has, so the one rule covers nothing else. Only what has been
+ * visited is held: the docs are not precached, because which language to hold
+ * is unknown at install and 46 pages in each would be megabytes nobody asked
+ * for.
+ *
  * ## Why it neither skips waiting nor claims clients
  *
  * An updated worker waits for every tab to close before activating, which is
@@ -47,7 +58,7 @@
  * once the last tab is gone.
  */
 
-const VERSION = "v1";
+const VERSION = "v2";
 const CACHE = `resivo-${VERSION}`;
 
 /**
@@ -167,6 +178,34 @@ self.addEventListener("activate", (event) => {
   );
 });
 
+/**
+ * A redirect to the docs home of the language a docs URL is in, when that home
+ * was opened and is held; undefined otherwise.
+ *
+ * A redirect and not the home's HTML under the page's own URL. The document is
+ * hydrated against the address it was asked for, so the router would try to
+ * render the page that was never opened, call its server function with no
+ * network, and land on the error screen. Redirecting makes the address and the
+ * document agree.
+ *
+ * `ignoreVary` because the docs answer with `Vary: Accept` (the same address
+ * serves Markdown to a client that asks for it), and the cache honours that:
+ * a lookup built from a bare path has no `Accept` and would never find the copy
+ * a browser's navigation stored.
+ */
+const docsIndex = async (cache, request) => {
+  const match = /^\/([^/]+)\/docs(?:\/|$)/.exec(new URL(request.url).pathname);
+
+  if (
+    match === null ||
+    (await cache.match(`/${match[1]}/docs`, { ignoreVary: true })) === undefined
+  ) {
+    return undefined;
+  }
+
+  return Response.redirect(`/${match[1]}/docs`, 302);
+};
+
 /** Network first, and the cache only when there is no network. */
 const navigation = async (event) => {
   const cache = await caches.open(CACHE);
@@ -189,6 +228,11 @@ const navigation = async (event) => {
      */
     return (
       (await cache.match(event.request, { ignoreSearch: true })) ??
+      // A docs page that was never opened falls back to the docs index of its
+      // own language, when that was opened, before the app: someone reading the
+      // documentation offline should land in the documentation, not in a
+      // library they did not ask for.
+      (await docsIndex(cache, event.request)) ??
       (await cache.match("/resumes", { ignoreSearch: true })) ??
       Response.error()
     );
@@ -253,8 +297,9 @@ self.addEventListener("fetch", (event) => {
    *
    * Cross-origin is not this worker's business. A range request is a partial
    * response the Cache API cannot store or serve. Everything else outside the
-   * three cases below (an export blob, `og.png`, a URL a future route invents)
-   * is safer fetched than guessed at.
+   * cases below is safer fetched than guessed at: an export blob, `og.png`, a
+   * URL a future route invents, and the documentation's machine-readable forms
+   * (`.md`, `llms.txt`, `/api/mcp`), which exist for tools that are online.
    */
   if (url.origin !== self.location.origin || request.headers.has("range")) {
     return;
@@ -270,7 +315,11 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  if (CHROME.includes(url.pathname)) {
+  if (
+    CHROME.includes(url.pathname) ||
+    url.pathname.startsWith("/api/search/") ||
+    url.pathname.startsWith("/_serverFn/")
+  ) {
     event.respondWith(revalidating(event));
   }
 });

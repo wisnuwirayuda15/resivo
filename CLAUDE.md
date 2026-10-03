@@ -16,7 +16,7 @@ bun run dev              # :3000
 bun run typecheck        # tsc --noEmit
 bun run test             # vitest, 818 tests in 51 files
 bun run test:e2e         # playwright, 93 specs, chromium only
-bun run test:e2e:pwa     # playwright against a real build, 5 specs
+bun run test:e2e:pwa     # playwright against a real build, 11 specs
 bun run lint             # eslint
 bun run check            # prettier --check
 bun run format           # prettier --write, then eslint --fix
@@ -200,10 +200,17 @@ only when `import.meta.env.PROD`, because a worker caching Vite's unhashed dev
 modules reads as the app ignoring a saved edit. It also means `bun run test:e2e`
 (a dev server, on purpose) cannot exercise it at all, hence
 `playwright.pwa.config.ts` and `e2e-pwa/`, which build and serve for real on
-:3100. Three rules inside it: navigations are network-first so a deploy lands on
+:3100. Four rules inside it: navigations are network-first so a deploy lands on
 the first visit, `/assets/*` is cache-first because every name there carries a
-content hash, and the manifest and icons are stale-while-revalidate because
-their names are stable. It deliberately does not `skipWaiting` or claim clients,
+content hash, and the manifest, the icons, `/api/search/*` and `/_serverFn/*` (the
+docs' search index and page data) are stale-while-revalidate because their URLs
+are stable. A docs page that was never opened falls back, offline, to a redirect
+to its language's docs home when that was opened, and not to the app shell: the
+document is hydrated against its own address, so serving another page's HTML
+under it lands on the error screen. The docs answer with `Vary: Accept`, which
+the Cache API honours, so a lookup built from a bare path needs `ignoreVary`.
+The `.md`, `llms*.txt` and `/api/mcp` addresses are deliberately not handled.
+It deliberately does not `skipWaiting` or claim clients,
 so an update never purges the cache under a page that is still running. Bump
 `VERSION` in it when its logic changes.
 

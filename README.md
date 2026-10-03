@@ -48,6 +48,11 @@ Monaco's language workers), so what the app has used is what it can open without
 a connection. Settings says which of those two states this device is in, rather
 than claiming offline before it is true.
 
+The documentation works the same way: a page you have read, the search index once
+you have searched, and the move between pages you have already opened are all
+available offline. A docs page you never opened is not, and falls back to the
+docs home if you opened that.
+
 **English and Indonesian.** The whole interface, including the writing guide,
 the tours and the ATS findings, is available in both, chosen in Settings or from
 the command palette and kept in this browser. English is the default and what the
