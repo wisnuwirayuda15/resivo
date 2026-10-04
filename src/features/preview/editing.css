@@ -26,17 +26,25 @@
 .rp-chrome {
   position: absolute;
   top: 0;
-  /* Outside the page's content box, in the margin. Nothing in the flow moves to
-     make room for it. */
-  right: 100%;
+  /* Inside the item's own box, at its top right corner, and not in the margin.
+     The margin is the user's to set (0.8in is 53px here) and the row of four
+     buttons is 84px wide, so in the margin the grip sat at x=-12 against a page
+     that clips at its own edge: the handle was there and nobody could see it.
+     Inside the box it can never be clipped, whatever the margin. It covers a
+     corner of the item while the pointer is on it, which is the price, and the
+     top right is where a line is most often empty. */
+  right: 0;
+  z-index: 1;
   /* A column, so a per-item control lands under the buttons rather than beside
-     them: the margin is finite sideways and unbounded downwards, and this is
-     absolutely positioned either way. */
+     them: growing downwards costs nothing, sideways it would run off the box. */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 2px;
-  padding-right: 6px;
+  padding: 2px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 1px 4px rgba(18, 18, 16, 0.18);
   opacity: 0;
   transition: opacity 120ms ease-out;
 }
@@ -46,9 +54,16 @@
   gap: 2px;
 }
 
+/* Inert until shown: inside the box it would otherwise sit, invisible, over the
+   text and swallow the click that was meant for the field underneath. */
+.rp-chrome {
+  pointer-events: none;
+}
+
 .rp-item:hover .rp-chrome,
 .rp-chrome:focus-within {
   opacity: 1;
+  pointer-events: auto;
 }
 
 .rp-chrome-grip,
