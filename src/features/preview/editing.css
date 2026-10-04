@@ -175,6 +175,23 @@
   cursor: text;
 }
 
+/**
+ * What an empty field says, so a block that was just inserted can be found.
+ *
+ * A field with nothing in it is a zero-width span in a zero-height line, so there
+ * was nothing to hover or click and the block was there and unreachable. This is
+ * in flow, not absolutely positioned: an absolute one would draw over whatever
+ * follows the empty block. It is also measured, which is fine, because the
+ * editable wrapper is in the measured tree in edit mode, so the page breaks
+ * already count the line. Print keeps the line and hides the words, so a print
+ * started in Visual mode breaks where the paper does.
+ */
+.rp-editable:empty:not([data-editing])::before {
+  content: var(--rp-placeholder, "");
+  color: rgba(18, 18, 16, 0.35);
+  font-style: italic;
+}
+
 .rp-editable:hover {
   outline: 1px dashed rgba(14, 124, 118, 0.5);
   outline-offset: 2px;
@@ -213,5 +230,9 @@
   .rp-editing {
     outline: none;
     background: none;
+  }
+
+  .rp-editable:empty::before {
+    visibility: hidden;
   }
 }

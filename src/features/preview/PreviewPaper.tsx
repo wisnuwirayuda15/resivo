@@ -23,11 +23,16 @@ import {
 } from "@/features/icons/catalog";
 import {
   addBlock,
+  duplicateBlock,
   removeBlock,
   setImageWidth,
 } from "@/features/editor/mutations";
 
 import { createId } from "@/lib/id";
+import {
+  INSERTABLE_BLOCK_KINDS,
+  createBlock,
+} from "@/features/resume/model/factory";
 import { resolveTemplate } from "@/features/templates/registry";
 
 import { documentFlow, flowItemClass } from "./flow";
@@ -39,6 +44,7 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Recipe } from "@/features/editor/mutations";
+import type { InsertableBlockKind } from "@/features/resume/model/factory";
 import type { ImageMap } from "@/features/assets/useAssetUrls";
 import type { FlowItem } from "./flow";
 import type { FlowMetric } from "./paginate";
@@ -47,6 +53,7 @@ import type {
   RenderMode,
 } from "@/features/templates/renderer/types";
 import type {
+  Block,
   DesignConfig,
   ResumeDocument,
   TemplateId,
@@ -464,26 +471,63 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
    * break.
    */
   const itemControls = (item: FlowItem): React.ReactNode => {
-    if (item.type !== "block" || apply === undefined) {
+    if (item.type === "header" || apply === undefined) {
       return undefined;
     }
 
     const section = document.content.sections.find(
       (candidate) => candidate.id === item.sectionId,
     );
-    const index = (section?.blocks ?? []).findIndex(
-      (candidate) => candidate.id === item.blockId,
-    );
 
-    if (section === undefined || index === -1) {
+    if (section === undefined) {
       return undefined;
     }
 
+    // A heading is not a block, so what follows it is the top of its section.
+    // That is the same place a block dropped on a heading goes (see `reorder.ts`).
+    const insertAt =
+      item.type === "sectionHeading"
+        ? 0
+        : section.blocks.findIndex(
+            (candidate) => candidate.id === item.blockId,
+          ) + 1;
+
+    if (item.type === "block" && insertAt === 0) {
+      return undefined;
+    }
+
+    const insert = (
+      <select
+        aria-label={t("chrome.insert")}
+        className="rp-chrome-select"
+        onChange={(event) => {
+          const kind = event.currentTarget.value as InsertableBlockKind;
+
+          apply(addBlock(section.id, createBlock(kind), insertAt));
+        }}
+        value=""
+      >
+        <option disabled value="">
+          {t("chrome.insertPlaceholder")}
+        </option>
+        {INSERTABLE_BLOCK_KINDS.map((kind) => (
+          <option key={kind} value={kind}>
+            {t(`chrome.blocks.${kind}`)}
+          </option>
+        ))}
+      </select>
+    );
+
+    if (item.type === "sectionHeading") {
+      return insert;
+    }
+
     const imageWidth = widthControl(item);
-    const isBreak = section.blocks[index]?.kind === "pageBreak";
+    const isBreak = section.blocks[insertAt - 1]?.kind === "pageBreak";
 
     return (
       <>
+        {insert}
         {/* Not offered on a break itself, two in a row means a blank page,
             which nobody reaches for from this button. Deleting one is the
             chrome's own × above. */}
@@ -496,7 +540,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                 addBlock(
                   section.id,
                   { id: createId(), kind: "pageBreak" },
-                  index + 1,
+                  insertAt,
                 ),
               )
             }
@@ -509,6 +553,12 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       </>
     );
   };
+
+  /** The kind of block a flow item stands for, or `undefined` for a heading. */
+  const blockKind = (item: FlowItem): Block["kind"] | undefined =>
+    document.content.sections
+      .find((section) => section.id === item.sectionId)
+      ?.blocks.find((candidate) => candidate.id === item.blockId)?.kind;
 
   /**
    * The width control for an image block, or nothing for any other item.
@@ -605,6 +655,17 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                   movable={isMovable(item)}
                   onMoveDown={step(item, 1)}
                   onMoveUp={step(item, -1)}
+                  onDuplicate={
+                    item.type === "block" && blockKind(item) !== "pageBreak"
+                      ? () =>
+                          apply(
+                            duplicateBlock(
+                              item.sectionId ?? "",
+                              item.blockId ?? "",
+                            ),
+                          )
+                      : undefined
+                  }
                   onRemove={
                     item.type === "block"
                       ? () =>
@@ -628,7 +689,20 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   );
 
   return (
-    <div className="rp-root" ref={rootRef}>
+    <div
+      className="rp-root"
+      ref={rootRef}
+      style={
+        {
+          // Read by `.rp-editable:empty::before` in `editing.css`. A custom
+          // property because that pseudo-element can only see its own element's
+          // attributes, and the words have to come from `t()`. On the root, not
+          // on the pages: the measuring container is a sibling of them, and it
+          // has to count the same line the pages draw.
+          "--rp-placeholder": JSON.stringify(t("chrome.placeholder")),
+        } as React.CSSProperties
+      }
+    >
       {/* The zoomed subtree. The measuring container is a sibling, never a
           descendant, because `zoom` scales the numbers it would read. */}
       {mode === "edit" && apply !== undefined ? (

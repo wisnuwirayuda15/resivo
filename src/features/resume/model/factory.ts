@@ -5,6 +5,7 @@ import { DOCUMENT_VERSION } from "./document";
 import { sectionTitle } from "./sectionTitles";
 
 import type {
+  Block,
   ContactItem,
   DocumentKind,
   IconRef,
@@ -53,6 +54,58 @@ export const createContact = (
   ...(options.icon === undefined ? {} : { icon: icon(options.icon) }),
   ...(options.href === undefined ? {} : { href: options.href }),
 });
+
+/**
+ * The kinds of block the paper offers to insert.
+ *
+ * Not every kind. The ones left out cannot be filled in from the paper yet, and
+ * an empty block of them is a dead end: an image needs an asset to point at, a
+ * tag list draws nothing until it has a tag and the paper has no way to add one,
+ * a code block and a table have no editable field there, and `raw` is only ever
+ * what the parser could not read. Add a kind here when the paper can edit it.
+ */
+export const INSERTABLE_BLOCK_KINDS = [
+  "paragraph",
+  "heading",
+  "bulletList",
+  "entry",
+  "quote",
+  "divider",
+  "pageBreak",
+] as const;
+
+export type InsertableBlockKind = (typeof INSERTABLE_BLOCK_KINDS)[number];
+
+/**
+ * An empty block of `kind`, with a fresh id.
+ *
+ * Empty in the sense of "nothing the owner did not write", never a sample line.
+ * The one thing it does carry is a single empty run where a kind has a list of
+ * them (a bullet, a paragraph of a quote): a list with no items draws nothing,
+ * so there would be no field on the paper to click, and the block would be
+ * there and unreachable. The shapes are what the Markdown codec reads an empty
+ * one of each as, so the document and its Markdown agree.
+ */
+export const createBlock = (kind: InsertableBlockKind): Block => {
+  const id = createId();
+
+  switch (kind) {
+    case "paragraph":
+      return { id, kind, text: [] };
+    case "heading":
+      return { id, kind, level: 3, text: [] };
+    case "bulletList":
+      return { id, kind, items: [{ text: [] }] };
+    case "entry":
+      return { id, kind, title: [], bullets: [[]] };
+    case "quote":
+      return { id, kind, paragraphs: [[]] };
+    case "divider":
+      return { id, kind };
+    case "pageBreak":
+      return { id, kind };
+  }
+};
 
 export const createSection = (
   kind: SectionKind,

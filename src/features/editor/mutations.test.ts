@@ -279,6 +279,83 @@ describe("block edits", () => {
     ).toBe(true);
   });
 
+  it("duplicates a block right after itself, under a new id", () => {
+    const { document, sectionId } = withParagraph();
+    const next = apply(document, edit.duplicateBlock(sectionId, "block-1"));
+    const blocks =
+      next.content.sections.find((s) => s.id === sectionId)?.blocks ?? [];
+
+    expect(blocks).toHaveLength(2);
+    expect(blocks[0]?.id).toBe("block-1");
+    expect(blocks[1]?.id).not.toBe("block-1");
+    expect(blocks[1]).toMatchObject({
+      kind: "paragraph",
+      text: text("Original"),
+    });
+    expect(documentSchema.safeParse(next).success).toBe(true);
+  });
+
+  it("puts a duplicate in the middle, not at the end", () => {
+    const { document, sectionId } = withParagraph();
+    const three = apply(
+      document,
+      edit.addBlock(sectionId, { id: "block-2", kind: "divider" }),
+      edit.duplicateBlock(sectionId, "block-1"),
+    );
+    const ids =
+      three.content.sections
+        .find((s) => s.id === sectionId)
+        ?.blocks.map((block) => block.id) ?? [];
+
+    expect(ids).toHaveLength(3);
+    expect(ids[0]).toBe("block-1");
+    expect(ids[2]).toBe("block-2");
+  });
+
+  it("copies a block deeply, so editing one leaves the other alone", () => {
+    const document = createEmptyDocument();
+    const sectionId = document.content.sections[0]?.id ?? "";
+    const withEntry = apply(
+      document,
+      edit.addBlock(sectionId, {
+        id: "entry-1",
+        kind: "entry",
+        title: text("Analyst"),
+        bullets: [text("one"), text("two")],
+      }),
+      edit.duplicateBlock(sectionId, "entry-1"),
+    );
+    const copyId =
+      withEntry.content.sections.find((s) => s.id === sectionId)?.blocks[1]
+        ?.id ?? "";
+
+    const edited = apply(
+      withEntry,
+      edit.setEntryBullet(sectionId, copyId, 0, text("changed")),
+    );
+    const blocks =
+      edited.content.sections.find((s) => s.id === sectionId)?.blocks ?? [];
+    const bullets = (index: number) => {
+      const block = blocks[index];
+
+      return block?.kind === "entry" ? block.bullets.map(plainText) : [];
+    };
+
+    expect(bullets(0)).toEqual(["one", "two"]);
+    expect(bullets(1)).toEqual(["changed", "two"]);
+  });
+
+  it("does nothing to duplicate a block that is not there", () => {
+    const { document, sectionId } = withParagraph();
+
+    expect(apply(document, edit.duplicateBlock(sectionId, "nope"))).toBe(
+      document,
+    );
+    expect(apply(document, edit.duplicateBlock("nope", "block-1"))).toBe(
+      document,
+    );
+  });
+
   it("edits paragraph text", () => {
     const { document, sectionId } = withParagraph();
 

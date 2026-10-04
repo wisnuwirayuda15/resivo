@@ -27,6 +27,7 @@ interface ItemChromeProps {
    * so the row of controls does not change width as an item moves. */
   onMoveUp?: (() => void) | null;
   onMoveDown?: (() => void) | null;
+  onDuplicate?: () => void;
   onRemove?: () => void;
   /**
    * Controls for what this particular item is, an image's width, so far.
@@ -47,6 +48,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   movable,
   onMoveUp,
   onMoveDown,
+  onDuplicate,
   onRemove,
   extra,
   children,
@@ -114,6 +116,17 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
             >
               <span aria-hidden>↓</span>
             </button>
+
+            {onDuplicate === undefined ? null : (
+              <button
+                aria-label={t("chrome.duplicate")}
+                className="rp-chrome-button"
+                onClick={onDuplicate}
+                type="button"
+              >
+                <span aria-hidden>↳</span>
+              </button>
+            )}
 
             {onRemove === undefined ? null : (
               <button

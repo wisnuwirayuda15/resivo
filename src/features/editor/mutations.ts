@@ -345,6 +345,34 @@ export const addBlock =
     section.blocks.splice(index, 0, block as Draft<Block>);
   };
 
+/**
+ * A copy of a block, directly after it, with its own id.
+ *
+ * Copied through JSON because the source is an Immer draft, which
+ * `structuredClone` refuses, and a block is plain data with nothing in it that
+ * JSON would drop. Nothing inside a block has an id of its own (a bullet is its
+ * position), so renewing the block's is all that keeps the two apart.
+ */
+export const duplicateBlock =
+  (sectionId: string, blockId: string): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId);
+    const index =
+      section?.blocks.findIndex((block) => block.id === blockId) ?? -1;
+    const source = section?.blocks[index];
+
+    if (section === undefined || source === undefined) {
+      return;
+    }
+
+    const copy = JSON.parse(JSON.stringify(source)) as Block;
+
+    section.blocks.splice(index + 1, 0, {
+      ...copy,
+      id: createId(),
+    } as Draft<Block>);
+  };
+
 export const removeBlock =
   (sectionId: string, blockId: string): Recipe =>
   (draft) => {
