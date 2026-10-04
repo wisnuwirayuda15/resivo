@@ -158,14 +158,22 @@
  * cut off) while the box it was drawn around was fine.
  *
  * `clip-path` rather than a wider box or padding, because either would move the
- * text and the paginator's measurements. Negative insets on the sides only: the
- * top and bottom still clip at the page body, which is what hides the part of a
- * tall item that belongs to the next page. Eight is the outline's four, doubled
- * so a thicker one later does not bring this back. Reset for print below.
+ * text and the paginator's measurements. Negative insets on the sides and the
+ * top, and none at the bottom: the bottom still clips at the page body, which is
+ * what hides the part of a tall item that belongs to the next page. Eight is the
+ * outline's four, doubled so a thicker one later does not bring this back.
+ * Reset for print below.
+ *
+ * The top needs it for the same reason as the sides, found on the name. A field
+ * set in a large size has an inline box taller than its line, so it sits a few
+ * pixels above the line and, as the first thing on the page, above the page
+ * body. The outline round it lost its top edge, and the tops of the capitals
+ * were as close to being cut as the outline was. Nothing is above the body but
+ * the page's own margin, so there is nothing for the open top to reveal.
  */
 .rp-page .rp-page-body {
   overflow: visible;
-  clip-path: inset(0 -8px);
+  clip-path: inset(-8px -8px 0);
 }
 
 /* An editable field. Outline, never border: a border would take space and move
