@@ -39,6 +39,12 @@ interface ItemChromeProps {
    * render any of this, so no control here can move a page break.
    */
   extra?: React.ReactNode;
+  /**
+   * Something drawn over the item itself rather than in the chrome's corner, an
+   * image's resize handle. It has to be absolutely positioned and out of flow,
+   * for the reason the chrome has to be.
+   */
+  overlay?: React.ReactNode;
   children: React.ReactNode;
   className: string;
 }
@@ -51,6 +57,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   onDuplicate,
   onRemove,
   extra,
+  overlay,
   children,
   className,
 }) => {
@@ -147,6 +154,8 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
       ) : null}
 
       {children}
+
+      {overlay}
     </div>
   );
 };

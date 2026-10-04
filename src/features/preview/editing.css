@@ -126,6 +126,71 @@
   cursor: pointer;
 }
 
+/**
+ * An image's resize handle, and the ghost of the width a drag would commit.
+ *
+ * Both absolutely positioned inside the item, so neither takes any height. The
+ * handle sits on the figure's right edge (its `left` is the width, set by the
+ * component) and is only drawn while the pointer is over the item, or while a
+ * drag is under way, when the pointer is somewhere else entirely.
+ */
+.rp-resize {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 10px;
+  transform: translateX(-50%);
+  cursor: ew-resize;
+  touch-action: none;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 120ms ease-out;
+}
+
+.rp-resize::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: min(40px, 60%);
+  border-radius: 2px;
+  background: rgb(14, 124, 118);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+  transform: translate(-50%, -50%);
+}
+
+.rp-item:hover .rp-resize,
+.rp-resize[data-active] {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.rp-resize-ghost {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  border: 1px dashed rgb(14, 124, 118);
+  background: rgba(14, 124, 118, 0.08);
+  pointer-events: none;
+}
+
+.rp-resize-label {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: rgb(14, 124, 118);
+  color: white;
+  font-family: system-ui, sans-serif;
+  font-size: 11px;
+  line-height: 1.3;
+}
+
 /* The item being dragged. Dimmed rather than hidden, so the page it came from
    does not reflow while the pointer is still down. */
 .rp-item[data-dragging] {
@@ -217,7 +282,9 @@
 }
 
 @media print {
-  .rp-chrome {
+  .rp-chrome,
+  .rp-resize,
+  .rp-resize-ghost {
     display: none;
   }
 

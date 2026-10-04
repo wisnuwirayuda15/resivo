@@ -265,3 +265,55 @@ export const cardMenu = async (page: Page, title: string) => {
 
   return menu;
 };
+
+/**
+ * Presses at `from`, walks to `to` and releases, with a real pointer.
+ *
+ * The pointer walks in steps: dnd-kit only starts a drag after it has moved four
+ * pixels, and a handle follows where the pointer has been, so a single jump would
+ * be a click and a teleport, not a drag.
+ *
+ * The events go through CDP rather than `page.mouse`. Measured here: with a
+ * button down, `page.mouse.move` over the preview iframe never resolves once a
+ * drag has started (the page itself stays responsive, and no native drag is
+ * reported), while the same moves sent as `Input.dispatchMouseEvent` return at
+ * once and the drag completes. The app is not what hangs, Playwright's drag
+ * bookkeeping is, and the raw events are what a browser receives from a person.
+ */
+export const pointerDrag = async (
+  page: Page,
+  from: { x: number; y: number },
+  to: { x: number; y: number },
+  steps = 20,
+): Promise<void> => {
+  const cdp = await page.context().newCDPSession(page);
+  const send = (
+    type: "mouseMoved" | "mousePressed" | "mouseReleased",
+    x: number,
+    y: number,
+    buttons: number,
+  ) =>
+    cdp.send("Input.dispatchMouseEvent", {
+      type,
+      x,
+      y,
+      buttons,
+      button: buttons === 0 && type === "mouseMoved" ? "none" : "left",
+      clickCount: type === "mouseMoved" ? 0 : 1,
+    });
+
+  await send("mouseMoved", from.x, from.y, 0);
+  await send("mousePressed", from.x, from.y, 1);
+
+  for (let step = 1; step <= steps; step += 1) {
+    await send(
+      "mouseMoved",
+      from.x + ((to.x - from.x) * step) / steps,
+      from.y + ((to.y - from.y) * step) / steps,
+      1,
+    );
+  }
+
+  await send("mouseReleased", to.x, to.y, 0);
+  await cdp.detach();
+};

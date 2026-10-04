@@ -123,6 +123,7 @@ export const editor = {
     insert: "Sisipkan blok setelah ini",
     insertPlaceholder: "Sisipkan",
     duplicate: "Gandakan",
+    resize: "Seret untuk mengubah ukuran",
     placeholder: "Klik untuk menulis",
     blocks: {
       paragraph: "Paragraf",

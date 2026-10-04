@@ -5,6 +5,7 @@ import {
   openEmptyApp,
   paper,
   paperText,
+  pointerDrag,
   typeMarkdown,
 } from "./app";
 
@@ -65,20 +66,7 @@ const item = (page: Page, kind: "section" | "block", text: string): Locator =>
     .filter({ hasText: text })
     .first();
 
-/**
- * Picks `from` up by its grip and puts it down on the middle of `onto`.
- *
- * The pointer walks there in steps. dnd-kit only starts a drag after the pointer
- * has moved four pixels, and it picks the drop target from where the pointer has
- * been, so a single jump would be a click and a teleport, not a drag.
- *
- * The events go through CDP rather than `page.mouse`. Measured here: with a
- * button down, `page.mouse.move` over the preview iframe never resolves once
- * the drag has started (the page itself stays responsive, and no native drag is
- * reported), while the same moves sent as `Input.dispatchMouseEvent` return at
- * once and the drag completes. The app is not what hangs, Playwright's drag
- * bookkeeping is, and the raw events are what a browser receives from a person.
- */
+/** Picks `from` up by its grip and puts it down on the middle of `onto`. */
 const drag = async (page: Page, from: Locator, onto: Locator) => {
   // The chrome is inert until its item is hovered, which is also what a person
   // has to do before they can see the grip.
@@ -94,42 +82,11 @@ const drag = async (page: Page, from: Locator, onto: Locator) => {
     throw new Error("the grip or the drop target has no box");
   }
 
-  const cdp = await page.context().newCDPSession(page);
-  const send = (
-    type: "mouseMoved" | "mousePressed" | "mouseReleased",
-    x: number,
-    y: number,
-    buttons: number,
-  ) =>
-    cdp.send("Input.dispatchMouseEvent", {
-      type,
-      x,
-      y,
-      buttons,
-      button: buttons === 0 && type === "mouseMoved" ? "none" : "left",
-      clickCount: type === "mouseMoved" ? 0 : 1,
-    });
-
-  const fromX = start.x + start.width / 2;
-  const fromY = start.y + start.height / 2;
-  const toX = end.x + end.width / 2;
-  const toY = end.y + end.height / 2;
-  const steps = 20;
-
-  await send("mouseMoved", fromX, fromY, 0);
-  await send("mousePressed", fromX, fromY, 1);
-
-  for (let step = 1; step <= steps; step += 1) {
-    await send(
-      "mouseMoved",
-      fromX + ((toX - fromX) * step) / steps,
-      fromY + ((toY - fromY) * step) / steps,
-      1,
-    );
-  }
-
-  await send("mouseReleased", toX, toY, 0);
-  await cdp.detach();
+  await pointerDrag(
+    page,
+    { x: start.x + start.width / 2, y: start.y + start.height / 2 },
+    { x: end.x + end.width / 2, y: end.y + end.height / 2 },
+  );
 };
 
 /** Where each word first appears on the paper, so an order can be asserted. */

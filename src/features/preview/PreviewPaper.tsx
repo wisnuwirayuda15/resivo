@@ -36,6 +36,7 @@ import {
 import { resolveTemplate } from "@/features/templates/registry";
 
 import { documentFlow, flowItemClass } from "./flow";
+import { ImageResizeHandle } from "./ImageResizeHandle";
 import { ItemChrome } from "./ItemChrome";
 import { isMovable, moveRecipe, stepRecipe } from "./reorder";
 import { paginate } from "./paginate";
@@ -554,6 +555,36 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     );
   };
 
+  /**
+   * The handle that drags an image's width, or nothing for any other item.
+   *
+   * It sets the same `widthPercent` the dropdown does, through the same recipe,
+   * so the two cannot disagree: the dropdown stays as the way to do it from the
+   * keyboard, which a drag is not.
+   */
+  const resizeHandle = (item: FlowItem): React.ReactNode => {
+    if (item.type !== "block" || apply === undefined) {
+      return undefined;
+    }
+
+    const block = document.content.sections
+      .find((section) => section.id === item.sectionId)
+      ?.blocks.find((candidate) => candidate.id === item.blockId);
+
+    if (block?.kind !== "image") {
+      return undefined;
+    }
+
+    return (
+      <ImageResizeHandle
+        onResize={(next) =>
+          apply(setImageWidth(item.sectionId ?? "", item.blockId ?? "", next))
+        }
+        percent={block.widthPercent ?? 100}
+      />
+    );
+  };
+
   /** The kind of block a flow item stands for, or `undefined` for a heading. */
   const blockKind = (item: FlowItem): Block["kind"] | undefined =>
     document.content.sections
@@ -653,6 +684,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                   id={id}
                   key={id}
                   movable={isMovable(item)}
+                  overlay={resizeHandle(item)}
                   onMoveDown={step(item, 1)}
                   onMoveUp={step(item, -1)}
                   onDuplicate={

@@ -127,6 +127,7 @@ export const editor = {
     insert: "Insert a block after this",
     insertPlaceholder: "Insert",
     duplicate: "Duplicate",
+    resize: "Drag to resize",
     placeholder: "Click to write",
     blocks: {
       paragraph: "Paragraph",

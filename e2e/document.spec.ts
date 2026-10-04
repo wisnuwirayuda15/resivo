@@ -7,8 +7,11 @@ import {
   openInspectorTab,
   paper,
   paperText,
+  pointerDrag,
   typeMarkdown,
 } from "./app";
+
+import type { Page } from "@playwright/test";
 
 /**
  * The parts of the document model that had no way in.
@@ -43,9 +46,8 @@ test("adds and removes a header contact", async ({ page }) => {
     .not.toContain("ada@example.com");
 });
 
-test("sets how wide an image draws", async ({ page }) => {
-  test.slow();
-
+/** Stores an image and inserts it into the Summary section. */
+const insertImage = async (page: Page): Promise<void> => {
   await openInspectorTab(page, "Assets");
 
   const chooser = page.waitForEvent("filechooser");
@@ -67,6 +69,12 @@ test("sets how wide an image draws", async ({ page }) => {
   await page.getByRole("combobox", { name: "Section to insert into" }).click();
   await page.getByRole("option", { name: "Summary" }).click();
   await page.getByRole("button", { name: "Insert" }).click();
+};
+
+test("sets how wide an image draws", async ({ page }) => {
+  test.slow();
+
+  await insertImage(page);
 
   const figure = paper(page).locator("[data-paged] .rp-figure").first();
   await expect(figure).toBeVisible({ timeout: 15_000 });
@@ -95,6 +103,73 @@ test("sets how wide an image draws", async ({ page }) => {
   // Back to 100 clears the property rather than writing it, so an exported
   // Markdown file carries no redundant attribute.
   await width.selectOption("100");
+
+  await expect
+    .poll(() => figure.evaluate((node) => node.style.width), {
+      timeout: 15_000,
+    })
+    .toBe("");
+});
+
+test("drags an image's handle to set its width", async ({ page }) => {
+  test.slow();
+
+  await insertImage(page);
+
+  const figure = paper(page).locator("[data-paged] .rp-figure").first();
+  await expect(figure).toBeVisible({ timeout: 15_000 });
+
+  await page
+    .locator("label")
+    .filter({ hasText: /^Visual$/ })
+    .click();
+
+  const item = paper(page).locator("[data-paged] .rp-item--block").first();
+  const handle = item.locator(".rp-resize");
+
+  // Inert until the item is hovered, which is also when a person can see it.
+  await item.hover();
+
+  const handleBox = await handle.boundingBox();
+  const itemBox = await item.boundingBox();
+
+  if (handleBox === null || itemBox === null) {
+    throw new Error("the handle or its item has no box");
+  }
+
+  // Half way across the column.
+  const half = itemBox.x + itemBox.width / 2;
+  const middle = handleBox.y + handleBox.height / 2;
+
+  await pointerDrag(
+    page,
+    { x: handleBox.x + handleBox.width / 2, y: middle },
+    { x: half, y: middle },
+  );
+
+  const widthNow = () =>
+    figure.evaluate((node) => Number.parseInt(node.style.width, 10));
+
+  // Rounded to a whole percent from where the pointer let go, so a few either
+  // side of 50 is the pointer's own jitter and not a defect.
+  await expect.poll(widthNow, { timeout: 15_000 }).toBeGreaterThanOrEqual(47);
+  await expect.poll(widthNow).toBeLessThanOrEqual(53);
+
+  // Past the right edge it means the whole column, which is stored as no width
+  // at all, the same as the dropdown's 100%.
+  await item.hover();
+
+  const narrowed = await handle.boundingBox();
+
+  if (narrowed === null) {
+    throw new Error("the handle has no box");
+  }
+
+  await pointerDrag(
+    page,
+    { x: narrowed.x + narrowed.width / 2, y: middle },
+    { x: itemBox.x + itemBox.width + 30, y: middle },
+  );
 
   await expect
     .poll(() => figure.evaluate((node) => node.style.width), {
