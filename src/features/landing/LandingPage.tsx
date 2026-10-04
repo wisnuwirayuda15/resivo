@@ -1,3 +1,4 @@
+import { getRouteApi } from "@tanstack/react-router";
 import { Box } from "@mantine/core";
 
 import { SITE_DESCRIPTION, SITE_NAME } from "@/lib/seo";
@@ -35,10 +36,12 @@ import { TemplateShowcase } from "./TemplateShowcase";
  * rather than through the route's `head`, because `head` takes meta and link
  * tags and this is neither.
  */
-const STRUCTURED_DATA = {
+const structuredData = (origin: string | null) => ({
   "@context": "https://schema.org",
   "@type": "SoftwareApplication",
   name: SITE_NAME,
+  // Only when the deployment knows its address: a relative `url` is not valid.
+  ...(origin === null ? {} : { url: origin }),
   applicationCategory: "BusinessApplication",
   applicationSubCategory: "Resume builder",
   operatingSystem: "Any, runs in a web browser",
@@ -51,25 +54,33 @@ const STRUCTURED_DATA = {
     "Export to PDF, self-contained HTML or Markdown",
     "Stores everything in the browser, with no account and no server",
   ],
+});
+
+const route = getRouteApi("/");
+
+export const LandingPage: React.FC = () => {
+  const origin = route.useLoaderData();
+
+  return (
+    <Box className="bg-app min-h-dvh">
+      <noscript>
+        <style>{"[data-reveal]{opacity:1;transform:none}"}</style>
+      </noscript>
+
+      <script
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(structuredData(origin)),
+        }}
+        type="application/ld+json"
+      />
+
+      <LandingNav />
+      <Hero />
+      <Surfaces />
+      <TemplateShowcase />
+      <LocalFirst />
+      <Capabilities />
+      <Closing />
+    </Box>
+  );
 };
-
-export const LandingPage: React.FC = () => (
-  <Box className="bg-app min-h-dvh">
-    <noscript>
-      <style>{"[data-reveal]{opacity:1;transform:none}"}</style>
-    </noscript>
-
-    <script
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(STRUCTURED_DATA) }}
-      type="application/ld+json"
-    />
-
-    <LandingNav />
-    <Hero />
-    <Surfaces />
-    <TemplateShowcase />
-    <LocalFirst />
-    <Capabilities />
-    <Closing />
-  </Box>
-);

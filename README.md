@@ -306,9 +306,10 @@ an environment variable in the Vercel project). Without it the
 address of the incoming request is used, which is right locally and behind a
 proxy that forwards the real host, but a `Host` header is chosen by whoever
 sends the request, so do not rely on it for a public site. Where no origin can be
-found at all, the absolute tags are left out rather than guessed. The landing
-page's canonical and the social card on the app's own pages stay root-relative,
-as they always were.
+found at all, the absolute tags are left out rather than guessed. The three public
+pages (`/`, `/templates`, `/about`) use the same origin for their canonical, the
+social card image and the structured data, and fall back to root-relative
+addresses when there is none.
 
 **Two things in `PRD.md` were superseded while building, and the file is left as
 it was written.** It lists Iconify web components in the stack and Phosphor with

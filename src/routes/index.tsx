@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 
 import { LandingPage } from "@/features/landing/LandingPage";
-import { SITE_DESCRIPTION, seo } from "@/lib/seo";
+import { SITE_DESCRIPTION, seo, seoLinks } from "@/lib/seo";
+import { getSiteOrigin } from "@/lib/siteOriginFn";
 
 /**
  * The landing page.
@@ -17,21 +18,27 @@ import { SITE_DESCRIPTION, seo } from "@/lib/seo";
  * sentence to live.
  */
 export const Route = createFileRoute("/")({
-  head: () => ({
+  loader: () => getSiteOrigin(),
+  head: ({ loaderData: origin }) => ({
     meta: seo({
       title: "Resivo, a local-first resume builder",
       description: SITE_DESCRIPTION,
+      origin,
+      path: "/",
     }),
     links: [
       /**
        * The one page worth naming a canonical for.
        *
-       * Relative, because the repo does not know the origin it is deployed to
-       * and a hardcoded one would be wrong everywhere else. A relative
-       * canonical resolves against the page, which is what makes `/` the
-       * canonical form of `/index.html` or `/?utm_source=...`.
+       * Absolute when the deployment knows its origin (`SITE_URL`, or the
+       * request), and relative when it does not, because a hardcoded domain would
+       * be wrong everywhere else. A relative canonical resolves against the page,
+       * which is what makes `/` the canonical form of `/index.html` or
+       * `/?utm_source=...`.
        */
-      { rel: "canonical", href: "/" },
+      ...(origin
+        ? seoLinks({ origin, path: "/" })
+        : [{ rel: "canonical", href: "/" }]),
     ],
   }),
   component: LandingPage,

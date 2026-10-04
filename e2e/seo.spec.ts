@@ -38,14 +38,19 @@ test("the landing page is described, indexable and unfurlable", async ({
 
   // The social card, and the size that makes the wordmark on it legible.
   expect(await content(page, 'meta[property="og:title"]')).toContain("Resivo");
-  expect(await content(page, 'meta[property="og:image"]')).toBe("/og.png");
+  expect(await content(page, 'meta[property="og:image"]')).toMatch(
+    /^https?:[/][/][^/]+[/]og[.]png$/,
+  );
+  expect(await content(page, 'meta[property="og:url"]')).toMatch(
+    /^https?:[/][/][^/]+[/]$/,
+  );
   expect(await content(page, 'meta[name="twitter:card"]')).toBe(
     "summary_large_image",
   );
 
   await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
     "href",
-    "/",
+    /^https?:[/][/][^/]+[/]$/,
   );
 
   // Exactly one h1, and it is the claim rather than the wordmark.
@@ -82,6 +87,7 @@ test("the structured data parses and names the app", async ({ page }) => {
 
   expect(data["@type"]).toBe("SoftwareApplication");
   expect(data.name).toBe("Resivo");
+  expect(data.url).toMatch(/^https?:[/][/][^/]+$/);
   expect(data.featureList.length).toBeGreaterThan(3);
 });
 
@@ -100,6 +106,14 @@ test("the two other public pages carry their own title and description", async (
     const description = await content(page, 'meta[name="description"]');
     expect((description ?? "").length).toBeGreaterThan(40);
     expect((description ?? "").length).toBeLessThanOrEqual(DESCRIPTION_MAX);
+
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+      "href",
+      new RegExp("^https?://[^/]+" + path + "$"),
+    );
+    expect(await content(page, 'meta[property="og:image"]')).toMatch(
+      /^https?:[/][/]/,
+    );
 
     // The shell renders the route title as the page's h1.
     await expect(page.locator("h1")).toHaveCount(1);

@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Box, Text } from "@mantine/core";
 
-import { seo } from "@/lib/seo";
+import { seo, seoLinks } from "@/lib/seo";
+import { getSiteOrigin } from "@/lib/siteOriginFn";
 
 import { Shell } from "@/components/shell/Shell";
 import { TemplateTile } from "@/features/resume/components/TemplateTile";
@@ -46,12 +47,16 @@ const TemplatesRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute("/templates")({
-  head: () => ({
+  loader: () => getSiteOrigin(),
+  head: ({ loaderData: origin }) => ({
     meta: seo({
       title: "ATS-friendly resume templates | Resivo",
       description:
         "Single-column resume templates, all pure CSS over one shared markup, all readable by an applicant tracking system.",
+      origin,
+      path: "/templates",
     }),
+    links: seoLinks({ origin: origin ?? null, path: "/templates" }),
   }),
   component: TemplatesRoute,
 });

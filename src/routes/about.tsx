@@ -1,7 +1,8 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { Box, Text } from "@mantine/core";
 
-import { seo } from "@/lib/seo";
+import { seo, seoLinks } from "@/lib/seo";
+import { getSiteOrigin } from "@/lib/siteOriginFn";
 
 import { Shell } from "@/components/shell/Shell";
 import { Trans, useTranslation } from "@/lib/i18n/useTranslation";
@@ -96,12 +97,16 @@ const AboutRoute: React.FC = () => {
 };
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
+  loader: () => getSiteOrigin(),
+  head: ({ loaderData: origin }) => ({
     meta: seo({
       title: "About Resivo, and what local-first costs",
       description:
         "What Resivo is, how a resume builder with no server works, and the one thing to know before you clear your browser storage.",
+      origin,
+      path: "/about",
     }),
+    links: seoLinks({ origin: origin ?? null, path: "/about" }),
   }),
   component: AboutRoute,
 });

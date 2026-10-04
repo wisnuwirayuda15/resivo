@@ -24,10 +24,9 @@ export const SITE_DESCRIPTION =
  * The social card.
  *
  * Root-relative unless an origin is passed to `seo()`. An absolute URL needs an
- * origin, this repo does not know the domain it will be deployed to, and a
- * wrong absolute URL is worse than a relative one: crawlers that require absolute resolve it against the
- * page, and a hardcoded domain would break every deployment that is not that
- * domain. `bun run generate-og` rebuilds the file.
+ * origin, and the repo does not know the domain it is deployed to: the public
+ * pages read it from the deployment (see `getSiteOrigin`), and a hardcoded one
+ * would be wrong on every other domain. `bun run generate-og` rebuilds the file.
  */
 export const OG_IMAGE = "/og.png";
 
