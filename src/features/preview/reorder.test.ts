@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { createEmptyDocument } from "@/features/resume/model/index";
 
 import { documentFlow } from "./flow";
-import { isMovable, moveRecipe, stepRecipe } from "./reorder";
+import { dropMark, isMovable, moveRecipe, stepRecipe } from "./reorder";
 
 import type { FlowItem } from "./flow";
 import type { Recipe } from "@/features/editor/mutations";
@@ -277,5 +277,72 @@ describe("stepRecipe", () => {
     const next = run(document, step(document, "section:s1", 1));
 
     expect(order(next).map(([id]) => id)).toEqual(["s2", "s3", "s1"]);
+  });
+});
+
+describe("dropMark", () => {
+  const mark = (
+    document: ResumeDocument,
+    subjectId: string,
+    targetId: string,
+  ) => {
+    const items = documentFlow(document);
+
+    return dropMark(
+      document,
+      items,
+      find(items, subjectId),
+      find(items, targetId),
+    );
+  };
+
+  it("draws below the target when a block moves down inside its section", () => {
+    expect(mark(build(TWO_SECTIONS), "block:a", "block:c")).toEqual({
+      id: "block:c",
+      edge: "after",
+    });
+  });
+
+  it("draws above the target when a block moves up inside its section", () => {
+    expect(mark(build(TWO_SECTIONS), "block:c", "block:a")).toEqual({
+      id: "block:a",
+      edge: "before",
+    });
+  });
+
+  it("draws above the target when a block goes into another section", () => {
+    expect(mark(build(TWO_SECTIONS), "block:a", "block:e")).toEqual({
+      id: "block:e",
+      edge: "before",
+    });
+  });
+
+  it("draws just below the heading a block is dropped on", () => {
+    expect(mark(build(TWO_SECTIONS), "block:a", "section:s2")).toEqual({
+      id: "section:s2",
+      edge: "after",
+    });
+  });
+
+  it("draws after the whole target section when a section moves down", () => {
+    expect(mark(build(TWO_SECTIONS), "section:s1", "section:s2")).toEqual({
+      id: "block:e",
+      edge: "after",
+    });
+  });
+
+  it("draws above the target heading when a section moves up", () => {
+    expect(mark(build(TWO_SECTIONS), "section:s2", "section:s1")).toEqual({
+      id: "section:s1",
+      edge: "before",
+    });
+  });
+
+  it("draws nothing for a drop that would do nothing", () => {
+    const document = build(TWO_SECTIONS);
+
+    // A section on a block, a block on itself, anything on the header.
+    expect(mark(document, "section:s1", "block:d")).toBeNull();
+    expect(mark(document, "block:a", "block:a")).toBeNull();
   });
 });

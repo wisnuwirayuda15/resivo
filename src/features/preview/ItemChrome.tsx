@@ -1,6 +1,10 @@
+import { useState } from "react";
+
 import { useSortable } from "@dnd-kit/sortable";
 
 import { useTranslation } from "@/lib/i18n/useTranslation";
+
+import type { DropEdge } from "./reorder";
 
 /**
  * The editing chrome around one flow item.
@@ -30,6 +34,16 @@ interface ItemChromeProps {
   onDuplicate?: () => void;
   onRemove?: () => void;
   /**
+   * Ask twice before removing. The first press only arms the button, which turns
+   * red and says so, and the second does it; moving focus away disarms it. For a
+   * delete that takes more with it than the thing under the pointer, a section
+   * and every block in it. A native dialog would do, and there is no component
+   * library in the iframe to draw a better one.
+   */
+  confirmRemove?: boolean;
+  /** Where a drag in progress would land relative to this item, if it would. */
+  dropEdge?: DropEdge;
+  /**
    * Controls for what this particular item is, an image's width, so far.
    *
    * Rendered on a second row of the chrome rather than beside the buttons: the
@@ -56,20 +70,17 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   onMoveDown,
   onDuplicate,
   onRemove,
+  confirmRemove = false,
+  dropEdge,
   extra,
   overlay,
   children,
   className,
 }) => {
   const { t } = useTranslation("editor");
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    setActivatorNodeRef,
-    isDragging,
-    isOver,
-  } = useSortable({ id, disabled: !movable });
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } =
+    useSortable({ id, disabled: !movable });
+  const [armed, setArmed] = useState(false);
 
   /**
    * No transform is applied, unlike a normal sortable list.
@@ -77,14 +88,14 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
    * The items of one section can be split across two page boxes, so the
    * "translate everything below the gap downwards" animation a sorting strategy
    * produces would slide content off one page and not onto the next. The drop
-   * position is shown with a rule instead, see `[data-over]` in `frame.css`.
+   * position is shown with a rule instead, see `[data-drop]` in `editing.css`.
    */
   return (
     <div
       className={className}
       data-dragging={isDragging ? "" : undefined}
       data-flow-id={id}
-      data-over={isOver && !isDragging ? "" : undefined}
+      data-drop={isDragging ? undefined : dropEdge}
       ref={setNodeRef}
     >
       {movable ? (
@@ -137,12 +148,25 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
 
             {onRemove === undefined ? null : (
               <button
-                aria-label={t("chrome.delete")}
+                aria-label={
+                  armed ? t("chrome.confirmDelete") : t("chrome.delete")
+                }
                 className="rp-chrome-button rp-chrome-danger"
-                onClick={onRemove}
+                data-armed={armed ? "" : undefined}
+                onBlur={() => setArmed(false)}
+                onClick={() => {
+                  if (confirmRemove && !armed) {
+                    setArmed(true);
+
+                    return;
+                  }
+
+                  setArmed(false);
+                  onRemove();
+                }}
                 type="button"
               >
-                <span aria-hidden>×</span>
+                <span aria-hidden>{armed ? t("chrome.sure") : "×"}</span>
               </button>
             )}
           </div>

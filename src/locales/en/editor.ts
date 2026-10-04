@@ -128,6 +128,10 @@ export const editor = {
     insertPlaceholder: "Insert",
     duplicate: "Duplicate",
     resize: "Drag to resize",
+    sectionBreak: "Start this section on a new page",
+    sectionBreakOff: "Stop this section starting on a new page",
+    confirmDelete: "Press again to delete this section and everything in it",
+    sure: "Sure?",
     placeholder: "Click to write",
     blocks: {
       paragraph: "Paragraph",

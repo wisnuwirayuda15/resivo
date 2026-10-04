@@ -131,3 +131,133 @@ test("drags a block into another section", async ({ page }) => {
     )
     .toEqual(["Gamma paragraph.", "Alpha paragraph.", "Skills"]);
 });
+
+test("drags a section onto the next page by holding at the bottom edge", async ({
+  page,
+}) => {
+  test.slow();
+
+  // Enough lines to run to a second page, short ones, because the Markdown pane
+  // is typed a key at a time.
+  const lines = Array.from({ length: 70 }, (_, index) => `L${index}`).join(
+    "\n\n",
+  );
+
+  await typeMarkdown(
+    page,
+    [
+      "# Ada Lovelace",
+      "",
+      "## Summary",
+      "",
+      "Alpha paragraph.",
+      "",
+      "## Skills",
+      "",
+      "Beta paragraph.",
+      "",
+      "## Long",
+      "",
+      lines,
+    ].join("\n"),
+  );
+
+  await expect
+    .poll(() => paper(page).locator(".rp-page").count(), { timeout: 60_000 })
+    .toBeGreaterThan(1);
+
+  const scrollTop = () =>
+    page.evaluate(
+      () =>
+        document.querySelector("iframe")?.contentDocument?.scrollingElement
+          ?.scrollTop ?? -1,
+    );
+
+  expect(await scrollTop()).toBe(0);
+
+  const skills = item(page, "section", "Skills");
+  await skills.hover();
+
+  const grip = await skills
+    .getByRole("button", { name: "Drag to move" })
+    .boundingBox();
+  const frame = await page.locator("iframe").boundingBox();
+
+  if (grip === null || frame === null) {
+    throw new Error("the grip or the frame has no box");
+  }
+
+  // Held in the bottom band of the window. dnd-kit's own scrolling watches the
+  // dragged item, which never moves here, so without this the next page cannot
+  // be reached by a drag at all.
+  await pointerDrag(
+    page,
+    { x: grip.x + grip.width / 2, y: grip.y + grip.height / 2 },
+    { x: frame.x + frame.width / 2, y: frame.y + frame.height - 6 },
+    12,
+    1500,
+  );
+
+  await expect.poll(scrollTop, { timeout: 10_000 }).toBeGreaterThan(200);
+});
+
+test("shows where a section would land, and nothing for a drop that does nothing", async ({
+  page,
+}) => {
+  const skills = item(page, "section", "Skills");
+  const projects = item(page, "section", "Projects");
+
+  await skills.hover();
+
+  const grip = await skills
+    .getByRole("button", { name: "Drag to move" })
+    .boundingBox();
+  const over = await projects.boundingBox();
+
+  if (grip === null || over === null) {
+    throw new Error("the grip or the target has no box");
+  }
+
+  const cdp = await page.context().newCDPSession(page);
+  const send = (
+    type: "mouseMoved" | "mousePressed" | "mouseReleased",
+    x: number,
+    y: number,
+    buttons: number,
+  ) =>
+    cdp.send("Input.dispatchMouseEvent", {
+      type,
+      x,
+      y,
+      buttons,
+      button: type === "mouseMoved" && buttons === 0 ? "none" : "left",
+      clickCount: type === "mouseMoved" ? 0 : 1,
+    });
+
+  const x = grip.x + grip.width / 2;
+  const y = grip.y + grip.height / 2;
+
+  await send("mouseMoved", x, y, 0);
+  await send("mousePressed", x, y, 1);
+
+  for (let step = 1; step <= 12; step += 1) {
+    await send(
+      "mouseMoved",
+      x + ((over.x + over.width / 2 - x) * step) / 12,
+      y + ((over.y + 8 - y) * step) / 12,
+      1,
+    );
+  }
+
+  // A section dragged down lands after the whole of the one it was dropped on,
+  // so the rule is under that section's last block, not under its heading.
+  const gamma = item(page, "block", "Gamma paragraph.");
+
+  await expect(gamma).toHaveAttribute("data-drop", "after");
+  await expect(projects).not.toHaveAttribute("data-drop", /.+/);
+
+  await send("mouseReleased", over.x + over.width / 2, over.y + 8, 0);
+  await cdp.detach();
+
+  await expect(gamma).not.toHaveAttribute("data-drop", /.+/);
+});

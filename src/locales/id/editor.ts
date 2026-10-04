@@ -124,6 +124,10 @@ export const editor = {
     insertPlaceholder: "Sisipkan",
     duplicate: "Gandakan",
     resize: "Seret untuk mengubah ukuran",
+    sectionBreak: "Mulai bagian ini di halaman baru",
+    sectionBreakOff: "Berhenti memulai bagian ini di halaman baru",
+    confirmDelete: "Tekan lagi untuk menghapus bagian ini beserta isinya",
+    sure: "Yakin?",
     placeholder: "Klik untuk menulis",
     blocks: {
       paragraph: "Paragraf",

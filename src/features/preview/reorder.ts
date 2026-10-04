@@ -184,3 +184,79 @@ export const stepRecipe = (
 
   return null;
 };
+
+export type DropEdge = "before" | "after";
+
+/** A flow item, and the edge of it where a drop would land. */
+export interface DropMark {
+  id: string;
+  edge: DropEdge;
+}
+
+/**
+ * Where on the page a drop would land, which is not always where the pointer is.
+ *
+ * `moveRecipe` says what a drop means, and it does not mean "above the item
+ * under the pointer": a block dragged down inside its section ends up below the
+ * one it was dropped on, and dragged up, above it. A section dragged down lands
+ * after the whole of the section it was dropped on, not after its heading. A
+ * rule drawn at the top of whatever is under the pointer was right half the time
+ * and misleading the other half, which is the half that put things one place off
+ * from where the rule said.
+ *
+ * It is derived from \`moveRecipe\` returning a recipe, so a drop that would do
+ * nothing draws nothing, instead of promising a place it will not go.
+ */
+export const dropMark = (
+  document: ResumeDocument,
+  items: ReadonlyArray<FlowItem>,
+  subject: FlowItem,
+  target: FlowItem,
+): DropMark | null => {
+  if (moveRecipe(document, subject, target) === null) {
+    return null;
+  }
+
+  const sections = document.content.sections;
+
+  if (subject.type === "sectionHeading") {
+    const from = sections.findIndex(
+      (section) => section.id === subject.sectionId,
+    );
+    const to = sections.findIndex((section) => section.id === target.sectionId);
+
+    if (from < to) {
+      // The last item that belongs to it, found from the end: the flow is flat,
+      // so "the end of a section" is only the last item that names it.
+      let last = target;
+
+      for (const item of items) {
+        if (item.sectionId === target.sectionId) {
+          last = item;
+        }
+      }
+
+      return { id: last.id, edge: "after" };
+    }
+
+    return { id: target.id, edge: "before" };
+  }
+
+  // Dropped on a heading, a block goes to the top of that section: just below it.
+  if (target.type === "sectionHeading") {
+    return { id: target.id, edge: "after" };
+  }
+
+  if (subject.sectionId === target.sectionId) {
+    const blocks =
+      sections.find((section) => section.id === subject.sectionId)?.blocks ??
+      [];
+    const from = blocks.findIndex((block) => block.id === subject.blockId);
+    const to = blocks.findIndex((block) => block.id === target.blockId);
+
+    return { id: target.id, edge: from < to ? "after" : "before" };
+  }
+
+  // Into another section a block takes the target's index, so it lands above.
+  return { id: target.id, edge: "before" };
+};

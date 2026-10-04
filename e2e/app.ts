@@ -285,6 +285,10 @@ export const pointerDrag = async (
   from: { x: number; y: number },
   to: { x: number; y: number },
   steps = 20,
+  /** Keep the button down this long at `to` before letting go, moving a pixel
+   * back and forth so the browser keeps sending events, which is what a held
+   * drag at the edge of a page looks like. */
+  holdMs = 0,
 ): Promise<void> => {
   const cdp = await page.context().newCDPSession(page);
   const send = (
@@ -312,6 +316,13 @@ export const pointerDrag = async (
       from.y + ((to.y - from.y) * step) / steps,
       1,
     );
+  }
+
+  const until = Date.now() + holdMs;
+
+  for (let tick = 0; Date.now() < until; tick += 1) {
+    await send("mouseMoved", to.x, to.y - (tick % 2), 1);
+    await page.waitForTimeout(40);
   }
 
   await send("mouseReleased", to.x, to.y, 0);

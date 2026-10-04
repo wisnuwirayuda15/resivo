@@ -98,6 +98,22 @@
   cursor: default;
 }
 
+/* Armed: the next press deletes. Wider than a square button, because it says so
+   in words, and red the whole time so it cannot be mistaken for the idle state. */
+.rp-chrome-button[data-armed] {
+  width: auto;
+  padding: 0 6px;
+  border-color: rgb(176, 42, 42);
+  background: rgb(176, 42, 42);
+  color: white;
+}
+
+.rp-chrome-button[aria-pressed="true"] {
+  border-color: rgba(14, 124, 118, 0.5);
+  background: rgba(14, 124, 118, 0.12);
+  color: rgb(14, 124, 118);
+}
+
 .rp-chrome-danger:hover:not(:disabled) {
   border-color: rgba(176, 42, 42, 0.4);
   color: rgb(176, 42, 42);
@@ -204,13 +220,21 @@
  * one section's items can be split across two page boxes, and a translate would
  * slide content off the bottom of one page without it appearing on the next.
  */
-.rp-item[data-over]::before {
+.rp-item[data-drop="before"]::before,
+.rp-item[data-drop="after"]::after {
   content: "";
   position: absolute;
-  top: 0;
   right: 0;
   left: 0;
   border-top: 2px solid rgb(14, 124, 118);
+}
+
+.rp-item[data-drop="before"]::before {
+  top: 0;
+}
+
+.rp-item[data-drop="after"]::after {
+  bottom: 0;
 }
 
 /**
@@ -293,7 +317,8 @@
     clip-path: none;
   }
 
-  .rp-item[data-over]::before {
+  .rp-item[data-drop]::before,
+  .rp-item[data-drop]::after {
     display: none;
   }
 

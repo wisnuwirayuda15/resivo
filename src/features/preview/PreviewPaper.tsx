@@ -25,7 +25,9 @@ import {
   addBlock,
   duplicateBlock,
   removeBlock,
+  removeSection,
   setImageWidth,
+  setSectionBreakBefore,
 } from "@/features/editor/mutations";
 
 import { createId } from "@/lib/id";
@@ -38,12 +40,13 @@ import { resolveTemplate } from "@/features/templates/registry";
 import { documentFlow, flowItemClass } from "./flow";
 import { ImageResizeHandle } from "./ImageResizeHandle";
 import { ItemChrome } from "./ItemChrome";
-import { isMovable, moveRecipe, stepRecipe } from "./reorder";
+import { dropMark, isMovable, moveRecipe, stepRecipe } from "./reorder";
 import { paginate } from "./paginate";
 import { renderFlow } from "./renderFlow";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
-import type { DragEndEvent } from "@dnd-kit/core";
+import type { DragEndEvent, DragOverEvent } from "@dnd-kit/core";
+import type { DropMark } from "./reorder";
 import type { Recipe } from "@/features/editor/mutations";
 import type { InsertableBlockKind } from "@/features/resume/model/factory";
 import type { ImageMap } from "@/features/assets/useAssetUrls";
@@ -59,6 +62,14 @@ import type {
   ResumeDocument,
   TemplateId,
 } from "@/features/resume/model/document";
+
+/** How close to the top or bottom of the window a held drag starts to scroll
+ * the page, and the most it scrolls in a frame. 56 is about the height of a
+ * heading, which is the thing being aimed at on the page below; 18 crosses a
+ * page of this height in a couple of seconds, which is quick and still
+ * stoppable. */
+const AUTOSCROLL_EDGE_PX = 56;
+const AUTOSCROLL_MAX_PX = 18;
 
 /**
  * The paper itself, rendered inside the preview iframe.
@@ -437,7 +448,101 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     useSensor(KeyboardSensor),
   );
 
+  /**
+   * Where the drag in progress would land, for the rule that says so.
+   *
+   * State, not derived on render: it is a function of the pointer, which dnd-kit
+   * reports through `onDragOver`, and only the item it names should re-render.
+   */
+  const [mark, setMark] = useState<DropMark | null>(null);
+
+  const [dragging, setDragging] = useState(false);
+
+  const startDrag = () => setDragging(true);
+
+  const endDrag = () => {
+    setDragging(false);
+    setMark(null);
+  };
+
+  /**
+   * Scrolls the page while a drag is held near its top or bottom edge.
+   *
+   * dnd-kit has its own, and it did not scroll here: measured, a drag held in the
+   * bottom band of the window left `scrollTop` at 0. Most likely because it
+   * follows the dragged item, and the item stays where it is (see `ItemChrome`,
+   * which applies no transform, because a sliding animation would move content
+   * off one page without it appearing on the next) while only the pointer moves.
+   * So the pointer is what is watched here, and a drop onto the next page would
+   * otherwise be out of reach in any document longer than the window, which is
+   * every document that has a next page.
+   *
+   * The speed rises with how far into the edge band the pointer is, so it can be
+   * stopped by easing off and not only by leaving. The loop runs on the iframe's
+   * own frames, and reads the pointer from the iframe's own events: a pointer
+   * that has left the iframe sends nothing here, which is the right moment to stop.
+   */
+  useEffect(() => {
+    const root = rootRef.current;
+    const doc = root?.ownerDocument;
+    const view = doc?.defaultView;
+
+    if (!dragging || doc === undefined || view === null || view === undefined) {
+      return undefined;
+    }
+
+    let pointerY: number | null = null;
+    let frame = 0;
+
+    const onMove = (event: PointerEvent) => {
+      pointerY = event.clientY;
+    };
+
+    const tick = () => {
+      if (pointerY !== null) {
+        const height = view.innerHeight;
+        const speed =
+          pointerY < AUTOSCROLL_EDGE_PX
+            ? -(AUTOSCROLL_EDGE_PX - pointerY) / AUTOSCROLL_EDGE_PX
+            : pointerY > height - AUTOSCROLL_EDGE_PX
+              ? (pointerY - (height - AUTOSCROLL_EDGE_PX)) / AUTOSCROLL_EDGE_PX
+              : 0;
+
+        if (speed !== 0) {
+          doc.scrollingElement?.scrollBy(
+            0,
+            Math.max(-1, Math.min(1, speed)) * AUTOSCROLL_MAX_PX,
+          );
+        }
+      }
+
+      frame = view.requestAnimationFrame(tick);
+    };
+
+    doc.addEventListener("pointermove", onMove);
+    frame = view.requestAnimationFrame(tick);
+
+    return () => {
+      doc.removeEventListener("pointermove", onMove);
+      view.cancelAnimationFrame(frame);
+    };
+  }, [dragging]);
+
+  const handleDragOver = (event: DragOverEvent) => {
+    const subject = itemById.get(String(event.active.id));
+    const target =
+      event.over === null ? undefined : itemById.get(String(event.over.id));
+
+    setMark(
+      subject === undefined || target === undefined
+        ? null
+        : dropMark(document, items, subject, target),
+    );
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
+    endDrag();
+
     const { active, over } = event;
 
     if (apply === undefined || over === null || active.id === over.id) {
@@ -520,7 +625,33 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     );
 
     if (item.type === "sectionHeading") {
-      return insert;
+      const breaksBefore = section.style?.breakBefore === "page";
+
+      return (
+        <>
+          {insert}
+          <button
+            aria-label={
+              breaksBefore
+                ? t("chrome.sectionBreakOff")
+                : t("chrome.sectionBreak")
+            }
+            aria-pressed={breaksBefore}
+            className="rp-chrome-button"
+            onClick={() =>
+              apply(
+                setSectionBreakBefore(
+                  section.id,
+                  breaksBefore ? "auto" : "page",
+                ),
+              )
+            }
+            type="button"
+          >
+            <span aria-hidden>⤓</span>
+          </button>
+        </>
+      );
     }
 
     const imageWidth = widthControl(item);
@@ -698,6 +829,8 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                           )
                       : undefined
                   }
+                  confirmRemove={item.type === "sectionHeading"}
+                  dropEdge={mark?.id === id ? mark.edge : undefined}
                   onRemove={
                     item.type === "block"
                       ? () =>
@@ -707,7 +840,9 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                               item.blockId ?? "",
                             ),
                           )
-                      : undefined
+                      : item.type === "sectionHeading"
+                        ? () => apply(removeSection(item.sectionId ?? ""))
+                        : undefined
                   }
                 >
                   {node}
@@ -740,7 +875,11 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
       {mode === "edit" && apply !== undefined ? (
         <DndContext
           collisionDetection={closestCenter}
+          autoScroll={false}
+          onDragCancel={endDrag}
           onDragEnd={handleDragEnd}
+          onDragOver={handleDragOver}
+          onDragStart={startDrag}
           sensors={sensors}
         >
           <SortableContext items={items.map((item) => item.id)}>
