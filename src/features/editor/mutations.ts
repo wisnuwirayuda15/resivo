@@ -652,6 +652,169 @@ export const setEntryBullet =
   };
 
 /**
+ * The recipes below add, remove and move the parts inside a block, which carry
+ * no ids: an entry's bullet, a list's item, a tag. Position is their identity,
+ * so each one takes an index (or a path, for a list that nests) and does nothing
+ * when it points at something that is not there. That is what lets a stale
+ * request from the paper, one that raced an undo, fall through harmlessly
+ * rather than land on whichever item now sits at that index.
+ */
+
+const blockOf = (
+  draft: Draft<ResumeDocument>,
+  sectionId: string,
+  blockId: string,
+): Draft<Block> | undefined =>
+  findSection(draft, sectionId)?.blocks.find(
+    (candidate) => candidate.id === blockId,
+  );
+
+/** An empty bullet at `atIndex`, which is where the new one will be. */
+export const addEntryBullet =
+  (sectionId: string, blockId: string, atIndex: number): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+
+    if (
+      block?.kind === "entry" &&
+      atIndex >= 0 &&
+      atIndex <= block.bullets.length
+    ) {
+      block.bullets.splice(atIndex, 0, []);
+    }
+  };
+
+export const removeEntryBullet =
+  (sectionId: string, blockId: string, index: number): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+
+    if (block?.kind === "entry" && index >= 0 && index < block.bullets.length) {
+      block.bullets.splice(index, 1);
+    }
+  };
+
+export const moveEntryBullet =
+  (sectionId: string, blockId: string, from: number, to: number): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+
+    if (block?.kind === "entry") {
+      moveWithin(block.bullets, from, to);
+    }
+  };
+
+/**
+ * The list a path points into, and the position within it.
+ *
+ * `[2, 0]` is the first item of the list nested under the third item, so the
+ * list is found by walking all but the last index, and the last is the position.
+ */
+const listAt = (
+  block: Draft<Block>,
+  path: ReadonlyArray<number>,
+): { items: Array<Draft<ListItem>>; index: number } | undefined => {
+  if (block.kind !== "bulletList" || path.length === 0) {
+    return undefined;
+  }
+
+  let items: Array<Draft<ListItem>> | undefined = block.items;
+
+  for (const step of path.slice(0, -1)) {
+    items = items?.[step]?.list?.items;
+  }
+
+  return items === undefined
+    ? undefined
+    : { items, index: path[path.length - 1] as number };
+};
+
+/**
+ * An empty item, at `path`, which is where the new one will be.
+ *
+ * A task item makes the next one a task item too: pressing Enter in a checklist
+ * means "another box", and a plain bullet in the middle of it would be a surprise.
+ */
+export const addBulletItem =
+  (sectionId: string, blockId: string, path: ReadonlyArray<number>): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+    const at = block === undefined ? undefined : listAt(block, path);
+
+    if (at === undefined || at.index < 0 || at.index > at.items.length) {
+      return;
+    }
+
+    const before = at.items[at.index - 1];
+
+    at.items.splice(at.index, 0, {
+      text: [],
+      ...(before?.checked === undefined ? {} : { checked: false }),
+    });
+  };
+
+/**
+ * Removes an item along with whatever was nested under it.
+ *
+ * A nested list left with no items is dropped, because a list with nothing in it
+ * would be written to Markdown as a bare marker.
+ */
+export const removeBulletItem =
+  (sectionId: string, blockId: string, path: ReadonlyArray<number>): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+    const at = block === undefined ? undefined : listAt(block, path);
+
+    if (at === undefined || at.index < 0 || at.index >= at.items.length) {
+      return;
+    }
+
+    at.items.splice(at.index, 1);
+
+    if (at.items.length === 0 && path.length > 1) {
+      const parent = listAt(block as Draft<Block>, path.slice(0, -1));
+      const owner = parent?.items[parent.index];
+
+      if (owner !== undefined) {
+        delete owner.list;
+      }
+    }
+  };
+
+/** One step up or down among its siblings. It never changes the depth. */
+export const moveBulletItem =
+  (
+    sectionId: string,
+    blockId: string,
+    path: ReadonlyArray<number>,
+    direction: -1 | 1,
+  ): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+    const at = block === undefined ? undefined : listAt(block, path);
+
+    if (at !== undefined) {
+      moveWithin(at.items, at.index, at.index + direction);
+    }
+  };
+
+/** An empty tag at `atIndex`. It is a blank string until the owner types, and
+ * `setTag` removes it again if they leave it blank. */
+export const addTag =
+  (sectionId: string, blockId: string, atIndex: number): Recipe =>
+  (draft) => {
+    const block = blockOf(draft, sectionId, blockId);
+
+    if (
+      block?.kind === "tagList" &&
+      atIndex >= 0 &&
+      atIndex <= block.tags.length
+    ) {
+      block.tags.splice(atIndex, 0, "");
+    }
+  };
+
+/**
  * One tag.
  *
  * Tags are plain strings, not rich text, so this takes a string, and an emptied

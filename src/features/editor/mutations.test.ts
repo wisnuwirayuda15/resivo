@@ -12,7 +12,7 @@ import { templateDefaults } from "@/features/templates/defaults";
 import * as edit from "./mutations";
 
 import type { Recipe } from "./mutations";
-import type { ResumeDocument } from "@/features/resume/model/document";
+import type { Block, ResumeDocument } from "@/features/resume/model/document";
 
 /** Applies a recipe the same way the store does. */
 const apply = (document: ResumeDocument, ...recipes: Array<Recipe>) =>
@@ -502,6 +502,232 @@ describe("block edits", () => {
     const next = apply(document, edit.moveBlockToSection(from, "ghost", to, 0));
 
     expect(next).toBe(document);
+  });
+});
+
+describe("parts inside a block", () => {
+  const setup = (block: Block) => {
+    const document = createEmptyDocument();
+    const sectionId = document.content.sections[0]?.id ?? "";
+
+    return {
+      sectionId,
+      document: apply(document, edit.addBlock(sectionId, block)),
+    };
+  };
+
+  const blockIn = (document: ResumeDocument, sectionId: string) =>
+    document.content.sections.find((s) => s.id === sectionId)?.blocks[0];
+
+  const entry = (...bullets: Array<string>): Block => ({
+    id: "e",
+    kind: "entry",
+    title: text("Analyst"),
+    bullets: bullets.map(text),
+  });
+
+  const bulletsOf = (document: ResumeDocument, sectionId: string) => {
+    const block = blockIn(document, sectionId);
+
+    return block?.kind === "entry" ? block.bullets.map(plainText) : [];
+  };
+
+  describe("entry bullets", () => {
+    it("adds an empty one where it is told", () => {
+      const { document, sectionId } = setup(entry("a", "b"));
+      const next = apply(document, edit.addEntryBullet(sectionId, "e", 1));
+
+      expect(bulletsOf(next, sectionId)).toEqual(["a", "", "b"]);
+      expect(documentSchema.safeParse(next).success).toBe(true);
+    });
+
+    it("stores a bullet and adds the next as one recipe", () => {
+      const { document, sectionId } = setup(entry("a"));
+      const next = apply(document, (draft) => {
+        edit.setEntryBullet(sectionId, "e", 0, text("kept"))(draft);
+        edit.addEntryBullet(sectionId, "e", 1)(draft);
+      });
+
+      expect(bulletsOf(next, sectionId)).toEqual(["kept", ""]);
+    });
+
+    it("removes one", () => {
+      const { document, sectionId } = setup(entry("a", "b", "c"));
+      const next = apply(document, edit.removeEntryBullet(sectionId, "e", 1));
+
+      expect(bulletsOf(next, sectionId)).toEqual(["a", "c"]);
+    });
+
+    it("moves one", () => {
+      const { document, sectionId } = setup(entry("a", "b", "c"));
+      const next = apply(document, edit.moveEntryBullet(sectionId, "e", 2, 0));
+
+      expect(bulletsOf(next, sectionId)).toEqual(["c", "a", "b"]);
+    });
+
+    it("ignores an index that is not there, and a block that is not an entry", () => {
+      const { document, sectionId } = setup(entry("a"));
+
+      expect(apply(document, edit.addEntryBullet(sectionId, "e", 5))).toBe(
+        document,
+      );
+      expect(apply(document, edit.removeEntryBullet(sectionId, "e", 3))).toBe(
+        document,
+      );
+      expect(apply(document, edit.addEntryBullet(sectionId, "nope", 0))).toBe(
+        document,
+      );
+
+      const { document: other, sectionId: otherSection } = setup({
+        id: "e",
+        kind: "divider",
+      });
+
+      expect(apply(other, edit.addEntryBullet(otherSection, "e", 0))).toBe(
+        other,
+      );
+    });
+  });
+
+  describe("list items", () => {
+    const list = (): Block => ({
+      id: "l",
+      kind: "bulletList",
+      items: [
+        { text: text("one") },
+        {
+          text: text("two"),
+          list: { items: [{ text: text("two-a") }, { text: text("two-b") }] },
+        },
+        { text: text("three") },
+      ],
+    });
+
+    const itemsOf = (document: ResumeDocument, sectionId: string) => {
+      const block = blockIn(document, sectionId);
+
+      return block?.kind === "bulletList"
+        ? block.items.map((item) => ({
+            text: plainText(item.text),
+            nested: item.list?.items.map((child) => plainText(child.text)),
+          }))
+        : [];
+    };
+
+    it("adds an empty item at a top-level position", () => {
+      const { document, sectionId } = setup(list());
+      const next = apply(document, edit.addBulletItem(sectionId, "l", [1]));
+
+      expect(itemsOf(next, sectionId).map((item) => item.text)).toEqual([
+        "one",
+        "",
+        "two",
+        "three",
+      ]);
+      expect(documentSchema.safeParse(next).success).toBe(true);
+    });
+
+    it("adds into a nested list by path", () => {
+      const { document, sectionId } = setup(list());
+      const next = apply(document, edit.addBulletItem(sectionId, "l", [1, 1]));
+
+      expect(itemsOf(next, sectionId)[1]?.nested).toEqual([
+        "two-a",
+        "",
+        "two-b",
+      ]);
+    });
+
+    it("makes the next item of a checklist a checkbox too", () => {
+      const { document, sectionId } = setup({
+        id: "l",
+        kind: "bulletList",
+        items: [{ text: text("task"), checked: true }],
+      });
+      const next = apply(document, edit.addBulletItem(sectionId, "l", [1]));
+      const block = blockIn(next, sectionId);
+
+      expect(block?.kind === "bulletList" && block.items[1]?.checked).toBe(
+        false,
+      );
+    });
+
+    it("removes an item with what was nested under it", () => {
+      const { document, sectionId } = setup(list());
+      const next = apply(document, edit.removeBulletItem(sectionId, "l", [1]));
+
+      expect(itemsOf(next, sectionId).map((item) => item.text)).toEqual([
+        "one",
+        "three",
+      ]);
+    });
+
+    it("drops a nested list that has had its last item removed", () => {
+      const { document, sectionId } = setup(list());
+      const next = apply(
+        document,
+        edit.removeBulletItem(sectionId, "l", [1, 0]),
+        edit.removeBulletItem(sectionId, "l", [1, 0]),
+      );
+
+      expect(itemsOf(next, sectionId)[1]?.nested).toBeUndefined();
+      expect(documentSchema.safeParse(next).success).toBe(true);
+    });
+
+    it("moves an item among its siblings and never changes its depth", () => {
+      const { document, sectionId } = setup(list());
+      const down = apply(document, edit.moveBulletItem(sectionId, "l", [0], 1));
+
+      expect(itemsOf(down, sectionId).map((item) => item.text)).toEqual([
+        "two",
+        "one",
+        "three",
+      ]);
+
+      const nested = apply(
+        document,
+        edit.moveBulletItem(sectionId, "l", [1, 0], 1),
+      );
+
+      expect(itemsOf(nested, sectionId)[1]?.nested).toEqual(["two-b", "two-a"]);
+    });
+
+    it("ignores a path that leads nowhere", () => {
+      const { document, sectionId } = setup(list());
+
+      expect(apply(document, edit.addBulletItem(sectionId, "l", [9, 0]))).toBe(
+        document,
+      );
+      expect(
+        apply(document, edit.removeBulletItem(sectionId, "l", [0, 4])),
+      ).toBe(document);
+      expect(apply(document, edit.addBulletItem(sectionId, "l", []))).toBe(
+        document,
+      );
+    });
+  });
+
+  describe("tags", () => {
+    const tags = (): Block => ({ id: "t", kind: "tagList", tags: ["a", "b"] });
+
+    it("adds a blank one, which setTag then removes if it stays blank", () => {
+      const { document, sectionId } = setup(tags());
+      const added = apply(document, edit.addTag(sectionId, "t", 1));
+      const block = blockIn(added, sectionId);
+
+      expect(block?.kind === "tagList" && block.tags).toEqual(["a", "", "b"]);
+
+      const cleared = apply(added, edit.setTag(sectionId, "t", 1, "  "));
+      const after = blockIn(cleared, sectionId);
+
+      expect(after?.kind === "tagList" && after.tags).toEqual(["a", "b"]);
+    });
+
+    it("ignores a position past the end", () => {
+      const { document, sectionId } = setup(tags());
+
+      expect(apply(document, edit.addTag(sectionId, "t", 9))).toBe(document);
+    });
   });
 });
 

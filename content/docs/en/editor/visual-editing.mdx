@@ -1,6 +1,6 @@
 ---
 title: Visual editing
-description: Edit text directly on the paper, drag and reorder blocks and sections, delete a block, and change an image's width.
+description: Edit text directly on the paper, add, duplicate and reorder blocks, work in lists and tags from the keyboard, and set an image's width.
 ---
 
 Besides writing Markdown, you can edit on the paper itself. At the top of the
@@ -10,8 +10,8 @@ Besides writing Markdown, you can edit on the paper itself. At the top of the
 - **Visual** makes the page editable.
 
 Visual mode changes what you can do, not what the page is. The controls it draws
-sit in the margin and are never part of what is measured, so turning it on
-cannot move a page break.
+float over an item's corner and are never part of what is measured, so turning
+it on cannot move a page break.
 
 ## Edit text [#text]
 
@@ -28,12 +28,13 @@ a field the browser's own undo applies to that field's typing.
 
 ## Move things [#move]
 
-Hover over a block or a section heading and a small set of controls appears in
-the margin:
+Hover over a block or a section heading and a small set of controls appears at
+its top right corner:
 
 - **Drag to move** is a handle you drag.
 - **Move up** and **Move down** do the same one place at a time, and are the way
   to do it from the keyboard.
+- **Duplicate** puts a copy of a block straight after it.
 - **Delete** removes a block. It is a block-level control: a section is
   removed from the **Sections** tab, where it asks first.
 
@@ -49,6 +50,28 @@ What a move means depends on what you drop on what:
 
 Any other combination does nothing, rather than a guess. Every move can be
 undone.
+
+## Add a block [#insert]
+
+**Insert a block after this** is a menu in the same set of controls. Choose a
+paragraph, a heading, a list, an entry, a quote, a divider or a page break and it
+is added after the block, or at the top of the section when you use it on a
+section heading. A new block is empty and shows a faint prompt, which is a line
+of its own while you are in Visual mode and is not printed.
+
+## Lists and tags [#lists]
+
+The bullets of an entry, the items of a list and the tags of a tag list have no
+controls of their own. They are edited as text, and the keyboard does the rest:
+
+- Press Enter to keep the one you are in and start the next, ready to type in.
+- Press Backspace in an empty one to remove it and go back to the one before.
+  The last one of a list stays, because a list with nothing in it has nothing to
+  click.
+- Press Alt and the up or down arrow to move it, in a list or an entry. A tag
+  does not move.
+
+A tag left blank is not kept.
 
 ## Images [#images]
 

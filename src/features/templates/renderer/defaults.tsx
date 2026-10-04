@@ -1,5 +1,12 @@
 import { DocumentIcon } from "@/features/icons/IconRenderer";
 import {
+  addBulletItem,
+  addEntryBullet,
+  addTag,
+  moveBulletItem,
+  moveEntryBullet,
+  removeBulletItem,
+  removeEntryBullet,
   setBlockText,
   setBulletItem,
   setEntryBullet,
@@ -14,7 +21,7 @@ import {
 } from "@/features/editor/mutations";
 import { plainText } from "@/features/resume/model/index";
 
-import { EditableText } from "./EditableText";
+import { EditableText, requestFocus } from "./EditableText";
 import { formatDateRange } from "./dates";
 
 import type { Recipe } from "@/features/editor/mutations";
@@ -73,6 +80,84 @@ const commitWith = (
   const { apply } = context;
 
   return apply === undefined ? undefined : (value) => apply(build(value));
+};
+
+/** Several recipes as one, so a gesture that changes two things is one undo. */
+const all =
+  (...recipes: Array<Recipe>): Recipe =>
+  (draft) => {
+    for (const recipe of recipes) {
+      recipe(draft);
+    }
+  };
+
+/**
+ * What Enter, Backspace on nothing and Alt with an arrow do in one item of a
+ * list, for any list of items that are each an `EditableText`.
+ *
+ * The three list shapes (an entry's bullets, a list's items, a tag list) differ
+ * in how an item is addressed and in what a recipe is called, and not at all in
+ * what the keys mean, so the meaning is written once and each shape says only how
+ * to store an item, add one, remove one and move one. `undefined` for a part
+ * means the key does nothing there (the last item cannot be removed, the first
+ * cannot move up), which is what keeps every list from reaching a state the
+ * paper has no way back from: a list with no item draws nothing, so nothing
+ * would be left to click.
+ */
+const listKeys = (
+  context: RenderContext,
+  shape: {
+    /** The key of whatever item sits at a position, for `requestFocus`. */
+    focusKey: (position: number) => string;
+    index: number;
+    count: number;
+    store: (value: InlineText) => Recipe;
+    add: Recipe;
+    remove: Recipe | undefined;
+    move: (direction: -1 | 1) => Recipe;
+  },
+): {
+  onBreak?: (value: InlineText) => void;
+  onRemoveEmpty?: () => void;
+  onMove?: (direction: -1 | 1, value: InlineText) => void;
+  focusKey: string;
+} => {
+  const { apply } = context;
+  const { focusKey, index, count } = shape;
+
+  if (apply === undefined) {
+    return { focusKey: focusKey(index) };
+  }
+
+  return {
+    focusKey: focusKey(index),
+    onBreak: (value) => {
+      requestFocus(focusKey(index + 1));
+      apply(all(shape.store(value), shape.add));
+    },
+    onRemoveEmpty:
+      shape.remove === undefined || count <= 1
+        ? undefined
+        : () => {
+            if (index > 0) {
+              requestFocus(focusKey(index - 1));
+            }
+
+            apply(shape.remove as Recipe);
+          },
+    onMove: (direction, value) => {
+      const to = index + direction;
+
+      if (to < 0 || to >= count) {
+        apply(shape.store(value));
+
+        return;
+      }
+
+      requestFocus(focusKey(to));
+      apply(all(shape.store(value), shape.move(direction)));
+    },
+  };
 };
 
 const DefaultHeader: React.FC<HeaderProps> = ({ header, context }) => {
@@ -271,6 +356,24 @@ const ListItems: React.FC<{
                 setBulletItem(section.id, block.id, here, value),
               )}
               value={item.text}
+              {...listKeys(context, {
+                focusKey: (position) =>
+                  `${block.id}:item:${[...path, position].join(".")}`,
+                index,
+                count: list.items.length,
+                store: (value) =>
+                  setBulletItem(section.id, block.id, here, value),
+                add: addBulletItem(section.id, block.id, [...path, index + 1]),
+                // The only item of the whole list stays: removing it would leave
+                // a list that draws nothing. A nested one may go, and takes its
+                // list with it.
+                remove:
+                  path.length === 0 && list.items.length === 1
+                    ? undefined
+                    : removeBulletItem(section.id, block.id, here),
+                move: (direction) =>
+                  moveBulletItem(section.id, block.id, here, direction),
+              })}
             />
             {item.list === undefined ? null : (
               <ListItems
@@ -501,6 +604,22 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
                   setEntryBullet(section.id, block.id, index, value),
                 )}
                 value={bullet}
+                {...listKeys(context, {
+                  focusKey: (position) => `${block.id}:bullet:${position}`,
+                  index,
+                  count: block.bullets.length,
+                  store: (value) =>
+                    setEntryBullet(section.id, block.id, index, value),
+                  add: addEntryBullet(section.id, block.id, index + 1),
+                  remove: removeEntryBullet(section.id, block.id, index),
+                  move: (direction) =>
+                    moveEntryBullet(
+                      section.id,
+                      block.id,
+                      index,
+                      index + direction,
+                    ),
+                })}
               />
             </li>
           ))}
@@ -508,6 +627,48 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
       )}
     </div>
   );
+};
+
+/**
+ * A tag's keys are the list keys with two differences. Enter on a blank tag does
+ * not add another, it just ends the edit (which removes the blank tag, see
+ * `setTag`), because a row of empty chips is never what was meant. And a tag does
+ * not move: the order of a keyword list is not something anyone arranges.
+ */
+const tagKeys = (
+  context: RenderContext,
+  section: Section,
+  block: TagListBlock,
+  index: number,
+) => {
+  const keys = listKeys(context, {
+    focusKey: (position) => `${block.id}:tag:${position}`,
+    index,
+    count: block.tags.length,
+    store: (value) => setTag(section.id, block.id, index, plainText(value)),
+    add: addTag(section.id, block.id, index + 1),
+    remove: setTag(section.id, block.id, index, ""),
+    move: () => () => undefined,
+  });
+
+  const { apply } = context;
+
+  return {
+    focusKey: keys.focusKey,
+    onRemoveEmpty: keys.onRemoveEmpty,
+    onBreak:
+      apply === undefined
+        ? undefined
+        : (value: InlineText) => {
+            if (plainText(value).trim() === "") {
+              apply(setTag(section.id, block.id, index, ""));
+
+              return;
+            }
+
+            keys.onBreak?.(value);
+          },
+  };
 };
 
 const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
@@ -527,6 +688,7 @@ const TagList: React.FC<BlockViewProps<TagListBlock>> = ({
             setTag(section.id, block.id, index, plainText(value)),
           )}
           value={[{ type: "text", text: tag }]}
+          {...tagKeys(context, section, block, index)}
         />
       </span>
     ))}

@@ -1,6 +1,6 @@
 ---
 title: Penyuntingan visual
-description: Sunting teks langsung di kertas, seret dan susun ulang blok dan bagian, hapus blok, dan ubah lebar gambar.
+description: Sunting teks langsung di kertas, tambah, gandakan dan susun ulang blok, kerjakan daftar dan tag dari keyboard, dan atur lebar gambar.
 ---
 
 Selain menulis Markdown, Anda bisa menyunting di kertas itu sendiri. Di bagian
@@ -11,8 +11,9 @@ atas panel **Kertas**, **Mode pratinjau** berpindah antara dua mode:
 - **Visual** membuat halaman dapat disunting.
 
 Mode Visual mengubah apa yang dapat Anda lakukan, bukan apa halaman itu. Kontrol
-yang digambarnya berada di margin dan tidak pernah menjadi bagian dari yang
-diukur, jadi menyalakannya tidak dapat menggeser pemisah halaman.
+yang digambarnya melayang di atas sudut sebuah item dan tidak pernah menjadi
+bagian dari yang diukur, jadi menyalakannya tidak dapat menggeser pemisah
+halaman.
 
 ## Sunting teks [#text]
 
@@ -32,11 +33,12 @@ ketikan di kolom itu.
 ## Pindahkan [#move]
 
 Arahkan kursor ke sebuah blok atau judul bagian dan seperangkat kontrol kecil
-muncul di margin:
+muncul di sudut kanan atasnya:
 
 - **Seret untuk memindahkan** adalah pegangan yang Anda seret.
 - **Naikkan** dan **Turunkan** melakukan hal yang sama satu tempat sekali, dan
   menjadi cara melakukannya dari keyboard.
+- **Gandakan** menaruh salinan sebuah blok tepat setelahnya.
 - **Hapus** menghapus sebuah blok. Ini kontrol tingkat blok: sebuah bagian
   dihapus dari tab **Bagian**, yang bertanya dulu.
 
@@ -52,6 +54,31 @@ Arti sebuah pemindahan bergantung pada apa yang dijatuhkan ke atas apa:
 
 Kombinasi lain tidak melakukan apa-apa, bukan menebak. Setiap pemindahan dapat
 diurungkan.
+
+## Tambah blok [#insert]
+
+**Sisipkan blok setelah ini** adalah menu dalam perangkat kontrol yang sama.
+Pilih paragraf, judul, daftar, entri, kutipan, pemisah, atau pemisah halaman dan
+blok itu ditambahkan setelah blok tersebut, atau di bagian atas bagian itu bila
+Anda memakainya pada judul bagian. Blok baru kosong dan menampilkan petunjuk
+samar, yang menjadi satu baris tersendiri selama Anda dalam mode Visual dan
+tidak dicetak.
+
+## Daftar dan tag [#lists]
+
+Poin sebuah entri, butir sebuah daftar, dan tag sebuah daftar tag tidak memiliki
+kontrol sendiri. Semuanya disunting sebagai teks, dan keyboard mengerjakan
+sisanya:
+
+- Tekan Enter untuk menyimpan yang sedang Anda sunting dan memulai berikutnya,
+  siap diketik.
+- Tekan Backspace pada yang kosong untuk menghapusnya dan kembali ke yang
+  sebelumnya. Yang terakhir dalam sebuah daftar tetap ada, karena daftar tanpa
+  isi tidak punya apa pun untuk diklik.
+- Tekan Alt dan panah atas atau bawah untuk memindahkannya, dalam daftar atau
+  entri. Sebuah tag tidak berpindah.
+
+Tag yang dibiarkan kosong tidak disimpan.
 
 ## Gambar [#images]
 
