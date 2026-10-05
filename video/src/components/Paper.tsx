@@ -40,15 +40,19 @@ export const Paper = ({
     root.innerHTML = `<style>${css}</style>${html}`;
   }, [document]);
 
+  // A transform does not change a box's layout size, so the scaled sheet sits in
+  // a wrapper of the size it is seen at, and centres and stacks by that.
   return (
-    <div
-      ref={host}
-      style={{
-        width: 816,
-        height: 1056,
-        transform: `scale(${scale})`,
-        transformOrigin: "top left",
-      }}
-    />
+    <div style={{ width: 816 * scale, height: 1056 * scale }}>
+      <div
+        ref={host}
+        style={{
+          width: 816,
+          height: 1056,
+          transform: `scale(${scale})`,
+          transformOrigin: "top left",
+        }}
+      />
+    </div>
   );
 };

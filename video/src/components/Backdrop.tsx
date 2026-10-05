@@ -13,9 +13,20 @@ import type { CSSProperties, ReactNode } from "react";
 const TILE = 384;
 const SPEED = 0.25;
 
-export const Backdrop = ({ children }: { children: ReactNode }) => {
+export const Backdrop = ({
+  children,
+  from = 0,
+}: {
+  children: ReactNode;
+  /**
+   * The frame of the whole film this scene starts on. A second backdrop inside
+   * a scene reads the scene's own clock, and without this it would slide from a
+   * different place than the one under it.
+   */
+  from?: number;
+}) => {
   const frame = useCurrentFrame();
-  const drift = (frame * SPEED) % TILE;
+  const drift = ((frame + from) * SPEED) % TILE;
 
   return (
     <div

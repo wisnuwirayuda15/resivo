@@ -19,10 +19,46 @@
         "type": { "from": 14, "frames": 170 }
       }
     },
-    "templates": { "bar": 4, "bars": 2, "events": {} },
-    "ats": { "bar": 6, "bars": 2, "events": {} },
-    "themes": { "bar": 8, "bars": 3, "events": {} },
-    "export": { "bar": 11, "bars": 2, "events": {} },
-    "outro": { "bar": 13, "bars": 2, "events": {} }
+    "templates": {
+      "bar": 4,
+      "bars": 2,
+      "events": {
+        "clicks": [27, 57, 87, 117, 147, 177],
+        "swaps": [30, 60, 90, 120, 150, 180]
+      }
+    },
+    "ats": {
+      "bar": 6,
+      "bars": 2,
+      "events": {
+        "chips": [20, 28, 36],
+        "clicks": [76, 142],
+        "dings": [150]
+      }
+    },
+    "themes": {
+      "bar": 8,
+      "bars": 3,
+      "events": {
+        "clicks": [108],
+        "flips": [112],
+        "thumps": [112]
+      }
+    },
+    "export": {
+      "bar": 11,
+      "bars": 2,
+      "events": {
+        "chips": [36, 66, 96, 126, 156, 186]
+      }
+    },
+    "outro": {
+      "bar": 13,
+      "bars": 2,
+      "events": {
+        "dings": [92],
+        "chips": [130]
+      }
+    }
   }
 }

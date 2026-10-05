@@ -22,12 +22,19 @@ const kindOf = (line: string): string => {
   return "prose";
 };
 
-export const MarkdownPane = ({ text }: { text: string }) => {
+export const MarkdownPane = ({
+  text,
+  top = false,
+}: {
+  text: string;
+  /** Start at the top of the pane instead of growing up from the bottom. */
+  top?: boolean;
+}) => {
   const lines = text.split("\n");
 
   return (
     <div className="v-code">
-      <div className="v-code-lines">
+      <div className="v-code-lines" data-top={top}>
         {lines.map((line, index) => (
           <div
             // The position is the identity: lines only ever grow.
