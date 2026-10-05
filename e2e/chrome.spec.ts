@@ -210,3 +210,67 @@ test("the sidebar can be collapsed repeatedly with a resume open", async ({
   await expectPaperReady(page);
   await expect(paper(page).locator(".rp-page").first()).toBeVisible();
 });
+
+/**
+ * A magnified page can be scrolled to both of its edges.
+ *
+ * The pages sat in a centred column, and a column wider than its window spills
+ * equally to both sides. The spill to the left of the origin is not scrollable,
+ * so at 200% the left edge of the paper could never be brought into view while
+ * the right one could. The assertion is the page's own left edge at the far left
+ * of the scroll, and its right edge at the far right, each with the padding the
+ * well gives it.
+ */
+test("a zoomed page can be scrolled to both of its edges", async ({ page }) => {
+  test.slow();
+
+  // Wide enough for the strip to show the zoom controls rather than fold them.
+  await page.setViewportSize({ width: 1600, height: 1000 });
+
+  await openEmptyApp(page);
+  await createResume(page, "Ada Lovelace");
+
+  const zoomIn = page.getByRole("button", { name: "Zoom in" });
+
+  await expect(async () => {
+    await zoomIn.click();
+    await expect(page.getByText("200%")).toBeVisible({ timeout: 500 });
+  }).toPass();
+
+  const frame = page
+    .frames()
+    .find((candidate) => candidate !== page.mainFrame());
+  expect(frame).toBeDefined();
+
+  const edges = (left: number) =>
+    frame?.evaluate((scrollLeft) => {
+      const scroller = document.scrollingElement;
+
+      if (scroller === null) {
+        return null;
+      }
+
+      // Scrolled first: the box is measured where the page ended up.
+      scroller.scrollLeft = scrollLeft;
+
+      const box = document.querySelector(".rp-page")?.getBoundingClientRect();
+
+      if (box === undefined) {
+        return null;
+      }
+
+      return {
+        left: box.left,
+        right: scroller.clientWidth - box.right,
+        wide: scroller.scrollWidth > scroller.clientWidth,
+      };
+    }, left);
+
+  const atStart = await edges(0);
+  const atEnd = await edges(1_000_000);
+
+  expect(atStart?.wide).toBe(true);
+  // 20px of padding at 200% is 40 on screen, both ways.
+  expect(atStart?.left).toBeGreaterThanOrEqual(39);
+  expect(atEnd?.right).toBeGreaterThanOrEqual(39);
+});

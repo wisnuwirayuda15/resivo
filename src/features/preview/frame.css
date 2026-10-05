@@ -95,7 +95,18 @@
 .rp-pages {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  /* Not `center`. A page wider than the window (any zoom past fit) overflows a
+     centred column on both sides equally, and the half that spills to the left
+     of the origin is not scrollable, so the left edge of the paper could never
+     be reached. Centring is done by the auto margins on `.rp-page` instead,
+     which collapse to zero when there is no room left over. */
+  align-items: flex-start;
+  /* As wide as the widest page plus the padding, and never narrower than the
+     window. Without it the container is the window's width and the page spills
+     out of its right edge, which scrolling reaches but the right padding does
+     not, so the paper ended flush against the scrollbar. */
+  width: max-content;
+  min-width: 100%;
   gap: 20px;
   padding: 20px;
 }
@@ -103,6 +114,7 @@
 .rp-page {
   position: relative;
   flex: none;
+  margin-inline: auto;
   width: var(--paper-w);
   height: var(--paper-h);
   padding: var(--paper-margin-top, var(--paper-margin))
