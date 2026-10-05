@@ -270,7 +270,7 @@ content/           the docs (MDX, en and id) and the AI prompts
 e2e/               Playwright specs, and the moves they share in app.ts
 e2e-pwa/           the offline spec, which needs a real build (own config)
 e2e-media/         the docs clips: scripted Playwright recordings (own config)
-video/             the 30 second promo film: Remotion, its own package
+video/             the 28 second promo film: Remotion, its own package
 src/
   routes/          file-based routes
   features/

@@ -14,7 +14,7 @@ import timeline from "../timeline.json";
 import type { ReactNode } from "react";
 
 /**
- * Bars 12 and 13. The six ways out fall into a grid, one on each beat after the
+ * Bars 11 and 12. The six ways out fall into a grid, one on each beat after the
  * first, and rest where a file would: the same fall as the opening scene's
  * syntax, so the film's two lists are made the same way.
  */

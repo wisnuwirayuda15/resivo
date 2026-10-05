@@ -38,22 +38,22 @@
     },
     "themes": {
       "bar": 8,
-      "bars": 3,
+      "bars": 2,
       "events": {
-        "clicks": [108],
-        "flips": [112],
-        "thumps": [112]
+        "clicks": [54],
+        "flips": [60],
+        "thumps": [60]
       }
     },
     "export": {
-      "bar": 11,
+      "bar": 10,
       "bars": 2,
       "events": {
         "chips": [36, 66, 96, 126, 156, 186]
       }
     },
     "outro": {
-      "bar": 13,
+      "bar": 12,
       "bars": 2,
       "events": {
         "dings": [92],

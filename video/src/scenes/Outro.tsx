@@ -5,7 +5,7 @@ import { lerp, progress, STANDARD } from "../lib/motion";
 import { sceneLength } from "../timeline";
 
 /**
- * Bars 14 and 15. The wordmark is drawn, the claim the whole product rests on
+ * Bars 13 and 14. The wordmark is drawn, the claim the whole product rests on
  * is said in the voice of the landing page (plain, and with its cost stated),
  * the address lands in a pill, and the picture fades out under the last of the
  * sound.

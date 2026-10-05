@@ -15,10 +15,12 @@ import timeline from "../timeline.json";
 import type { Waypoint } from "../components/Cursor";
 
 /**
- * Bars 9 to 11. The window is shown in the light theme, the pointer presses the
+ * Bars 9 and 10. The window is shown in the light theme, the pointer presses the
  * moon, and a circle of the dark theme opens from the button across the whole
  * frame: the title, the backdrop and the window change together, and the paper
- * does not, because the paper never follows the theme.
+ * does not, because the paper never follows the theme. Two bars and not three:
+ * the light half only has to be long enough to see where the pointer goes, and
+ * a third bar of the same dark window was the part that dragged.
  *
  * The dark layer is a second copy of the same scene under
  * `data-mantine-color-scheme="dark"`. The app's `scheme.css` keys every
@@ -33,7 +35,7 @@ const FLIP = flips[0] ?? 0;
 const MOON = { x: 1691, y: 217 };
 
 const PATH: ReadonlyArray<Waypoint> = [
-  { frame: 24, x: 1250, y: 760 },
+  { frame: 4, x: 1250, y: 760 },
   { frame: CLICK - 8, ...MOON },
   { frame: CLICK + 12, ...MOON },
   { frame: CLICK + 70, x: 1180, y: 880 },

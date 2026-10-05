@@ -101,7 +101,6 @@ const PROGRESSION = [
   "G",
   "G",
   "C",
-  "Em",
   "Am",
   "F",
   "G",
@@ -109,13 +108,14 @@ const PROGRESSION = [
   "C",
 ];
 
-/** How much of each layer is present in a bar, 0 to about 1.2. */
+/** How much of each layer is present in a bar, 0 to about 1.2. The loudest bars
+ * are the two of the theme change, and the last two are the resolution. */
 const level = {
   arp: (bar) =>
-    [0, 0.55, 1, 1, 1, 1, 1, 1, 1.15, 1.15, 1.15, 1, 1, 0.7, 0.4][bar] ?? 0,
-  drums: (bar) => (bar >= 2 && bar <= 12 ? 1 : 0),
-  hats: (bar) => (bar >= 3 && bar <= 12 ? 1 : 0),
-  bass: (bar) => (bar >= 1 && bar <= 13 ? 1 : 0),
+    [0, 0.55, 1, 1, 1, 1, 1, 1, 1.15, 1.15, 1, 1, 0.7, 0.4][bar] ?? 0,
+  drums: (bar) => (bar >= 2 && bar <= 11 ? 1 : 0),
+  hats: (bar) => (bar >= 3 && bar <= 11 ? 1 : 0),
+  bass: (bar) => (bar >= 1 && bar <= 12 ? 1 : 0),
 };
 
 // ---------------------------------------------------------------------------
