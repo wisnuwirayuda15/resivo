@@ -1,0 +1,48 @@
+/**
+ * The video's stylesheet entry.
+ *
+ * It takes the app's colour ramps and semantic aliases as they are, so a card
+ * in the film is painted from the same `--bg-*` and `--text-*` variables as the
+ * card in the app, and `[data-mantine-color-scheme="dark"]` on any element
+ * flips everything under it. Tailwind is not part of the video, so nothing from
+ * `theme.css` is imported; the three font stacks it would have provided are
+ * restated at the bottom, in step with `src/styles/fonts.css`.
+ */
+@layer theme, base, mantine, mantine-onboarding-tour, components, utilities;
+
+@import "@fontsource-variable/instrument-sans";
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/source-serif-4";
+@import "@mantine/core/styles.layer.css";
+@import "../../src/styles/tokens.css";
+@import "../../src/styles/scheme.css";
+
+:root {
+  --font-sans:
+    "Instrument Sans Variable", "Instrument Sans", ui-sans-serif, system-ui,
+    sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace;
+  --font-serif:
+    "Source Serif 4 Variable", "Source Serif 4", ui-serif, Georgia,
+    "Times New Roman", serif;
+}
+
+html,
+body {
+  margin: 0;
+  background: var(--bg-app);
+  font-family: var(--font-sans);
+  color: var(--text-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Remotion draws each frame on its own, so a CSS transition or animation would
+   be caught at an arbitrary point of its run. Motion in the film is a function
+   of the frame number and nothing else. */
+*,
+*::before,
+*::after {
+  transition: none !important;
+  animation: none !important;
+}

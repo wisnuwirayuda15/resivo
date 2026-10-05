@@ -10,3 +10,6 @@ src/features/icons/*.gen.ts
 
 # The prompts are copied to a model as written, byte for byte.
 content/prompts/
+
+# The promo film: render output and the generated soundtrack.
+video/out/

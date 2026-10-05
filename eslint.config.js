@@ -88,6 +88,9 @@ export default [
       "src/routeTree.gen.ts",
       "src/features/icons/*.gen.ts",
       "scripts/**",
+      // A separate package that bundles with webpack and is typed by its own
+      // tsconfig, so the root's type-aware parser has no project for it.
+      "video/**",
       // The service worker is served as it is written, from the origin root, so
       // it is outside the module graph and outside tsconfig with it. Prettier
       // still formats it and a Playwright spec still exercises it.

@@ -6,6 +6,10 @@
     "prettier.config.js",
     "vite.config.ts"
   ],
+  // The film is its own package with its own tsconfig, because it resolves the
+  // same modules through webpack and not Vite. Type it with
+  // "bun run --cwd video typecheck".
+  "exclude": ["node_modules", "video"],
 
   "compilerOptions": {
     "target": "ES2022",

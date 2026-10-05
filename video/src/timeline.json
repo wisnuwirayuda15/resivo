@@ -1,0 +1,15 @@
+{
+  "fps": 60,
+  "bpm": 120,
+  "width": 1920,
+  "height": 1080,
+  "scenes": {
+    "intro": { "bar": 0, "bars": 2 },
+    "write": { "bar": 2, "bars": 2 },
+    "templates": { "bar": 4, "bars": 2 },
+    "ats": { "bar": 6, "bars": 2 },
+    "themes": { "bar": 8, "bars": 3 },
+    "export": { "bar": 11, "bars": 2 },
+    "outro": { "bar": 13, "bars": 2 }
+  }
+}
