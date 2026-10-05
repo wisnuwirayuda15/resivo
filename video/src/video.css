@@ -55,24 +55,56 @@ body {
     0 18px 48px rgba(18, 18, 16, 0.18), 0 2px 8px rgba(18, 18, 16, 0.08);
   --v-float:
     0 8px 24px rgba(18, 18, 16, 0.09), 0 2px 6px rgba(18, 18, 16, 0.05);
-  --v-grid: rgba(18, 18, 16, 0.045);
+  --v-grid: rgba(18, 18, 16, 0.05);
+  --v-glow: rgba(255, 255, 255, 0.85);
 }
 
 [data-mantine-color-scheme="dark"] {
   --v-lift: 0 18px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
   --v-float: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.35);
-  --v-grid: rgba(255, 255, 255, 0.04);
+  --v-grid: rgba(255, 255, 255, 0.045);
+  --v-glow: rgba(255, 255, 255, 0.05);
 }
 
 /* Backdrop: the app background with a hairline grid, the way the second
    reference film sets its objects on a drafting surface. */
+/* Three quiet layers over the app background, so a white page is not an empty
+   one: a lit centre that falls off toward the corners, a hairline grid, and a
+   small plus at every fourth crossing (the registration marks of a drafting
+   sheet). `--drift` is set from the frame by `Backdrop`, and the pattern repeats
+   every 384px, so it can slide without a seam. */
 .v-backdrop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
   background-color: var(--bg-app);
   background-image:
+    radial-gradient(
+      ellipse 70% 65% at 50% 46%,
+      var(--v-glow) 0%,
+      transparent 100%
+    ),
     linear-gradient(var(--v-grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--v-grid) 1px, transparent 1px);
-  background-size: 96px 96px;
-  background-position: center;
+  background-size:
+    100% 100%,
+    96px 96px,
+    96px 96px;
+  background-position:
+    0 0,
+    var(--drift) var(--drift),
+    var(--drift) var(--drift);
+}
+
+.v-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  opacity: 0.3;
+  mask-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='384' height='384'><path d='M187 192h10M192 187v10' stroke='black' stroke-width='2' stroke-linecap='round' fill='none'/></svg>");
+  mask-size: 384px 384px;
+  mask-position: calc(var(--drift) - 192px) calc(var(--drift) - 192px);
 }
 
 .v-stage {
