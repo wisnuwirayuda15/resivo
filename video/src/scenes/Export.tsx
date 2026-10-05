@@ -8,7 +8,7 @@ import {
 } from "@phosphor-icons/react";
 import { useCurrentFrame } from "remotion";
 
-import { lerp, progress } from "../lib/motion";
+import { GRAVITY, landing, lerp, progress } from "../lib/motion";
 import timeline from "../timeline.json";
 
 import type { ReactNode } from "react";
@@ -62,7 +62,7 @@ const FORMATS: ReadonlyArray<{
 
 const COLUMN = 520;
 const ROW = 220;
-const FALL = 24;
+const FALL = 18;
 const DROP = 520;
 
 export const Export = () => {
@@ -82,8 +82,9 @@ export const Export = () => {
       </h2>
       <div className="v-files">
         {FORMATS.map((format, index) => {
-          const start = (chips[index] ?? 0) - FALL;
-          const fall = progress(frame, start, FALL);
+          const land = chips[index] ?? 0;
+          const start = land - FALL;
+          const fall = progress(frame, start, FALL, GRAVITY);
           const column = (index % 3) - 1;
           const row = Math.floor(index / 3);
           const tilt = [-1.5, 1, -0.8, 1.2, -1, 1.5][index] ?? 0;
@@ -98,7 +99,7 @@ export const Export = () => {
                   row * ROW - DROP,
                   row * ROW,
                   fall,
-                )}px)) rotate(${lerp(tilt * 4, tilt, fall)}deg)`,
+                )}px)) rotate(${lerp(tilt * 4, tilt, fall)}deg) scale(${landing(frame, land)})`,
               }}
             >
               <span className="v-file-icon">{format.icon}</span>

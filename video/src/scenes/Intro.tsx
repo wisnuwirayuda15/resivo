@@ -1,7 +1,7 @@
 import { useCurrentFrame } from "remotion";
 
 import { Caret } from "../components/Caret";
-import { lerp, progress } from "../lib/motion";
+import { GRAVITY, landing, lerp, progress } from "../lib/motion";
 import timeline from "../timeline.json";
 
 /**
@@ -45,7 +45,7 @@ const PILE: ReadonlyArray<{
 ];
 
 /** Frames a chip takes to land, and how far above its place it starts. */
-const FALL = 22;
+const FALL = 18;
 const DROP = 560;
 
 export const Intro = () => {
@@ -74,8 +74,9 @@ export const Intro = () => {
       </h1>
       <div className="v-pile">
         {PILE.map((chip, index) => {
-          const start = (chips[index] ?? 0) - FALL;
-          const fall = progress(frame, start, FALL);
+          const land = chips[index] ?? 0;
+          const start = land - FALL;
+          const fall = progress(frame, start, FALL, GRAVITY);
           const visible = progress(frame, start, 6);
 
           return (
@@ -89,7 +90,7 @@ export const Intro = () => {
                   chip.y - DROP,
                   chip.y,
                   fall,
-                )}px)) rotate(${lerp(chip.rotate * 4, chip.rotate, fall)}deg)`,
+                )}px)) rotate(${lerp(chip.rotate * 4, chip.rotate, fall)}deg) scale(${landing(frame, land)})`,
               }}
             >
               {chip.label}
