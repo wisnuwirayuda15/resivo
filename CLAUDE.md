@@ -246,7 +246,8 @@ so an update never purges the cache under a page that is still running. Bump
 
 **The promo film is code that reuses the app, and its sound is written from the
 same clock as its picture.** `video/` is a separate package (`bun install` in
-it, then `bun run video:studio` or `bun run video:render` from the root) that
+it, then `bun run video:dev` or `bun run video:render` from the root; the studio
+is on :3300, clear of the app's :3000, the PWA build's :3100 and the clips' :3200) that
 resolves `@/` to `../src`, so the paper in it is drawn by the real template
 renderer, the ATS panel's words and findings come from the real rules, and the
 colours are the app's own `tokens.css` and `scheme.css`. It is kept out of the
@@ -262,6 +263,9 @@ and one effect for each event (nothing is recorded or downloaded, so there is no
 licence to check). Move an event in the JSON and its sound moves with it. Run
 `bun run --cwd video audio:check` after changing the mix; it needs ffmpeg
 (`FFMPEG`, or the PATH). Remotion bundles its own, so rendering does not.
+`bun run video:publish` renders and then puts the film and its poster in
+`public/promo/`, which is what the README shows. Change the film, publish it
+again, and commit the two files with it: the 11 MB is in git history each time.
 
 ## Layout
 

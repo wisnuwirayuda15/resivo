@@ -7,6 +7,16 @@ Write a resume in Markdown or edit it directly on the page, style it with a
 visual panel or your own CSS, and export it as a PDF, a single self-contained
 HTML file, or Markdown.
 
+[![A 28 second tour of Resivo: Markdown in, seven templates, the ATS check, light and dark, and the export formats.](public/promo/resivo-promo.jpg)](public/promo/resivo-promo.mp4)
+
+A 28 second tour, 1080p at 60 fps with sound: Markdown typed into the editor,
+seven templates over one document, the ATS check and its one-click fixes, the
+light and dark themes, and the export formats. Click the picture to play it.
+
+The film is made from the app and not recorded from it: the paper, the ATS
+findings and the colours in it come from this repository's own code. It lives in
+`video/`, and `bun run video:publish` renders it again into `public/promo/`.
+
 ## Why local-first
 
 A resume is a document about you: where you live, who employs you, what you are
