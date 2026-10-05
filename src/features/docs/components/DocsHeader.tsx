@@ -8,6 +8,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 
+import { GithubStars } from "@/components/GithubStars";
 import { Logo } from "@/components/shell/Logo";
 import { Icon } from "@/features/icons/IconRenderer";
 
@@ -91,6 +92,8 @@ export const DocsHeader: React.FC<DocsHeaderProps> = ({
           >
             {t("header.openApp")}
           </Button>
+
+          <GithubStars label={t("header.github")} locale={lang} />
         </Box>
       </Box>
     </Box>

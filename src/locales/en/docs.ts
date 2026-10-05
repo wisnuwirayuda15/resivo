@@ -12,6 +12,7 @@ export const docs = {
     language: "Language",
     lightTheme: "Switch to the light theme",
     darkTheme: "Switch to the dark theme",
+    github: "Resivo on GitHub",
     openNav: "Open the documentation menu",
     closeNav: "Close the documentation menu",
   },

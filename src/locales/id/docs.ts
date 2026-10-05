@@ -10,6 +10,7 @@ export const docs = {
     language: "Bahasa",
     lightTheme: "Ganti ke tema terang",
     darkTheme: "Ganti ke tema gelap",
+    github: "Resivo di GitHub",
     openNav: "Buka menu dokumentasi",
     closeNav: "Tutup menu dokumentasi",
   },

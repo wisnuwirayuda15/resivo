@@ -10,6 +10,7 @@ export const landing = {
     openApp: "Buka aplikasi",
     lightTheme: "Tema terang",
     darkTheme: "Tema gelap",
+    github: "Resivo di GitHub",
   },
   hero: {
     title: "Resume Anda tidak pernah meninggalkan browser ini.",

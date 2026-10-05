@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
+import { GithubStars } from "@/components/GithubStars";
 import { Logo } from "@/components/shell/Logo";
 import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
 
@@ -87,6 +88,8 @@ export const LandingNav: React.FC = () => {
           >
             {t("nav.openApp")}
           </Button>
+
+          <GithubStars label={t("nav.github")} locale={lang} />
         </Box>
       </Box>
     </Box>

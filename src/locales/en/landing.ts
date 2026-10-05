@@ -16,6 +16,7 @@ export const landing = {
     openApp: "Open the app",
     lightTheme: "Light theme",
     darkTheme: "Dark theme",
+    github: "Resivo on GitHub",
   },
   hero: {
     title: "Your resume never leaves this browser.",
