@@ -6,13 +6,14 @@ anywhere. That premise is the source of most decisions here, and it is worth
 checking any change against it.
 
 Read `README.md` for what the app does and `PRD.md` for the original brief
-(kept as written, with two superseded items reconciled in the README).
+(kept as written, with two superseded items reconciled below).
 
 ## Commands
 
 ```bash
 bun install
 bun run dev              # :3000
+bun run build            # production build, a Nitro Node server
 bun run typecheck        # tsc --noEmit
 bun run test             # vitest, 1017 tests in 71 files
 bun run test:e2e         # playwright, 166 specs, chromium only
@@ -244,6 +245,53 @@ It deliberately does not `skipWaiting` or claim clients,
 so an update never purges the cache under a page that is still running. Bump
 `VERSION` in it when its logic changes.
 
+**There is no version history, and that is a decision.** Undo covers the whole
+session and every surface, and the JSON backup covers what outlives one: a
+machine lost, a browser cleared, a document taken somewhere else. A revision
+store would spend the device's finite storage on a recovery path those two
+already provide. "A version per job" is a different thing and does not change
+this: it is a whole resume of its own, copied with the same section and block ids
+so Compare can line two resumes up by identity, and deleting the original keeps
+its versions as ordinary resumes.
+
+**The ATS check asks the paper for the page count, and says so when it cannot.**
+Length is not in the document: it comes from laying it out at a real width with
+real fonts, which only the preview does. The preview reports each measurement
+with the document it measured, and the check uses a count only for that
+document. Below 1200px the paper is unmounted whenever another pane is open, so
+an edit there changes the length with nobody measuring it, and the tab then says
+it cannot check length instead of repeating the old number. A dismissed finding
+is kept per resume in memory and not saved: saving it would be a new document
+field, a schema bump and a migration over every stored resume, for a preference
+that only matters while someone works down the list.
+
+**The print stylesheet has no fragmentation properties, on purpose.** Each page
+box is assigned exactly one sheet, so `orphans`, `widows` and `break-inside` have
+nothing to act on, and `break-inside: avoid` on an item that printed a fraction
+taller than it measured would let the browser move it to a sheet of its own and
+add a page the preview never showed. The guarantees are structural instead: items
+are atomic (an entry never breaks mid-entry, a paragraph is never balanced across
+a break) and a heading is kept with what follows it. Page breaks come in three
+scales: `::pagebreak` between two things (it round-trips through Markdown), a
+per-section toggle, and one document-wide setting for a heading left last on a
+page.
+
+**Export is one artefact with several destinations.** HTML is one file with no
+external reference (images, custom fonts and the bundled typefaces are inlined).
+PDF is that same file, printed in a frame of its own and thrown away, so neither
+can drift from the preview. Markdown uses the serializer the editor reads. JSON
+Resume and plain text carry the content and not the design, so neither reads
+back to the same look; JSON Resume is read leniently and lists what a resume here
+has no place for rather than dropping it quietly.
+
+**Two things in `PRD.md` were superseded while building, and the file is left as
+it was written.** It lists Iconify web components in the stack and Phosphor with
+a searchable picker in its own section; Phosphor is what was built, because the
+picker renders thousands of glyphs under virtualization and an export has to
+inline real SVG, neither of which a webfont serves. And it asks for three initial
+templates where four existed at the time (`classic`, `modern`, `technical`,
+`editorial`; there are seven now). Neither is a gap to close.
+
 **The promo film is code that reuses the app, and its sound is written from the
 same clock as its picture.** `video/` is a separate package (`bun install` in
 it, then `bun run video:dev` or `bun run video:render` from the root; the studio
@@ -326,7 +374,10 @@ the model, the codec, the paginator, the sanitizer, the export writer, the
 backup format, the migrations. Repository tests use `fake-indexeddb`; the few
 that need a DOM opt in per file with `// @vitest-environment happy-dom`.
 
-`bun run test:e2e` is the only place the browser-only parts are exercised. Two
+`bun run test:e2e` is the only place the browser-only parts are exercised, and
+`e2e/workflow.spec.ts` is the whole app end to end (create, edit, restyle, add an
+image, export, group, back up, reload, wipe, restore), the one test that says it
+works and not only its parts. `bun run test:e2e:ui` opens Playwright's runner. Two
 things to know before writing one:
 
 - `openEmptyApp` in `e2e/app.ts` deletes the database, marks both onboarding

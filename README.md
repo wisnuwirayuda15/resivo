@@ -20,10 +20,8 @@ HTML file, or Markdown.
 
 ![Resivo in its light and dark themes: Markdown on the left, the resume in the middle, and the style panel on the right. The paper stays light in both.](public/brand/resivo-editor.png)
 
-There is also a [28 second tour](public/promo/resivo-promo.mp4) of it, made from
-the app and not recorded from it: the paper, the ATS findings and the colours in
-it come from this repository's own code. It lives in `video/`, and
-`bun run video:publish` renders it again into `public/promo/`.
+There is also a [28 second tour](public/promo/resivo-promo.mp4), made from the app's
+own code in `video/`.
 
 ## Why local-first
 
@@ -35,6 +33,27 @@ The consequence is the tradeoff: clearing your browser storage deletes your
 resumes, and there is no copy anywhere else. Backup and restore in Settings is
 the only thing that survives a cleared browser or a lost machine.
 
+## What it does
+
+- **Markdown or the page.** Write CommonMark and GFM with a few directives for
+  structured entries, or click any text on the paper and edit it in place. It
+  round-trips losslessly, and anything it cannot typeset is kept and flagged
+  rather than dropped.
+- **Seven templates**, single column and ATS friendly, with a control for every
+  design token and your own sanitized CSS on top.
+- **An ATS check** that lists what would trip a parser, with one-click fixes.
+- **The PDF is the preview.** Pagination is measured, and export reuses the same
+  breaks.
+- **Export** to PDF, a self-contained HTML file, Markdown, JSON Resume, plain
+  text, or a zip with the images and fonts. **Import** Markdown, JSON Resume or
+  plain text.
+- **A library** with groups, search and archive, a copy per job with a word by
+  word comparison, and cover letters.
+- **Light and dark**, with the paper always light, in English and Indonesian.
+- **Installable, and it opens with no network.**
+- **Documentation for people and for tools**, at `/en/docs` and `/id/docs`, with
+  `llms.txt` and a read-only MCP server over the same pages.
+
 ## Getting started
 
 ```bash
@@ -45,415 +64,21 @@ bun install
 bun run dev
 ```
 
-The app runs at http://localhost:3000.
-
-## What it does
-
-**A landing page at `/`.** The root used to redirect straight into the
-library, which meant an app whose whole premise is that your data stays on your
-own device had nowhere to say so before asking for it. The page is served from
-the same SSR shell, reads nothing from the database, and shows the format next
-to the page it produces. The library is still the canonical URL for "all my
-resumes", at `/resumes`.
-
-**Installable, and it opens with no network.** Resivo can be installed from
-Settings or from the browser's own control, and put in a dock or on a home
-screen, where it runs in its own window and starts at the library rather than
-the landing page. A service worker caches the app itself, so a reload works with
-the network gone: your resumes were always on the device, and now the thing that
-reads them is too. Nothing is precached in bulk (the build is 21 MB, most of it
-Monaco's language workers), so what the app has used is what it can open without
-a connection. Settings says which of those two states this device is in, rather
-than claiming offline before it is true.
-
-The documentation works the same way: a page you have read, the search index once
-you have searched, and the move between pages you have already opened are all
-available offline. A docs page you never opened is not, and falls back to the
-docs home if you opened that.
-
-**English and Indonesian.** The whole interface, including the docs, the
-tours and the ATS findings, is available in both, chosen in Settings or from
-the command palette and kept in this browser. English is the default and what the
-server renders, so the indexed pages are stable for a crawler; the stored choice,
-or failing that the browser's language, is applied after hydration rather than
-during it, which is the price of not detecting a language on the server without
-sending anything about the visitor to it. A new blank resume names its sections
-in the interface's language, and the Markdown importer recognises the Indonesian
-headings. The prompt for a language model stays in English on purpose: it is an
-instruction to a model, not part of the interface. Messages are TypeScript
-modules, the Indonesian ones are typed against the English, and a test fails on
-a missing key, a changed placeholder or a sentence left untranslated. A lint
-rule rejects text written straight into JSX.
-
-**One resume as a zip.** The Export as zip item on a card, and the Bundle entry in
-the editor's export menu, write one resume with everything it needs: the
-document with its template, tokens and custom CSS, and the images and fonts it
-uses as the files they are. Import it from the new-resume dialog on another
-device and it is the same resume; a test compares the HTML export before and
-after and requires the two to be identical. It is for moving or keeping one
-resume, where the backup in Settings is for the whole device, and it is a zip
-rather than JSON with base64 so the assets are not a third larger and any
-archive tool opens it. What "the same" rests on is the template: the bundle
-records which revision of it drew the resume, and an import says so when the
-CSS has changed since, because that is the one thing that can break a page
-differently. A bundle is read as untrusted input: only the files it should have
-are read, sizes are checked from what the archive declares before anything is
-inflated, every image and font goes through the same checks as an upload, and
-nothing is written until all of it has passed.
-
-**A version per job.** Create version for a job, on a card, copies a resume
-for one company and role (and, if you like, a link to the posting). A version
-is a resume of its own, finished and exportable, and not a revision of the
-original: Resivo has no version history, and this does not change that, because
-what is stored is whole resumes and the comparison is between two things that
-both exist. The copy keeps the ids of every section and block, so the Compare
-button in a version's editor can line the two up by identity and show what was
-reworded word by word, what was added, removed, hidden or moved, and whether the
-template or style differs. Cards say what a version is for and how many a
-resume has, and search finds the company or role. Deleting the original keeps
-its versions as ordinary resumes that still say what they were written for.
-
-**Cover letters.** A letter is a document of its own kind, made from the same
-dialog, with an example or a blank page, or from a resume's menu, which copies
-the header and, for a version, the company as the recipient. It lives in the
-same table, route and editor as a resume and is paginated and exported by the
-same pipeline; what differs is four small things. The paper draws no section
-headings for it, so nothing sits above the first paragraph. Its design starts as
-a letter's (an inch of margin, an 11pt body, lines 1.5 apart, a paragraph's worth
-of space between paragraphs) over whichever template you picked. The ATS tab
-asks it letter questions: a name, an email, type and margins, hidden text, one
-page and about 450 words, and not the sections, dates and entries a resume has.
-And the library files it apart, behind a Cover letters row in the sidebar. The
-docs have a page for letters and a prompt to copy for writing one with an
-assistant, which tells the model not to invent a recipient, a company or an
-achievement. JSON Resume is not offered for a letter, because it has nowhere to
-put one.
-
-**Library.** Multiple resumes, organised into groups, with search, sort,
-duplicate and archive. Archived resumes are hidden, never deleted.
-
-**Two ways to start.** A new resume is either the example, a finished
-one-page resume with entries, dates, a tag list and every section a template
-lays out specially, or a blank page with the four usual sections and nothing in
-them. The example is the default until you pick the other, and then that is
-remembered. The point of it is the first minute: an empty page does not show
-what an entry is or that skills are a `::tags` line, and the documentation is a
-link somebody has to know to follow. It is real Markdown, checked against the
-real parser in a test, so what you read in the code pane is what the format
-actually is. A third way in is an existing file, from the same dialog: Markdown,
-a JSON Resume file, or plain text. Plain text is read for the conventions a text
-resume has (a name on top, contacts under it, headings in capitals or by their
-usual names, a bullet character) and handed to the Markdown reader, so there is
-one parser and a file cannot be understood two ways. JSON Resume is read
-leniently, a wrong type in one field does not refuse the file, and what a resume
-here has no place for (the photograph, links on jobs, grades) is listed rather
-than dropped quietly. Whatever comes in is checked against the document schema
-before anything is written.
-
-**Sidebar.** Collapses to a 60px rail of icons, from the header or Ctrl/Cmd+B,
-and stays that way across a reload. The rail drops the group list rather than
-shrinking it: every group is the same folder glyph, so a column of them asks you
-to hover each one to find out which is which.
-
-**Three-panel editor.** Markdown and CSS on the left, the paper in the middle,
-style controls on the right. Panel widths are draggable and remembered. Below
-1200px (where three panes and the sidebar no longer fit) the same three become
-one behind a tab strip rather than overflowing sideways. Nothing is dropped on a
-small screen: the controls a narrow pane cannot show inline fold into a popover,
-and the sidebar becomes a drawer.
-
-**Markdown.** CommonMark and GFM, plus directives such as
-`:::entry{title="…" start="2021-03"}` for the structured entries a heading
-convention could never recover reliably. Headings, lists of either kind at any
-depth, task lists, tables, quotes and fences are all typeset. Sections are
-opened by the shallowest heading level in the file, so a resume written
-elsewhere with `###` headings works as pasted. It round-trips losslessly:
-what is left (raw HTML, footnotes, link definitions) is kept verbatim and
-flagged as a warning rather than silently dropped, and text that arrives above
-the first heading goes into an untitled section rather than being refused.
-
-**A guide, and a prompt.** The Guide button in the code pane opens the docs on the
-format in a new tab: every directive with a working example, and what custom CSS
-can and cannot reach. One page there holds a prompt that states the whole format
-to a language model, including what never to emit, so a resume you asked an
-assistant to write comes back in a shape this app can read. Every resume example
-is parsed by the real codec, and every CSS one by the real sanitizer, in a test,
-because a syntax guide's failure mode is being wrong rather than being ugly.
-
-**Documentation, for people and for tools.** `/en/docs` and `/id/docs` are a
-complete public manual: sidebar, contents, search that runs in the browser,
-breadcrumbs and previous and next links, written in both languages and read at
-the same address in either. It is MDX in `content/docs`, rendered with Fumadocs
-headless and Mantine. Any page can be copied as Markdown, opened as Markdown, or
-handed to Claude or ChatGPT by its public address alone. Tools can read it too:
-every page has a `.md` address, the normal address returns Markdown to a client
-that asks for it, `/llms.txt` and the per-language `llms-full.txt` carry the
-whole manual, and `/api/mcp` is a read-only MCP server over the same pages. It
-holds public text only and never touches what is stored in a browser.
-
-**Visual editing.** Click any text on the paper to edit it in place; drag blocks
-and sections to reorder them, or use the move buttons beside them. Switching the
-editor on cannot move a page break, the chrome is never part of what the
-paginator measures.
-
-**Templates and style.** Seven ATS-friendly single-column templates (`classic`,
-`modern`, `technical`, `editorial`, `compact`, `profile`, `bold`), all pure CSS
-over one shared markup, plus a control for every design token: paper size,
-margins, fonts, sizes, colours, rhythm, rules, icons, and where pages break.
-
-**Page breaks.** Three scales, because the need comes in three. `::pagebreak`
-puts a break between two particular things and round-trips through Markdown; a
-per-section toggle starts a section on a fresh sheet; and one document-wide
-setting decides whether a heading may be the last thing on a page. What the
-paginator does _not_ do is split an item: an entry never breaks mid-entry, and
-by the same token a paragraph is never balanced across a break.
-
-**Custom CSS.** Your own stylesheet, applied to the resume only. It is
-sanitized (no `@import`, no external `url()`, no `position: fixed`), and injected
-into a cascade layer above the template, so it can restyle the paper but cannot
-reach the app around it or break the pagination it was measured against.
-
-**Assets.** An image gallery and custom font upload, shared across every resume
-on the device, each with a page of its own that also reports what nothing refers
-to any more. Fonts are validated by the browser's own font parser on upload, so
-a bad file is refused rather than silently falling back. Settings totals up what
-the device is holding.
-
-**Icons.** All 1512 Phosphor icons in all six weights, searchable, rendered as
-inline SVG so they survive into an export.
-
-**Export.** HTML is one file with no external reference of any kind: images,
-custom fonts and the bundled typefaces are all inlined. PDF is that same file,
-printed, built, handed to the browser in a frame of its own and thrown away, so
-the PDF and the HTML export are one artefact with two destinations and neither
-can drift from the preview. Markdown uses the same serializer the editor reads. JSON Resume carries the
-content in the format other tools read, and plain text is the same content with
-no styling, for a form that asks you to paste a resume; neither can carry the
-design, so neither reads back to the same look.
-
-**An ATS check.** The inspector's fourth tab reads the document the way an
-applicant tracking system might and lists what would trip it: no name or email,
-a contact that is only an icon, an end date before its start, dates written in
-words, two columns, a table, text a stylesheet hides, a body size or a margin
-too small to print, a colour too pale to read, a resume that runs past two
-pages. Each finding says what is wrong
-and why a parser or a recruiter would care, and the ones with an obvious repair
-carry a button, plus one to apply them all. A fix goes through the same edit
-path as everything else, so one undo takes it back. It looks for common
-problems and cannot promise how a particular system will parse a file, because
-none of them publishes how, and the panel says so. It runs on the document in
-the browser and sends nothing anywhere.
-
-**Keyboard and discovery.** `Ctrl/Cmd+K` opens a command palette over every page
-and command; the application menu lists the shortcuts and the things worth
-knowing. A first visit offers a short tour (of the library, and of the editor
-the first time a resume is opened), which can be skipped from any step and
-restarted from that menu or the palette. Both run at any width: on a screen
-where the editor is one pane behind a tab strip, the tour opens the tab each
-step needs and points at that tab rather than at a column that is not there.
-
-## How it works
-
-The preview is a same-origin **iframe**, and that choice drives much of the
-architecture. Only a separate document gives its own `@page` rule, its own root
-font size, and a cascade the app cannot leak into, so the paper stays light
-while the app is dark, and the document whose HTML is exported is the one on
-screen.
-
-Pagination is **measured, not guessed**: every block is laid out once in a hidden
-container at the exact page width, measured, and then distributed into page boxes
-using the breaks that produced. Both passes render the same React elements, so
-what was measured is what appears. Export reuses those breaks rather than
-re-deriving them.
-
-That is also why CSS fragmentation properties (`orphans`, `widows`,
-`break-inside`) are deliberately absent from the print stylesheet. Each page box
-is assigned exactly one sheet, so there is no CSS fragmentation left for them to
-influence, and `break-inside: avoid` on an item that printed a fraction taller
-than it measured would let the browser move it to a sheet of its own and add a
-page the preview never showed. The equivalent guarantees are structural instead:
-items are atomic, and a heading is kept with what follows it.
-
-The document is one typed model, and every edit (a keystroke in the Markdown
-pane, a slider in the style panel, a drag on the paper) goes through the same
-typed recipes. That is what keeps one undo history coherent across three very
-different editing surfaces.
-
-## Decisions worth knowing
-
-**There is no version history, and that is a decision.** Undo covers the whole
-session and every surface, and the JSON backup covers the cases that outlive
-one, a machine lost, a browser cleared, a document taken somewhere else. A
-revision store would spend the device's storage on a recovery path those two
-already provide, on an app whose whole premise is that the storage is finite and
-local. If a resume needs to be kept as it was, save a backup or export the
-Markdown; both are one click.
-
-**The ATS check asks the paper for the page count, and says so when it cannot.**
-Length is not in the document: it comes from laying the document out at a real
-width with real fonts, which only the preview does. The preview reports each
-measurement together with the document it measured, and the check uses a count
-only for that document. Below 1200px the paper is unmounted whenever another
-pane is open, so an edit made there changes the length with nobody measuring it.
-A bare number would keep claiming the old count, so after such an edit the tab
-says it cannot check length and asks for the Paper tab instead.
-
-**A dismissed ATS finding is remembered for the session, not saved.** Saving it
-would mean a new field on the document, a bump of its schema version and a
-migration that touches every stored resume, for a preference that only matters
-while someone works down the list. It is kept per resume in memory, so it
-survives switching tabs but not a reload.
-
-**Three pages and the documentation are indexable, and the rest say so.** `/`,
-`/templates`, `/about` and everything under `/en/docs` and `/id/docs` carry a
-title, a description and a social card. Every route behind the app shell renders
-the contents of one browser's IndexedDB, so a crawler sees an empty shell of it
-however full the real one is, and an empty shell in a search index is worse than
-no result: those routes send `noindex` and `robots.txt` repeats it. The two are
-not redundant, because they are read at different moments. `robots.txt` stops
-the fetch; the meta tag stops the indexing of a page reached by a link from
-elsewhere.
-
-Each docs page also names its canonical address and links its translation, with
-`x-default` pointing at English, and carries a breadcrumb trail as structured
-data. `/sitemap.xml` lists the three public pages and every docs page with its
-alternates, and `/robots.txt` is a route that points at it. Both need an
-absolute address, and the repo does not know where it is deployed, so set
-`SITE_URL` in production (the live site is `https://resivo-cv.vercel.app`, set as
-an environment variable in the Vercel project). Without it the
-address of the incoming request is used, which is right locally and behind a
-proxy that forwards the real host, but a `Host` header is chosen by whoever
-sends the request, so do not rely on it for a public site. Where no origin can be
-found at all, the absolute tags are left out rather than guessed. The three public
-pages (`/`, `/templates`, `/about`) use the same origin for their canonical, the
-social card image and the structured data, and fall back to root-relative
-addresses when there is none.
-
-**Two things in `PRD.md` were superseded while building, and the file is left as
-it was written.** It lists Iconify web components in the stack and Phosphor with
-a searchable picker in its own section; Phosphor is what was built, because the
-picker has to render thousands of glyphs under virtualization and an export has
-to inline real SVG, neither of which a webfont serves. And it asks for three
-initial templates, where four exist: `classic`, `modern`, `technical` and
-`editorial`. Neither difference is a gap to close; both are recorded here so the
-PRD can be read as the brief it was rather than as a checklist that half
-failed.
+The app runs at http://localhost:3000. `bun run test`, `bun run test:e2e`,
+`bun run lint`, `bun run check` and `bun run typecheck` are the checks. What
+else is worth knowing about the codebase, and why it is built the way it is, is
+in [CLAUDE.md](CLAUDE.md).
 
 ## Stack
 
-TanStack Start (SSR shell) · TanStack Router, Query · Mantine 9, with Spotlight
-for the palette and `mantine-onboarding-tour` for the first run · Tailwind CSS 4
-· Zustand + Immer · Dexie / IndexedDB · Zod · Monaco · unified / remark ·
-PostCSS · dnd-kit · Phosphor
-
-The SSR shell is kept, but nothing that touches user data runs on the server:
-IndexedDB, Monaco, the preview iframe and dnd-kit all sit behind client-only
-boundaries.
-
-## Project layout
-
-```
-content/           the docs (MDX, English and Indonesian) and the AI prompts
-e2e/               Playwright specs, and the moves they share
-e2e-pwa/           the offline spec, which needs a real build
-src/
-  routes/          file-based routes (library, editor, assets, settings, about)
-  features/
-    resume/        the document model, schema, queries and the example
-    editor/        store, autosave, undo, Markdown and CSS panes
-    preview/       iframe host, paginator, flow, reorder
-    templates/     template registry and the renderers
-    markdown/      the Markdown codec, both directions
-    css/           the custom-CSS sanitizer
-    style/         the style inspector
-    icons/         generated icon catalog and picker
-    assets/        images and fonts
-    ats/           the ATS check: rules, fixes, and the inspector tab
-    export/        PDF, HTML and Markdown adapters
-    docs/          the public documentation: routes, search, Markdown for readers
-                   and agents (the text itself is in `content/docs`)
-    landing/       the marketing page at `/`
-    pwa/           installing, and whether the app is cached here
-    backup/        whole-database backup and restore
-    settings/      app preferences and storage usage
-    commands/      the command palette
-    onboarding/    the first-run tours
-  database/        Dexie schema, repositories, migrations
-  assets/          the logo, as SVG
-  components/      app chrome
-  lib/             small shared utilities
-```
-
-## Scripts
-
-```bash
-bun run dev            # dev server on :3000
-bun run build          # production build
-bun run typecheck      # tsc --noEmit
-bun run test           # vitest
-bun run test:e2e       # playwright, in a real browser
-bun run test:e2e:pwa   # playwright against a real build, for offline
-bun run lint           # eslint
-bun run check          # prettier --check
-bun run format         # prettier --write, then eslint --fix
-bun run generate-icons # rebuild the icon catalog from @phosphor-icons/core
-bun run generate-favicon # re-render the PNG marks from the two SVGs in public/
-bun run generate-og      # re-render public/og.png, the social card
-```
-
-`generate-icons` writes `src/features/icons/*.gen.ts`, which is **committed**.
-Codegen deliberately stays out of the build so a clean checkout does not depend
-on a dev dependency resolving to the same icon-set version.
-
-## Testing
-
-Two suites, for two different questions.
-
-```bash
-bun run test
-```
-
-Unit-level, no browser: the model, the Markdown codec, the paginator, the CSS
-sanitizer, the reorder logic, the export writer, the backup format and the
-document migrations, and the docs content: every page in both languages, every
-code example run through the real codec or sanitizer, and every number, name and
-limit the pages quote checked against the code that owns it. Repository tests
-use `fake-indexeddb`; the few that need a
-DOM opt in per file with `// @vitest-environment happy-dom`.
-
-```bash
-bun run test:e2e
-```
-
-Playwright, in a real Chromium. This is the only place the parts that exist only
-in a browser get exercised: a Mantine modal, a Monaco editor that has actually
-laid itself out, the preview iframe, an edit made by clicking on the paper, a
-page count that changes when a break is inserted, and IndexedDB surviving a
-reload. `e2e/workflow.spec.ts` is the whole thing end to end (create, edit,
-restyle, add an image, export, group, back up, reload, wipe, restore), and it is
-the test that says the app works, rather than that its parts do.
-
-`openEmptyApp` starts every spec from a deleted database, and marks the
-onboarding tours as already seen: a new database is a new user, and the tour's
-overlay would otherwise intercept the clicks the rest of the suite makes.
-`e2e/onboarding.spec.ts` is the one that opts back in.
-
-`bun run test:e2e:ui` opens Playwright's runner if you want to watch it happen.
-The dev server is started automatically, and reused if one is already running.
-
-```bash
-bun run test:e2e:pwa
-```
-
-The service worker, and the only suite that runs against a real build. It has to:
-the worker is registered only in production, and what it caches are hashed asset
-URLs that do not exist until a build has produced them, so run against the dev
-server this spec would pass while testing nothing. It builds, serves on :3100,
-takes the network away with the app open, and reloads.
+TanStack Start (SSR shell), Router and Query, Mantine 9, Tailwind CSS 4, Zustand
+and Immer, Dexie, Zod, Monaco, unified and remark, PostCSS, dnd-kit, Phosphor.
+Nothing that touches user data runs on the server.
 
 ## Deploying
 
-The build output is a self-contained Node server (Nitro).
+The build is a self-contained Node server (Nitro), and no environment variable is
+required.
 
 ```bash
 bun run build
@@ -463,9 +88,9 @@ bun run build
 node .output/server/index.mjs
 ```
 
-Any static or Node-compatible host works, there is no database to provision and
-no environment variable to set, because the server only ever ships the app
-itself. For host-specific presets see https://v3.nitro.build/deploy.
+Set `SITE_URL` in production so the canonical addresses, the sitemap and the
+social card are absolute. For host-specific presets see
+https://v3.nitro.build/deploy.
 
 ## Star history
 
