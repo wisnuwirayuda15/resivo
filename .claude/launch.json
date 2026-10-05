@@ -6,6 +6,12 @@
       "runtimeExecutable": "bun",
       "runtimeArgs": ["run", "dev"],
       "port": 3000
+    },
+    {
+      "name": "resivo-video",
+      "runtimeExecutable": "bun",
+      "runtimeArgs": ["run", "video:dev"],
+      "port": 3300
     }
   ]
 }
