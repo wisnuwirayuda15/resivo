@@ -5,9 +5,11 @@
   "scripts": {
     "audio": "node scripts/generate-audio.mjs",
     "audio:check": "node scripts/check-audio.mjs",
-    "studio": "remotion studio src/index.ts",
+    "dev": "remotion studio src/index.ts --port=3300",
+    "studio": "bun run dev",
     "still": "remotion still src/index.ts Promo",
     "render": "bun run audio && remotion render src/index.ts Promo out/resivo-promo.mp4",
+    "publish": "bun run render && node scripts/publish.mjs && remotion still src/index.ts Promo ../public/promo/resivo-promo.jpg --frame=444 --image-format=jpeg --jpeg-quality=88 --scale=0.667",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

@@ -23,8 +23,10 @@
     "generate-og": "node scripts/render-og.mjs",
     "test:e2e:pwa": "playwright test --config playwright.pwa.config.ts",
     "record:docs": "playwright test --config playwright.media.config.ts",
+    "video:dev": "bun run --cwd video dev",
     "video:studio": "bun run --cwd video studio",
-    "video:render": "bun run --cwd video render"
+    "video:render": "bun run --cwd video render",
+    "video:publish": "bun run --cwd video publish"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
