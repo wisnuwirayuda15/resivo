@@ -112,7 +112,7 @@ const level = (from, to) => {
 
 const fps = timeline.fps;
 const bar = (60 / timeline.bpm) * 4;
-const SOUNDS = ["chips", "swaps", "clicks", "dings", "flips", "thumps"];
+const SOUNDS = ["chips", "swaps", "clicks", "dings", "flips", "thumps", "hits"];
 
 const cues = Object.values(timeline.scenes).flatMap((scene) =>
   SOUNDS.flatMap((key) =>

@@ -8,7 +8,11 @@
       "bar": 0,
       "bars": 2,
       "events": {
-        "type": { "from": 12, "every": 3, "count": 30 },
+        "type": {
+          "from": 12,
+          "every": 3,
+          "count": 30
+        },
         "chips": [118, 130, 142, 154, 166, 178, 190, 202, 214]
       }
     },
@@ -16,7 +20,11 @@
       "bar": 2,
       "bars": 2,
       "events": {
-        "type": { "from": 14, "frames": 170 }
+        "type": {
+          "from": 14,
+          "frames": 170
+        },
+        "hits": [0]
       }
     },
     "templates": {
@@ -24,7 +32,8 @@
       "bars": 2,
       "events": {
         "clicks": [27, 57, 87, 117, 147, 177],
-        "swaps": [30, 60, 90, 120, 150, 180]
+        "swaps": [30, 60, 90, 120, 150, 180],
+        "hits": [0]
       }
     },
     "ats": {
@@ -33,7 +42,8 @@
       "events": {
         "chips": [20, 28, 36],
         "clicks": [76, 142],
-        "dings": [150]
+        "dings": [150],
+        "hits": [0]
       }
     },
     "themes": {
@@ -42,14 +52,16 @@
       "events": {
         "clicks": [54],
         "flips": [60],
-        "thumps": [60]
+        "thumps": [60],
+        "hits": [0]
       }
     },
     "export": {
       "bar": 10,
       "bars": 2,
       "events": {
-        "chips": [36, 66, 96, 126, 156, 186]
+        "chips": [36, 66, 96, 126, 156, 186],
+        "hits": [0]
       }
     },
     "outro": {
@@ -57,7 +69,8 @@
       "bars": 2,
       "events": {
         "dings": [92],
-        "chips": [130]
+        "chips": [130],
+        "hits": [0]
       }
     }
   }

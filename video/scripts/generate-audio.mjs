@@ -389,6 +389,42 @@ const whoosh = (end, length = 0.45, gain = 0.1) => {
   );
 };
 
+/** The tail of a cut: the same noise falling away from the bar line, as the
+ * panel uncovers the new scene. */
+const swoosh = (start, length = 0.4, gain = 0.09) => {
+  let low = 0;
+
+  add(
+    fx,
+    start,
+    length,
+    (t) => {
+      const progress = t / length;
+      const coefficient = 0.02 + 0.5 * (1 - progress) ** 2;
+
+      low += coefficient * (random() * 2 - 1 - low);
+
+      return low * (1 - progress) ** 1.4;
+    },
+    gain * 3,
+  );
+};
+
+/** The hit on the bar line, where the panel is at full cover. */
+const hit = (start) => {
+  add(
+    fx,
+    start,
+    0.3,
+    (t) =>
+      Math.sin(2 * Math.PI * (52 * t + (46 / 22) * (1 - Math.exp(-t * 22)))) *
+      Math.exp(-t * 12) *
+      Math.min(1, t / 0.002),
+    0.34,
+  );
+  noiseBurst(fx, start, 0.07, 0.09, 0.9);
+};
+
 const thump = (start) => {
   add(
     fx,
@@ -423,15 +459,18 @@ const EVENT_SOUND = {
   dings: ding,
   flips: flip,
   thumps: thump,
+  hits: hit,
 };
 
 for (const [, scene] of sceneEntries) {
   const origin = scene.bar * BAR;
   const events = scene.events ?? {};
 
-  // Every cut after the first is announced by a rise into the bar line.
+  // Every cut after the first is a rise into the bar line, a hit on it, and a
+  // fall away from it (the `hits` event is in the timeline, the rest follows).
   if (scene.bar > 0) {
-    whoosh(origin);
+    whoosh(origin, 0.5, 0.12);
+    swoosh(origin);
   }
 
   if (events.type !== undefined) {
@@ -499,7 +538,7 @@ const [wetLeft, wetRight] = pingPong(left, right, BEAT * 0.75, 0.4, 0.3);
  */
 const MUSIC_GAIN = Number(process.env.AUDIO_MUSIC ?? 0.6);
 const FX_GAIN = Number(process.env.AUDIO_FX ?? 2.4);
-const MASTER = Number(process.env.AUDIO_MASTER ?? 1.7);
+const MASTER = Number(process.env.AUDIO_MASTER ?? 1.55);
 
 const fadeIn = 0.04;
 const fadeOut = 1.4;
