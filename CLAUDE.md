@@ -74,7 +74,7 @@ is 992px, `lg` is 1200px and `xl` is 1408px. There is also an `xs` at 576px.
 A layout written against Tailwind's 640px `sm` will open up 128px too late.
 
 **Cascade layer order is declared at the top of `src/styles/global.css`:**
-`theme, base, mantine, mantine-onboarding-tour, components, utilities`.
+`theme, base, mantine, mantine-onboarding-tour, mantine-video, components, utilities`.
 Unlayered CSS beats every layered rule whatever the order, so always import the
 `styles.layer.css` build of a Mantine ecosystem package, and put app rules that
 must be overridable by a utility in `@layer components`. Two bugs in this repo
@@ -312,13 +312,20 @@ licence to check). Move an event in the JSON and its sound moves with it. Run
 `bun run --cwd video audio:check` after changing the mix; it needs ffmpeg
 (`FFMPEG`, or the PATH). Remotion bundles its own, so rendering does not.
 `bun run video:publish` renders and then puts the film and its poster in
-`public/promo/`, which the landing page plays (`landing/Tour.tsx`, with
-`preload="none"` so the 11 MB is fetched only on play) and the README links to
+`public/promo/`, which the landing page plays (`landing/Tour.tsx`) and the README links to
 and does not embed: GitHub does not
 play a repository's own video inline, so the README shows `public/brand/` (the
 logo, and a light and dark screenshot of the editor) instead. Change the film,
 publish it again, and commit the two files with it: the 11 MB is in git history
 each time.
+
+**Every video goes through `components/VideoPlayer.tsx`, which is Mantine Video
+and not a `<video controls>`.** Each browser draws its own control bar and none
+follow the app's theme, so the same clip looked like three products. It keeps
+`preload="none"` (the film is 11 MB, a page pays for the poster until play) and
+never autoplays; the docs clips pass `loop` and are muted. The package needs
+`@tabler/icons-react` as a peer for its control icons, the one use of that set in
+an app that is otherwise Phosphor.
 
 **The one request the public pages make.** The landing page and the docs header
 show the repository's star count (`components/GithubStars.tsx`), a plain `GET` to

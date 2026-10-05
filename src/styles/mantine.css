@@ -6,14 +6,15 @@
  * rule whatever the order, so the plain `styles.css` of an ecosystem package
  * would sit above the app's own `components` and `utilities` layers and could
  * not be overridden by a Tailwind class. Mantine's own packages declare
- * `@layer mantine`; the tour declares one of its own, which global.css puts
- * beside it in the order statement.
+ * `@layer mantine`; the tour and the video player declare one of their own,
+ * which global.css puts beside it in the order statement.
  */
 @import "@mantine/dates/styles.layer.css";
 @import "@mantine/notifications/styles.layer.css";
 @import "@mantine/spotlight/styles.layer.css";
 @import "@mantine/code-highlight/styles.layer.css";
 @import "@gfazioli/mantine-onboarding-tour/styles.layer.css";
+@import "@gfazioli/mantine-video/styles.layer.css";
 
 /**
  * The tour's card: as wide as the screen allows, and never wider.

@@ -1,5 +1,7 @@
 import { Box, Text } from "@mantine/core";
 
+import { VideoPlayer } from "@/components/VideoPlayer";
+
 interface VideoProps {
   /** A file under `public/docs-media`, as a path from the site root. */
   src: string;
@@ -15,27 +17,14 @@ interface VideoProps {
 /**
  * A short screen recording of the app, played in place.
  *
- * Muted and looping because it is a demonstration and not a talk, with controls
- * left on so it can be paused, which a looping clip with no way to stop it is
- * not acceptable without. It does not autoplay: a reader who asked for reduced
- * motion has said so once to their system, and a docs page should not need to be
- * told again. `preload="none"` is the other half of that decision. A page with a
- * clip on it costs the poster and nothing more until someone presses play.
+ * Muted and looping because it is a demonstration and not a talk, with the
+ * player's controls on so it can be paused, which a looping clip with no way to
+ * stop it is not acceptable without. It does not autoplay, and the player
+ * fetches nothing but the poster until someone presses play: see `VideoPlayer`.
  */
 export const Video: React.FC<VideoProps> = ({ src, poster, caption }) => (
   <Box className="my-6" component="figure">
-    <Box
-      aria-label={caption}
-      className="rounded-panel border-line w-full border"
-      component="video"
-      controls
-      loop
-      muted
-      playsInline
-      poster={poster}
-      preload="none"
-      src={src}
-    />
+    <VideoPlayer label={caption} loop poster={poster} src={src} />
     <Text
       className="text-muted mt-2 text-center text-[13px]"
       component="figcaption"

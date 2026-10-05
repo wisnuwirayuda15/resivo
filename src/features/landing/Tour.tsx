@@ -1,5 +1,6 @@
 import { Box, Text } from "@mantine/core";
 
+import { VideoPlayer } from "@/components/VideoPlayer";
 import { useTranslation } from "@/lib/i18n/useTranslation";
 
 import { Reveal } from "./Reveal";
@@ -7,11 +8,10 @@ import { Reveal } from "./Reveal";
 /**
  * The 28 second film, under the hero.
  *
- * `preload="none"` and a poster, because the file is 11 MB and most visitors
- * will not press play: the page pays for a 125 KB picture and the film is fetched
- * only when asked for. It has sound, so it never autoplays, and it is served from
- * this origin like everything else on the page, so playing it sends nothing to a
- * third party. It is made by `video/` from the app's own code (see `CLAUDE.md`),
+ * The player fetches nothing but the 125 KB poster until someone presses play
+ * (the film is 11 MB), and it has sound, so it never autoplays. It is served
+ * from this origin like everything else on the page, so playing it sends nothing
+ * to a third party. It is made by `video/` from the app's own code (see `CLAUDE.md`),
  * and `bun run video:publish` is what puts a new cut at these two addresses.
  *
  * No captions track: there is no speech in it, only music, and what it shows is
@@ -40,16 +40,7 @@ export const Tour: React.FC = () => {
         </Reveal>
 
         <Reveal className="mt-10" order={1}>
-          <Box
-            aria-label={t("tour.label")}
-            className="border-line-soft bg-sunken rounded-panel aspect-video w-full overflow-hidden border"
-            component="video"
-            controls
-            playsInline
-            poster={POSTER}
-            preload="none"
-            src={FILM}
-          />
+          <VideoPlayer label={t("tour.label")} poster={POSTER} src={FILM} />
         </Reveal>
       </Box>
     </Box>
