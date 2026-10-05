@@ -144,6 +144,7 @@ export const editor = {
     },
     imageWidth: "Image width",
     drag: "Drag to move",
+    menu: "Item actions",
     moveUp: "Move up",
     moveDown: "Move down",
     delete: "Delete",

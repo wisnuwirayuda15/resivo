@@ -9,14 +9,21 @@ import { useTranslation } from "@/lib/i18n/useTranslation";
 import {
   ColorField,
   ControlGroup,
+  IconChoiceField,
   NumberField,
   SelectField,
   SliderField,
   SwitchField,
+  TextField,
 } from "./controls";
 
 import type { Recipe } from "@/features/editor/mutations";
 import type { FontSummary } from "@/database/index";
+import {
+  TAG_SEPARATOR_MAX,
+  TEXT_ALIGNMENTS,
+} from "@/features/resume/model/document";
+
 import type {
   DesignConfig,
   FontRef,
@@ -138,6 +145,10 @@ const AVATAR_SHAPES = ["circle", "rounded", "square"] as const satisfies Array<
   DesignConfig["image"]["avatarShape"]
 >;
 
+/** What the tag separator is until someone sets one, the middle dot
+ * `base.css` draws. */
+const DEFAULT_TAG_SEPARATOR = "·";
+
 const WEIGHTS = [
   ["300", "light"],
   ["400", "regular"],
@@ -187,6 +198,12 @@ export const StylePanel: React.FC<StylePanelProps> = ({
   const weightOptions = WEIGHTS.map(([value, key]) => ({
     value,
     label: t(`weights.${key}`),
+  }));
+
+  const alignOptions = TEXT_ALIGNMENTS.map((value) => ({
+    value,
+    icon: `text-align-${value}`,
+    label: t(`alignments.${value}`),
   }));
 
   const shapeOptions = AVATAR_SHAPES.map((value) => ({
@@ -324,6 +341,26 @@ export const StylePanel: React.FC<StylePanelProps> = ({
             })
           }
           value={String(typography.weights.heading)}
+        />
+      </ControlGroup>
+
+      <ControlGroup title={t("groups.text")}>
+        <IconChoiceField
+          data={alignOptions}
+          hint={t("hints.align")}
+          label={t("fields.align")}
+          onChange={(align) => patch({ text: { align } })}
+          value={design.text?.align ?? "left"}
+        />
+        <TextField
+          hint={t("hints.tagSeparator")}
+          label={t("fields.tagSeparator")}
+          maxLength={TAG_SEPARATOR_MAX}
+          onChange={(tagSeparator) =>
+            patch({ text: { tagSeparator } }, "design:tagSeparator")
+          }
+          placeholder={DEFAULT_TAG_SEPARATOR}
+          value={design.text?.tagSeparator ?? DEFAULT_TAG_SEPARATOR}
         />
       </ControlGroup>
 

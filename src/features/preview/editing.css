@@ -25,26 +25,26 @@
 
 .rp-chrome {
   position: absolute;
-  top: 0;
-  /* Inside the item's own box, at its top right corner, and not in the margin.
-     The margin is the user's to set (0.8in is 53px here) and the row of four
-     buttons is 84px wide, so in the margin the grip sat at x=-12 against a page
-     that clips at its own edge: the handle was there and nobody could see it.
-     Inside the box it can never be clipped, whatever the margin. It covers a
-     corner of the item while the pointer is on it, which is the price, and the
-     top right is where a line is most often empty. */
-  right: 0;
+  /* Level with the item's first line, not its top edge: the item's own padding
+     is the air above it, and the handle belongs to the text. */
+  top: var(--rp-space, 0);
+  /* In the page's left margin, where a block editor puts its handle, and not over
+     the item. The earlier row of four buttons sat inside the box at its top
+     right and covered the dates, which is the one corner an entry is never
+     empty. The chrome is 46px wide, so a margin narrower than that pulls it back
+     over the text by the difference rather than off the sheet. */
+  left: max(
+    -46px,
+    calc(-1 * var(--paper-margin-left, var(--paper-margin, 0.6in)))
+  );
   z-index: 1;
-  /* A column, so a per-item control lands under the buttons rather than beside
-     them: growing downwards costs nothing, sideways it would run off the box. */
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 2px;
-  padding: 2px;
-  border-radius: 6px;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 1px 4px rgba(18, 18, 16, 0.18);
+  /* The right padding is a bridge: the pointer crosses it on its way from the
+     text to the buttons, and it keeps the item hovered the whole way. */
+  padding: 0 4px 0 0;
   opacity: 0;
   transition: opacity 120ms ease-out;
 }
@@ -54,16 +54,12 @@
   gap: 2px;
 }
 
-/* Inert until shown: inside the box it would otherwise sit, invisible, over the
-   text and swallow the click that was meant for the field underneath. */
-.rp-chrome {
-  pointer-events: none;
-}
-
+/* Shown on the item's hover, which includes the chrome itself (it is the item's
+   child), so it does not vanish as the pointer moves into the margin. */
 .rp-item:hover .rp-chrome,
-.rp-chrome:focus-within {
+.rp-chrome:focus-within,
+.rp-chrome[data-open] {
   opacity: 1;
-  pointer-events: auto;
 }
 
 .rp-chrome-grip,
@@ -71,15 +67,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   padding: 0;
-  border: 1px solid rgba(18, 18, 16, 0.12);
+  border: 0;
   border-radius: 4px;
-  background: rgba(255, 255, 255, 0.94);
-  color: rgba(18, 18, 16, 0.55);
+  background: transparent;
+  color: rgba(18, 18, 16, 0.4);
   font-family: system-ui, sans-serif;
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1;
   cursor: pointer;
 }
@@ -89,38 +85,117 @@
 }
 
 .rp-chrome-grip:hover,
-.rp-chrome-button:hover:not(:disabled) {
-  color: rgba(18, 18, 16, 0.9);
+.rp-chrome-button:hover:not(:disabled),
+.rp-chrome[data-open] .rp-chrome-grip {
+  background: rgba(18, 18, 16, 0.08);
+  color: rgba(18, 18, 16, 0.75);
 }
 
-.rp-chrome-button:disabled {
+/* The menu a click on the grip opens, below it. Small and white with a hairline
+   and a soft shadow, like the paper's other floating things. */
+.rp-chrome-menu {
+  display: flex;
+  flex-direction: column;
+  min-width: 136px;
+  padding: 4px;
+  border-radius: 6px;
+  background: white;
+  box-shadow:
+    0 0 0 1px rgba(18, 18, 16, 0.08),
+    0 6px 18px rgba(18, 18, 16, 0.18);
+}
+
+.rp-chrome-item {
+  padding: 5px 8px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgba(18, 18, 16, 0.85);
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.3;
+  text-align: left;
+  cursor: pointer;
+}
+
+.rp-chrome-item:hover:not(:disabled),
+.rp-chrome-item:focus-visible {
+  background: rgba(18, 18, 16, 0.06);
+}
+
+.rp-chrome-item:disabled {
   opacity: 0.35;
   cursor: default;
 }
 
-/* Armed: the next press deletes. Wider than a square button, because it says so
-   in words, and red the whole time so it cannot be mistaken for the idle state. */
-.rp-chrome-button[data-armed] {
-  width: auto;
-  padding: 0 6px;
-  border-color: rgb(176, 42, 42);
+.rp-chrome-extra {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+}
+
+.rp-chrome-extra > .rp-chrome-select {
+  margin: 2px 4px;
+}
+
+/* The plus. A select is the control, so the native popup, its keyboard model and
+   its placement come with it, drawn invisibly over a plus sign: the select is not
+   styled at all, which is the point, a 20px select would show its arrow. */
+.rp-chrome-plus {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  color: rgba(18, 18, 16, 0.4);
+  font-family: system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.rp-chrome-plus:hover,
+.rp-chrome-plus:focus-within {
+  background: rgba(18, 18, 16, 0.08);
+  color: rgba(18, 18, 16, 0.75);
+}
+
+.rp-chrome-pick {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* Armed: the next press deletes. Red the whole time so it cannot be mistaken for
+   the idle state, and it says in words what the press will do. */
+.rp-chrome-item[data-armed] {
   background: rgb(176, 42, 42);
   color: white;
 }
 
-.rp-chrome-button[aria-pressed="true"] {
-  border-color: rgba(14, 124, 118, 0.5);
+.rp-chrome-item.rp-chrome-danger {
+  color: rgb(176, 42, 42);
+}
+
+.rp-chrome-item.rp-chrome-danger[data-armed] {
+  color: white;
+}
+
+.rp-chrome-item[aria-pressed="true"] {
   background: rgba(14, 124, 118, 0.12);
   color: rgb(14, 124, 118);
 }
 
-.rp-chrome-danger:hover:not(:disabled) {
-  border-color: rgba(176, 42, 42, 0.4);
-  color: rgb(176, 42, 42);
-}
-
 .rp-chrome-grip:focus-visible,
 .rp-chrome-button:focus-visible,
+.rp-chrome-item:focus-visible,
+.rp-chrome-plus:has(:focus-visible),
 .rp-chrome-select:focus-visible {
   outline: 2px solid rgb(14, 124, 118);
   outline-offset: 1px;
@@ -262,7 +337,7 @@
  */
 .rp-page .rp-page-body {
   overflow: visible;
-  clip-path: inset(-8px -8px 0);
+  clip-path: inset(-8px -8px 0 -48px);
 }
 
 /* An editable field. Outline, never border: a border would take space and move

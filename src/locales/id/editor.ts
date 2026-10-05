@@ -140,6 +140,7 @@ export const editor = {
     },
     imageWidth: "Lebar gambar",
     drag: "Seret untuk memindahkan",
+    menu: "Tindakan item",
     moveUp: "Naikkan",
     moveDown: "Turunkan",
     delete: "Hapus",

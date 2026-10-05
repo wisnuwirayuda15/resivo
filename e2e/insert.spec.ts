@@ -4,6 +4,7 @@ import {
   createResume,
   markdownPaneText,
   openEmptyApp,
+  openItemMenu,
   paper,
   paperText,
   typeMarkdown,
@@ -86,8 +87,8 @@ test("duplicates a block", async ({ page }) => {
 
   await expect(alpha).toHaveCount(1);
 
-  await alpha.first().hover();
-  await alpha.first().getByRole("button", { name: "Duplicate" }).click();
+  await openItemMenu(alpha.first());
+  await alpha.first().getByRole("menuitem", { name: "Duplicate" }).click();
 
   await expect(alpha).toHaveCount(2);
 

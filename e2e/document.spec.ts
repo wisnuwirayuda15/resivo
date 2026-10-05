@@ -3,8 +3,10 @@ import { expect, test } from "@playwright/test";
 import {
   PNG_2X2,
   createResume,
+  markdownPaneText,
   openEmptyApp,
   openInspectorTab,
+  openItemMenu,
   paper,
   paperText,
   pointerDrag,
@@ -89,6 +91,11 @@ test("sets how wide an image draws", async ({ page }) => {
     .locator("label")
     .filter({ hasText: /^Visual$/ })
     .click();
+
+  // The width control is in the menu the item's grip opens.
+  await openItemMenu(
+    paper(page).locator("[data-paged] .rp-item:has(.rp-figure)").first(),
+  );
 
   const width = paper(page).getByLabel("Image width");
   await expect(width).toBeVisible({ timeout: 15_000 });
@@ -279,4 +286,114 @@ test("writes dates in the document language", async ({ page }) => {
     .toMatch(/Sekarang/);
   // The month name follows the same tag, which is what the tag was always for.
   expect(await paperText(page)).not.toMatch(/Present/);
+});
+
+test("edits an entry's dates on the paper", async ({ page }) => {
+  await typeMarkdown(
+    page,
+    [
+      "# Ada Lovelace",
+      "",
+      "## Experience",
+      "",
+      ':::entry{title="Analyst" start="2021-03" end="2022-08"}',
+      ":::",
+    ].join("\n"),
+  );
+
+  await expect
+    .poll(() => paperText(page), { timeout: 15_000 })
+    .toMatch(/Mar 2021/);
+
+  await page
+    .locator("label")
+    .filter({ hasText: /^Visual$/ })
+    .click();
+
+  const dates = paper(page).locator('[data-paged] [title="Edit entry dates"]');
+  await dates.click();
+
+  await page.keyboard.press("ControlOrMeta+a");
+  await page.keyboard.type("Jan 2020 - Present");
+  await page.keyboard.press("Enter");
+
+  // Read back as dates, not kept as the prose that was typed: the paper prints
+  // the document's own form, and the Markdown holds the machine-readable one.
+  await expect
+    .poll(() => paperText(page), { timeout: 15_000 })
+    .toMatch(/Jan 2020/);
+  expect(await paperText(page)).toMatch(/Present/);
+
+  await expect
+    .poll(() => markdownPaneText(page), { timeout: 15_000 })
+    .toContain('start="2020-01"');
+  expect(await markdownPaneText(page)).toContain('current="true"');
+});
+
+test("aligns body text and sets the tag separator from the Style tab", async ({
+  page,
+}) => {
+  await typeMarkdown(
+    page,
+    [
+      "# Ada Lovelace",
+      "",
+      "## Summary",
+      "",
+      "Alpha paragraph.",
+      "",
+      "## Skills",
+      "",
+      "::tags[Logic, Maths, Poetry]",
+    ].join("\n"),
+  );
+
+  await expect
+    .poll(() => paperText(page), { timeout: 15_000 })
+    .toContain("Alpha paragraph.");
+
+  const paragraph = paper(page)
+    .locator("[data-paged] .rp-item--block p")
+    .first();
+  const secondTag = paper(page).locator("[data-paged] .rp-tag").nth(1);
+
+  await openInspectorTab(page, "Style");
+
+  await page
+    .getByRole("radiogroup", { name: "Alignment" })
+    .getByRole("img", { name: "Justify" })
+    .click();
+
+  await expect
+    .poll(
+      () => paragraph.evaluate((node) => getComputedStyle(node).textAlign),
+      {
+        timeout: 15_000,
+      },
+    )
+    .toBe("justify");
+
+  // The default is a middle dot, and a document that never touched the control
+  // draws it.
+  await expect
+    .poll(
+      () =>
+        secondTag.evaluate(
+          (node) => getComputedStyle(node, "::before").content,
+        ),
+      { timeout: 15_000 },
+    )
+    .toBe('"\u00b7"');
+
+  await page.getByRole("textbox", { name: "Tag separator" }).fill("/");
+
+  await expect
+    .poll(
+      () =>
+        secondTag.evaluate(
+          (node) => getComputedStyle(node, "::before").content,
+        ),
+      { timeout: 15_000 },
+    )
+    .toBe('"/"');
 });

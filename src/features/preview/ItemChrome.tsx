@@ -14,9 +14,11 @@ import type { DropEdge } from "./reorder";
  * pass renders the item without any of this, so the heights the paginator reads
  * are the heights of the printed document, not of the document plus its handles.
  *
- * The chrome is absolutely positioned in the item's own margin for the same
+ * The chrome is absolutely positioned in the page's left margin for the same
  * reason, belt to that braces: even if it did appear in a measured tree, it
- * would contribute no height.
+ * would contribute no height. It is two small buttons (a plus that duplicates,
+ * and a grip that drags and, on a click, opens a menu), so it never covers the
+ * dates at the item's right edge, which the earlier row of four buttons did.
  *
  * No Mantine and no Tailwind, this renders inside the preview iframe, which
  * loads neither. Everything it needs is in `frame.css`.
@@ -32,6 +34,12 @@ interface ItemChromeProps {
   onMoveUp?: (() => void) | null;
   onMoveDown?: (() => void) | null;
   onDuplicate?: () => void;
+  /**
+   * The plus: a control that adds something after this item, a select of block
+   * kinds drawn over a plus sign. Owned by the caller because what can be added
+   * depends on the document; this only gives it its place beside the grip.
+   */
+  insert?: React.ReactNode;
   onRemove?: () => void;
   /**
    * Ask twice before removing. The first press only arms the button, which turns
@@ -46,11 +54,10 @@ interface ItemChromeProps {
   /**
    * Controls for what this particular item is, an image's width, so far.
    *
-   * Rendered on a second row of the chrome rather than beside the buttons: the
-   * chrome sits in the page's margin, and growing it sideways would eventually
-   * run off the paper, whereas growing it downwards costs nothing. It is inside
-   * the chrome for the reason the chrome exists, the measuring pass does not
-   * render any of this, so no control here can move a page break.
+   * Rendered in the grip's menu, so the chrome stays two buttons wide whatever
+   * the item is. It is inside the chrome for the reason the chrome exists, the
+   * measuring pass does not render any of this, so no control here can move a
+   * page break.
    */
   extra?: React.ReactNode;
   /**
@@ -69,6 +76,7 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   onMoveUp,
   onMoveDown,
   onDuplicate,
+  insert,
   onRemove,
   confirmRemove = false,
   dropEdge,
@@ -81,6 +89,12 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, isDragging } =
     useSortable({ id, disabled: !movable });
   const [armed, setArmed] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const close = () => {
+    setOpen(false);
+    setArmed(false);
+  };
 
   /**
    * No transform is applied, unlike a normal sortable list.
@@ -99,81 +113,152 @@ export const ItemChrome: React.FC<ItemChromeProps> = ({
       ref={setNodeRef}
     >
       {movable ? (
-        <div className="rp-chrome" contentEditable={false}>
+        <div
+          className="rp-chrome"
+          contentEditable={false}
+          data-open={open ? "" : undefined}
+          onBlur={(event) => {
+            // Focus leaving the whole chrome, not moving between its buttons.
+            if (!event.currentTarget.contains(event.relatedTarget)) {
+              close();
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key === "Escape" && open) {
+              event.stopPropagation();
+              close();
+            }
+          }}
+        >
           <div className="rp-chrome-row">
+            {insert === undefined ? null : (
+              <span className="rp-chrome-plus">
+                <span aria-hidden>+</span>
+                {insert}
+              </span>
+            )}
+
             <button
+              aria-expanded={open}
+              aria-haspopup="menu"
               aria-label={t("chrome.drag")}
               className="rp-chrome-grip"
               ref={setActivatorNodeRef}
+              title={t("chrome.drag")}
               type="button"
               {...attributes}
               {...listeners}
+              aria-roledescription="sortable"
+              onClick={() => {
+                setOpen((current) => !current);
+                setArmed(false);
+              }}
+              onKeyDown={(event) => {
+                // Enter opens the menu, which is where a keyboard user finds
+                // move, duplicate and delete. Space still picks the item up for
+                // a keyboard drag, which dnd-kit starts from the same key press.
+                if (event.key === "Enter") {
+                  return;
+                }
+
+                (
+                  listeners?.onKeyDown as
+                    ((event: React.KeyboardEvent) => void) | undefined
+                )?.(event);
+              }}
             >
               {/* Six dots, drawn inline: the iframe has no icon font and no
                 Mantine, and an SVG here would be the seventh copy of a glyph the
                 app already ships. */}
               <span aria-hidden>⠿</span>
             </button>
-
-            <button
-              aria-label={t("chrome.moveUp")}
-              className="rp-chrome-button"
-              disabled={onMoveUp === null || onMoveUp === undefined}
-              onClick={() => onMoveUp?.()}
-              type="button"
-            >
-              <span aria-hidden>↑</span>
-            </button>
-
-            <button
-              aria-label={t("chrome.moveDown")}
-              className="rp-chrome-button"
-              disabled={onMoveDown === null || onMoveDown === undefined}
-              onClick={() => onMoveDown?.()}
-              type="button"
-            >
-              <span aria-hidden>↓</span>
-            </button>
-
-            {onDuplicate === undefined ? null : (
-              <button
-                aria-label={t("chrome.duplicate")}
-                className="rp-chrome-button"
-                onClick={onDuplicate}
-                type="button"
-              >
-                <span aria-hidden>↳</span>
-              </button>
-            )}
-
-            {onRemove === undefined ? null : (
-              <button
-                aria-label={
-                  armed ? t("chrome.confirmDelete") : t("chrome.delete")
-                }
-                className="rp-chrome-button rp-chrome-danger"
-                data-armed={armed ? "" : undefined}
-                onBlur={() => setArmed(false)}
-                onClick={() => {
-                  if (confirmRemove && !armed) {
-                    setArmed(true);
-
-                    return;
-                  }
-
-                  setArmed(false);
-                  onRemove();
-                }}
-                type="button"
-              >
-                <span aria-hidden>{armed ? t("chrome.sure") : "×"}</span>
-              </button>
-            )}
           </div>
 
-          {extra === undefined ? null : (
-            <div className="rp-chrome-row">{extra}</div>
-          )}
+          {open ? (
+            <div
+              aria-label={t("chrome.menu")}
+              className="rp-chrome-menu"
+              role="menu"
+            >
+              <button
+                className="rp-chrome-item"
+                disabled={onMoveUp === null || onMoveUp === undefined}
+                onClick={() => {
+                  onMoveUp?.();
+                  close();
+                }}
+                role="menuitem"
+                type="button"
+              >
+                {t("chrome.moveUp")}
+              </button>
+
+              <button
+                className="rp-chrome-item"
+                disabled={onMoveDown === null || onMoveDown === undefined}
+                onClick={() => {
+                  onMoveDown?.();
+                  close();
+                }}
+                role="menuitem"
+                type="button"
+              >
+                {t("chrome.moveDown")}
+              </button>
+
+              {onDuplicate === undefined ? null : (
+                <button
+                  className="rp-chrome-item"
+                  onClick={() => {
+                    onDuplicate();
+                    close();
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  {t("chrome.duplicate")}
+                </button>
+              )}
+
+              {extra === undefined ? null : (
+                <div
+                  className="rp-chrome-extra"
+                  onClick={(event) => {
+                    // A button in here has done its thing, and the menu is done.
+                    if ((event.target as HTMLElement).closest("button")) {
+                      close();
+                    }
+                  }}
+                >
+                  {extra}
+                </div>
+              )}
+
+              {onRemove === undefined ? null : (
+                <button
+                  aria-label={
+                    armed ? t("chrome.confirmDelete") : t("chrome.delete")
+                  }
+                  className="rp-chrome-item rp-chrome-danger"
+                  data-armed={armed ? "" : undefined}
+                  onClick={() => {
+                    if (confirmRemove && !armed) {
+                      setArmed(true);
+
+                      return;
+                    }
+
+                    close();
+                    onRemove();
+                  }}
+                  role="menuitem"
+                  type="button"
+                >
+                  {armed ? t("chrome.sure") : t("chrome.delete")}
+                </button>
+              )}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

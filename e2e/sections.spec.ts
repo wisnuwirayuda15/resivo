@@ -3,6 +3,7 @@ import { expect, test } from "@playwright/test";
 import {
   createResume,
   openEmptyApp,
+  openItemMenu,
   paper,
   paperText,
   typeMarkdown,
@@ -66,12 +67,12 @@ test("deleting a section from the paper asks before it does", async ({
   await visual(page);
 
   const skills = heading(page, "Skills");
-  await skills.hover();
+  await openItemMenu(skills);
 
-  await skills.getByRole("button", { name: "Delete", exact: true }).click();
+  await skills.getByRole("menuitem", { name: "Delete", exact: true }).click();
 
   // The first press only arms it, and says what the second will do.
-  const armed = skills.getByRole("button", {
+  const armed = skills.getByRole("menuitem", {
     name: "Press again to delete this section and everything in it",
   });
   await expect(armed).toBeVisible();
@@ -111,18 +112,18 @@ test("a section can be told to start on a new page, and told not to", async ({
   await expect(pages(page)).toHaveCount(1);
 
   const skills = heading(page, "Skills");
-  await skills.hover();
+  await openItemMenu(skills);
 
-  const on = skills.getByRole("button", {
+  const on = skills.getByRole("menuitem", {
     name: "Start this section on a new page",
   });
   await on.click();
 
   await expect(pages(page)).toHaveCount(2, { timeout: 15_000 });
 
-  await skills.hover();
+  await openItemMenu(skills);
 
-  const off = skills.getByRole("button", {
+  const off = skills.getByRole("menuitem", {
     name: "Stop this section starting on a new page",
   });
   await expect(off).toHaveAttribute("aria-pressed", "true");
@@ -167,7 +168,8 @@ test("a page break can be found and deleted on the paper", async ({ page }) => {
 
   await page.mouse.move(box.x + box.width / 2, box.y - 3);
 
-  await marker.getByRole("button", { name: "Delete" }).click();
+  await marker.getByRole("button", { name: "Drag to move" }).click();
+  await marker.getByRole("menuitem", { name: "Delete" }).click();
 
   await expect(pages(page)).toHaveCount(1, { timeout: 15_000 });
 });

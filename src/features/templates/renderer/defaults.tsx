@@ -10,6 +10,7 @@ import {
   setBlockText,
   setBulletItem,
   setEntryBullet,
+  setEntryDateRange,
   setEntryField,
   setHeaderHeadline,
   setHeaderName,
@@ -22,7 +23,7 @@ import {
 import { plainText } from "@/features/resume/model/index";
 
 import { EditableText, requestFocus } from "./EditableText";
-import { formatDateRange } from "./dates";
+import { formatDateRange, parseDateRange } from "./dates";
 
 import type { Recipe } from "@/features/editor/mutations";
 import type {
@@ -562,12 +563,34 @@ const Entry: React.FC<BlockViewProps<EntryBlock>> = ({
             {/**
              * The dates are the one run of text on the paper that is *derived*,
              * `formatDateRange` turns two ISO strings into whatever the locale
-             * writes. Editing the rendered string would mean parsing prose back
-             * into dates, and a resume that silently misreads "Mar 2019" is worse
-             * than one whose dates are edited in the Markdown pane. So this stays
-             * read-only here, deliberately.
+             * writes, so editing it means reading prose back into dates. That is
+             * done by `parseDateRange`, which is lenient and never lossy (what it
+             * cannot read is kept as typed), and only when the text actually
+             * changed: opening the field and leaving it must not rewrite
+             * `2019-03-15` as `2019-03`. Clearing it removes the dates.
              */}
-            {dates === "" ? null : <div>{dates}</div>}
+            {dates === "" ? null : (
+              <div>
+                <EditableText
+                  context={context}
+                  label="entry dates"
+                  onCommit={commitWith(context, (value) => {
+                    const typed = plainText(value).trim();
+
+                    // Unchanged is an empty recipe, so the stored `2019-03-15`
+                    // is not rewritten as the `2019-03` the paper printed.
+                    return typed === dates
+                      ? () => undefined
+                      : setEntryDateRange(
+                          section.id,
+                          block.id,
+                          parseDateRange(typed, context.locale),
+                        );
+                  })}
+                  value={[{ type: "text", text: dates }]}
+                />
+              </div>
+            )}
             {block.location === undefined ? null : (
               <div>
                 <EditableText

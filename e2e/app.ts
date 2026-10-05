@@ -143,6 +143,16 @@ export const createResume = async (
 export const paper = (page: Page) =>
   page.frameLocator("iframe").locator("body");
 
+/**
+ * Opens an item's menu: hover it, then click its grip. The chrome is two small
+ * buttons in the left margin (a plus and a grip), and move, duplicate-by-menu and
+ * delete live in what the grip opens.
+ */
+export const openItemMenu = async (item: Locator): Promise<void> => {
+  await item.hover();
+  await item.getByRole("button", { name: "Drag to move" }).click();
+};
+
 export const expectPaperReady = async (page: Page): Promise<void> => {
   await expect(paper(page).locator("[data-paged]").first()).toBeVisible({
     timeout: 30_000,

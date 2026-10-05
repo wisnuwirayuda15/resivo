@@ -118,12 +118,12 @@ test("edits text on the paper, and the Markdown follows", async ({ page }) => {
   await expect(editing).toBeVisible();
 
   // The outline sits 4px outside the field, and a line that fills the measure is
-  // flush with the page body, which used to clip it at the edge. The sides and
+  // flush with the page body, which used to clip it at the edge. The sides (the left wider, for the item handles) and
   // the top have to be open (the top because a large name sits above its line,
   // as the first thing on the page) and the bottom still closed.
   await expect(
     paper(page).locator(".rp-page-body[data-paged]").first(),
-  ).toHaveCSS("clip-path", /inset\(-8px -8px 0px\)/);
+  ).toHaveCSS("clip-path", /inset\(-8px -8px 0px -48px\)/);
 
   await page.keyboard.press("ControlOrMeta+a");
   await page.keyboard.type("Wrote the very first algorithm.", { delay: 20 });

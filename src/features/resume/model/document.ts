@@ -364,6 +364,14 @@ export interface BoxEdges {
   left: number;
 }
 
+/** How body text sits in its column. */
+export const TEXT_ALIGNMENTS = ["left", "center", "right", "justify"] as const;
+export type TextAlignment = (typeof TEXT_ALIGNMENTS)[number];
+
+/** The longest tag separator the Style tab accepts, in characters. A separator
+ * is a mark between two keywords, and anything longer is a phrase. */
+export const TAG_SEPARATOR_MAX = 8;
+
 export interface FontRef {
   /** CSS family name, e.g. `Source Serif 4 Variable`. */
   family: string;
@@ -421,6 +429,20 @@ export interface DesignConfig {
     size: number;
     color: string;
     defaultWeight: IconWeight;
+  };
+  /**
+   * Body text and tag lists. Optional for the reason `pagination` is: a document
+   * written before these existed has no such field, and its absence has to mean
+   * the template's own look (inherited alignment, a middle dot) rather than
+   * making an old document invalid.
+   */
+  text?: {
+    /** Paragraphs, summaries, bullets and quotes. Headings, dates and the
+     * header keep the template's own alignment. */
+    align?: TextAlignment;
+    /** Printed between two tags. An empty string is a valid choice (a gap and no
+     * mark), which is why absence and `""` are different. */
+    tagSeparator?: string;
   };
   /**
    * How pagination behaves. Optional because documents written before it

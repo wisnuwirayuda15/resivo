@@ -165,6 +165,48 @@ describe("designVars", () => {
   });
 });
 
+describe("designVars, text", () => {
+  it("writes neither variable until the document sets them", () => {
+    // An unset alignment has to stay unset, or it would override a template that
+    // sets its own.
+    const css = designVars(design());
+
+    expect(css).not.toContain("--paper-text-align");
+    expect(css).not.toContain("--paper-tag-sep");
+  });
+
+  it("writes the alignment, and refuses a value it does not know", () => {
+    expect(
+      varValue(
+        designVars(design((config) => (config.text = { align: "justify" }))),
+        "--paper-text-align",
+      ),
+    ).toBe("justify");
+
+    const stored = design((config) => {
+      config.text = { align: "x; color: red" as never };
+    });
+
+    expect(designVars(stored)).not.toContain("--paper-text-align");
+  });
+
+  it("writes the separator as a string literal that cannot end itself", () => {
+    const value = (separator: string) =>
+      varValue(
+        designVars(
+          design((config) => (config.text = { tagSeparator: separator })),
+        ),
+        "--paper-tag-sep",
+      );
+
+    expect(value("/")).toBe('"/"');
+    // Empty is a choice (a gap and no mark), not the same as unset.
+    expect(value("")).toBe('""');
+    expect(value('";}body{')).toBe('"body"');
+    expect(value("abcdefghijkl")).toBe('"abcdefgh"');
+  });
+});
+
 describe("previewStylesheet", () => {
   const css = previewStylesheet({
     templateId: "classic",

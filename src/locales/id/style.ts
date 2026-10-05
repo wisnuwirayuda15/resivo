@@ -20,6 +20,7 @@ export const style = {
   groups: {
     paper: "Kertas",
     typography: "Tipografi",
+    text: "Teks",
     colour: "Warna",
     spacing: "Jarak",
     rules: "Garis",
@@ -52,6 +53,8 @@ export const style = {
     thickness: "Ketebalan",
     colour: "Warna",
     shape: "Bentuk",
+    align: "Perataan",
+    tagSeparator: "Pemisah tag",
     keepHeadings: "Jaga judul bersama isinya",
     document: "Dokumen",
   },
@@ -69,6 +72,10 @@ export const style = {
     spaceHeading: "Jarak di bawah judul, sebelum blok pertamanya.",
     photoSize:
       "Berlaku setelah foto dipasang, dari tab Aset atau halaman Gambar.",
+    align:
+      "Cara paragraf, ringkasan, butir, dan kutipan diletakkan dalam kolomnya. Judul, tanggal, dan kepala tetap memakai perataan bawaan templat.",
+    tagSeparator:
+      "Tanda yang dicetak di antara dua tag, hingga 8 karakter. Kosongkan untuk jeda tanpa tanda.",
     keepHeadings:
       "Mencegah judul bagian menjadi hal terakhir di sebuah halaman. Bila mati, halaman lebih padat, dengan harga satu pemisah yang paling dilihat pembaca.",
     language:
@@ -80,6 +87,12 @@ export const style = {
     medium: "Sedang",
     semibold: "Semi tebal",
     bold: "Tebal",
+  },
+  alignments: {
+    left: "Rata kiri",
+    center: "Rata tengah",
+    right: "Rata kanan",
+    justify: "Rata kiri-kanan",
   },
   avatarShapes: {
     circle: "Lingkaran",

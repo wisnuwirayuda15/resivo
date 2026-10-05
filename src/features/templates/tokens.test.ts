@@ -27,6 +27,16 @@ const names = (css: string, pattern: RegExp): string[] =>
 const declared = new Set<string>([
   ...sheets.flatMap(({ css }) => names(css, /(--paper-[a-z0-9-]+)s*:/g)),
   ...names(designVars(templateDefaults("classic")), /(--paper-[a-z0-9-]+)s*:/g),
+  // Written only once the Style tab sets them, see `designVars`. They cannot be
+  // declared in a stylesheet: an unset one is what lets a template keep its own
+  // alignment.
+  ...names(
+    designVars({
+      ...templateDefaults("classic"),
+      text: { align: "left", tagSeparator: "x" },
+    }),
+    /(--paper-[a-z0-9-]+)s*:/g,
+  ),
 ]);
 
 describe("paper tokens", () => {

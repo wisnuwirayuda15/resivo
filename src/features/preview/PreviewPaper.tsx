@@ -569,16 +569,19 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
   };
 
   /**
-   * Per-item controls, on the chrome's second row.
+   * Per-item controls: the insert select (drawn as the plus beside the grip) and
+   * the extras the grip's menu lists, a section's page break and an image's width.
    *
    * Everything here is chrome, which is the only reason a control may sit on the
    * paper at all: chrome is rendered in the paged pass alone and positioned in
    * the page's margin, so nothing here is measured and nothing here can move a
    * break.
    */
-  const itemControls = (item: FlowItem): React.ReactNode => {
+  const itemControls = (
+    item: FlowItem,
+  ): { insert?: React.ReactNode; extra?: React.ReactNode } => {
     if (item.type === "header" || apply === undefined) {
-      return undefined;
+      return {};
     }
 
     const section = document.content.sections.find(
@@ -586,7 +589,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     );
 
     if (section === undefined) {
-      return undefined;
+      return {};
     }
 
     // A heading is not a block, so what follows it is the top of its section.
@@ -599,13 +602,13 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
           ) + 1;
 
     if (item.type === "block" && insertAt === 0) {
-      return undefined;
+      return {};
     }
 
     const insert = (
       <select
         aria-label={t("chrome.insert")}
-        className="rp-chrome-select"
+        className="rp-chrome-pick"
         onChange={(event) => {
           const kind = event.currentTarget.value as InsertableBlockKind;
 
@@ -627,17 +630,12 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
     if (item.type === "sectionHeading") {
       const breaksBefore = section.style?.breakBefore === "page";
 
-      return (
-        <>
-          {insert}
+      return {
+        insert,
+        extra: (
           <button
-            aria-label={
-              breaksBefore
-                ? t("chrome.sectionBreakOff")
-                : t("chrome.sectionBreak")
-            }
             aria-pressed={breaksBefore}
-            className="rp-chrome-button"
+            className="rp-chrome-item"
             onClick={() =>
               apply(
                 setSectionBreakBefore(
@@ -646,44 +644,49 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
                 ),
               )
             }
+            role="menuitem"
             type="button"
           >
-            <span aria-hidden>⤓</span>
+            {breaksBefore
+              ? t("chrome.sectionBreakOff")
+              : t("chrome.sectionBreak")}
           </button>
-        </>
-      );
+        ),
+      };
     }
 
     const imageWidth = widthControl(item);
     const isBreak = section.blocks[insertAt - 1]?.kind === "pageBreak";
 
-    return (
-      <>
-        {insert}
-        {/* Not offered on a break itself, two in a row means a blank page,
-            which nobody reaches for from this button. Deleting one is the
-            chrome's own × above. */}
-        {isBreak ? null : (
-          <button
-            aria-label={t("chrome.insertBreak")}
-            className="rp-chrome-button"
-            onClick={() =>
-              apply(
-                addBlock(
-                  section.id,
-                  { id: createId(), kind: "pageBreak" },
-                  insertAt,
-                ),
-              )
-            }
-            type="button"
-          >
-            <span aria-hidden>⤓</span>
-          </button>
-        )}
-        {imageWidth}
-      </>
-    );
+    return {
+      insert,
+      extra: (
+        <>
+          {/* Not offered on a break itself, two in a row means a blank page,
+              which nobody reaches for from here. Deleting one is the menu's
+              own Delete. */}
+          {isBreak ? null : (
+            <button
+              className="rp-chrome-item"
+              onClick={() =>
+                apply(
+                  addBlock(
+                    section.id,
+                    { id: createId(), kind: "pageBreak" },
+                    insertAt,
+                  ),
+                )
+              }
+              role="menuitem"
+              type="button"
+            >
+              {t("chrome.insertBreak")}
+            </button>
+          )}
+          {imageWidth}
+        </>
+      ),
+    };
   };
 
   /**
@@ -811,7 +814,7 @@ export const PreviewPaper: React.FC<PreviewPaperProps> = ({
               return (
                 <ItemChrome
                   className={flowItemClass(item.type)}
-                  extra={itemControls(item)}
+                  {...itemControls(item)}
                   id={id}
                   key={id}
                   movable={isMovable(item)}

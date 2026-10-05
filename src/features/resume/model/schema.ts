@@ -7,7 +7,9 @@ import {
   PAPER_SIZES,
   SECTION_KINDS,
   DOCUMENT_KINDS,
+  TAG_SEPARATOR_MAX,
   TEMPLATE_IDS,
+  TEXT_ALIGNMENTS,
 } from "./document";
 
 import type {
@@ -280,6 +282,13 @@ const designConfigSchema = z.object({
     color: cssColor,
     defaultWeight: z.enum(ICON_WEIGHTS),
   }),
+  // Optional for the same reason as `pagination` below.
+  text: z
+    .object({
+      align: z.enum(TEXT_ALIGNMENTS).optional(),
+      tagSeparator: z.string().max(TAG_SEPARATOR_MAX).optional(),
+    })
+    .optional(),
   // Optional, so a document written before pagination had settings still
   // validates. Its absence means the defaults.
   pagination: z

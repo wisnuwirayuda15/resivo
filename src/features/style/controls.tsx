@@ -2,12 +2,16 @@ import {
   Box,
   ColorInput,
   NumberInput,
+  SegmentedControl,
   Select,
   Slider,
   Switch,
   Text,
+  TextInput,
   Tooltip,
 } from "@mantine/core";
+
+import { Icon } from "@/features/icons/IconRenderer";
 
 import type { ReactNode } from "react";
 
@@ -178,6 +182,71 @@ export const SelectField = <T extends string>({
           onChange(next);
         }
       }}
+      size="xs"
+      value={value}
+    />
+  </Field>
+);
+
+/**
+ * A short choice shown as a row of icons, for a token whose options have a
+ * well-known glyph (text alignment). Each segment is labelled for assistive
+ * technology and by tooltip, since an icon alone says nothing to a screen reader.
+ */
+export const IconChoiceField = <T extends string>({
+  value,
+  onChange,
+  data,
+  label,
+  hint,
+}: {
+  value: T;
+  onChange: (value: T) => void;
+  data: Array<{ value: T; icon: string; label: string }>;
+  label: string;
+  hint?: string;
+}) => (
+  <Field hint={hint} label={label}>
+    <SegmentedControl
+      aria-label={label}
+      data={data.map((option) => ({
+        value: option.value,
+        label: (
+          <Tooltip label={option.label} openDelay={300}>
+            <Box
+              aria-label={option.label}
+              className="flex items-center justify-center"
+              role="img"
+            >
+              <Icon name={option.icon} size={14} />
+            </Box>
+          </Tooltip>
+        ),
+      }))}
+      fullWidth
+      onChange={(next) => onChange(next)}
+      size="xs"
+      value={value}
+    />
+  </Field>
+);
+
+/** A short free-text token. Commits on every keystroke, like the number fields,
+ * so the paper follows the typing. */
+export const TextField: React.FC<{
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+  hint?: string;
+  placeholder?: string;
+  maxLength?: number;
+}> = ({ value, onChange, label, hint, placeholder, maxLength }) => (
+  <Field hint={hint} label={label}>
+    <TextInput
+      aria-label={label}
+      maxLength={maxLength}
+      onChange={(event) => onChange(event.currentTarget.value)}
+      placeholder={placeholder}
       size="xs"
       value={value}
     />

@@ -220,10 +220,10 @@ describe("edit mode markup", () => {
     const count = (edit.match(/class="rp-editable"/g) ?? []).length;
 
     // name, headline, two contacts, section title, entry title/subtitle/
-    // location/summary, two entry bullets, paragraph, three list items across
+    // dates/location/summary, two entry bullets, paragraph, three list items across
     // two levels, a subheading, a quoted paragraph, a table heading and a table
     // cell, two tags, one icon label. A code block is not counted: its content
     // is literal, so it is edited in the Markdown pane rather than on the paper.
-    expect(count).toBe(22);
+    expect(count).toBe(23);
   });
 });

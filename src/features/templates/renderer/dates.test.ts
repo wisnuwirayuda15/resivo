@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { RANGE_DASH, formatDateRange, parseDatePoint } from "./dates";
+import {
+  RANGE_DASH,
+  formatDateRange,
+  parseDatePoint,
+  parseDateRange,
+} from "./dates";
 
 describe("parseDatePoint", () => {
   it("recognises the machine-readable forms", () => {
@@ -111,5 +116,58 @@ describe("formatDateRange", () => {
 
   it("respects the document locale", () => {
     expect(formatDateRange({ start: "2021-03" }, "de")).toBe("März 2021");
+  });
+});
+
+describe("parseDateRange", () => {
+  it("reads back what formatDateRange prints", () => {
+    for (const range of [
+      { start: "2021-03", end: "2024-08" },
+      { start: "2021-03", current: true },
+      { start: "2019", end: "2021" },
+    ]) {
+      expect(parseDateRange(formatDateRange(range, "en"), "en")).toEqual(range);
+    }
+  });
+
+  it("reads the document's own language, and English too", () => {
+    const printed = formatDateRange({ start: "2021-05", current: true }, "id");
+
+    expect(parseDateRange(printed, "id")).toEqual({
+      start: "2021-05",
+      current: true,
+    });
+    expect(parseDateRange("March 2021 - Present", "id")).toEqual({
+      start: "2021-03",
+      current: true,
+    });
+  });
+
+  it("splits on a dash, a spaced hyphen, to, and a bare year pair", () => {
+    const want = { start: "2019-03", end: "2021-01" };
+
+    expect(parseDateRange("2019-03 - 2021-01", "en")).toEqual(want);
+    expect(parseDateRange(`2019-03${RANGE_DASH}2021-01`, "en")).toEqual(want);
+    expect(parseDateRange("Mar 2019 to Jan 2021", "en")).toEqual(want);
+    expect(parseDateRange("2019-2021", "en")).toEqual({
+      start: "2019",
+      end: "2021",
+    });
+  });
+
+  it("does not split an ISO month on its own hyphen", () => {
+    expect(parseDateRange("2019-03", "en")).toEqual({ start: "2019-03" });
+  });
+
+  it("keeps what it cannot read, as typed", () => {
+    expect(parseDateRange("Summer 2019 - Fall 2020", "en")).toEqual({
+      start: "Summer 2019",
+      end: "Fall 2020",
+    });
+  });
+
+  it("is no range when there is nothing to read", () => {
+    expect(parseDateRange("", "en")).toBeUndefined();
+    expect(parseDateRange("   ", "en")).toBeUndefined();
   });
 });

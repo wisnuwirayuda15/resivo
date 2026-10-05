@@ -22,6 +22,7 @@ export const style = {
   groups: {
     paper: "Paper",
     typography: "Typography",
+    text: "Text",
     colour: "Colour",
     spacing: "Spacing",
     rules: "Rules",
@@ -54,6 +55,8 @@ export const style = {
     thickness: "Thickness",
     colour: "Colour",
     shape: "Shape",
+    align: "Alignment",
+    tagSeparator: "Tag separator",
     keepHeadings: "Keep headings with content",
     document: "Document",
   },
@@ -71,6 +74,10 @@ export const style = {
     spaceHeading: "Gap under a heading, before its first block.",
     photoSize:
       "Applies once a photo is attached, from the Assets tab or the Images page.",
+    align:
+      "How paragraphs, summaries, bullets and quotes sit in their column. Headings, dates and the header keep the template’s own alignment.",
+    tagSeparator:
+      "The mark printed between two tags, up to 8 characters. Leave it empty for a gap and no mark.",
     keepHeadings:
       "Stops a section heading being the last thing on a page. Off packs the pages tighter, at the cost of the one break every reader notices.",
     language:
@@ -82,6 +89,12 @@ export const style = {
     medium: "Medium",
     semibold: "Semibold",
     bold: "Bold",
+  },
+  alignments: {
+    left: "Align left",
+    center: "Align centre",
+    right: "Align right",
+    justify: "Justify",
   },
   avatarShapes: {
     circle: "Circle",

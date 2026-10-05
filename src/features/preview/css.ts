@@ -3,6 +3,11 @@ import { templateLayerCss } from "@/features/templates/registry";
 import frameCssText from "./frame.css?raw";
 import editingCssText from "./editing.css?raw";
 
+import {
+  TAG_SEPARATOR_MAX,
+  TEXT_ALIGNMENTS,
+} from "@/features/resume/model/document";
+
 import type {
   DesignConfig,
   FontRef,
@@ -91,6 +96,19 @@ const fontValue = (font: FontRef, fallback: string): string => {
 
   return family === "" ? fallback : `'${family}', var(--font-serif)`;
 };
+
+/**
+ * A user's text as a CSS string literal, for `content`.
+ *
+ * Characters that could end the string or the declaration are dropped rather
+ * than escaped: a separator is a mark like a dot or a slash, and the length is
+ * capped so one cannot grow into a paragraph. Everything else, emoji and
+ * non-Latin included, passes through.
+ */
+const cssString = (value: string): string =>
+  `"${Array.from(value.replace(/["'\\;{}<>\r\n]/g, ""))
+    .slice(0, TAG_SEPARATOR_MAX)
+    .join("")}"`;
 
 const AVATAR_RADIUS: Record<DesignConfig["image"]["avatarShape"], string> = {
   circle: "50%",
@@ -186,6 +204,24 @@ export const designVars = (design: DesignConfig): string => {
     ["--paper-icon-size", `${clamp(icons.size, 6, 48, 12)}px`],
     ["--paper-icon-color", safeColor(icons.color, "#55554e")],
   ];
+
+  /**
+   * Written only when the document sets them. An unset `--paper-text-align`
+   * leaves `text-align: var(--paper-text-align)` invalid at computed time, which
+   * is `inherit` for this property, so a template that centres its own text keeps
+   * doing so. A default value here would override every such template.
+   */
+  const align = design.text?.align;
+
+  if (align !== undefined && TEXT_ALIGNMENTS.includes(align)) {
+    declarations.push(["--paper-text-align", align]);
+  }
+
+  const separator = design.text?.tagSeparator;
+
+  if (separator !== undefined) {
+    declarations.push(["--paper-tag-sep", cssString(separator)]);
+  }
 
   const body = declarations
     .map(([name, value]) => `  ${name}: ${value};`)

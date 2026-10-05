@@ -145,6 +145,17 @@
   padding-bottom: var(--paper-space-heading);
 }
 
+/* ---- Body text ---- */
+
+/* Blocks are flow items of their own, not children of a section element, so the
+   selector names the item. Written by the Style tab's alignment control, and only when it is set, see
+   `designVars`. Unset, the declaration is invalid at computed time and the
+   property inherits, which is what leaves a template's own alignment alone. The
+   header, the dates and the headings are outside this list on purpose. */
+.rp-item--block :is(p, ul, ol, blockquote) {
+  text-align: var(--paper-text-align);
+}
+
 /* ---- Entries ---- */
 
 .rp-entry-head {
@@ -312,7 +323,7 @@
 }
 
 .rp-tag + .rp-tag::before {
-  content: "·";
+  content: var(--paper-tag-sep, "·");
   margin-right: 0.7em;
   color: var(--paper-rule-color);
 }

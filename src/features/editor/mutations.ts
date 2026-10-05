@@ -5,6 +5,7 @@ import { templateDefaults } from "@/features/templates/defaults";
 import type { Draft } from "immer";
 import type {
   Block,
+  DateRange,
   DesignConfig,
   IconRef,
   InlineText,
@@ -631,6 +632,29 @@ export const setEntryField =
     }
 
     block[field] = value;
+  };
+
+/**
+ * An entry's dates, from the paper. `undefined` removes them, which is what
+ * clearing the field means, and leaves no empty `dateRange` behind for the
+ * renderer to branch on.
+ */
+export const setEntryDateRange =
+  (sectionId: string, blockId: string, range: DateRange | undefined): Recipe =>
+  (draft) => {
+    const section = findSection(draft, sectionId);
+    const block = section?.blocks.find((candidate) => candidate.id === blockId);
+
+    if (block?.kind !== "entry") {
+      return;
+    }
+
+    if (range === undefined) {
+      delete block.dateRange;
+      return;
+    }
+
+    block.dateRange = range;
   };
 
 /** One bullet of an entry. Entry bullets are a different array from a bullet

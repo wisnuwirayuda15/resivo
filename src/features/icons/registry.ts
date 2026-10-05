@@ -66,6 +66,10 @@ import {
   StarIcon,
   SunIcon,
   TextAaIcon,
+  TextAlignCenterIcon,
+  TextAlignJustifyIcon,
+  TextAlignLeftIcon,
+  TextAlignRightIcon,
   TextHIcon,
   TranslateIcon,
   TrashIcon,
@@ -170,6 +174,10 @@ export const ICON_REGISTRY: Record<string, PhosphorIcon> = {
   // Typography and media
   "text-aa": TextAaIcon,
   "text-h": TextHIcon,
+  "text-align-left": TextAlignLeftIcon,
+  "text-align-center": TextAlignCenterIcon,
+  "text-align-right": TextAlignRightIcon,
+  "text-align-justify": TextAlignJustifyIcon,
   image: ImageIcon,
 
   // Resume content, contact rows and section headings
