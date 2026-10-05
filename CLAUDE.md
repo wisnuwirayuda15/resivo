@@ -244,12 +244,33 @@ It deliberately does not `skipWaiting` or claim clients,
 so an update never purges the cache under a page that is still running. Bump
 `VERSION` in it when its logic changes.
 
+**The promo film is code that reuses the app, and its sound is written from the
+same clock as its picture.** `video/` is a separate package (`bun install` in
+it, then `bun run video:studio` or `bun run video:render` from the root) that
+resolves `@/` to `../src`, so the paper in it is drawn by the real template
+renderer, the ATS panel's words and findings come from the real rules, and the
+colours are the app's own `tokens.css` and `scheme.css`. It is kept out of the
+root `tsc` and ESLint (webpack, not Vite, so `?raw` is mapped in
+`remotion.config.ts`); type it with `bun run --cwd video typecheck`. Dark is one
+subtree under `data-mantine-color-scheme="dark"`, which works because
+`scheme.css` keys off that attribute on any element. The paper is a shadow root
+and not an iframe, since a frame has to be ready on the frame it is asked for.
+Everything is placed on a 120 BPM grid in `video/src/timeline.json`: a beat is 30
+frames at 60 fps, a scene starts on a bar line, and
+`video/scripts/generate-audio.mjs` reads the same file to synthesise the music
+and one effect for each event (nothing is recorded or downloaded, so there is no
+licence to check). Move an event in the JSON and its sound moves with it. Run
+`bun run --cwd video audio:check` after changing the mix; it needs ffmpeg
+(`FFMPEG`, or the PATH). Remotion bundles its own, so rendering does not.
+
 ## Layout
 
 ```
 content/           the docs (MDX, en and id) and the AI prompts
 e2e/               Playwright specs, and the moves they share in app.ts
 e2e-pwa/           the offline spec, which needs a real build (own config)
+e2e-media/         the docs clips: scripted Playwright recordings (own config)
+video/             the 30 second promo film: Remotion, its own package
 src/
   routes/          file-based routes
   features/
