@@ -1,8 +1,9 @@
+import { Box, Skeleton, Text, UnstyledButton } from "@mantine/core";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Text, UnstyledButton } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { cn } from "@/lib/utils";
+import { useHover } from "@mantine/hooks";
 
 /**
  * The repository's page, and how many people have starred it.
@@ -15,7 +16,7 @@ import { cn } from "@/lib/utils";
 
 const REPOSITORY = "wisnuwirayuda15/resivo";
 
-export const REPOSITORY_URL = `https://github.com/${REPOSITORY}`;
+const REPOSITORY_URL = `https://github.com/${REPOSITORY}`;
 
 /**
  * Ten minutes. GitHub allows 60 unauthenticated requests an hour per address,
@@ -56,13 +57,15 @@ export const GithubStars: React.FC<GithubStarsProps> = ({
   locale,
   className,
 }) => {
+  const { hovered, ref } = useHover();
+
   /**
    * Silent on failure, offline, rate limited or blocked: the link is the
    * feature and the count is a garnish, so there is no retry and no error. The
    * query does not run on the server, which is what keeps the first client
    * render identical to the server's.
    */
-  const { data: stars } = useQuery({
+  const { data: stars = -1, isPending } = useQuery({
     queryKey: ["github-stars", REPOSITORY],
     queryFn: fetchStars,
     staleTime: STALE_MS,
@@ -71,6 +74,7 @@ export const GithubStars: React.FC<GithubStarsProps> = ({
 
   return (
     <UnstyledButton
+      ref={ref}
       aria-label={label}
       className={cn(
         "text-muted hover:text-body hover:bg-hover rounded-control duration-fast ease-standard flex h-[30px] items-center gap-2 px-2 transition-colors active:scale-[0.96]",
@@ -82,24 +86,28 @@ export const GithubStars: React.FC<GithubStarsProps> = ({
       target="_blank"
       title={label}
     >
-      <Icon name="github-logo" size={16} />
+      <Icon name="github-logo" size={16} weight={hovered ? "fill" : "bold"} />
 
-      {stars === undefined ? null : (
-        // Off a phone's bar: the docs' header already has a burger, the logo, a
-        // search, a language and a theme control in 390px, and the link alone
-        // is the part that has to stay.
-        <Box className="hidden items-center gap-0.5 sm:flex">
-          <Icon name="star" size={12} weight="fill" />
+      {isPending ? (
+        <Skeleton className="h-[20px] w-[40px]" />
+      ) : stars >= 0 ? (
+        <Box className="hidden items-center gap-1 sm:flex">
+          <Icon className="flex-none" name="star" size={12} weight="fill" />
           {/* Monospace and tabular, the design system's rule for a number that
-              changes in place. */}
-          <Text className="font-mono text-[12px] tabular-nums" span>
+              changes in place. `leading-none` so the line box is the glyph's
+              own height: with the inherited line height the digits sat a pixel
+              or two off the centre the star is aligned to. */}
+          <Text
+            className="font-mono text-[12px] leading-none tabular-nums"
+            span
+          >
             {new Intl.NumberFormat(locale, {
               notation: "compact",
               maximumFractionDigits: 1,
             }).format(stars)}
           </Text>
         </Box>
-      )}
+      ) : null}
     </UnstyledButton>
   );
 };
