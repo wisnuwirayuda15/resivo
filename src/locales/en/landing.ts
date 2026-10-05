@@ -24,6 +24,11 @@ export const landing = {
     openApp: "Open the app",
     seeTemplates: "See the templates",
   },
+  tour: {
+    title: "The whole app in 28 seconds.",
+    body: "Markdown in, seven templates, the ATS check, light and dark, and every export format. The film is made from the app's own code, so what it shows is what the app does.",
+    label: "A 28 second tour of Resivo",
+  },
   surfaces: {
     title: "Three ways to edit it. One document underneath.",
     markdown: {

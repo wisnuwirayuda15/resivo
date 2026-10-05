@@ -312,7 +312,9 @@ licence to check). Move an event in the JSON and its sound moves with it. Run
 `bun run --cwd video audio:check` after changing the mix; it needs ffmpeg
 (`FFMPEG`, or the PATH). Remotion bundles its own, so rendering does not.
 `bun run video:publish` renders and then puts the film and its poster in
-`public/promo/`, which the README links to and does not embed: GitHub does not
+`public/promo/`, which the landing page plays (`landing/Tour.tsx`, with
+`preload="none"` so the 11 MB is fetched only on play) and the README links to
+and does not embed: GitHub does not
 play a repository's own video inline, so the README shows `public/brand/` (the
 logo, and a light and dark screenshot of the editor) instead. Change the film,
 publish it again, and commit the two files with it: the 11 MB is in git history

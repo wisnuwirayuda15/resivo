@@ -10,6 +10,7 @@ import { LandingNav } from "./LandingNav";
 import { LocalFirst } from "./LocalFirst";
 import { Surfaces } from "./Surfaces";
 import { TemplateShowcase } from "./TemplateShowcase";
+import { Tour } from "./Tour";
 
 /**
  * The landing page.
@@ -76,6 +77,7 @@ export const LandingPage: React.FC = () => {
 
       <LandingNav />
       <Hero />
+      <Tour />
       <Surfaces />
       <TemplateShowcase />
       <LocalFirst />

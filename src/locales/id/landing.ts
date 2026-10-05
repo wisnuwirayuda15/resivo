@@ -18,6 +18,11 @@ export const landing = {
     openApp: "Buka aplikasi",
     seeTemplates: "Lihat template",
   },
+  tour: {
+    title: "Seluruh aplikasi dalam 28 detik.",
+    body: "Markdown masuk, tujuh template, pemeriksaan ATS, terang dan gelap, dan setiap format ekspor. Filmnya dibuat dari kode aplikasi itu sendiri, jadi yang ditampilkannya adalah yang dikerjakan aplikasi.",
+    label: "Tur Resivo selama 28 detik",
+  },
   surfaces: {
     title: "Tiga cara menyuntingnya. Satu dokumen di bawahnya.",
     markdown: {
