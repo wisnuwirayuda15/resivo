@@ -61,6 +61,15 @@ describe("docs Markdown", () => {
     expect(out).not.toContain("<Card");
   });
 
+  it("writes a video as a link that says what it shows", () => {
+    const out = toMarkdown(
+      '<Video src="/docs-media/clip.webm" poster="/docs-media/clip.png" caption="Dragging a block." />',
+    );
+
+    expect(out).toContain("[Video: Dragging a block.](/docs-media/clip.webm)");
+    expect(out).not.toContain("<Video");
+  });
+
   it("labels each tab and keeps its content", () => {
     const out = toMarkdown(
       '<Tabs items={["macOS", "Windows"]}>\n<Tab value="macOS">\n\nUse one.\n\n</Tab>\n<Tab value="Windows">\n\nUse two.\n\n</Tab>\n</Tabs>',

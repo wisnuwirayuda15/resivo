@@ -15,6 +15,7 @@ import { DocLink } from "./DocLink";
 import { makeHeading } from "./Heading";
 import { Step, Steps } from "./Steps";
 import { Tab, Tabs } from "./Tabs";
+import { Video } from "./Video";
 
 import type { MDXComponents } from "mdx/types";
 
@@ -125,4 +126,5 @@ export const docsComponents: MDXComponents = {
   Cards,
   Card,
   Kbd,
+  Video,
 };

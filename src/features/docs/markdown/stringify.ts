@@ -115,6 +115,10 @@ export const stringifyDocsElement: NonNullable<LLMsOptions["stringify"]> = (
         .join("\n");
     case "Tab":
       return `**${attribute(node, "value") ?? ""}**\n\n${flow(node, state, info)}`;
+    case "Video":
+      // A clip has no text form, so what is left is a link to it. The caption
+      // is what the clip shows, which is the part a reader of this form needs.
+      return `[Video: ${attribute(node, "caption") ?? ""}](${attribute(node, "src") ?? ""})`;
     case "Kbd":
       return `\`${oneLine(state.containerPhrasing(node, info))}\``;
     default:
