@@ -46,3 +46,220 @@ body {
   transition: none !important;
   animation: none !important;
 }
+
+/* Shadows live in the Mantine theme in the app and not in tokens.css, so the
+   two the film needs are restated with the app's numbers. */
+:root,
+[data-mantine-color-scheme="light"] {
+  --v-lift:
+    0 18px 48px rgba(18, 18, 16, 0.18), 0 2px 8px rgba(18, 18, 16, 0.08);
+  --v-float:
+    0 8px 24px rgba(18, 18, 16, 0.09), 0 2px 6px rgba(18, 18, 16, 0.05);
+  --v-grid: rgba(18, 18, 16, 0.045);
+}
+
+[data-mantine-color-scheme="dark"] {
+  --v-lift: 0 18px 48px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.4);
+  --v-float: 0 8px 24px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.35);
+  --v-grid: rgba(255, 255, 255, 0.04);
+}
+
+/* Backdrop: the app background with a hairline grid, the way the second
+   reference film sets its objects on a drafting surface. */
+.v-backdrop {
+  background-color: var(--bg-app);
+  background-image:
+    linear-gradient(var(--v-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--v-grid) 1px, transparent 1px);
+  background-size: 96px 96px;
+  background-position: center;
+}
+
+.v-stage {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.v-headline,
+.v-title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-title);
+  white-space: nowrap;
+}
+
+.v-headline {
+  position: relative;
+  font-size: 118px;
+  line-height: 1.05;
+}
+
+.v-ghost {
+  visibility: hidden;
+}
+
+.v-typed {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.v-title {
+  font-size: 76px;
+  line-height: 1.05;
+}
+
+.v-accent {
+  color: var(--text-accent);
+}
+
+.v-caret {
+  display: inline-block;
+  width: 7px;
+  height: 0.86em;
+  margin-left: 0.08em;
+  vertical-align: -0.1em;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.v-caret[data-on="false"] {
+  opacity: 0;
+}
+
+/* Intro */
+.v-intro {
+  justify-content: flex-start;
+  padding-top: 290px;
+}
+
+.v-pile {
+  position: relative;
+  width: 0;
+  height: 0;
+  margin-top: 110px;
+}
+
+.v-chip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 14px 26px;
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-card);
+  background: var(--bg-surface);
+  box-shadow: var(--v-float);
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+  font-size: 32px;
+  font-weight: 500;
+  color: var(--text-body);
+  white-space: nowrap;
+}
+
+.v-chip[data-accent="true"] {
+  color: var(--text-accent);
+}
+
+/* A pane of the app */
+.v-window {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--border-default);
+  border-radius: var(--r-dialog);
+  background: var(--bg-surface);
+  box-shadow: var(--v-lift);
+}
+
+.v-window-bar {
+  display: flex;
+  align-items: center;
+  flex: none;
+  height: 56px;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border-default);
+  background: var(--bg-surface);
+}
+
+.v-window-title {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  color: var(--text-muted);
+}
+
+.v-window-body {
+  flex: 1;
+  min-height: 0;
+}
+
+/* Write */
+.v-write {
+  justify-content: flex-start;
+  padding-top: 64px;
+  gap: 44px;
+}
+
+.v-write-window {
+  width: 1560px;
+  height: 810px;
+}
+
+.v-split {
+  display: grid;
+  grid-template-columns: 700px 1fr;
+  height: 100%;
+}
+
+.v-code {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-right: 1px solid var(--border-default);
+  background: var(--bg-code);
+}
+
+.v-code-lines {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  height: 100%;
+  padding: 24px 32px;
+  font-family: var(--font-mono);
+  font-variant-ligatures: none;
+  font-size: 21px;
+  line-height: 1.7;
+}
+
+.v-code-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+  color: var(--text-muted);
+}
+
+.v-code-line[data-kind="heading"] {
+  color: var(--text-title);
+  font-weight: 500;
+}
+
+.v-code-line[data-kind="directive"] {
+  color: var(--text-accent);
+}
+
+.v-code-line[data-kind="bullet"] {
+  color: var(--text-body);
+}
+
+.v-canvas {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 28px;
+  overflow: hidden;
+  background: var(--bg-sunken);
+}

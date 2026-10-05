@@ -4,12 +4,25 @@
   "width": 1920,
   "height": 1080,
   "scenes": {
-    "intro": { "bar": 0, "bars": 2 },
-    "write": { "bar": 2, "bars": 2 },
-    "templates": { "bar": 4, "bars": 2 },
-    "ats": { "bar": 6, "bars": 2 },
-    "themes": { "bar": 8, "bars": 3 },
-    "export": { "bar": 11, "bars": 2 },
-    "outro": { "bar": 13, "bars": 2 }
+    "intro": {
+      "bar": 0,
+      "bars": 2,
+      "events": {
+        "type": { "from": 12, "every": 3, "count": 30 },
+        "chips": [118, 130, 142, 154, 166, 178, 190, 202, 214]
+      }
+    },
+    "write": {
+      "bar": 2,
+      "bars": 2,
+      "events": {
+        "type": { "from": 14, "frames": 170 }
+      }
+    },
+    "templates": { "bar": 4, "bars": 2, "events": {} },
+    "ats": { "bar": 6, "bars": 2, "events": {} },
+    "themes": { "bar": 8, "bars": 3, "events": {} },
+    "export": { "bar": 11, "bars": 2, "events": {} },
+    "outro": { "bar": 13, "bars": 2, "events": {} }
   }
 }
