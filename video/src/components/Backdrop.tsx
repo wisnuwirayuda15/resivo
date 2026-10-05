@@ -7,10 +7,10 @@ import type { CSSProperties, ReactNode } from "react";
  *
  * The pattern slides a quarter of a pixel a frame, 15 pixels a second, which is
  * too slow to read as motion and enough to keep a held frame alive. It wraps
- * at 384 pixels, four grid cells, which is the tile of the plus marks, so the
+ * at 192 pixels, two grid cells, which is the tile of the plus marks, so the
  * loop has no seam.
  */
-const TILE = 384;
+const TILE = 192;
 const SPEED = 0.25;
 
 export const Backdrop = ({
