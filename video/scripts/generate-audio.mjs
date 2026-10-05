@@ -489,10 +489,16 @@ const pingPong = (inLeft, inRight, time, feedback, mix) => {
 
 const [wetLeft, wetRight] = pingPong(left, right, BEAT * 0.75, 0.4, 0.3);
 
-const MUSIC_GAIN = 1;
-const FX_GAIN = 1;
-/** Set by measurement: 1.7 puts the whole track at -16 LUFS, with a true peak
- * of -4.5 dB, which leaves the room a loudness-normalising player will want. */
+/**
+ * The balance, set by `check-audio.mjs` and not by ear. With the music at full
+ * level most of the effects (a pop on a beat that already has a kick under it)
+ * cannot be told from the music: 14 of the 38 cues stood out. At 0.6 and 2.4
+ * 34 of them do, the whole track measures about -16.5 LUFS and the true peak is
+ * -1.7 dB, which leaves the room a loudness-normalising player will want. The
+ * environment variables are for trying another mix without editing the file.
+ */
+const MUSIC_GAIN = Number(process.env.AUDIO_MUSIC ?? 0.6);
+const FX_GAIN = Number(process.env.AUDIO_FX ?? 2.4);
 const MASTER = Number(process.env.AUDIO_MASTER ?? 1.7);
 
 const fadeIn = 0.04;
