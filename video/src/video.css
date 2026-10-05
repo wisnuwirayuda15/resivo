@@ -669,3 +669,12 @@ body {
   border-radius: 50%;
   background: var(--p-300);
 }
+
+/* The cut panels sit above every scene, the pointer included. */
+.v-cut-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}

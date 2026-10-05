@@ -5,6 +5,7 @@ import { theme } from "@/styles/theme";
 
 import { Backdrop } from "./components/Backdrop";
 import { Shell } from "./components/Shell";
+import { Transitions } from "./components/Transitions";
 import { Ats } from "./scenes/Ats";
 import { Export } from "./scenes/Export";
 import { Intro } from "./scenes/Intro";
@@ -38,6 +39,7 @@ export const Promo = () => (
       <Shell scene="outro">
         <Outro />
       </Shell>
+      <Transitions />
     </Backdrop>
   </MantineProvider>
 );
