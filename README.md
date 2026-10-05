@@ -1,21 +1,29 @@
-# Resivo
+<h1 align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="public/brand/resivo-logo-dark.svg">
+    <img alt="Resivo" src="public/brand/resivo-logo.svg" width="240">
+  </picture>
+</h1>
 
-A local-first resume builder. Everything lives in your browser, no account, no
-server, no network request that carries your data anywhere.
+<p align="center">
+  A local-first resume builder. Everything lives in your browser, no account, no
+  server, no network request that carries your data anywhere.
+</p>
+
+<p align="center">
+  <a href="https://resivo-cv.vercel.app">Open the app</a>
+</p>
 
 Write a resume in Markdown or edit it directly on the page, style it with a
 visual panel or your own CSS, and export it as a PDF, a single self-contained
 HTML file, or Markdown.
 
-[![A 28 second tour of Resivo: Markdown in, seven templates, the ATS check, light and dark, and the export formats.](public/promo/resivo-promo.jpg)](public/promo/resivo-promo.mp4)
+![Resivo in its light and dark themes: Markdown on the left, the resume in the middle, and the style panel on the right. The paper stays light in both.](public/brand/resivo-editor.png)
 
-A 28 second tour, 1080p at 60 fps with sound: Markdown typed into the editor,
-seven templates over one document, the ATS check and its one-click fixes, the
-light and dark themes, and the export formats. Click the picture to play it.
-
-The film is made from the app and not recorded from it: the paper, the ATS
-findings and the colours in it come from this repository's own code. It lives in
-`video/`, and `bun run video:publish` renders it again into `public/promo/`.
+There is also a [28 second tour](public/promo/resivo-promo.mp4) of it, made from
+the app and not recorded from it: the paper, the ATS findings and the colours in
+it come from this repository's own code. It lives in `video/`, and
+`bun run video:publish` renders it again into `public/promo/`.
 
 ## Why local-first
 
@@ -458,3 +466,13 @@ node .output/server/index.mjs
 Any static or Node-compatible host works, there is no database to provision and
 no environment variable to set, because the server only ever ships the app
 itself. For host-specific presets see https://v3.nitro.build/deploy.
+
+## Star history
+
+<a href="https://www.star-history.com/#wisnuwirayuda15/resivo&Date">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=wisnuwirayuda15/resivo&type=Date&theme=dark">
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=wisnuwirayuda15/resivo&type=Date">
+    <img alt="Star history of wisnuwirayuda15/resivo" src="https://api.star-history.com/svg?repos=wisnuwirayuda15/resivo&type=Date">
+  </picture>
+</a>

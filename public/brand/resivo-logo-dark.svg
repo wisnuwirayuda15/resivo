@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 12 417 96" fill="none" role="img">
+  <title>Resivo</title>
+  <g
+    stroke="#f2f2f0"
+    stroke-width="16"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M8 100V20h30a22 22 0 0 1 0 44H8" />
+    <path d="M30 64l30 36" />
+    <path d="M141 73a27 27 0 1 0-11.5 22.1" />
+    <path d="M87 73h54" />
+    <path d="M193.7 54.9a13.5 13.5 0 1 0-12.7 18.1a13.5 13.5 0 1 1-12.7 18.4" />
+    <path d="M222 46v54" />
+    <path d="M249 46l24 54l24-54" />
+    <circle cx="351" cy="73" r="27" />
+  </g>
+  <circle cx="222" cy="26" r="8" fill="#f2f2f0" />
+  <circle cx="407" cy="98" r="10" fill="#4fb3ac" />
+</svg>

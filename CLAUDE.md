@@ -264,8 +264,19 @@ licence to check). Move an event in the JSON and its sound moves with it. Run
 `bun run --cwd video audio:check` after changing the mix; it needs ffmpeg
 (`FFMPEG`, or the PATH). Remotion bundles its own, so rendering does not.
 `bun run video:publish` renders and then puts the film and its poster in
-`public/promo/`, which is what the README shows. Change the film, publish it
-again, and commit the two files with it: the 11 MB is in git history each time.
+`public/promo/`, which the README links to and does not embed: GitHub does not
+play a repository's own video inline, so the README shows `public/brand/` (the
+logo, and a light and dark screenshot of the editor) instead. Change the film,
+publish it again, and commit the two files with it: the 11 MB is in git history
+each time.
+
+**The one request the public pages make.** The landing page and the docs header
+show the repository's star count (`components/GithubStars.tsx`), a plain `GET` to
+`api.github.com` that carries nothing of the user's. It is why a page that says
+"no network request that carries your data anywhere" still has one: the claim is
+about data, and this is a read of a public number. The app behind `/resumes` never
+makes it, and it fails silently, so offline or rate limited (60 an hour per
+address, which is why the query is stale for ten minutes) shows the link alone.
 
 ## Layout
 
@@ -275,6 +286,7 @@ e2e/               Playwright specs, and the moves they share in app.ts
 e2e-pwa/           the offline spec, which needs a real build (own config)
 e2e-media/         the docs clips: scripted Playwright recordings (own config)
 video/             the 28 second promo film: Remotion, its own package
+public/brand/      the README's logo (light and dark) and editor screenshot
 src/
   routes/          file-based routes
   features/
