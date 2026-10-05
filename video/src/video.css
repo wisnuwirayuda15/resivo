@@ -678,3 +678,12 @@ body {
   overflow: hidden;
   pointer-events: none;
 }
+
+/* The mark in the middle of a cut, centred by its own transform. */
+.v-mark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 270px;
+  height: auto;
+}

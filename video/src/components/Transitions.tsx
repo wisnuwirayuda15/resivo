@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import { useCurrentFrame } from "remotion";
 
 import { lerp, progress, STANDARD } from "../lib/motion";
+import { Mark } from "./Mark";
 import { height, sceneFrom, width } from "../timeline";
 
 import type { SceneName } from "../timeline";
@@ -192,25 +194,30 @@ export const Transitions = () => {
           return null;
         }
 
-        return LAYERS.map((layer) => {
-          const cover = progress(t + layer.cover, -COVER, COVER, STANDARD);
-          const reveal = progress(t + layer.reveal, 0, REVEAL, STANDARD);
+        return (
+          <Fragment key={into}>
+            {LAYERS.map((layer) => {
+              const cover = progress(t + layer.cover, -COVER, COVER, STANDARD);
+              const reveal = progress(t + layer.reveal, 0, REVEAL, STANDARD);
 
-          if (cover <= 0 || reveal >= 1) {
-            return null;
-          }
+              if (cover <= 0 || reveal >= 1) {
+                return null;
+              }
 
-          return (
-            <Layer
-              key={`${into}:${layer.color}`}
-              kind={kind}
-              color={layer.color}
-              t={t + layer.cover}
-              cover={cover}
-              reveal={reveal}
-            />
-          );
-        });
+              return (
+                <Layer
+                  key={layer.color}
+                  kind={kind}
+                  color={layer.color}
+                  t={t + layer.cover}
+                  cover={cover}
+                  reveal={reveal}
+                />
+              );
+            })}
+            {t >= -10 && t <= 5 ? <Mark t={t} /> : null}
+          </Fragment>
+        );
       })}
     </div>
   );
