@@ -114,10 +114,8 @@ export const Shell: React.FC<ShellProps> = ({
   useHotkeys([["mod+B", toggleSidebar]]);
 
   return (
-    /* Outside the shell, because a tour step points at the sidebar and the app
-       bar as well as at the content, and a target has to be below the provider
-       to register itself. */
-    <AppTour onRevealSidebar={setTourNav} restartSignal={tourRequests}>
+    <>
+      <AppTour onRevealSidebar={setTourNav} restartSignal={tourRequests} />
       <AppShell
         layout="alt"
         // The height and width come from the tokens rather than from literals,
@@ -240,6 +238,6 @@ export const Shell: React.FC<ShellProps> = ({
           />
         </ClientOnly>
       </AppShell>
-    </AppTour>
+    </>
   );
 };

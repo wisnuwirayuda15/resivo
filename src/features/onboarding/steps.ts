@@ -1,5 +1,5 @@
+import type { FloatingPosition } from "@mantine/core";
 import type { TFunction } from "i18next";
-import type { OnboardingTourStep } from "@gfazioli/mantine-onboarding-tour";
 import type { en } from "@/locales/en";
 import type { EditorPane } from "@/features/editor/tourPane";
 import type { TourName } from "./seen";
@@ -12,12 +12,12 @@ import type { TourName } from "./seen";
  * backup in Settings is the only copy of a local-first document is the sentence
  * this app most needs someone to read before they need it.
  *
- * A step's `id` is matched against an `OnboardingTour.Target` of the same id
- * mounted somewhere below the provider, so every id here has exactly one
- * anchor in the tree, and a step whose anchor is not mounted would darken the
- * screen and point at nothing. That is why there are two tours rather than one
- * crossing between the library and the editor: each tour's anchors are all on
- * the route it runs on.
+ * A step's `id` is matched against the `data-tour` attribute of an element
+ * mounted somewhere in the document (see `tourSelector`), so every id here has
+ * exactly one anchor in the tree, and a step whose anchor is not mounted would
+ * darken the screen and point at nothing. That is why there are two tours rather
+ * than one crossing between the library and the editor: each tour's anchors are
+ * all on the route it runs on.
  */
 
 export const TOUR_TARGET_IDS = {
@@ -46,6 +46,32 @@ export const TOUR_TARGET_IDS = {
   paperTab: "tour-paper-tab",
   styleTab: "tour-style-tab",
 } as const;
+
+/**
+ * The selector `Tour.Step` takes for an anchor.
+ *
+ * A selector and not a ref, which is the point: the anchors are spread across a
+ * dozen components, and a selector is resolved again when its element mounts
+ * later, which is what a pane behind a tab does once the tour has asked for it.
+ */
+export const tourSelector = (id: string): string => `[data-tour="${id}"]`;
+
+/**
+ * Which side of the anchor the card goes.
+ *
+ * `bottom` is right for a button or a sidebar row, and wrong for a pane: three
+ * of the editor's anchors are full-height columns, and "below" a target taller
+ * than the viewport is off the bottom of the screen, which `shift` cannot
+ * rescue, because it only moves along the cross axis. Beside a tall target the
+ * card is centred on it instead, which is on screen by construction.
+ */
+const stepPosition = (id: string): FloatingPosition => {
+  if (id === TOUR_TARGET_IDS.code || id === TOUR_TARGET_IDS.paper) {
+    return "right";
+  }
+
+  return id === TOUR_TARGET_IDS.inspector ? "left" : "bottom";
+};
 
 /**
  * The steps whose anchor is a row in the sidebar.
@@ -129,6 +155,14 @@ const NARROW_EDITOR_STEPS: Array<StepDefinition<EditorKey>> = EDITOR_STEPS.map(
   },
 );
 
+/** One step as the tour draws it: the anchor, the card's words and its side. */
+export interface TourStepContent {
+  id: string;
+  title: string;
+  content: string;
+  position: FloatingPosition;
+}
+
 export const tourSteps = (
   name: TourName,
   t: TFunction<"onboarding">,
@@ -138,12 +172,13 @@ export const tourSteps = (
    * tour's steps point. Irrelevant to the library tour.
    */
   options: { wideEditor: boolean } = { wideEditor: true },
-): Array<OnboardingTourStep> => {
+): Array<TourStepContent> => {
   if (name === "library") {
     return LIBRARY_STEPS.map(({ id, key }) => ({
       id,
       title: t(`library.${key}.title`),
       content: t(`library.${key}.content`),
+      position: stepPosition(id),
     }));
   }
 
@@ -154,6 +189,7 @@ export const tourSteps = (
       id,
       title: t(`editor.${key}.title`),
       content: t(`editor.${key}.content`),
+      position: stepPosition(id),
     }),
   );
 };

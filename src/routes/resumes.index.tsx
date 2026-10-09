@@ -12,7 +12,6 @@ import { ClientOnly } from "@/components/client-only";
 import { EmptyState } from "@/components/EmptyState";
 import { Icon } from "@/features/icons/IconRenderer";
 import { NewResumeDialog } from "@/features/resume/components/NewResumeDialog";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { ResumeLibrary } from "@/features/resume/components/ResumeLibrary";
 import { useGroups, useResumes } from "@/features/resume/queries";
@@ -160,25 +159,24 @@ const LibraryRoute: React.FC = () => {
           </Box>
           {/* The header's button, not the sidebar's or the empty state's: it
               is the one that is on screen whatever the library holds. */}
-          <OnboardingTour.Target id={TOUR_TARGET_IDS.newResume}>
-            {/* The glyph alone on a phone, and centred in its own square.
+          {/* The glyph alone on a phone, and centred in its own square.
 
                 The icon is a child rather than a `leftSection`, because a
                 section keeps its trailing margin once the label beside it is
                 hidden, which left the plus a few pixels left of centre and
                 looking out of line with everything else in the row.
                 `aria-label` is what keeps the button named either way. */}
-            <Button
-              aria-label={t("newResume")}
-              className="max-sm:w-[30px] max-sm:px-0"
-              onClick={() => setNewResumeOpen(true)}
-            >
-              <Icon name="plus" size={15} />
-              <Box className="ms-1.5 hidden sm:inline" component="span">
-                {t("newResume")}
-              </Box>
-            </Button>
-          </OnboardingTour.Target>
+          <Button
+            aria-label={t("newResume")}
+            className="max-sm:w-[30px] max-sm:px-0"
+            data-tour={TOUR_TARGET_IDS.newResume}
+            onClick={() => setNewResumeOpen(true)}
+          >
+            <Icon name="plus" size={15} />
+            <Box className="ms-1.5 hidden sm:inline" component="span">
+              {t("newResume")}
+            </Box>
+          </Button>
         </>
       }
     >

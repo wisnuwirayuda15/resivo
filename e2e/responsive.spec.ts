@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
 
+import type { Page } from "@playwright/test";
+
 import {
   createResume,
   expectPaperReady,
@@ -206,6 +208,49 @@ test("the navbar drawer closes when the page beside it is tapped", async ({
 });
 
 /**
+ * Whether the tour is pointing at something on screen.
+ *
+ * The card is only centred when its step found no anchor, so a card that is not
+ * is one that has an anchor, and the spotlight cutout is that anchor's box. Its
+ * centre has to be inside the viewport: the card can be fully on screen while
+ * the thing it describes is behind a closed drawer or a tab that is not open.
+ * Polled, because the cutout follows an anchor that is still sliding in.
+ */
+const expectSpotlightOnScreen = async (page: Page) => {
+  await expect(page.locator(".mantine-Tour-tooltip")).not.toHaveAttribute(
+    "data-centered",
+    "true",
+  );
+
+  await expect
+    .poll(async () => {
+      const centre = await page
+        .locator(".mantine-Tour-spotlight")
+        .evaluate((node) => {
+          // The attributes and not `getBoundingClientRect`, which is empty for
+          // a rect inside a mask. The overlay is the size of the viewport, so
+          // they are viewport coordinates.
+          const read = (name: string) => Number(node.getAttribute(name));
+
+          return {
+            x: read("x") + read("width") / 2,
+            y: read("y") + read("height") / 2,
+          };
+        });
+      const viewport = page.viewportSize();
+
+      return (
+        viewport !== null &&
+        centre.x > 0 &&
+        centre.x < viewport.width &&
+        centre.y > 0 &&
+        centre.y < viewport.height
+      );
+    })
+    .toBe(true);
+};
+
+/**
  * The tour, on the screen where it had the least room to work.
  *
  * Two things were wrong at phone width. The popover renders at a fixed 374px,
@@ -227,21 +272,13 @@ test("the tour can be walked through on a phone", async ({ page }) => {
   });
   await page.reload();
 
-  const popover = page.locator(
-    ".mantine-OnboardingTourPopoverContent-popoverContent",
-  );
   /**
    * The card's own box, not the content inside it.
    *
-   * This is what the first attempt at the fix missed. Capping the content left
-   * the dropdown around it 369px wide and placed for that width, so its right
-   * edge (the last stepper dot with it) was 10px outside a 375px viewport
-   * while the content it held measured as being on screen.
+   * The tour sizes this element to the room it has, so it is what has to sit
+   * inside the viewport: the width it reports is the width it was given.
    */
-  const card = page
-    .locator(".mantine-Popover-dropdown")
-    .filter({ has: popover });
-  const focused = page.locator("[data-onboarding-tour-focus-reveal-focused]");
+  const card = page.locator(".mantine-Tour-tooltip");
 
   await expect(page.getByText("Start here")).toBeVisible({ timeout: 20_000 });
 
@@ -255,7 +292,7 @@ test("the tour can be walked through on a phone", async ({ page }) => {
     await expect(card).toBeInViewport({ ratio: 1 });
     await page.getByRole("button", { name: "Next" }).click();
     await expect(page.getByText(heading)).toBeVisible();
-    await expect(focused).toBeInViewport({ ratio: 1 });
+    await expectSpotlightOnScreen(page);
   }
 
   await expect(card).toBeInViewport({ ratio: 1 });
@@ -265,7 +302,7 @@ test("the tour can be walked through on a phone", async ({ page }) => {
    *
    * A card that fits by being small is not the fix asked for: this one is
    * capped at the viewport less an 8px gutter each side, so on a 375px screen
-   * it should be 359px rather than the package's own 400px cap clipped to fit.
+   * it should be 359px rather than its 460px cap clipped to fit.
    */
   const width = await card.evaluate((node) =>
     Math.round(node.getBoundingClientRect().width),
@@ -299,13 +336,7 @@ test("the editor tour runs on a phone, one tab at a time", async ({ page }) => {
   );
   await page.reload();
 
-  const popover = page.locator(
-    ".mantine-OnboardingTourPopoverContent-popoverContent",
-  );
-  const card = page
-    .locator(".mantine-Popover-dropdown")
-    .filter({ has: popover });
-  const focused = page.locator("[data-onboarding-tour-focus-reveal-focused]");
+  const card = page.locator(".mantine-Tour-tooltip");
 
   // Scoped to the editor's own strip: the inspector has a tab called Style
   // too, and both are on screen once that pane is open.
@@ -340,7 +371,7 @@ test("the editor tour runs on a phone, one tab at a time", async ({ page }) => {
 
     // On screen, and pointing at something on screen.
     await expect(card).toBeInViewport({ ratio: 1 });
-    await expect(focused.first()).toBeInViewport({ ratio: 1 });
+    await expectSpotlightOnScreen(page);
 
     if (index < steps.length - 1) {
       await page.getByRole("button", { name: "Next" }).click();

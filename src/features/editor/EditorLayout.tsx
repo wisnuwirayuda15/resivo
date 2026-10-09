@@ -2,7 +2,6 @@ import { useCallback, useState } from "react";
 import { Splitter, Tabs } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useTranslation } from "@/lib/i18n/useTranslation";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
@@ -211,30 +210,27 @@ export const EditorLayout: React.FC<EditorLayoutProps> = ({
           {/* The tour points at these rather than at the panes they open, and
               the anchors live here rather than beside the pane ones so that
               exactly one of the two is in the document at a time. */}
-          <OnboardingTour.Target id={TOUR_TARGET_IDS.codeTab}>
-            <Tabs.Tab
-              leftSection={<Icon name="markdown-logo" size={13} />}
-              value="code"
-            >
-              {t("panes.code")}
-            </Tabs.Tab>
-          </OnboardingTour.Target>
-          <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTab}>
-            <Tabs.Tab
-              leftSection={<Icon name="file-text" size={13} />}
-              value="paper"
-            >
-              {t("panes.paper")}
-            </Tabs.Tab>
-          </OnboardingTour.Target>
-          <OnboardingTour.Target id={TOUR_TARGET_IDS.styleTab}>
-            <Tabs.Tab
-              leftSection={<Icon name="palette" size={13} />}
-              value="style"
-            >
-              {t("panes.style")}
-            </Tabs.Tab>
-          </OnboardingTour.Target>
+          <Tabs.Tab
+            data-tour={TOUR_TARGET_IDS.codeTab}
+            leftSection={<Icon name="markdown-logo" size={13} />}
+            value="code"
+          >
+            {t("panes.code")}
+          </Tabs.Tab>
+          <Tabs.Tab
+            data-tour={TOUR_TARGET_IDS.paperTab}
+            leftSection={<Icon name="file-text" size={13} />}
+            value="paper"
+          >
+            {t("panes.paper")}
+          </Tabs.Tab>
+          <Tabs.Tab
+            data-tour={TOUR_TARGET_IDS.styleTab}
+            leftSection={<Icon name="palette" size={13} />}
+            value="style"
+          >
+            {t("panes.style")}
+          </Tabs.Tab>
         </Tabs.List>
 
         <Tabs.Panel className="min-h-0 flex-1" value="code">

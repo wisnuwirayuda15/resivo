@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button } from "@mantine/core";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
+import { Tour } from "@mantine/core";
 import { useMediaQuery } from "@mantine/hooks";
 import { useRouterState } from "@tanstack/react-router";
 
@@ -11,39 +10,36 @@ import { useTourPane } from "@/features/editor/tourPane";
 import {
   EDITOR_STEP_PANES,
   SIDEBAR_STEP_IDS,
-  TOUR_TARGET_IDS,
+  tourSelector,
   tourSteps,
 } from "./steps";
 
-import type { ReactNode } from "react";
 import type { TourName } from "./seen";
 
 /**
- * The onboarding tour, wrapped around the whole shell.
+ * The onboarding tour, rendered beside the shell.
  *
- * It has to be an ancestor of what it points at: `OnboardingTour.Target`
- * registers itself through context, so a target outside this provider is a step
- * with nothing to highlight. Wrapping the shell rather than the page is what
- * lets a step point at the sidebar or the app bar as well as the content.
+ * Mantine's `Tour` finds its anchors by selector (`data-tour`), so it does not
+ * have to be an ancestor of what it points at, and a step can point at the
+ * sidebar or the app bar as well as the content.
  *
- * Two tours, not one. The package matches a step to a mounted target, so a tour
- * that crossed from the library into the editor would spend half its steps
- * darkening the screen and pointing at nothing while the other route's
- * components were unmounted. Each tour runs where its anchors are, and the
- * editor's arrives the first time someone opens a resume, which is also when
- * it is useful.
+ * Two tours, not one. A step waits for its anchor to mount, so a tour that
+ * crossed from the library into the editor would spend half its steps darkening
+ * the screen and pointing at nothing while the other route's components were
+ * unmounted. Each tour runs where its anchors are, and the editor's arrives the
+ * first time someone opens a resume, which is also when it is useful.
  *
- * Nobody is made to finish one. `withSkipButton` is what the user asked for, and
- * skipping marks the tour seen exactly as completing it does: being shown
- * something and deciding you do not want it is an answer, not a postponement.
+ * Nobody is made to finish one. Skip is always on the card, and skipping marks
+ * the tour seen exactly as completing it does: being shown something and
+ * deciding you do not want it is an answer, not a postponement. The card has no
+ * close button of its own, because it would be a second control for the same
+ * answer and a second button with the name "End" on the last step.
  */
 
 interface AppTourProps {
-  children: ReactNode;
   /**
-   * Bumped to start the tour again from the app menu or the palette. The
-   * package starts on `started` going true, so a restart needs an edge rather
-   * than a boolean that is already set.
+   * Bumped to start the tour again from the app menu or the palette. A restart
+   * needs an edge rather than a boolean that is already set.
    */
   restartSignal: number;
   /**
@@ -56,27 +52,15 @@ interface AppTourProps {
 }
 
 /**
- * Which side of the target the popover goes.
+ * The widest the card gets, which is also the width it keeps on any screen
+ * with room for it.
  *
- * `bottom` is right for a button or a sidebar row, and wrong for a pane: three
- * of the editor's anchors are full-height columns, and "below" a target taller
- * than the viewport is off the bottom of the screen, which `shift` cannot
- * rescue, because it only moves along the cross axis. Beside a tall target the
- * popover is centred on it instead, which is on screen by construction.
- *
- * A function of the controller because that is the only per-step hook the
- * package offers to `OnboardingTour.Target`: a step's own `focusRevealProps`
- * reaches the element-walking path, not the context one these targets use.
+ * Mantine's default is 360px, which is a narrow measure for paragraphs this
+ * long and read as cramped on the very screen with room to spare. On a phone
+ * the tour already takes the room there is, less an 8px gutter, so 460px is only
+ * the point where a paragraph of this length stops gaining from more.
  */
-const popoverPosition = (
-  stepId: string | undefined,
-): "bottom" | "left" | "right" => {
-  if (stepId === TOUR_TARGET_IDS.code || stepId === TOUR_TARGET_IDS.paper) {
-    return "right";
-  }
-
-  return stepId === TOUR_TARGET_IDS.inspector ? "left" : "bottom";
-};
+const CARD_MAX_WIDTH = 460;
 
 /** Which tour belongs to this route, or none. */
 const tourForPath = (pathname: string): TourName | null => {
@@ -89,7 +73,6 @@ const tourForPath = (pathname: string): TourName | null => {
 };
 
 export const AppTour: React.FC<AppTourProps> = ({
-  children,
   restartSignal,
   onRevealSidebar,
 }) => {
@@ -174,93 +157,78 @@ export const AppTour: React.FC<AppTourProps> = ({
   };
 
   if (name === null) {
-    return children;
+    return null;
   }
 
+  const steps = tourSteps(name, t, { wideEditor });
+
   return (
-    <OnboardingTour
-      // Fired for both endings, so skipping and finishing are recorded the same
+    <Tour
+      active={started}
+      closeOnEscape
+      // Keyed by the tour, so one that carries on across a route change starts
+      // its steps from the first rather than from an index the other tour owns.
+      key={name}
+      labels={{
+        skip: t("buttons.skip"),
+        back: t("buttons.prev"),
+        next: t("buttons.next"),
+        // The last step's button, and the only place this label is shown.
+        close: t("buttons.end"),
+        stepCounter: (current, total) =>
+          t("buttons.stepCounter", { current, total }),
+      }}
+      maxWidth={CARD_MAX_WIDTH}
+      // Fired for every ending, so skipping and finishing are recorded the same
       // way. There is no third outcome worth distinguishing.
-      /**
-       * Placement, per step.
-       *
-       * The package defaults to the left of the target on anything wider than
-       * `sm`, which is wrong here: half these anchors are in a 232px sidebar
-       * pinned to the left edge, so "left" is off the screen. Flip and shift
-       * keep the result on screen from there, and the offset is positive so the
-       * arrow has somewhere to sit rather than overlapping the cutout.
-       */
-      focusRevealProps={(controller) => ({
-        popoverProps: {
-          position: popoverPosition(controller.selectedStepId),
-          offset: 12,
-          // An 8px gutter rather than 16: the card is capped at the viewport
-          // less that much, so the two numbers agreeing is what leaves it the
-          // same margin on both sides instead of shifted against one edge.
-          middlewares: { flip: true, shift: { padding: 8 } },
-        },
-      })}
-      onOnboardingTourEnd={finish}
+      onClose={finish}
       /**
        * Two of the library's steps point at rows in the sidebar, which is a
        * drawer below `sm`, so the tour opens it for those and closes it again
        * on the way out. Without this the tour dimmed the screen, highlighted
-       * nothing, and left no control on screen to go on with.
+       * nothing, and left no control on screen to go on with. The card follows
+       * the drawer as it slides in: the tour re-measures its anchor as it moves.
        *
-       * The cutout follows: the package re-measures on a 50ms poll for 1.5s
-       * after each step, which comfortably outlasts the drawer's 200ms.
+       * And the editor's tab strip, the same way. Where three panes fit this
+       * asks for nothing: none of the wide tour's anchors is behind a tab.
+       * Where they do not, the pane holding the step has to be the active tab
+       * before the step can anchor at all, since `keepMounted={false}` keeps the
+       * other two out of the document. The tour waits for an anchor that is not
+       * mounted yet and picks it up when it appears, which is what makes asking
+       * from here, once the step is open, enough.
+       *
+       * A step with no pane of its own, the last one points at the app bar,
+       * leaves the request where it was rather than dropping it. Releasing it
+       * mid-tour would swap the pane behind the card for no reason the reader
+       * can see; the release belongs at the end, and `finish` does it.
        */
-      onOnboardingTourChange={(step) => {
+      onStepOpen={(index) => {
+        const step = steps[index];
+
+        if (step === undefined) {
+          return;
+        }
+
         onRevealSidebar?.(!sidebarPermanent && SIDEBAR_STEP_IDS.has(step.id));
-        /**
-         * And the editor's tab strip, the same way.
-         *
-         * Where three panes fit this asks for nothing: none of the wide tour's
-         * anchors is behind a tab. Where they do not, the pane holding the
-         * step has to be the active tab before the step can anchor at all,
-         * since `keepMounted={false}` keeps the other two out of the document.
-         * Setting it here rather than in an effect is what makes the tab change
-         * and the step change one commit; the package re-measures its cutout on
-         * a 50ms poll for 1.5s afterwards, which covers the pane mounting.
-         *
-         * A step with no pane of its own, the last one points at the app bar,
-         * leaves the request where it was rather than dropping it. Releasing it
-         * mid-tour would swap the pane behind the card for no reason the reader
-         * can see; the release belongs at the end, and `finish` does it.
-         */
+
         const pane = wideEditor ? undefined : EDITOR_STEP_PANES[step.id];
 
         if (pane !== undefined) {
           requestPane(pane);
         }
       }}
-      /**
-       * Skip is given a real button.
-       *
-       * The package draws it as a Mantine `Anchor` with no `href`, which is an
-       * `<a>` that is neither focusable nor announced as anything, so the one
-       * control the user was promised could only be reached with a pointer.
-       */
-      skipNavigation={(controller) => (
-        <Button
-          onClick={controller.skipTour}
-          size="compact-xs"
-          variant="subtle"
-        >
-          {t("buttons.skip")}
-        </Button>
-      )}
-      started={started}
-      endStepNavigation={t("buttons.end")}
-      nextStepNavigation={t("buttons.next")}
-      prevStepNavigation={t("buttons.prev")}
-      tour={tourSteps(name, t, { wideEditor })}
-      withNextButton
-      withPrevButton
-      withSkipButton
-      withStepper
+      withCloseButton={false}
     >
-      {children}
-    </OnboardingTour>
+      {steps.map((step) => (
+        <Tour.Step
+          key={step.id}
+          position={step.position}
+          target={tourSelector(step.id)}
+          title={step.title}
+        >
+          {step.content}
+        </Tour.Step>
+      ))}
+    </Tour>
   );
 };

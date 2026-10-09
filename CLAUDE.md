@@ -74,12 +74,13 @@ is 992px, `lg` is 1200px and `xl` is 1408px. There is also an `xs` at 576px.
 A layout written against Tailwind's 640px `sm` will open up 128px too late.
 
 **Cascade layer order is declared at the top of `src/styles/global.css`:**
-`theme, base, mantine, mantine-onboarding-tour, mantine-video, components, utilities`.
+`theme, base, mantine, mantine-video, components, utilities`.
 Unlayered CSS beats every layered rule whatever the order, so always import the
 `styles.layer.css` build of a Mantine ecosystem package, and put app rules that
 must be overridable by a utility in `@layer components`. Two bugs in this repo
 came from forgetting that: an unlayered `a { color }` in `base.css` that beat
-`.text-muted`, and the tour's own stylesheet.
+`.text-muted`, and the stylesheet of the third-party tour package the app used
+before Mantine's own `Tour`.
 
 **The preview is a same-origin iframe, and that drives the architecture.** Only
 a separate document gives its own `@page` rule, its own root font size and a
@@ -137,6 +138,16 @@ it,** with `keepMounted={false}` because an inactive Mantine panel is
 zero width. The onboarding tour drives that tab strip through
 `features/editor/tourPane.ts`, and below the breakpoint its three pane steps
 point at the tab that opens each pane rather than at the pane.
+
+**The tour is Mantine's `Tour`, and its anchors are `data-tour` attributes.**
+`Tour.Step` takes a selector, so there is no provider to be below and no wrapper
+component: an element opts in with `data-tour={TOUR_TARGET_IDS.x}` and
+`features/onboarding/steps.ts` builds the selector from the same id. A selector
+is resolved again when its element mounts, which is what lets a step ask for a
+tab or the sidebar drawer from `onStepOpen` and have its anchor picked up once
+it appears. Mantine's own components pass `data-*` through, including the ones
+that clone their child (`Tooltip`, `Menu.Target`), so the anchor goes on the
+element itself.
 
 **Words go through `t()`, and the language is applied after hydration.**
 Messages are `src/locales/{en,id}/<namespace>.ts`; the English `as const` is the

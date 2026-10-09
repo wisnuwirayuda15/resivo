@@ -15,8 +15,6 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
-
 import { Icon } from "@/features/icons/IconRenderer";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
 import { ExportMenu } from "@/features/export/ExportMenu";
@@ -281,103 +279,106 @@ export const PreviewPane: React.FC<PreviewPaneProps> = ({
 
   return (
     <section className={cn("flex min-h-0 flex-col", className)}>
-      <OnboardingTour.Target id={TOUR_TARGET_IDS.paperTitlebar}>
-        <header className="border-line-soft bg-surface h-titlebar flex flex-none items-center gap-3 border-b px-3">
-          {/* The count stays at every width. The sheet's measurements follow it
+      <header
+        className="border-line-soft bg-surface h-titlebar flex flex-none items-center gap-3 border-b px-3"
+        data-tour={TOUR_TARGET_IDS.paperTitlebar}
+      >
+        {/* The count stays at every width. The sheet's measurements follow it
               only when there is room, and move into the popover below. */}
-          <Text span className="text-subtle flex-none font-mono text-[11px]">
-            {t("preview.pages", { count: pageCount })}
-            {roomy ? ` · ${sheet}` : ""}
-          </Text>
+        <Text span className="text-subtle flex-none font-mono text-[11px]">
+          {t("preview.pages", { count: pageCount })}
+          {roomy ? ` · ${sheet}` : ""}
+        </Text>
 
-          <Box className="ml-auto flex items-center gap-1">
-            <ExportMenu document={resume} pages={pages} title={title} />
+        <Box className="ml-auto flex items-center gap-1">
+          <ExportMenu document={resume} pages={pages} title={title} />
 
-            {apply === undefined ? null : (
-              <SegmentedControl
-                aria-label={t("preview.mode")}
-                data={[
-                  { value: "read", label: t("preview.read") },
-                  { value: "visual", label: t("preview.visual") },
-                ]}
-                onChange={(next) => setEditing(next === "visual")}
-                size="xs"
-                value={editing ? "visual" : "read"}
-              />
-            )}
+          {apply === undefined ? null : (
+            <SegmentedControl
+              aria-label={t("preview.mode")}
+              data={[
+                { value: "read", label: t("preview.read") },
+                { value: "visual", label: t("preview.visual") },
+              ]}
+              onChange={(next) => setEditing(next === "visual")}
+              size="xs"
+              value={editing ? "visual" : "read"}
+            />
+          )}
 
-            {roomy ? (
-              <>
-                {paperSizeControl}
-                {zoomControls}
-              </>
-            ) : (
-              /* Everything the strip cannot hold, one tap away.
+          {roomy ? (
+            <>
+              {paperSizeControl}
+              {zoomControls}
+            </>
+          ) : (
+            /* Everything the strip cannot hold, one tap away.
 
                  Not dropped, which is what it was: paper size, zoom and fit
                  were simply not on a phone at all. These are the same controls
                  moved rather than copied, so the document never holds a second
                  Letter/A4 or a second "Fit width". */
-              <Popover
-                position="bottom-end"
-                radius="panel"
-                shadow="lg"
-                width={264}
-                withArrow
-              >
-                <Popover.Target>
-                  <UnstyledButton
-                    aria-label={t("preview.paperAndZoom")}
-                    className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[24px] items-center justify-center"
-                  >
-                    <Icon name="sliders-horizontal" size={15} />
-                  </UnstyledButton>
-                </Popover.Target>
+            <Popover
+              position="bottom-end"
+              radius="panel"
+              shadow="lg"
+              width={264}
+              withArrow
+            >
+              <Popover.Target>
+                <UnstyledButton
+                  aria-label={t("preview.paperAndZoom")}
+                  className="text-muted hover:text-body hover:bg-hover rounded-control flex size-[24px] items-center justify-center"
+                >
+                  <Icon name="sliders-horizontal" size={15} />
+                </UnstyledButton>
+              </Popover.Target>
 
-                <Popover.Dropdown>
-                  <Box className="flex flex-col gap-3">
-                    {paperSizeControl === null ? null : (
-                      <Box className="flex items-center justify-between gap-3">
-                        <Text className="text-muted text-[12px]" span>
-                          {t("preview.paper")}
-                        </Text>
-                        {paperSizeControl}
-                      </Box>
-                    )}
-
+              <Popover.Dropdown>
+                <Box className="flex flex-col gap-3">
+                  {paperSizeControl === null ? null : (
                     <Box className="flex items-center justify-between gap-3">
                       <Text className="text-muted text-[12px]" span>
-                        {t("preview.zoom")}
+                        {t("preview.paper")}
                       </Text>
-                      {zoomControls}
+                      {paperSizeControl}
                     </Box>
+                  )}
 
-                    <Text className="text-subtle font-mono text-[11px]" span>
-                      {sheet}
+                  <Box className="flex items-center justify-between gap-3">
+                    <Text className="text-muted text-[12px]" span>
+                      {t("preview.zoom")}
                     </Text>
+                    {zoomControls}
                   </Box>
-                </Popover.Dropdown>
-              </Popover>
-            )}
-          </Box>
-        </header>
-      </OnboardingTour.Target>
+
+                  <Text className="text-subtle font-mono text-[11px]" span>
+                    {sheet}
+                  </Text>
+                </Box>
+              </Popover.Dropdown>
+            </Popover>
+          )}
+        </Box>
+      </header>
 
       {/* The well, not the paper: the paper is inside an iframe, and nothing in
           this document can point at a node in another one. */}
-      <OnboardingTour.Target id={TOUR_TARGET_IDS.paper}>
-        <Box className="bg-sunken min-h-0 flex-1 overflow-hidden" ref={wellRef}>
-          <PreviewFrame
-            className="block size-full border-0 bg-transparent"
-            apply={apply}
-            document={resume}
-            mode={editing && apply !== undefined ? "edit" : "view"}
-            onPageCountChange={handlePageCount}
-            onPaginated={handlePaginated}
-            zoom={zoom}
-          />
-        </Box>
-      </OnboardingTour.Target>
+      <Box
+        className="bg-sunken min-h-0 flex-1 overflow-hidden"
+        data-tour={TOUR_TARGET_IDS.paper}
+        ref={wellRef}
+      >
+        <PreviewFrame
+          className="block size-full border-0 bg-transparent"
+          apply={apply}
+          document={resume}
+          mode={editing && apply !== undefined ? "edit" : "view"}
+          onPageCountChange={handlePageCount}
+          onPaginated={handlePaginated}
+          zoom={zoom}
+        />
+      </Box>
     </section>
   );
 };

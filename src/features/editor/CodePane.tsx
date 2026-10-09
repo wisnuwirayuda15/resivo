@@ -2,7 +2,6 @@ import { Suspense, lazy, useCallback, useState } from "react";
 import { Box, Loader, Tabs, Text } from "@mantine/core";
 
 import { Icon } from "@/features/icons/IconRenderer";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { GuideLink } from "./GuideLink";
 import { TOUR_TARGET_IDS } from "@/features/onboarding/steps";
@@ -70,67 +69,68 @@ export const CodePane: React.FC<CodePaneProps> = ({
   const notices = warnings.length + refusals;
 
   return (
-    <OnboardingTour.Target id={TOUR_TARGET_IDS.code}>
-      <Box className={cn("bg-code flex min-h-0 flex-col", className)}>
-        <Tabs
-          className="flex min-h-0 flex-1 flex-col"
-          keepMounted={false}
-          onChange={setTab}
-          value={tab}
+    <Box
+      className={cn("bg-code flex min-h-0 flex-col", className)}
+      data-tour={TOUR_TARGET_IDS.code}
+    >
+      <Tabs
+        className="flex min-h-0 flex-1 flex-col"
+        keepMounted={false}
+        onChange={setTab}
+        value={tab}
+      >
+        <Tabs.List
+          aria-label={t("code.sourceFiles")}
+          className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
         >
-          <Tabs.List
-            aria-label={t("code.sourceFiles")}
-            className="h-titlebar border-line-soft bg-surface flex-none border-b px-1"
+          <Tabs.Tab
+            leftSection={<Icon name="markdown-logo" size={13} />}
+            value="markdown"
           >
-            <Tabs.Tab
-              leftSection={<Icon name="markdown-logo" size={13} />}
-              value="markdown"
-            >
-              resume.md
-            </Tabs.Tab>
-            <Tabs.Tab
-              leftSection={<Icon name="file-css" size={13} />}
-              value="css"
-            >
-              style.css
-            </Tabs.Tab>
+            resume.md
+          </Tabs.Tab>
+          <Tabs.Tab
+            leftSection={<Icon name="file-css" size={13} />}
+            value="css"
+          >
+            style.css
+          </Tabs.Tab>
 
-            {/* The right end of the strip: the notice count when there is one,
+          {/* The right end of the strip: the notice count when there is one,
                 and the way into the guide, which is always there. */}
-            <Box className="ml-auto flex items-center gap-2 self-center pr-1">
-              {notices === 0 ? null : (
-                <Text
-                  className="text-warning-text font-mono text-[11px] tabular-nums"
-                  span
-                >
-                  {t("code.notices", { count: notices })}
-                </Text>
-              )}
-              <GuideLink />
-            </Box>
-          </Tabs.List>
+          <Box className="ml-auto flex items-center gap-2 self-center pr-1">
+            {notices === 0 ? null : (
+              <Text
+                className="text-warning-text font-mono text-[11px] tabular-nums"
+                span
+              >
+                {t("code.notices", { count: notices })}
+              </Text>
+            )}
+            <GuideLink />
+          </Box>
+        </Tabs.List>
 
-          <Tabs.Panel className="min-h-0 flex-1" value="markdown">
-            <Suspense fallback={<EditorFallback />}>
-              <MarkdownEditor
-                document={resume}
-                onSourceChange={onSourceChange}
-                warnings={warnings}
-              />
-            </Suspense>
-          </Tabs.Panel>
+        <Tabs.Panel className="min-h-0 flex-1" value="markdown">
+          <Suspense fallback={<EditorFallback />}>
+            <MarkdownEditor
+              document={resume}
+              onSourceChange={onSourceChange}
+              warnings={warnings}
+            />
+          </Suspense>
+        </Tabs.Panel>
 
-          <Tabs.Panel className="min-h-0 flex-1" value="css">
-            <Suspense fallback={<EditorFallback />}>
-              <CssEditor
-                css={resume.customCss}
-                onChange={onCustomCssChange}
-                onRefusalCount={handleRefusals}
-              />
-            </Suspense>
-          </Tabs.Panel>
-        </Tabs>
-      </Box>
-    </OnboardingTour.Target>
+        <Tabs.Panel className="min-h-0 flex-1" value="css">
+          <Suspense fallback={<EditorFallback />}>
+            <CssEditor
+              css={resume.customCss}
+              onChange={onCustomCssChange}
+              onRefusalCount={handleRefusals}
+            />
+          </Suspense>
+        </Tabs.Panel>
+      </Tabs>
+    </Box>
   );
 };

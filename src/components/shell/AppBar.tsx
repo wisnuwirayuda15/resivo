@@ -10,7 +10,6 @@ import {
 
 import { Link } from "@tanstack/react-router";
 import { useTranslation, useUiLanguage } from "@/lib/i18n/useTranslation";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { docsHref } from "@/features/docs/paths";
 import { Icon } from "@/features/icons/IconRenderer";
@@ -152,74 +151,73 @@ export const AppBar: React.FC<AppBarProps> = ({
       {/* The two icon buttons are the same kind of control, so they sit tighter
           to each other than to anything else in the row. The tour points at the
           pair rather than at either button: one of them is a `Menu.Target` and
-          the other a `Tooltip` child, and both work by cloning what they wrap. */}
-      <OnboardingTour.Target id={TOUR_TARGET_IDS.appMenu}>
-        <Box className="flex items-center gap-0.5">
-          {/* Out of the row on a phone, where every pixel is contested, and
+          the other a `Tooltip` child, and both work by cloning what they wrap, so
+          the anchor is the box around them. */}
+      <Box
+        className="flex items-center gap-0.5"
+        data-tour={TOUR_TARGET_IDS.appMenu}
+      >
+        {/* Out of the row on a phone, where every pixel is contested, and
               into the menu below, so the control still exists at every width. */}
-          <Box visibleFrom="sm">
-            <Tooltip
-              label={isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
-            >
-              <BarButton
-                icon={isDark ? "sun" : "moon"}
-                label={t("appBar.toggleTheme")}
-                onClick={() => setColorScheme(isDark ? "light" : "dark")}
-              />
-            </Tooltip>
-          </Box>
+        <Box visibleFrom="sm">
+          <Tooltip
+            label={isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
+          >
+            <BarButton
+              icon={isDark ? "sun" : "moon"}
+              label={t("appBar.toggleTheme")}
+              onClick={() => setColorScheme(isDark ? "light" : "dark")}
+            />
+          </Tooltip>
+        </Box>
 
-          <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
-            <Menu.Target>
-              <BarButton
-                icon="dots-three"
-                label={t("appBar.applicationMenu")}
-              />
-            </Menu.Target>
-            <Menu.Dropdown>
-              {/* Where the theme toggle goes when the row cannot hold it. Only
+        <Menu position="bottom-end" shadow="lg" radius="panel" width={220}>
+          <Menu.Target>
+            <BarButton icon="dots-three" label={t("appBar.applicationMenu")} />
+          </Menu.Target>
+          <Menu.Dropdown>
+            {/* Where the theme toggle goes when the row cannot hold it. Only
                   below the breakpoint, so it is never offered twice. */}
-              <Menu.Item
-                hiddenFrom="sm"
-                leftSection={<Icon name={isDark ? "sun" : "moon"} size={15} />}
-                onClick={() => setColorScheme(isDark ? "light" : "dark")}
-              >
-                {isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
-              </Menu.Item>
-              <Menu.Item
-                leftSection={<Icon name="keyboard" size={15} />}
-                onClick={onShowShortcuts}
-              >
-                {t("appBar.keyboardShortcuts")}
-              </Menu.Item>
-              {/* A plain anchor and not the router's link: the docs are a
+            <Menu.Item
+              hiddenFrom="sm"
+              leftSection={<Icon name={isDark ? "sun" : "moon"} size={15} />}
+              onClick={() => setColorScheme(isDark ? "light" : "dark")}
+            >
+              {isDark ? t("appBar.lightTheme") : t("appBar.darkTheme")}
+            </Menu.Item>
+            <Menu.Item
+              leftSection={<Icon name="keyboard" size={15} />}
+              onClick={onShowShortcuts}
+            >
+              {t("appBar.keyboardShortcuts")}
+            </Menu.Item>
+            {/* A plain anchor and not the router's link: the docs are a
                   separate site section with their own chrome, so this is a
                   full navigation, and an anchor can be opened in a new tab. */}
-              <Menu.Item
-                component="a"
-                href={docsHref(lang)}
-                leftSection={<Icon name="markdown-logo" size={15} />}
-              >
-                {t("appBar.docs")}
-              </Menu.Item>
-              <Menu.Item
-                component={Link}
-                leftSection={<Icon name="info" size={15} />}
-                to="/about"
-              >
-                {t("appBar.about")}
-              </Menu.Item>
-              <Menu.Divider />
-              <Menu.Item
-                leftSection={<Icon name="sparkle" size={15} />}
-                onClick={onStartTour}
-              >
-                {t("appBar.takeTheTour")}
-              </Menu.Item>
-            </Menu.Dropdown>
-          </Menu>
-        </Box>
-      </OnboardingTour.Target>
+            <Menu.Item
+              component="a"
+              href={docsHref(lang)}
+              leftSection={<Icon name="markdown-logo" size={15} />}
+            >
+              {t("appBar.docs")}
+            </Menu.Item>
+            <Menu.Item
+              component={Link}
+              leftSection={<Icon name="info" size={15} />}
+              to="/about"
+            >
+              {t("appBar.about")}
+            </Menu.Item>
+            <Menu.Divider />
+            <Menu.Item
+              leftSection={<Icon name="sparkle" size={15} />}
+              onClick={onStartTour}
+            >
+              {t("appBar.takeTheTour")}
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Box>
     </Box>
   );
 };

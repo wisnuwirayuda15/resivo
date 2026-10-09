@@ -6,41 +6,12 @@
  * rule whatever the order, so the plain `styles.css` of an ecosystem package
  * would sit above the app's own `components` and `utilities` layers and could
  * not be overridden by a Tailwind class. Mantine's own packages declare
- * `@layer mantine`; the tour and the video player declare one of their own,
- * which global.css puts beside it in the order statement.
+ * `@layer mantine`; the video player declares one of its own, which global.css
+ * puts beside it in the order statement. The tour is in `@mantine/core`, so it
+ * needs nothing here.
  */
 @import "@mantine/dates/styles.layer.css";
 @import "@mantine/notifications/styles.layer.css";
 @import "@mantine/spotlight/styles.layer.css";
 @import "@mantine/code-highlight/styles.layer.css";
-@import "@gfazioli/mantine-onboarding-tour/styles.layer.css";
 @import "@gfazioli/mantine-video/styles.layer.css";
-
-/**
- * The tour's card: as wide as the screen allows, and never wider.
- *
- * The package caps its dropdown at 400px, which was wrong at both ends. On a
- * phone that produced a 369px dropdown placed 16px from the left edge, so its
- * right 10px (and the last stepper dot with it) sat outside a 375px viewport.
- * On a desktop 400px is a narrow measure for paragraphs this long, which is
- * what made the card read as cramped on the very screen with room to spare.
- *
- * One rule covers both, because both are the same rule: take the room there is.
- * The 8px gutter is what keeps the card off the edge; 460px is the point where
- * a paragraph of this length stops gaining from being given more.
- *
- * The cap belongs on the dropdown rather than on the card inside it. The
- * dropdown is what the positioner measures, so capping only the card left the
- * dropdown placed for a width it no longer had, which is how the overflow
- * survived the first attempt at this.
- *
- * In the `components` layer, above the package's own `mantine-onboarding-tour`
- * layer and below Tailwind's utilities.
- */
-@layer components {
-  .mantine-Popover-dropdown:has(
-    > .mantine-OnboardingTourPopoverContent-popoverContent
-  ) {
-    max-width: min(460px, calc(100vw - 1rem));
-  }
-}

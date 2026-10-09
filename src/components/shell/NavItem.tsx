@@ -1,6 +1,5 @@
 import { Link } from "@tanstack/react-router";
 import { Box, Text, Tooltip } from "@mantine/core";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { cn } from "@/lib/utils";
 import { Icon } from "@/features/icons/IconRenderer";
@@ -79,9 +78,9 @@ export const NavItemContent: React.FC<NavItemContentProps> = ({
  *
  * A function returning an element rather than a component, so the expanded case
  * hands back the row *itself*. A component would have to return a fragment
- * there, and `OnboardingTour.Target` reaches for its child element, a fragment
- * is not one, and the tour's step for the Images row then had nothing to point
- * at. It failed silently, as a step with no anchor does.
+ * there, and a tooltip clones its child element to attach itself, which a
+ * fragment is not. The row has to be the element the tour's anchor attribute is
+ * on, in both states.
  */
 const withRailLabel = (
   collapsed: boolean,
@@ -120,13 +119,14 @@ export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
   onNavigate,
   tourId,
 }) => {
-  const link = withRailLabel(
+  return withRailLabel(
     collapsed,
     label,
     <Link
       to={to}
       onClick={onNavigate}
       className={navItemClassName(active, collapsed)}
+      data-tour={tourId}
       // Named explicitly on the rail, where the only thing left in the row is
       // a glyph and a tooltip, which a screen reader never reads.
       aria-label={collapsed ? label : undefined}
@@ -141,12 +141,6 @@ export const NavLink: React.FC<NavLinkProps & { tourId?: string }> = ({
         collapsed={collapsed}
       />
     </Link>,
-  );
-
-  return tourId === undefined ? (
-    link
-  ) : (
-    <OnboardingTour.Target id={tourId}>{link}</OnboardingTour.Target>
   );
 };
 

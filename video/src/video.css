@@ -8,7 +8,7 @@
  * `theme.css` is imported; the three font stacks it would have provided are
  * restated at the bottom, in step with `src/styles/fonts.css`.
  */
-@layer theme, base, mantine, mantine-onboarding-tour, components, utilities;
+@layer theme, base, mantine, components, utilities;
 
 @import "@fontsource-variable/instrument-sans";
 @import "@fontsource-variable/jetbrains-mono";

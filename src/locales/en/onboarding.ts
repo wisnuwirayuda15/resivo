@@ -12,6 +12,7 @@ export const onboarding = {
     end: "End",
     prev: "Prev",
     skip: "Skip",
+    stepCounter: "{{current}} of {{total}}",
   },
   library: {
     newResume: {

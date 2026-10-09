@@ -1,5 +1,4 @@
 import { Button } from "@mantine/core";
-import { OnboardingTour } from "@gfazioli/mantine-onboarding-tour";
 
 import { docsHref } from "@/features/docs/paths";
 import { Icon } from "@/features/icons/IconRenderer";
@@ -33,19 +32,18 @@ export const GuideLink: React.FC = () => {
   const language = useUiLanguage();
 
   return (
-    <OnboardingTour.Target id={TOUR_TARGET_IDS.guide}>
-      <Button
-        component="a"
-        href={docsHref(language, ["format", "overview"])}
-        leftSection={<Icon name="book-open" size={13} />}
-        rel="noopener"
-        size="compact-xs"
-        target="_blank"
-        title={t("code.guideHint")}
-        variant="default"
-      >
-        {t("code.guide")}
-      </Button>
-    </OnboardingTour.Target>
+    <Button
+      component="a"
+      data-tour={TOUR_TARGET_IDS.guide}
+      href={docsHref(language, ["format", "overview"])}
+      leftSection={<Icon name="book-open" size={13} />}
+      rel="noopener"
+      size="compact-xs"
+      target="_blank"
+      title={t("code.guideHint")}
+      variant="default"
+    >
+      {t("code.guide")}
+    </Button>
   );
 };
