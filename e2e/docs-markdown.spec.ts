@@ -11,8 +11,18 @@ import type { APIRequestContext, Page } from "@playwright/test";
  * none of the components that draw the page left in it.
  */
 
+/**
+ * Long enough for the first visit to a docs page on a cold dev server, which
+ * compiles the page and its MDX on the request: about 7s in practice, against
+ * the 5s an assertion gets by default. A page that is already compiled hydrates
+ * in well under one second, so this costs nothing when it is not needed.
+ */
+const HYDRATION_TIMEOUT = 20_000;
+
 const hydrated = async (page: Page) => {
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({
+    timeout: HYDRATION_TIMEOUT,
+  });
 };
 
 /** What must never reach a reader of the Markdown: a tag, an import, a heading

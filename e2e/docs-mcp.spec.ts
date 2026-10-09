@@ -143,7 +143,9 @@ test.describe("docs MCP server", () => {
     page,
   }) => {
     await page.goto("/en/docs/help/use-with-ai");
-    await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+    await expect(page.locator('[data-hydrated="true"]')).toBeVisible({
+      timeout: 20_000,
+    });
 
     await expect(page.locator("pre")).toContainText(
       "resivo-docs http://localhost:3000/api/mcp",

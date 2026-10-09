@@ -25,8 +25,18 @@ import type { Page } from "@playwright/test";
  * drift. */
 const INDEX_BUDGET = 1792 * 1024;
 
+/**
+ * Long enough for the first visit to a docs page on a cold dev server, which
+ * compiles the page and its MDX on the request: about 7s in practice, against
+ * the 5s an assertion gets by default. A page that is already compiled hydrates
+ * in well under one second, so this costs nothing when it is not needed.
+ */
+const HYDRATION_TIMEOUT = 20_000;
+
 const hydrated = async (page: Page) => {
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({
+    timeout: HYDRATION_TIMEOUT,
+  });
 };
 
 /** The hits. Spotlight draws each as a button inside the dialog. */

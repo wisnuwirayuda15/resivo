@@ -73,7 +73,12 @@ export const openEmptyApp = async (page: Page): Promise<void> => {
   );
 
   await page.reload();
-  await expect(page.getByRole("link", { name: "Templates" })).toBeVisible();
+  // The first spec of a run on a cold dev server waits for the app's chunks to
+  // compile on the request, which outlasts the 5s an assertion gets by default.
+  // Once they are compiled the shell is up in a fraction of a second.
+  await expect(page.getByRole("link", { name: "Templates" })).toBeVisible({
+    timeout: 20_000,
+  });
 };
 
 /**

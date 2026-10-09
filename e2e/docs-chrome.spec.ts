@@ -3,6 +3,14 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 /**
+ * Long enough for the first visit to a docs page on a cold dev server, which
+ * compiles the page and its MDX on the request: about 7s in practice, against
+ * the 5s an assertion gets by default. A page that is already compiled hydrates
+ * in well under one second, so this costs nothing when it is not needed.
+ */
+const HYDRATION_TIMEOUT = 20_000;
+
+/**
  * The docs' frame: header, sidebar, breadcrumbs, pager and the phone drawer.
  *
  * Interactive specs wait for `data-hydrated`, which the layout sets in an
@@ -10,7 +18,9 @@ import type { Page } from "@playwright/test";
  * nothing, and the test would read a page that never reacted.
  */
 const hydrated = async (page: Page) => {
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({
+    timeout: HYDRATION_TIMEOUT,
+  });
 };
 
 const sidebar = (page: Page) =>
@@ -139,6 +149,33 @@ test.describe("docs chrome", () => {
     await expect(skip).toBeFocused();
     await skip.press("Enter");
     await expect(page).toHaveURL(/#docs-main$/);
+  });
+
+  /**
+   * The header while the star count is still on its way.
+   *
+   * The request is held, because the layout has to be right for as long as
+   * GitHub takes and not only once it has answered: a placeholder for a count
+   * that is hidden on a phone once it arrives pushed the page 26px past the
+   * screen, and the spec above only caught it when the network was slow.
+   */
+  test("does not widen the page on a phone while the star count loads", async ({
+    page,
+  }) => {
+    await page.route("https://api.github.com/**", () => {
+      // Never answered.
+    });
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/en/docs/format/overview");
+    await hydrated(page);
+
+    const overflow = await page.evaluate(
+      () =>
+        document.documentElement.scrollWidth -
+        document.documentElement.clientWidth,
+    );
+
+    expect(overflow).toBe(0);
   });
 
   test("keeps its sidebar in a drawer on a phone, and nothing off the side", async ({

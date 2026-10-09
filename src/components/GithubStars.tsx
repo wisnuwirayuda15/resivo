@@ -89,7 +89,11 @@ export const GithubStars: React.FC<GithubStarsProps> = ({
       <Icon name="github-logo" size={16} weight={hovered ? "fill" : "bold"} />
 
       {isPending ? (
-        <Skeleton className="h-[20px] w-[40px]" />
+        /* Hidden where the count is, below `sm`. A placeholder for something
+           that will never appear is 40px of header the phone has not got: it
+           pushed the page 26px wider than the screen for as long as GitHub took
+           to answer, and the page jumped back when it did. */
+        <Skeleton className="hidden h-[20px] w-[40px] sm:block" />
       ) : stars >= 0 ? (
         <Box className="hidden items-center gap-1 sm:flex">
           <Icon className="flex-none" name="star" size={12} weight="fill" />

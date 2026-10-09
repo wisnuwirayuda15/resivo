@@ -3,6 +3,14 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 
 /**
+ * Long enough for the first visit to a docs page on a cold dev server, which
+ * compiles the page and its MDX on the request: about 7s in practice, against
+ * the 5s an assertion gets by default. A page that is already compiled hydrates
+ * in well under one second, so this costs nothing when it is not needed.
+ */
+const HYDRATION_TIMEOUT = 20_000;
+
+/**
  * What an article is made of: highlighted code, the blocks an author can write,
  * links, and the contents column that follows the reader.
  *
@@ -13,7 +21,9 @@ import type { Page } from "@playwright/test";
  * page has the tabs; and the local-first page has the warning.
  */
 const hydrated = async (page: Page) => {
-  await expect(page.locator('[data-hydrated="true"]')).toBeVisible();
+  await expect(page.locator('[data-hydrated="true"]')).toBeVisible({
+    timeout: HYDRATION_TIMEOUT,
+  });
 };
 
 const article = (page: Page) => page.getByRole("article");
